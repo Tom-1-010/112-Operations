@@ -687,13 +687,17 @@ export default function Dashboard() {
             minute: '2-digit'
           });
 
-          const mc = incident.classificatie1 ? incident.classificatie1.substring(0, 10) : '-';
-          const omschrijving = incident.classificatie1 || 'Onbekend';
+          const mc = incident.classificatie1 ? incident.classificatie1.substring(0, 12) : '-';
+          
+          // Parse location - street name and house number only
           const locatie = incident.straatnaam && incident.huisnummer 
             ? `${incident.straatnaam} ${incident.huisnummer}` 
-            : incident.meldingsadres || '-';
+            : (incident.meldingsadres || '-');
+          
+          // Place/city in separate column
           const plaats = incident.plaatsnaam || incident.gemeente || '-';
-          const prioriteit = `PRIO ${incident.prioriteit || 3}`;
+          
+          const prioriteitNummer = incident.prioriteit || 3;
           
           // Map status to legacy format
           let status = 'Nieuw';
@@ -702,7 +706,6 @@ export default function Dashboard() {
           if (incident.status === 'In wacht') status = 'Nieuw';
           if (incident.status === 'Afgesloten') status = 'Afgesloten';
 
-          const priorityClass = `legacy-prio-${incident.prioriteit || 3}`;
           const statusClass = `legacy-status-${status.toLowerCase()}`;
 
           return `
@@ -710,17 +713,18 @@ export default function Dashboard() {
               <div class="legacy-col-id">${incidentNumber}</div>
               <div class="legacy-col-tijd">${formattedTime}</div>
               <div class="legacy-col-mc">${mc}</div>
-              <div class="legacy-col-omschrijving" title="${omschrijving}">${omschrijving}</div>
               <div class="legacy-col-locatie" title="${locatie}">${locatie}</div>
               <div class="legacy-col-plaats" title="${plaats}">${plaats}</div>
-              <div class="legacy-col-prio ${priorityClass}">${prioriteit}</div>
+              <div class="legacy-col-prio">
+                <span class="priority-box priority-box-${prioriteitNummer}">${prioriteitNummer}</span>
+              </div>
               <div class="legacy-col-status ${statusClass}">${status}</div>
             </div>
           `;
         }).join('');
 
         // Add row selection functionality
-        window.selectIncidentRow = function(row: HTMLElement) {
+        (window as any).selectIncidentRow = function(row: HTMLElement) {
           // Remove previous selection
           const previousSelected = incidentsList.querySelector('.selected');
           if (previousSelected) {
@@ -1792,10 +1796,9 @@ export default function Dashboard() {
                     <div className="legacy-col-id">Incidentnummer</div>
                     <div className="legacy-col-tijd">Tijd</div>
                     <div className="legacy-col-mc">MC</div>
-                    <div className="legacy-col-omschrijving">Omschrijving</div>
                     <div className="legacy-col-locatie">Locatie</div>
                     <div className="legacy-col-plaats">Plaats</div>
-                    <div className="legacy-col-prio">Prio</div>
+                    <div className="legacy-col-prio">P</div>
                     <div className="legacy-col-status">Status</div>
                   </div>
                   <div className="legacy-table-body" id="allIncidentsLegacyList">

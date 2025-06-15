@@ -369,28 +369,29 @@ body {
 .incidents-legacy-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
-  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .legacy-table-header {
   display: grid;
-  grid-template-columns: 100px 60px 50px 150px 120px 80px 60px 80px;
-  background: #c0c0c0;
+  grid-template-columns: 120px 70px 80px 150px 100px 50px 90px;
+  background: #e9ecef;
   border: 1px solid #808080;
   border-bottom: 2px solid #808080;
   font-weight: bold;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .legacy-table-header > div {
-  padding: 4px 6px;
+  padding: 8px 12px;
   border-right: 1px solid #808080;
   text-align: left;
 }
 
 .legacy-table-header > div:last-child {
   border-right: none;
+  text-align: right;
 }
 
 .legacy-table-body {
@@ -402,14 +403,16 @@ body {
 
 .legacy-incident-row {
   display: grid;
-  grid-template-columns: 100px 60px 50px 150px 120px 80px 60px 80px;
+  grid-template-columns: 120px 70px 80px 150px 100px 50px 90px;
   border-bottom: 1px solid #d0d0d0;
   cursor: pointer;
   transition: background-color 0.1s ease;
+  min-height: 32px;
+  align-items: center;
 }
 
 .legacy-incident-row:nth-child(even) {
-  background: #f8f8f8;
+  background: #f8f9fa;
 }
 
 .legacy-incident-row:nth-child(odd) {
@@ -426,9 +429,9 @@ body {
 }
 
 .legacy-incident-row > div {
-  padding: 3px 6px;
+  padding: 6px 12px;
   border-right: 1px solid #d0d0d0;
-  font-size: 10px;
+  font-size: 11px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -436,6 +439,7 @@ body {
 
 .legacy-incident-row > div:last-child {
   border-right: none;
+  text-align: right;
 }
 
 .legacy-col-id {
@@ -447,31 +451,47 @@ body {
   font-weight: bold;
 }
 
-.legacy-prio-1 {
-  color: #dc3545;
+.legacy-col-status {
+  font-size: 9px;
+  color: #6c757d;
+  text-align: right;
 }
 
-.legacy-prio-2 {
-  color: #007bff;
+.priority-box {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
 }
 
-.legacy-prio-3 {
-  color: #28a745;
+.priority-box-1 {
+  background: #dc3545;
 }
 
-.legacy-prio-4,
-.legacy-prio-5 {
-  color: #6f42c1;
+.priority-box-2 {
+  background: #007bff;
+}
+
+.priority-box-3 {
+  background: #28a745;
+}
+
+.priority-box-4,
+.priority-box-5 {
+  background: #6f42c1;
 }
 
 .legacy-status-nieuw {
   color: #007bff;
-  font-weight: bold;
 }
 
 .legacy-status-openstaand {
   color: #fd7e14;
-  font-weight: bold;
 }
 
 .legacy-status-afgesloten {
