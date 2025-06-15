@@ -901,6 +901,67 @@ body {
   background: hsl(210, 14%, 97%);
 }
 
+/* Basisteams Styles */
+.basisteams-content {
+  padding: 24px;
+}
+
+.basisteams-filter-section {
+  margin-bottom: 24px;
+}
+
+.basisteams-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid hsl(214, 13%, 91%);
+  background: white;
+}
+
+.basisteams-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.basisteams-table th {
+  background: hsl(210, 14%, 97%);
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  border-bottom: 2px solid hsl(214, 13%, 91%);
+}
+
+.basisteams-table td {
+  padding: 12px;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+  vertical-align: middle;
+}
+
+.basisteam-row:hover {
+  background: hsl(210, 14%, 97%);
+}
+
+.team-code {
+  font-weight: 600;
+  color: hsl(208, 79%, 51%);
+  width: 100px;
+}
+
+.team-naam {
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  width: 200px;
+}
+
+.team-gemeenten {
+  color: hsl(220, 9%, 40%);
+}
+
+.gemeente-tag {
+  color: hsl(220, 9%, 40%);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .content-grid {

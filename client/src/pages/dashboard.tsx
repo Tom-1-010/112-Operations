@@ -135,6 +135,26 @@ export default function Dashboard() {
     }));
   };
 
+  // Basisteams data for Rotterdam
+  interface BasisTeam {
+    code: string;
+    naam: string;
+    gemeenten: string[];
+  }
+
+  const [basisTeams] = useLocalStorage<BasisTeam[]>('basisTeamsRotterdam', [
+    { code: "A1", naam: "Waterweg", gemeenten: ["Schiedam", "Maassluis", "Vlaardingen"] },
+    { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam Centrum"] },
+    { code: "A3", naam: "Noord", gemeenten: ["Rotterdam Noord", "Bergschenhoek"] },
+    { code: "A4", naam: "Oost", gemeenten: ["Rotterdam Oost", "Capelle aan den IJssel"] },
+    { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam Zuid", "Barendrecht"] },
+    { code: "A6", naam: "West", gemeenten: ["Rotterdam West", "Westland"] },
+    { code: "B1", naam: "Voorne-Putten", gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"] },
+    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard", "Binnenmaas"] },
+    { code: "C1", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"] },
+    { code: "D1", naam: "Drechtsteden", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"] }
+  ]);
+
   const incidentTypes = [
     'Diefstal', 'Verkeersongeval', 'Vermiste persoon', 'Huiselijk geweld',
     'Inbraak', 'Openbare orde verstoring', 'Bedreiging', 'Geweld',
@@ -296,6 +316,56 @@ export default function Dashboard() {
     // Only initialize if units section is active
     if (activeSection === 'units') {
       const cleanup = initializeUnitsFilter();
+      return cleanup;
+    }
+  }, [activeSection]);
+
+  // Basisteams filter functionality
+  useEffect(() => {
+    const initializeBasisteamsFilter = () => {
+      const filterInput = document.getElementById('basisteamsFilter') as HTMLInputElement;
+      if (!filterInput) return;
+
+      const handleFilterChange = () => {
+        const filterValue = filterInput.value.toLowerCase();
+        const teamRows = document.querySelectorAll('.basisteam-row');
+        
+        teamRows.forEach((row) => {
+          const teamData = row.getAttribute('data-team');
+          if (teamData) {
+            try {
+              const team = JSON.parse(teamData);
+              const code = team.code.toLowerCase();
+              const naam = team.naam.toLowerCase();
+              const gemeenten = team.gemeenten.map((gemeente: string) => gemeente.toLowerCase()).join(' ');
+              
+              const matchesFilter = 
+                code.includes(filterValue) ||
+                naam.includes(filterValue) ||
+                gemeenten.includes(filterValue);
+              
+              if (matchesFilter) {
+                (row as HTMLElement).style.display = 'table-row';
+              } else {
+                (row as HTMLElement).style.display = 'none';
+              }
+            } catch (error) {
+              console.error('Error parsing team data:', error);
+            }
+          }
+        });
+      };
+
+      filterInput.addEventListener('input', handleFilterChange);
+      
+      return () => {
+        filterInput.removeEventListener('input', handleFilterChange);
+      };
+    };
+
+    // Only initialize if settings section is active
+    if (activeSection === 'settings') {
+      const cleanup = initializeBasisteamsFilter();
       return cleanup;
     }
   }, [activeSection]);
@@ -659,7 +729,56 @@ export default function Dashboard() {
         {activeSection === 'map' && renderPlaceholderSection('Kaart Overzicht', 'geo-alt')}
         {activeSection === 'archive' && renderPlaceholderSection('Archief', 'archive')}
         {activeSection === 'reports' && renderPlaceholderSection('Rapporten', 'file-text')}
-        {activeSection === 'settings' && renderPlaceholderSection('Instellingen', 'gear')}
+        {activeSection === 'settings' && (
+          <div className="content-section active">
+            <div className="section">
+              <div className="section-header">
+                <h3 className="section-title">Basisteams Eenheid Rotterdam</h3>
+              </div>
+              <div className="basisteams-content">
+                <div className="basisteams-filter-section">
+                  <label htmlFor="basisteamsFilter" className="filter-label">🔍 Filter basisteams</label>
+                  <input
+                    type="text"
+                    id="basisteamsFilter"
+                    className="filter-input"
+                    placeholder="Zoek op teamcode, naam of gemeente..."
+                  />
+                </div>
+                
+                <div className="basisteams-table-container">
+                  <table className="basisteams-table">
+                    <thead>
+                      <tr>
+                        <th>Teamcode</th>
+                        <th>Teamnaam</th>
+                        <th>Gemeenten</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {basisTeams.map((team) => (
+                        <tr key={team.code} className="basisteam-row" data-team={JSON.stringify(team)}>
+                          <td className="team-code">
+                            <strong>{team.code}</strong>
+                          </td>
+                          <td className="team-naam">{team.naam}</td>
+                          <td className="team-gemeenten">
+                            {team.gemeenten.map((gemeente, index) => (
+                              <span key={gemeente} className="gemeente-tag">
+                                {gemeente}
+                                {index < team.gemeenten.length - 1 && ', '}
+                              </span>
+                            ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <div className={`notification ${showNotification ? 'show' : ''}`}>
