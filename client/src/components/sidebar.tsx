@@ -1,9 +1,13 @@
+import { useState } from 'react';
+
 interface SidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
 }
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
+  
   const menuItems = [
     { id: 'dashboard', icon: 'speedometer2', label: 'Dashboard' },
     { id: 'incidents', icon: 'exclamation-triangle', label: 'Incidenten' },
@@ -12,8 +16,18 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     { id: 'map', icon: 'geo-alt', label: 'Kaart' },
     { id: 'archive', icon: 'archive', label: 'Archief' },
     { id: 'reports', icon: 'file-text', label: 'Rapporten' },
-    { id: 'settings', icon: 'gear', label: 'Instellingen' },
   ];
+
+  const settingsSubItems = [
+    { id: 'settings', icon: 'table', label: 'Basisteams' },
+    { id: 'classificaties', icon: 'tags', label: 'Classificaties' },
+  ];
+
+  const handleSettingsClick = () => {
+    setSettingsExpanded(!settingsExpanded);
+  };
+
+  const isSettingsActive = activeSection === 'settings' || activeSection === 'classificaties';
 
   return (
     <nav className="sidebar">
@@ -32,6 +46,29 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <span>{item.label}</span>
           </div>
         ))}
+        
+        {/* Settings menu with dropdown */}
+        <div className={`nav-item nav-dropdown ${isSettingsActive ? 'active' : ''}`}>
+          <div className="nav-item-main" onClick={handleSettingsClick}>
+            <i className="bi bi-gear"></i>
+            <span>Instellingen</span>
+            <i className={`bi bi-chevron-${settingsExpanded ? 'down' : 'right'} nav-arrow`}></i>
+          </div>
+          {settingsExpanded && (
+            <div className="nav-submenu">
+              {settingsSubItems.map((subItem) => (
+                <div
+                  key={subItem.id}
+                  className={`nav-subitem ${activeSection === subItem.id ? 'active' : ''}`}
+                  onClick={() => onSectionChange(subItem.id)}
+                >
+                  <i className={`bi bi-${subItem.icon}`}></i>
+                  <span>{subItem.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

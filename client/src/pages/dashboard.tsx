@@ -1436,6 +1436,106 @@ export default function Dashboard() {
           renderPlaceholderSection("Archief", "archive")}
         {activeSection === "reports" &&
           renderPlaceholderSection("Rapporten", "file-text")}
+        {activeSection === "classificaties" && (
+          <div className="content-section active">
+            <div className="section">
+              <div className="section-header">
+                <h3 className="section-title">Classificaties Beheer</h3>
+                <button className="btn btn-primary">
+                  <i className="bi bi-plus-lg"></i>
+                  Nieuwe Classificatie
+                </button>
+              </div>
+              <div className="classificaties-content">
+                <div className="classificaties-table-container">
+                  <table className="classificaties-table">
+                    <thead>
+                      <tr>
+                        <th>Niveau</th>
+                        <th>Code</th>
+                        <th>Omschrijving</th>
+                        <th>Prioriteit</th>
+                        <th>Acties</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="classificatie-row">
+                        <td><span className="niveau-badge niveau-1">1</span></td>
+                        <td className="classificatie-code"><strong>VRK001</strong></td>
+                        <td className="classificatie-omschrijving">Verkeer - Wegverkeer</td>
+                        <td><span className="priority-tag priority-medium">Gemiddeld</span></td>
+                        <td className="classificatie-actions">
+                          <button className="btn btn-secondary btn-sm">
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button className="btn btn-danger btn-sm">
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="classificatie-row">
+                        <td><span className="niveau-badge niveau-1">1</span></td>
+                        <td className="classificatie-code"><strong>GWL001</strong></td>
+                        <td className="classificatie-omschrijving">Geweld - Huiselijk geweld</td>
+                        <td><span className="priority-tag priority-high">Hoog</span></td>
+                        <td className="classificatie-actions">
+                          <button className="btn btn-secondary btn-sm">
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button className="btn btn-danger btn-sm">
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="classificatie-row">
+                        <td><span className="niveau-badge niveau-2">2</span></td>
+                        <td className="classificatie-code"><strong>VRK002</strong></td>
+                        <td className="classificatie-omschrijving">Verkeer - Fietsverkeer</td>
+                        <td><span className="priority-tag priority-low">Laag</span></td>
+                        <td className="classificatie-actions">
+                          <button className="btn btn-secondary btn-sm">
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button className="btn btn-danger btn-sm">
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="classificatie-row">
+                        <td><span className="niveau-badge niveau-1">1</span></td>
+                        <td className="classificatie-code"><strong>BRD001</strong></td>
+                        <td className="classificatie-omschrijving">Brand - Woningbrand</td>
+                        <td><span className="priority-tag priority-high">Hoog</span></td>
+                        <td className="classificatie-actions">
+                          <button className="btn btn-secondary btn-sm">
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button className="btn btn-danger btn-sm">
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="classificatie-row">
+                        <td><span className="niveau-badge niveau-2">2</span></td>
+                        <td className="classificatie-code"><strong>DST001</strong></td>
+                        <td className="classificatie-omschrijving">Diefstal - Inbraak woning</td>
+                        <td><span className="priority-tag priority-medium">Gemiddeld</span></td>
+                        <td className="classificatie-actions">
+                          <button className="btn btn-secondary btn-sm">
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button className="btn btn-danger btn-sm">
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeSection === "settings" && (
           <div className="content-section active">
             <div className="section">

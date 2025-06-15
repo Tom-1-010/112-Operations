@@ -128,6 +128,69 @@ body {
   font-size: 16px;
 }
 
+/* Dropdown menu styles */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-item-main {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  justify-content: space-between;
+}
+
+.nav-item-main:hover {
+  background: rgba(255,255,255,0.1);
+  border-left-color: hsl(206, 82%, 69%);
+}
+
+.nav-dropdown.active .nav-item-main {
+  background: rgba(255,255,255,0.15);
+  border-left-color: white;
+}
+
+.nav-arrow {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  margin-left: auto;
+}
+
+.nav-submenu {
+  background: rgba(0,0,0,0.2);
+  border-left: 2px solid rgba(255,255,255,0.3);
+  margin-left: 16px;
+}
+
+.nav-subitem {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px 10px 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  border-left: 3px solid transparent;
+}
+
+.nav-subitem:hover {
+  background: rgba(255,255,255,0.1);
+  border-left-color: hsl(206, 82%, 69%);
+}
+
+.nav-subitem.active {
+  background: rgba(255,255,255,0.2);
+  border-left-color: white;
+}
+
+.nav-subitem i {
+  width: 16px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
 /* Main Content */
 .main-content {
   flex: 1;
@@ -1116,6 +1179,90 @@ body {
 
 .gemeente-tag {
   color: hsl(220, 9%, 40%);
+}
+
+/* Classificaties Table */
+.classificaties-content {
+  padding: 24px;
+}
+
+.classificaties-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid hsl(214, 13%, 91%);
+}
+
+.classificaties-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.classificaties-table thead {
+  background: hsl(210, 14%, 97%);
+  border-bottom: 2px solid hsl(214, 13%, 91%);
+}
+
+.classificaties-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  font-size: 14px;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+}
+
+.classificatie-row {
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+  transition: background-color 0.2s ease;
+}
+
+.classificatie-row:hover {
+  background: hsl(210, 14%, 98%);
+}
+
+.classificatie-row td {
+  padding: 16px;
+  font-size: 14px;
+  color: hsl(213, 22%, 24%);
+  vertical-align: middle;
+}
+
+.niveau-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-weight: 600;
+  font-size: 12px;
+  color: white;
+}
+
+.niveau-badge.niveau-1 {
+  background: hsl(208, 79%, 51%);
+}
+
+.niveau-badge.niveau-2 {
+  background: hsl(122, 39%, 49%);
+}
+
+.niveau-badge.niveau-3 {
+  background: hsl(32, 95%, 44%);
+}
+
+.classificatie-code {
+  font-family: 'Courier New', monospace;
+}
+
+.classificatie-omschrijving {
+  max-width: 300px;
+}
+
+.classificatie-actions {
+  display: flex;
+  gap: 8px;
 }
 
 /* Responsive */
