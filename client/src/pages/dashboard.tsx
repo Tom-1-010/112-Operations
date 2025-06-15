@@ -783,11 +783,22 @@ export default function Dashboard() {
         try {
           const response = await fetch(`/api/address/search?q=${encodeURIComponent(query)}`);
           
-          if (!response.ok) throw new Error('API request failed');
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Invalid response format');
+          }
           
           const data = await response.json();
           
-          if (data.response && data.response.docs && data.response.docs.length > 0) {
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          
+          if (data.response && data.response.docs && Array.isArray(data.response.docs) && data.response.docs.length > 0) {
             showSuggestions(data.response.docs);
           } else {
             showNoResults();
@@ -802,11 +813,22 @@ export default function Dashboard() {
         try {
           const response = await fetch(`/api/address/lookup?id=${encodeURIComponent(addressId)}`);
           
-          if (!response.ok) throw new Error('Address lookup failed');
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Invalid response format');
+          }
           
           const data = await response.json();
           
-          if (data.response && data.response.docs && data.response.docs[0]) {
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          
+          if (data.response && data.response.docs && Array.isArray(data.response.docs) && data.response.docs[0]) {
             return data.response.docs[0];
           }
         } catch (error) {
@@ -816,33 +838,53 @@ export default function Dashboard() {
       };
 
       const showSuggestions = (addresses: any[]) => {
-        suggestionsContainer.innerHTML = addresses.map(address => `
-          <div class="address-suggestion" data-id="${address.id}">
-            <div class="address-suggestion-main">${address.weergavenaam}</div>
-          </div>
-        `).join('');
-        
-        suggestionsContainer.classList.add('show');
+        try {
+          suggestionsContainer.innerHTML = addresses.map(address => `
+            <div class="address-suggestion" data-id="${address.id || ''}" data-display="${address.weergavenaam || ''}">
+              <div class="address-suggestion-main">${address.weergavenaam || 'Onbekend adres'}</div>
+            </div>
+          `).join('');
+          
+          suggestionsContainer.classList.add('show');
 
-        // Add click handlers to suggestions
-        suggestionsContainer.querySelectorAll('.address-suggestion').forEach(suggestion => {
-          suggestion.addEventListener('click', async (e) => {
-            const addressId = (e.currentTarget as HTMLElement).getAttribute('data-id');
-            if (addressId) {
-              const details = await getAddressDetails(addressId);
-              if (details) {
-                // Fill the address field
-                addressInput.value = `${details.straatnaam} ${details.huis_nlt}`;
+          // Add click handlers to suggestions
+          suggestionsContainer.querySelectorAll('.address-suggestion').forEach(suggestion => {
+            suggestion.addEventListener('click', async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              try {
+                const addressId = (e.currentTarget as HTMLElement).getAttribute('data-id');
+                const displayName = (e.currentTarget as HTMLElement).getAttribute('data-display');
                 
-                // Fill postcode and gemeente
-                if (postcodeInput) postcodeInput.value = details.postcode || '';
-                if (gemeenteInput) gemeenteInput.value = details.woonplaatsnaam || '';
-                
+                if (addressId && displayName) {
+                  showLoading();
+                  const details = await getAddressDetails(addressId);
+                  
+                  if (details && details.straatnaam && details.huis_nlt) {
+                    // Fill the address field
+                    addressInput.value = `${details.straatnaam} ${details.huis_nlt}`;
+                    
+                    // Fill postcode and gemeente
+                    if (postcodeInput) postcodeInput.value = details.postcode || '';
+                    if (gemeenteInput) gemeenteInput.value = details.woonplaatsnaam || '';
+                  } else {
+                    // Fallback to display name parsing
+                    addressInput.value = displayName.split(',')[0] || displayName;
+                  }
+                  
+                  hideSuggestions();
+                }
+              } catch (error) {
+                console.error('Address selection error:', error);
                 hideSuggestions();
               }
-            }
+            });
           });
-        });
+        } catch (error) {
+          console.error('Error showing suggestions:', error);
+          showError('Fout bij tonen van suggesties');
+        }
       };
 
       const handleInput = (e: Event) => {
