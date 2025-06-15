@@ -1221,11 +1221,7 @@ export default function Dashboard() {
                             placeholder="Adres van het incident..."
                             autoComplete="off"
                           />
-                          <div id="addressSuggestions" className="address-suggestions">
-                            <div id="addressLoading" className="address-loading" style={{display: 'none'}}>
-                              Zoeken naar adressen...
-                            </div>
-                          </div>
+                          <div id="addressSuggestions" className="address-suggestions"></div>
                         </div>
                       </div>
                       
