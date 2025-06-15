@@ -18,7 +18,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GMS Incident routes
   app.post("/api/gms-incidents", async (req, res) => {
     try {
-      const validatedData = insertGmsIncidentSchema.parse(req.body);
+      const data = req.body;
+      // Convert tijdstip string to Date object
+      if (data.tijdstip) {
+        data.tijdstip = new Date(data.tijdstip);
+      }
+      const validatedData = insertGmsIncidentSchema.parse(data);
       const [incident] = await db
         .insert(gmsIncidents)
         .values(validatedData)

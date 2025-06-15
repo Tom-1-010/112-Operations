@@ -41,6 +41,8 @@ export const insertUnitSchema = createInsertSchema(units);
 export const insertGmsIncidentSchema = createInsertSchema(gmsIncidents).omit({
   id: true,
   aangemaaktOp: true,
+}).extend({
+  tijdstip: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;

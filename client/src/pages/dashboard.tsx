@@ -178,6 +178,21 @@ export default function Dashboard() {
 
         {activeSection === 'incidents' && renderPlaceholderSection('Alle Incidenten', 'exclamation-triangle')}
         {activeSection === 'units' && renderPlaceholderSection('Eenheden Beheer', 'truck')}
+        {activeSection === 'gms' && (
+          <div className="content-section active">
+            <iframe 
+              src="/gms" 
+              style={{ 
+                width: '100%', 
+                height: '90vh', 
+                border: 'none',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}
+              title="GMS Dispatch Simulator"
+            />
+          </div>
+        )}
         {activeSection === 'map' && renderPlaceholderSection('Kaart Overzicht', 'geo-alt')}
         {activeSection === 'archive' && renderPlaceholderSection('Archief', 'archive')}
         {activeSection === 'reports' && renderPlaceholderSection('Rapporten', 'file-text')}
