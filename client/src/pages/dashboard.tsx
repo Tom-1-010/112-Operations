@@ -914,6 +914,11 @@ export default function Dashboard() {
         sendMessage();
       };
 
+      // Handle Alert button click for urgent messages
+      const handleAlertClick = () => {
+        sendMessage(true);
+      };
+
       // Handle Enter key (but not Shift+Enter or Alt+Enter)
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
@@ -970,6 +975,7 @@ export default function Dashboard() {
       const plaatsnaamField = document.getElementById('gmsPlaatsnaam') as HTMLInputElement;
 
       verzendButton.addEventListener('click', handleVerzendClick);
+      alertButton.addEventListener('click', handleAlertClick);
       kladblok.addEventListener('keydown', handleKeyDown);
       priorityInput.addEventListener('input', handlePriorityChange);
       priorityInput.addEventListener('change', handlePriorityChange);
@@ -1307,6 +1313,7 @@ export default function Dashboard() {
 
       return () => {
         verzendButton.removeEventListener('click', handleVerzendClick);
+        alertButton.removeEventListener('click', handleAlertClick);
         kladblok.removeEventListener('keydown', handleKeyDown);
         priorityInput.removeEventListener('input', handlePriorityChange);
         priorityInput.removeEventListener('change', handlePriorityChange);
