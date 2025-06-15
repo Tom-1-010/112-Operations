@@ -743,6 +743,89 @@ export default function Dashboard() {
         const message = kladblok.textContent?.trim();
         if (!message) return;
 
+        // Smart command processing for address auto-fill
+        const processSmartCommands = (text: string) => {
+          const lines = text.split('\n');
+          
+          for (const line of lines) {
+            if (line.trim().startsWith('=')) {
+              const addressText = line.substring(1).trim();
+              parseAndFillAddress(addressText);
+              return true; // Command processed
+            }
+          }
+          return false; // No command found
+        };
+
+        // Parse address information and auto-fill form fields
+        const parseAndFillAddress = (addressText: string) => {
+          // Address parsing patterns
+          const patterns = [
+            // Pattern 1: "Street number, City" (e.g., "Kalverstraat 123, Amsterdam")
+            /^(.+?)\s+(\d+[a-zA-Z]?)\s*,\s*(.+)$/,
+            // Pattern 2: "Street number City" (e.g., "Kalverstraat 123 Amsterdam")
+            /^(.+?)\s+(\d+[a-zA-Z]?)\s+(.+)$/,
+            // Pattern 3: Just "Street, City" (e.g., "Kalverstraat, Amsterdam")
+            /^(.+?)\s*,\s*(.+)$/
+          ];
+
+          let streetName = '';
+          let houseNumber = '';
+          let cityName = '';
+
+          for (const pattern of patterns) {
+            const match = addressText.match(pattern);
+            if (match) {
+              if (match.length === 4) {
+                // Pattern 1 & 2: Street, Number, City
+                streetName = match[1].trim();
+                houseNumber = match[2].trim();
+                cityName = match[3].trim();
+              } else if (match.length === 3) {
+                // Pattern 3: Street, City (no number)
+                streetName = match[1].trim();
+                cityName = match[2].trim();
+              }
+              break;
+            }
+          }
+
+          // Auto-fill the form fields
+          const straatnaamField = document.getElementById('gmsStraatnaam') as HTMLInputElement;
+          const huisnummerField = document.getElementById('gmsHuisnummer') as HTMLInputElement;
+          const plaatsnaamField = document.getElementById('gmsPlaatsnaam') as HTMLInputElement;
+
+          if (straatnaamField && streetName) {
+            straatnaamField.value = streetName;
+          }
+          if (huisnummerField && houseNumber) {
+            huisnummerField.value = houseNumber;
+          }
+          if (plaatsnaamField && cityName) {
+            plaatsnaamField.value = cityName;
+          }
+
+          // Add visual feedback
+          const logEntry = document.createElement('div');
+          logEntry.className = 'gms-log-entry';
+          logEntry.innerHTML = `
+            <span class="gms-log-time">${new Date().toLocaleTimeString('nl-NL')}</span>
+            <span class="gms-log-message">📍 Adres automatisch ingevuld: ${streetName} ${houseNumber}, ${cityName}</span>
+          `;
+          meldingLogging.appendChild(logEntry);
+          meldingLogging.scrollTop = meldingLogging.scrollHeight;
+        };
+
+        // Check for smart commands first
+        const commandProcessed = processSmartCommands(message);
+        
+        // If a command was processed, clear the kladblok and return
+        if (commandProcessed) {
+          kladblok.textContent = '';
+          kladblok.focus();
+          return;
+        }
+
         // Auto-classification based on keywords
         const processAutoClassification = (text: string) => {
           const classificatie1Select = document.getElementById('gmsClassificatie1') as HTMLSelectElement;
