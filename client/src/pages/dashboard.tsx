@@ -1030,13 +1030,6 @@ export default function Dashboard() {
       const createIncidentFromGMS = (status: 'Afgesloten' | 'Openstaand') => {
         const formData = collectGMSFormData();
         const now = new Date();
-        
-        // Convert numeric priority to string priority
-        const getPriorityString = (priority: number): 'low' | 'medium' | 'high' => {
-          if (priority <= 2) return 'high';
-          if (priority === 3) return 'medium';
-          return 'low';
-        };
 
         // Map status to expected incident status
         const getIncidentStatus = (gmsStatus: string): 'active' | 'accepted' | 'closed' => {
@@ -1052,7 +1045,7 @@ export default function Dashboard() {
           timestamp: now.toISOString(),
           timeAgo: '0 min geleden',
           unitsAssigned: 0,
-          priority: getPriorityString(formData.prioriteit),
+          priority: formData.prioriteit, // Keep numeric priority for dashboard display
           status: getIncidentStatus(status),
           // Additional GMS data (as extended properties)
           meldernaam: formData.meldernaam,
