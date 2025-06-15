@@ -13,6 +13,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     { id: 'incidents', icon: 'exclamation-triangle', label: 'Incidenten' },
     { id: 'units', icon: 'truck', label: 'Eenheden' },
     { id: 'gms', icon: 'clipboard-check', label: 'GMS' },
+    { id: 'intake', icon: 'file-signature', label: 'Intake' },
     { id: 'map', icon: 'geo-alt', label: 'Kaart' },
     { id: 'archive', icon: 'archive', label: 'Archief' },
     { id: 'reports', icon: 'file-text', label: 'Rapporten' },
