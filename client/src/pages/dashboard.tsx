@@ -435,15 +435,17 @@ export default function Dashboard() {
         const classificatie3 = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
         
         // Bestaande velden
+        const locatie = document.getElementById("gmsLocatie") as HTMLInputElement;
         const tijdstip = document.getElementById("gmsTijdstip") as HTMLInputElement;
         const soortMelding = document.getElementById("gmsSoortMelding") as HTMLSelectElement;
+        const prioriteit = document.getElementById("gmsPrioriteit") as HTMLInputElement;
         const output = document.getElementById("gmsOutput");
 
         if (!kladblok || !output) return;
 
         // Validate required fields
-        if (!meldingsadres?.value.trim()) {
-          alert("Vul het meldingsadres in.");
+        if (!meldingsadres?.value.trim() && !locatie?.value.trim()) {
+          alert("Vul minimaal het meldingsadres of locatie in.");
           return;
         }
 
@@ -470,8 +472,10 @@ export default function Dashboard() {
           
           // Aanvullende informatie
           opmerkingen: kladblok.textContent || "",
+          locatie: locatie?.value.trim() || "",
           tijdstip: tijdstip?.value || "",
-          soortMelding: soortMelding?.value || ""
+          soortMelding: soortMelding?.value || "",
+          prioriteit: parseInt(prioriteit?.value || "3")
         };
 
         // Save to localStorage incidenten array
@@ -505,7 +509,9 @@ export default function Dashboard() {
         if (classificatie3) classificatie3.value = "";
         
         // Reset bestaande velden
+        if (locatie) locatie.value = "";
         if (soortMelding) soortMelding.value = "";
+        if (prioriteit) prioriteit.value = "3";
         updateGMSTime();
 
         showNotificationMessage("GMS melding opgeslagen");
@@ -728,7 +734,10 @@ export default function Dashboard() {
       const kladblok = document.getElementById('gmsKladblok');
       const verzendButton = document.getElementById('gmsVerzendButton');
       const meldingLogging = document.getElementById('gmsMeldingLogging');
-      if (!kladblok || !verzendButton || !meldingLogging) return;
+      const priorityInput = document.getElementById('gmsPrioriteit') as HTMLInputElement;
+      const priorityIndicator = document.getElementById('gmsPriorityIndicator');
+      
+      if (!kladblok || !verzendButton || !meldingLogging || !priorityInput || !priorityIndicator) return;
 
       const sendMessage = () => {
         const message = kladblok.textContent?.trim();
@@ -773,12 +782,37 @@ export default function Dashboard() {
         }
       };
 
+      // Update priority indicator color
+      const updatePriorityIndicator = () => {
+        const priorityValue = parseInt(priorityInput.value) || 3;
+        
+        // Remove all priority classes
+        priorityIndicator.className = 'gms-priority-indicator';
+        
+        // Add the appropriate priority class
+        if (priorityValue >= 1 && priorityValue <= 5) {
+          priorityIndicator.classList.add(`priority-${priorityValue}`);
+        }
+      };
+
+      // Handle priority input changes
+      const handlePriorityChange = () => {
+        updatePriorityIndicator();
+      };
+
+      // Initialize priority indicator with default value
+      updatePriorityIndicator();
+
       verzendButton.addEventListener('click', handleVerzendClick);
       kladblok.addEventListener('keydown', handleKeyDown);
+      priorityInput.addEventListener('input', handlePriorityChange);
+      priorityInput.addEventListener('change', handlePriorityChange);
 
       return () => {
         verzendButton.removeEventListener('click', handleVerzendClick);
         kladblok.removeEventListener('keydown', handleKeyDown);
+        priorityInput.removeEventListener('input', handlePriorityChange);
+        priorityInput.removeEventListener('change', handlePriorityChange);
       };
     };
 
@@ -1290,6 +1324,16 @@ export default function Dashboard() {
                   {/* Bestaande velden */}
                   <div className="gms-existing-fields">
                     <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsLocatie">📍 Locatie (legacy)</label>
+                      <input
+                        type="text"
+                        id="gmsLocatie"
+                        className="gms-input"
+                        placeholder="Voer locatie in..."
+                      />
+                    </div>
+                    
+                    <div className="gms-form-group">
                       <label className="gms-label" htmlFor="gmsTijdstip">⏰ Tijdstip</label>
                       <input
                         type="datetime-local"
@@ -1309,7 +1353,26 @@ export default function Dashboard() {
                       </select>
                     </div>
                     
-                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsPrioriteit">⚡ Prioriteit (1-5)</label>
+                      <div className="gms-priority-wrapper">
+                        <input
+                          type="number"
+                          id="gmsPrioriteit"
+                          className="gms-input gms-priority-input"
+                          min="1"
+                          max="5"
+                          defaultValue="3"
+                        />
+                        <div 
+                          id="gmsPriorityIndicator" 
+                          className="gms-priority-indicator"
+                        ></div>
+                      </div>
+                      <div className="gms-priority-help">
+                        1 is hoogste prioriteit, 5 is laagste
+                      </div>
+                    </div>
                     
                     <button
                       id="gmsSaveButton"
