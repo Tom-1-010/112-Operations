@@ -424,9 +424,12 @@ export default function Dashboard() {
         const melderadres = document.getElementById("gmsMelderadres") as HTMLInputElement;
         const telefoonnummer = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
         
-        // Melding locatie
-        const meldingsadres = document.getElementById("gmsMeldingsadres") as HTMLInputElement;
+        // Melding locatie (new address fields)
+        const straatnaam = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+        const huisnummer = document.getElementById("gmsHuisnummer") as HTMLInputElement;
+        const toevoeging = document.getElementById("gmsToevoeging") as HTMLInputElement;
         const postcode = document.getElementById("gmsPostcode") as HTMLInputElement;
+        const plaatsnaam = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
         const gemeente = document.getElementById("gmsGemeente") as HTMLInputElement;
         
         // Classificaties
@@ -442,8 +445,8 @@ export default function Dashboard() {
         if (!kladblok || !output) return;
 
         // Validate required fields
-        if (!meldingsadres?.value.trim()) {
-          alert("Vul het meldingsadres in.");
+        if (!straatnaam?.value.trim()) {
+          alert("Vul de straatnaam in.");
           return;
         }
 
@@ -459,8 +462,11 @@ export default function Dashboard() {
           telefoonnummer: telefoonnummer?.value.trim() || "",
           
           // Melding locatie
-          meldingsadres: meldingsadres?.value.trim() || "",
+          straatnaam: straatnaam?.value.trim() || "",
+          huisnummer: huisnummer?.value.trim() || "",
+          toevoeging: toevoeging?.value.trim() || "",
           postcode: postcode?.value.trim() || "",
+          plaatsnaam: plaatsnaam?.value.trim() || "",
           gemeente: gemeente?.value.trim() || "",
           
           // LMC Classificatie
@@ -495,8 +501,11 @@ export default function Dashboard() {
         if (telefoonnummer) telefoonnummer.value = "";
         
         // Reset melding locatie
-        if (meldingsadres) meldingsadres.value = "";
+        if (straatnaam) straatnaam.value = "";
+        if (huisnummer) huisnummer.value = "";
+        if (toevoeging) toevoeging.value = "";
         if (postcode) postcode.value = "";
+        if (plaatsnaam) plaatsnaam.value = "";
         if (gemeente) gemeente.value = "";
         
         // Reset classificaties
@@ -1452,23 +1461,39 @@ export default function Dashboard() {
                       {/* Meldinglocatie Block */}
                       <div className="gms-block">
                         <div className="gms-block-title">Meldinglocatie</div>
-                        <div className="gms-form-row">
-                          <div className="gms-field-group gms-field-wide">
-                            <label>Adres</label>
-                            <input type="text" id="gmsMeldingsadres" className="gms-field" />
+                        
+                        {/* Row 1: Straatnaam, Huisnummer, Toevoeging */}
+                        <div className="gms-address-row">
+                          <div className="gms-field-group gms-field-street">
+                            <label>Straatnaam</label>
+                            <input type="text" id="gmsStraatnaam" className="gms-field" />
                           </div>
-                          <div className="gms-field-group">
-                            <label>Unit</label>
-                            <input type="text" className="gms-field gms-field-small" />
+                          <div className="gms-field-group gms-field-number">
+                            <label>Huisnummer</label>
+                            <input type="text" id="gmsHuisnummer" className="gms-field gms-field-small" />
+                          </div>
+                          <div className="gms-field-group gms-field-extension">
+                            <label>Toevoeging</label>
+                            <input type="text" id="gmsToevoeging" className="gms-field gms-field-small" />
                           </div>
                         </div>
-                        <div className="gms-form-row">
-                          <div className="gms-field-group">
+                        
+                        {/* Row 2: Postcode, Plaatsnaam */}
+                        <div className="gms-address-row">
+                          <div className="gms-field-group gms-field-postal">
                             <label>Postcode</label>
                             <input type="text" id="gmsPostcode" className="gms-field gms-field-small" />
                           </div>
-                          <div className="gms-field-group">
-                            <label>Plaats</label>
+                          <div className="gms-field-group gms-field-city">
+                            <label>Plaatsnaam</label>
+                            <input type="text" id="gmsPlaatsnaam" className="gms-field" />
+                          </div>
+                        </div>
+                        
+                        {/* Row 3: Gemeente (full width) */}
+                        <div className="gms-address-row">
+                          <div className="gms-field-group gms-field-full">
+                            <label>Gemeente</label>
                             <input type="text" id="gmsGemeente" className="gms-field" />
                           </div>
                         </div>

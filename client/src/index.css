@@ -620,6 +620,42 @@ body {
   flex: 2;
 }
 
+/* Address Layout Specific */
+.gms-address-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: flex-end;
+}
+
+.gms-field-street {
+  flex: 3;
+}
+
+.gms-field-number {
+  flex: 1;
+  max-width: 60px;
+}
+
+.gms-field-extension {
+  flex: 1;
+  max-width: 50px;
+}
+
+.gms-field-postal {
+  flex: 1;
+  max-width: 80px;
+}
+
+.gms-field-city {
+  flex: 2;
+}
+
+.gms-field-full {
+  flex: 1;
+  width: 100%;
+}
+
 .gms-field-group label {
   font-size: 10px;
   margin-bottom: 2px;
