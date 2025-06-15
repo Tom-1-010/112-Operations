@@ -561,17 +561,10 @@ body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Middle Row: Logging (left) + Classifications (right) */
-.gms-middle-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-}
-
-.gms-logging-section {
+/* Second Row: LMC Classificaties (full width) */
+.gms-classificatie-row {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  justify-content: center;
 }
 
 .gms-classificatie-section {
@@ -583,6 +576,22 @@ body {
   border-radius: 8px;
   border: 1px solid hsl(214, 13%, 91%);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Third Row: Melding Logging (full width, below classifications) */
+.gms-logging-row {
+  display: flex;
+  justify-content: center;
+}
+
+.gms-logging-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 800px;
 }
 
 /* Bottom Row: Additional fields + Actions */
@@ -1396,9 +1405,9 @@ body {
     gap: 16px;
   }
   
-  .gms-middle-row {
-    grid-template-columns: 1fr;
-    gap: 24px;
+  .gms-classificatie-row,
+  .gms-logging-row {
+    padding: 0 16px;
   }
   
   .gms-bottom-row {

@@ -1492,19 +1492,8 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Second Row: Melding Logging (left) + LMC Classificaties (right) */}
-                  <div className="gms-middle-row">
-                    
-                    {/* Left: Melding Logging */}
-                    <div className="gms-logging-section">
-                      <label className="gms-label">📋 Melding Logging</label>
-                      <div
-                        id="gmsMeldingLogging"
-                        className="gms-melding-logging"
-                      ></div>
-                    </div>
-                    
-                    {/* Right: LMC Classificaties */}
+                  {/* Second Row: LMC Classificaties */}
+                  <div className="gms-classificatie-row">
                     <div className="gms-classificatie-section">
                       <h4 className="gms-section-title">📋 LMC Classificatie</h4>
                       <div className="gms-classificatie-grid">
@@ -1542,6 +1531,17 @@ export default function Dashboard() {
                           </select>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Third Row: Melding Logging (now below classifications) */}
+                  <div className="gms-logging-row">
+                    <div className="gms-logging-section">
+                      <label className="gms-label">📋 Melding Logging</label>
+                      <div
+                        id="gmsMeldingLogging"
+                        className="gms-melding-logging"
+                      ></div>
                     </div>
                   </div>
 
