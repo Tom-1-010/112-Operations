@@ -761,6 +761,10 @@ body {
   flex-direction: column;
 }
 
+.gms-text-block-compact {
+  flex: 0.7; /* Reduced from 1 to 0.7 for more compact notes field */
+}
+
 .gms-text-area {
   background: white;
   border: 1px inset #c0c0c0;
@@ -770,6 +774,10 @@ body {
   flex: 1;
   overflow-y: auto;
   min-height: 150px;
+}
+
+.gms-text-area-compact {
+  min-height: 100px; /* Reduced from 150px to 100px for compact layout */
 }
 
 .gms-text-area:focus {
@@ -821,6 +829,10 @@ body {
   flex: 0.6;
 }
 
+.gms-logging-block-tall {
+  flex: 0.8; /* Increased from 0.6 to 0.8 for taller logging area */
+}
+
 .gms-logging-area {
   background: white;
   border: 1px inset #c0c0c0;
@@ -829,6 +841,10 @@ body {
   font-family: 'Courier New', monospace;
   height: 100px;
   overflow-y: auto;
+}
+
+.gms-logging-area-tall {
+  height: 130px; /* 30% taller than the original 100px */
 }
 
 /* Additional Fields */

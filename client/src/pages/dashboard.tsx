@@ -2035,13 +2035,22 @@ export default function Dashboard() {
                     {/* Right Column */}
                     <div className="gms-right-column">
                       
+                      {/* Logging Area */}
+                      <div className="gms-block gms-logging-block gms-logging-block-tall">
+                        <div className="gms-block-title">Melding Logging</div>
+                        <div 
+                          id="gmsMeldingLogging"
+                          className="gms-logging-area gms-logging-area-tall"
+                        ></div>
+                      </div>
+
                       {/* Main Text Field */}
-                      <div className="gms-block gms-text-block">
+                      <div className="gms-block gms-text-block gms-text-block-compact">
                         <div className="gms-block-title">Notitieveld</div>
                         <div 
                           id="gmsKladblok"
                           contentEditable="true"
-                          className="gms-text-area"
+                          className="gms-text-area gms-text-area-compact"
                           data-placeholder="Voer hier de melding in..."
                         ></div>
                         <div className="gms-text-controls">
@@ -2055,15 +2064,6 @@ export default function Dashboard() {
                             Verzend
                           </button>
                         </div>
-                      </div>
-
-                      {/* Logging Area */}
-                      <div className="gms-block gms-logging-block">
-                        <div className="gms-block-title">Melding Logging</div>
-                        <div 
-                          id="gmsMeldingLogging"
-                          className="gms-logging-area"
-                        ></div>
                       </div>
 
                       {/* Additional Fields */}
