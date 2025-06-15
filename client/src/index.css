@@ -388,19 +388,40 @@ body {
   text-align: center;
 }
 
-.priority-low {
+.priority-1 {
+  background: hsl(0, 86%, 94%);
+  color: hsl(0, 65%, 51%);
+}
+
+.priority-2 {
+  background: hsl(214, 86%, 94%);
+  color: hsl(208, 79%, 51%);
+}
+
+.priority-3 {
   background: hsl(122, 41%, 92%);
   color: hsl(123, 38%, 44%);
 }
 
-.priority-medium {
-  background: hsl(32, 100%, 94%);
-  color: hsl(32, 95%, 44%);
+.priority-4-5 {
+  background: hsl(270, 41%, 92%);
+  color: hsl(270, 55%, 45%);
 }
 
-.priority-high {
-  background: hsl(0, 86%, 94%);
-  color: hsl(0, 65%, 51%);
+/* Status badges */
+.status-uitgegeven {
+  color: hsl(208, 79%, 51%);
+  font-weight: 600;
+}
+
+.status-openstaand {
+  color: hsl(32, 95%, 44%);
+  font-weight: 600;
+}
+
+.status-in-wacht {
+  color: hsl(220, 9%, 60%);
+  font-weight: 600;
 }
 
 .units-assigned {

@@ -689,16 +689,13 @@ export default function Dashboard() {
             minute: '2-digit'
           });
 
-          const prioriteitLabel = incident.prioriteit === 1 ? 'Zeer Hoog' :
-                                 incident.prioriteit === 2 ? 'Hoog' :
-                                 incident.prioriteit === 3 ? 'Gemiddeld' :
-                                 incident.prioriteit === 4 ? 'Laag' :
-                                 incident.prioriteit === 5 ? 'Zeer Laag' :
-                                 'Gemiddeld';
+          const prioriteitLabel = `Prio ${incident.prioriteit}`;
 
-          const prioriteitClass = incident.prioriteit <= 2 ? 'priority-high' :
-                                 incident.prioriteit === 3 ? 'priority-medium' :
-                                 'priority-low';
+          const prioriteitClass = incident.prioriteit === 1 ? 'priority-1' :
+                                 incident.prioriteit === 2 ? 'priority-2' :
+                                 incident.prioriteit === 3 ? 'priority-3' :
+                                 (incident.prioriteit === 4 || incident.prioriteit === 5) ? 'priority-4-5' :
+                                 'priority-3';
 
           return `
             <div class="incident-row">
@@ -710,7 +707,7 @@ export default function Dashboard() {
                   ${prioriteitLabel}
                 </span>
               </div>
-              <div class="incident-status">${incident.status}</div>
+              <div class="incident-status status-${incident.status.toLowerCase().replace(' ', '-')}">${incident.status}</div>
             </div>
           `;
         }).join('');

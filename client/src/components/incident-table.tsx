@@ -19,16 +19,25 @@ export default function IncidentTable({
     (inc) => inc.status === 'active' || inc.status === 'accepted'
   );
 
-  const getPriorityLabel = (priority: string) => {
-    switch (priority) {
-      case 'low':
-        return 'Laag';
-      case 'medium':
-        return 'Gemiddeld';
-      case 'high':
-        return 'Hoog';
+  const getPriorityLabel = (priority: string | number) => {
+    const priorityNum = typeof priority === 'string' ? parseInt(priority) : priority;
+    return `Prio ${priorityNum}`;
+  };
+
+  const getPriorityClass = (priority: string | number) => {
+    const priorityNum = typeof priority === 'string' ? parseInt(priority) : priority;
+    switch (priorityNum) {
+      case 1:
+        return 'priority-1';
+      case 2:
+        return 'priority-2';
+      case 3:
+        return 'priority-3';
+      case 4:
+      case 5:
+        return 'priority-4-5';
       default:
-        return priority;
+        return 'priority-3';
     }
   };
 
@@ -63,7 +72,7 @@ export default function IncidentTable({
                 <div className="incident-time">{incident.timeAgo}</div>
                 <div className="units-assigned">{incident.unitsAssigned}</div>
                 <div>
-                  <span className={`priority-tag priority-${incident.priority}`}>
+                  <span className={`priority-tag ${getPriorityClass(incident.priority)}`}>
                     {getPriorityLabel(incident.priority)}
                   </span>
                 </div>
