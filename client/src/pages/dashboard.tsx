@@ -733,13 +733,14 @@ export default function Dashboard() {
     const initializeKladblokFeatures = () => {
       const kladblok = document.getElementById('gmsKladblok');
       const verzendButton = document.getElementById('gmsVerzendButton');
+      const alertButton = document.getElementById('gmsAlertButton');
       const meldingLogging = document.getElementById('gmsMeldingLogging');
       const priorityInput = document.getElementById('gmsPrioriteit') as HTMLInputElement;
       const priorityIndicator = document.getElementById('gmsPriorityIndicator');
       
-      if (!kladblok || !verzendButton || !meldingLogging || !priorityInput || !priorityIndicator) return;
+      if (!kladblok || !verzendButton || !alertButton || !meldingLogging || !priorityInput || !priorityIndicator) return;
 
-      const sendMessage = () => {
+      const sendMessage = (isUrgent = false) => {
         const message = kladblok.textContent?.trim();
         if (!message) return;
 
@@ -830,8 +831,8 @@ export default function Dashboard() {
           }
         };
 
-        // Check for smart commands first
-        const commandProcessed = processSmartCommands(message);
+        // Check for smart commands first (only for non-urgent messages)
+        const commandProcessed = !isUrgent && processSmartCommands(message);
         
         // If a command was processed, clear the kladblok and return
         if (commandProcessed) {
@@ -840,7 +841,7 @@ export default function Dashboard() {
           return;
         }
 
-        // Auto-classification based on keywords
+        // Auto-classification based on keywords (only for non-urgent messages)
         const processAutoClassification = (text: string) => {
           const classificatie1Select = document.getElementById('gmsClassificatie1') as HTMLSelectElement;
           if (!classificatie1Select) return;
@@ -874,22 +875,27 @@ export default function Dashboard() {
           }
         };
 
-        // Process auto-classification
-        processAutoClassification(message);
+        // Process auto-classification (only for non-urgent messages)
+        if (!isUrgent) {
+          processAutoClassification(message);
+        }
 
-        // Create timestamp in HH:MM format
+        // Create timestamp in HH:MM:SS format for urgent messages, HH:MM for regular
         const now = new Date();
         const timestamp = now.toLocaleTimeString('nl-NL', { 
           hour: '2-digit', 
-          minute: '2-digit' 
+          minute: '2-digit',
+          second: isUrgent ? '2-digit' : undefined
         });
 
-        // Create log entry
+        // Create log entry with urgent styling if needed
         const logEntry = document.createElement('div');
-        logEntry.className = 'gms-log-entry';
+        logEntry.className = isUrgent ? 'gms-log-entry urgent' : 'gms-log-entry';
+        
+        const messageText = isUrgent ? `🚨 Spoedmelding: ${message}` : message;
         logEntry.innerHTML = `
           <span class="gms-log-time">${timestamp}</span>
-          <span class="gms-log-message">${message}</span>
+          <span class="gms-log-message">${messageText}</span>
         `;
 
         // Add to logging area (latest at bottom)
@@ -2057,6 +2063,13 @@ export default function Dashboard() {
                           <button type="button" className="gms-text-btn" onClick={() => document.execCommand('bold')}>B</button>
                           <button type="button" className="gms-text-btn" onClick={() => document.execCommand('underline')}>U</button>
                           <button type="button" className="gms-text-btn" onClick={() => document.execCommand('italic')}>I</button>
+                          <button 
+                            id="gmsAlertButton"
+                            className="gms-alert-btn"
+                            title="Markeer als spoedmelding"
+                          >
+                            ❗
+                          </button>
                           <button 
                             id="gmsVerzendButton"
                             className="gms-action-btn"

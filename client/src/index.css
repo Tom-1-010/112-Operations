@@ -815,13 +815,33 @@ body {
   border: 1px inset #c0c0c0;
 }
 
+.gms-alert-btn {
+  background: #dc3545;
+  border: 1px outset #c0c0c0;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.gms-alert-btn:hover {
+  background: #c82333;
+}
+
+.gms-alert-btn:active {
+  border: 1px inset #c0c0c0;
+  background: #bd2130;
+}
+
 .gms-action-btn {
   background: #e0e0e0;
   border: 1px outset #c0c0c0;
   padding: 4px 12px;
   font-size: 11px;
   cursor: pointer;
-  margin-left: auto;
 }
 
 /* Logging Block */
@@ -1030,6 +1050,15 @@ body {
   border-bottom: none;
 }
 
+.gms-log-entry.urgent {
+  background: #f8d7da;
+  padding: 8px;
+  border-radius: 4px;
+  border-bottom: 1px solid #f5c6cb;
+  font-weight: bold;
+  margin: 4px 0;
+}
+
 .gms-log-time {
   color: hsl(208, 79%, 51%);
   font-weight: 600;
@@ -1038,6 +1067,14 @@ body {
 
 .gms-log-message {
   color: hsl(213, 22%, 24%);
+}
+
+.gms-log-entry.urgent .gms-log-time {
+  color: #721c24;
+}
+
+.gms-log-entry.urgent .gms-log-message {
+  color: #721c24;
 }
 
 .gms-priority-wrapper {
