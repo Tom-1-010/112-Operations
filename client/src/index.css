@@ -1,0 +1,484 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Police Dashboard Specific Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: hsl(210, 14%, 97%);
+  color: hsl(213, 22%, 24%);
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, hsl(208, 79%, 51%) 0%, hsl(215, 89%, 34%) 100%);
+  color: white;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.sidebar-nav {
+  padding: 20px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.1);
+  border-left-color: hsl(206, 82%, 69%);
+}
+
+.nav-item.active {
+  background: rgba(255,255,255,0.15);
+  border-left-color: white;
+}
+
+.nav-item i {
+  width: 20px;
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.header h1 {
+  color: hsl(208, 79%, 51%);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.header-time {
+  color: hsl(220, 9%, 40%);
+  font-size: 14px;
+}
+
+/* Dashboard Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-left: 4px solid hsl(208, 79%, 51%);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: hsl(208, 79%, 51%);
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: hsl(220, 9%, 40%);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-icon {
+  float: right;
+  font-size: 24px;
+  color: hsl(208, 79%, 51%);
+  opacity: 0.7;
+}
+
+/* Content Sections */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 20px 24px;
+  background: hsl(210, 14%, 97%);
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background: hsl(208, 79%, 51%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: hsl(215, 89%, 34%);
+}
+
+.btn-success {
+  background: hsl(122, 39%, 49%);
+  color: white;
+}
+
+.btn-success:hover {
+  background: hsl(123, 38%, 44%);
+}
+
+.btn-danger {
+  background: hsl(0, 65%, 51%);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: hsl(0, 68%, 42%);
+}
+
+.btn-secondary {
+  background: hsl(210, 11%, 47%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: hsl(210, 11%, 40%);
+}
+
+/* Incidents Table */
+.incidents-table {
+  width: 100%;
+}
+
+.incident-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 80px 100px 140px;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+  align-items: center;
+  font-size: 14px;
+}
+
+.incident-row:hover {
+  background: hsl(210, 14%, 97%);
+}
+
+.incident-type {
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+}
+
+.incident-location {
+  color: hsl(220, 9%, 40%);
+}
+
+.incident-time {
+  color: hsl(220, 9%, 40%);
+  font-size: 12px;
+}
+
+.priority-tag {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.priority-low {
+  background: hsl(122, 41%, 92%);
+  color: hsl(123, 38%, 44%);
+}
+
+.priority-medium {
+  background: hsl(32, 100%, 94%);
+  color: hsl(32, 95%, 44%);
+}
+
+.priority-high {
+  background: hsl(0, 86%, 94%);
+  color: hsl(0, 65%, 51%);
+}
+
+.units-assigned {
+  text-align: center;
+  color: hsl(208, 79%, 51%);
+  font-weight: 600;
+}
+
+.incident-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Units Panel */
+.units-grid {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.unit-type {
+  margin-bottom: 16px;
+}
+
+.unit-type-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unit-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.unit-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unit-active {
+  background: hsl(122, 41%, 92%);
+  color: hsl(123, 38%, 44%);
+}
+
+.unit-inactive {
+  background: hsl(0, 86%, 94%);
+  color: hsl(0, 65%, 51%);
+}
+
+.unit-busy {
+  background: hsl(32, 100%, 94%);
+  color: hsl(32, 95%, 44%);
+}
+
+/* Status indicator */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-active {
+  background: hsl(122, 41%, 49%);
+}
+
+.status-inactive {
+  background: hsl(0, 84%, 57%);
+}
+
+.status-busy {
+  background: hsl(32, 95%, 60%);
+}
+
+/* Notification */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: hsl(122, 41%, 49%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+/* Hidden class for navigation */
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .incident-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .incident-actions {
+    justify-content: flex-start;
+  }
+}
