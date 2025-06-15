@@ -435,17 +435,15 @@ export default function Dashboard() {
         const classificatie3 = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
         
         // Bestaande velden
-        const locatie = document.getElementById("gmsLocatie") as HTMLInputElement;
         const tijdstip = document.getElementById("gmsTijdstip") as HTMLInputElement;
-        const soortMelding = document.getElementById("gmsSoortMelding") as HTMLSelectElement;
         const prioriteit = document.getElementById("gmsPrioriteit") as HTMLInputElement;
         const output = document.getElementById("gmsOutput");
 
         if (!kladblok || !output) return;
 
         // Validate required fields
-        if (!meldingsadres?.value.trim() && !locatie?.value.trim()) {
-          alert("Vul minimaal het meldingsadres of locatie in.");
+        if (!meldingsadres?.value.trim()) {
+          alert("Vul het meldingsadres in.");
           return;
         }
 
@@ -472,9 +470,7 @@ export default function Dashboard() {
           
           // Aanvullende informatie
           opmerkingen: kladblok.textContent || "",
-          locatie: locatie?.value.trim() || "",
           tijdstip: tijdstip?.value || "",
-          soortMelding: soortMelding?.value || "",
           prioriteit: parseInt(prioriteit?.value || "3")
         };
 
@@ -509,8 +505,6 @@ export default function Dashboard() {
         if (classificatie3) classificatie3.value = "";
         
         // Reset bestaande velden
-        if (locatie) locatie.value = "";
-        if (soortMelding) soortMelding.value = "";
         if (prioriteit) prioriteit.value = "3";
         updateGMSTime();
 
@@ -700,8 +694,8 @@ export default function Dashboard() {
           return `
             <div class="incident-row">
               <div class="incident-time">${formattedTime}</div>
-              <div class="incident-location">${incident.gemeente || incident.locatie || 'Onbekend'}</div>
-              <div class="incident-type">${incident.soortMelding || 'Onbekend'}</div>
+              <div class="incident-location">${incident.gemeente || incident.meldingsadres || 'Onbekend'}</div>
+              <div class="incident-type">${incident.classificatie1 || 'Onbekend'}</div>
               <div>
                 <span class="priority-tag ${prioriteitClass}">
                   ${prioriteitLabel}
@@ -1555,16 +1549,6 @@ export default function Dashboard() {
                   <div className="gms-bottom-row">
                     <div className="gms-additional-fields">
                       <div className="gms-form-group">
-                        <label className="gms-label" htmlFor="gmsLocatie">📍 Locatie (legacy)</label>
-                        <input
-                          type="text"
-                          id="gmsLocatie"
-                          className="gms-input"
-                          placeholder="Voer locatie in..."
-                        />
-                      </div>
-                      
-                      <div className="gms-form-group">
                         <label className="gms-label" htmlFor="gmsTijdstip">⏰ Tijdstip</label>
                         <input
                           type="datetime-local"
@@ -1572,16 +1556,6 @@ export default function Dashboard() {
                           className="gms-input"
                           readOnly
                         />
-                      </div>
-                      
-                      <div className="gms-form-group">
-                        <label className="gms-label" htmlFor="gmsSoortMelding">🚨 Soort melding</label>
-                        <select id="gmsSoortMelding" className="gms-input">
-                          <option value="">Selecteer soort melding...</option>
-                          <option value="Inbraak woning">Inbraak woning</option>
-                          <option value="Brandmelding">Brandmelding</option>
-                          <option value="Verkeersongeval">Verkeersongeval</option>
-                        </select>
                       </div>
                       
                       <div className="gms-form-group">
