@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [notification, setNotification] = useState("");
   const [showNotification, setShowNotification] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
 
   const [incidents, setIncidents] = useLocalStorage<Incident[]>(
     "policeIncidents",
@@ -178,6 +179,37 @@ export default function Dashboard() {
     });
     setShowAddUnitForm(false);
     showNotificationMessage("Nieuwe eenheid toegevoegd");
+  };
+
+  const handleDeleteAllIncidents = () => {
+    // Clear incidents from localStorage
+    localStorage.removeItem('incidenten');
+    
+    // Clear all incident logs
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('incident_logs_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Close the modal
+    setShowDeleteConfirmModal(false);
+    
+    // Show success message
+    showNotificationMessage("Alle incidenten zijn verwijderd.");
+    
+    // Refresh the incidents list if on the incidents page
+    if (activeSection === 'incidents') {
+      const incidentsList = document.getElementById('allIncidentsLegacyList');
+      if (incidentsList) {
+        incidentsList.innerHTML = `
+          <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
+            Geen incidenten gevonden
+          </div>
+        `;
+      }
+    }
   };
 
   const toggleRole = (role: string) => {
@@ -1997,6 +2029,12 @@ export default function Dashboard() {
             <div className="section">
               <div className="section-header">
                 <h3 className="section-title">Alle Incidenten</h3>
+                <button 
+                  className="delete-all-incidents-btn"
+                  onClick={() => setShowDeleteConfirmModal(true)}
+                >
+                  🗑️ Delete All Incidents
+                </button>
               </div>
               <div className="incidents-legacy-content">
                 <div className="incidents-legacy-table">
@@ -2115,6 +2153,34 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Delete Confirmation Modal */}
+              {showDeleteConfirmModal && (
+                <div className="delete-confirm-modal-overlay">
+                  <div className="delete-confirm-modal-content">
+                    <div className="delete-confirm-modal-header">
+                      <h3>Bevestiging vereist</h3>
+                    </div>
+                    <div className="delete-confirm-modal-body">
+                      <p>Weet je zeker dat je alle incidenten wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.</p>
+                    </div>
+                    <div className="delete-confirm-modal-footer">
+                      <button 
+                        className="delete-confirm-cancel-btn"
+                        onClick={() => setShowDeleteConfirmModal(false)}
+                      >
+                        Annuleren
+                      </button>
+                      <button 
+                        className="delete-confirm-delete-btn"
+                        onClick={handleDeleteAllIncidents}
+                      >
+                        Verwijder alles
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
