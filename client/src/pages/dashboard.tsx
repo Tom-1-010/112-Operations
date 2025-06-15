@@ -728,77 +728,6 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
-  // Simple address autocomplete functionality
-  useEffect(() => {
-    if (activeSection !== 'gms') return;
-
-    const addressInput = document.getElementById('gmsMeldingsadres') as HTMLInputElement;
-    const suggestionsContainer = document.getElementById('addressSuggestions');
-    
-    if (!addressInput || !suggestionsContainer) return;
-
-    let timeoutId: NodeJS.Timeout;
-
-    const handleInput = async (e: Event) => {
-      const query = (e.target as HTMLInputElement).value.trim();
-      
-      clearTimeout(timeoutId);
-      
-      if (query.length < 3) {
-        suggestionsContainer.style.display = 'none';
-        return;
-      }
-
-      timeoutId = setTimeout(async () => {
-        try {
-          const response = await fetch(`/api/address/search?q=${encodeURIComponent(query)}`);
-          const data = await response.json();
-          
-          if (data?.response?.docs?.length > 0) {
-            const suggestions = data.response.docs.slice(0, 5);
-            suggestionsContainer.innerHTML = suggestions.map((addr: any) => `
-              <div class="address-suggestion" data-full="${addr.weergavenaam}">
-                ${addr.weergavenaam}
-              </div>
-            `).join('');
-            
-            suggestionsContainer.style.display = 'block';
-            
-            // Add click handlers
-            suggestions.forEach((_: any, index: number) => {
-              const suggestionEl = suggestionsContainer.children[index] as HTMLElement;
-              suggestionEl.onclick = () => {
-                const fullAddress = suggestionEl.getAttribute('data-full') || '';
-                addressInput.value = fullAddress.split(',')[0];
-                suggestionsContainer.style.display = 'none';
-              };
-            });
-          } else {
-            suggestionsContainer.style.display = 'none';
-          }
-        } catch (error) {
-          console.error('Address search failed:', error);
-          suggestionsContainer.style.display = 'none';
-        }
-      }, 300);
-    };
-
-    const handleClickOutside = (e: Event) => {
-      if (!addressInput.contains(e.target as Node) && !suggestionsContainer.contains(e.target as Node)) {
-        suggestionsContainer.style.display = 'none';
-      }
-    };
-
-    addressInput.addEventListener('input', handleInput);
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      clearTimeout(timeoutId);
-      addressInput.removeEventListener('input', handleInput);
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [activeSection]);
-
   const showNotificationMessage = (message: string) => {
     setNotification(message);
     setShowNotification(true);
@@ -1211,18 +1140,14 @@ export default function Dashboard() {
                     {/* Melding Locatie - Right Column */}
                     <div className="gms-melding-section">
                       <h4 className="gms-section-title">📍 Melding Locatie</h4>
-                      <div className="gms-form-group gms-address-autocomplete">
+                      <div className="gms-form-group">
                         <label className="gms-label" htmlFor="gmsMeldingsadres">📍 Meldingsadres</label>
-                        <div className="address-input-container">
-                          <input
-                            type="text"
-                            id="gmsMeldingsadres"
-                            className="gms-input"
-                            placeholder="Adres van het incident..."
-                            autoComplete="off"
-                          />
-                          <div id="addressSuggestions" className="address-suggestions"></div>
-                        </div>
+                        <input
+                          type="text"
+                          id="gmsMeldingsadres"
+                          className="gms-input"
+                          placeholder="Adres van het incident..."
+                        />
                       </div>
                       
                       <div className="gms-form-group">
