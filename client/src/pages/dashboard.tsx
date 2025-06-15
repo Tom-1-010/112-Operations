@@ -759,50 +759,54 @@ export default function Dashboard() {
 
         // Parse address information and auto-fill form fields
         const parseAndFillAddress = (addressText: string) => {
-          // Address parsing patterns
-          const patterns = [
-            // Pattern 1: "Street number, City" (e.g., "Kalverstraat 123, Amsterdam")
-            /^(.+?)\s+(\d+[a-zA-Z]?)\s*,\s*(.+)$/,
-            // Pattern 2: "Street number City" (e.g., "Kalverstraat 123 Amsterdam")
-            /^(.+?)\s+(\d+[a-zA-Z]?)\s+(.+)$/,
-            // Pattern 3: Just "Street, City" (e.g., "Kalverstraat, Amsterdam")
-            /^(.+?)\s*,\s*(.+)$/
-          ];
-
-          let streetName = '';
-          let houseNumber = '';
-          let cityName = '';
-
-          for (const pattern of patterns) {
-            const match = addressText.match(pattern);
-            if (match) {
-              if (match.length === 4) {
-                // Pattern 1 & 2: Street, Number, City
-                streetName = match[1].trim();
-                houseNumber = match[2].trim();
-                cityName = match[3].trim();
-              } else if (match.length === 3) {
-                // Pattern 3: Street, City (no number)
-                streetName = match[1].trim();
-                cityName = match[2].trim();
-              }
-              break;
-            }
-          }
-
-          // Auto-fill the form fields
+          // Get form field references
           const straatnaamField = document.getElementById('gmsStraatnaam') as HTMLInputElement;
           const huisnummerField = document.getElementById('gmsHuisnummer') as HTMLInputElement;
           const plaatsnaamField = document.getElementById('gmsPlaatsnaam') as HTMLInputElement;
 
-          if (straatnaamField && streetName) {
-            straatnaamField.value = streetName;
-          }
-          if (huisnummerField && houseNumber) {
-            huisnummerField.value = houseNumber;
-          }
-          if (plaatsnaamField && cityName) {
-            plaatsnaamField.value = cityName;
+          let cityName = '';
+          let streetName = '';
+          let houseNumber = '';
+          let feedbackMessage = '';
+
+          // Pattern 1: =Plaatsnaam (just city name)
+          if (!addressText.includes('/')) {
+            cityName = addressText.trim();
+            if (plaatsnaamField) {
+              plaatsnaamField.value = cityName;
+            }
+            feedbackMessage = `📍 Plaatsnaam ingevuld: ${cityName}`;
+          } 
+          // Pattern 2: =Plaatsnaam/Straatnaam Huisnummer
+          else {
+            const parts = addressText.split('/');
+            if (parts.length === 2) {
+              cityName = parts[0].trim();
+              const streetAndNumber = parts[1].trim();
+              
+              // Extract street name and house number
+              // Match pattern: "Straatnaam Huisnummer" where number can include letters
+              const streetMatch = streetAndNumber.match(/^(.+?)\s+(\d+[a-zA-Z]*)$/);
+              
+              if (streetMatch) {
+                streetName = streetMatch[1].trim();
+                houseNumber = streetMatch[2].trim();
+                
+                // Fill all three fields
+                if (plaatsnaamField) plaatsnaamField.value = cityName;
+                if (straatnaamField) straatnaamField.value = streetName;
+                if (huisnummerField) huisnummerField.value = houseNumber;
+                
+                feedbackMessage = `📍 Adres ingevuld: ${cityName}, ${streetName} ${houseNumber}`;
+              } else {
+                // If no house number found, just fill city and street
+                streetName = streetAndNumber;
+                if (plaatsnaamField) plaatsnaamField.value = cityName;
+                if (straatnaamField) straatnaamField.value = streetName;
+                
+                feedbackMessage = `📍 Adres ingevuld: ${cityName}, ${streetName}`;
+              }
+            }
           }
 
           // Add visual feedback
@@ -810,7 +814,7 @@ export default function Dashboard() {
           logEntry.className = 'gms-log-entry';
           logEntry.innerHTML = `
             <span class="gms-log-time">${new Date().toLocaleTimeString('nl-NL')}</span>
-            <span class="gms-log-message">📍 Adres automatisch ingevuld: ${streetName} ${houseNumber}, ${cityName}</span>
+            <span class="gms-log-message">${feedbackMessage}</span>
           `;
           meldingLogging.appendChild(logEntry);
           meldingLogging.scrollTop = meldingLogging.scrollHeight;
