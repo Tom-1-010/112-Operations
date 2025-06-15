@@ -984,6 +984,193 @@ export default function Dashboard() {
       // Initialize header with current values
       updateDynamicHeader();
 
+      // GMS Status Button Handlers
+      const collectGMSFormData = () => {
+        // Get all form field values
+        const meldernaam = (document.getElementById('gmsMeldernaam') as HTMLInputElement)?.value || '';
+        const telefoonnummer = (document.getElementById('gmsTelefoonnummer') as HTMLInputElement)?.value || '';
+        const melderadres = (document.getElementById('gmsMelderadres') as HTMLInputElement)?.value || '';
+        const straatnaam = (document.getElementById('gmsStraatnaam') as HTMLInputElement)?.value || '';
+        const huisnummer = (document.getElementById('gmsHuisnummer') as HTMLInputElement)?.value || '';
+        const toevoeging = (document.getElementById('gmsToevoeging') as HTMLInputElement)?.value || '';
+        const postcode = (document.getElementById('gmsPostcode') as HTMLInputElement)?.value || '';
+        const plaatsnaam = (document.getElementById('gmsPlaatsnaam') as HTMLInputElement)?.value || '';
+        const gemeente = (document.getElementById('gmsGemeente') as HTMLInputElement)?.value || '';
+        const classificatie1 = (document.getElementById('gmsClassificatie1') as HTMLSelectElement)?.value || '';
+        const classificatie2 = (document.getElementById('gmsClassificatie2') as HTMLSelectElement)?.value || '';
+        const classificatie3 = (document.getElementById('gmsClassificatie3') as HTMLSelectElement)?.value || '';
+        const prioriteit = parseInt((document.getElementById('gmsPrioriteit') as HTMLInputElement)?.value || '3');
+        const tijdstip = (document.getElementById('gmsTijdstip') as HTMLInputElement)?.value || '';
+        const notities = kladblok?.textContent || '';
+
+        // Create location string
+        const locationParts = [straatnaam, huisnummer, plaatsnaam].filter(part => part.trim());
+        const location = locationParts.length > 0 ? locationParts.join(' ') : 'Onbekende locatie';
+
+        return {
+          meldernaam,
+          telefoonnummer,
+          melderadres,
+          straatnaam,
+          huisnummer,
+          toevoeging,
+          postcode,
+          plaatsnaam,
+          gemeente,
+          classificatie1,
+          classificatie2,
+          classificatie3,
+          prioriteit,
+          tijdstip,
+          notities,
+          location
+        };
+      };
+
+      const createIncidentFromGMS = (status: 'Afgesloten' | 'Openstaand') => {
+        const formData = collectGMSFormData();
+        const now = new Date();
+        
+        // Convert numeric priority to string priority
+        const getPriorityString = (priority: number): 'low' | 'medium' | 'high' => {
+          if (priority <= 2) return 'high';
+          if (priority === 3) return 'medium';
+          return 'low';
+        };
+
+        // Map status to expected incident status
+        const getIncidentStatus = (gmsStatus: string): 'active' | 'accepted' | 'closed' => {
+          if (gmsStatus === 'Afgesloten') return 'closed';
+          if (gmsStatus === 'Openstaand') return 'accepted';
+          return 'active';
+        };
+        
+        const incident = {
+          id: Date.now(),
+          type: formData.classificatie1 || 'Algemeen',
+          location: formData.location,
+          timestamp: now.toISOString(),
+          timeAgo: '0 min geleden',
+          unitsAssigned: 0,
+          priority: getPriorityString(formData.prioriteit),
+          status: getIncidentStatus(status),
+          // Additional GMS data (as extended properties)
+          meldernaam: formData.meldernaam,
+          telefoonnummer: formData.telefoonnummer,
+          melderadres: formData.melderadres,
+          straatnaam: formData.straatnaam,
+          huisnummer: formData.huisnummer,
+          toevoeging: formData.toevoeging,
+          postcode: formData.postcode,
+          plaatsnaam: formData.plaatsnaam,
+          gemeente: formData.gemeente,
+          classificatie2: formData.classificatie2,
+          classificatie3: formData.classificatie3,
+          notities: formData.notities
+        } as any; // Cast to any to allow additional properties
+
+        return incident as Incident;
+      };
+
+      const resetGMSForm = () => {
+        // Reset all input fields
+        const inputs = document.querySelectorAll('.gms-classic-layout input[type="text"], .gms-classic-layout input[type="number"]');
+        inputs.forEach((input) => {
+          (input as HTMLInputElement).value = '';
+        });
+
+        // Reset select fields
+        const selects = document.querySelectorAll('.gms-classic-layout select');
+        selects.forEach((select) => {
+          (select as HTMLSelectElement).selectedIndex = 0;
+        });
+
+        // Reset priority to default
+        const priorityInput = document.getElementById('gmsPrioriteit') as HTMLInputElement;
+        if (priorityInput) {
+          priorityInput.value = '3';
+          updatePriorityIndicator();
+        }
+
+        // Clear notepad and logging
+        if (kladblok) {
+          kladblok.textContent = '';
+        }
+        if (meldingLogging) {
+          meldingLogging.innerHTML = '';
+        }
+
+        // Reset datetime to current time
+        const timeInput = document.getElementById('gmsTijdstip') as HTMLInputElement;
+        if (timeInput) {
+          const now = new Date();
+          const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+          timeInput.value = localDateTime;
+        }
+
+        // Update header
+        updateDynamicHeader();
+      };
+
+      // Event handlers for status buttons
+      const handleEindrapport = () => {
+        const incident = createIncidentFromGMS('Afgesloten');
+        
+        // Add to incidents list
+        setIncidents(prev => [incident, ...prev]);
+        
+        // Show notification
+        showNotificationMessage('Eindrapport opgeslagen en naar Incidenten verzonden');
+        
+        // Reset form
+        resetGMSForm();
+      };
+
+      const handleUitgifte = () => {
+        const incident = createIncidentFromGMS('Openstaand');
+        
+        // Add to incidents list
+        setIncidents(prev => [incident, ...prev]);
+        
+        // Show notification
+        showNotificationMessage('Incident uitgegeven en naar Incidenten verzonden');
+        
+        // Reset form
+        resetGMSForm();
+      };
+
+      const handleSluitAf = () => {
+        resetGMSForm();
+        showNotificationMessage('Formulier gereset');
+      };
+
+      const handleSluit = () => {
+        // No specific functionality for now
+        showNotificationMessage('Sluit functie nog niet geïmplementeerd');
+      };
+
+      // Get button references
+      const eindrapportBtn = document.getElementById('gmsEindrapportButton');
+      const uitgifteBtn = document.getElementById('gmsUitgifteButton');
+      const sluitAfBtn = document.getElementById('gmsSluitAfButton');
+      const sluitBtn = document.getElementById('gmsSluitButton');
+
+      // Add event listeners for status buttons
+      if (eindrapportBtn) {
+        eindrapportBtn.addEventListener('click', handleEindrapport);
+      }
+      if (uitgifteBtn) {
+        uitgifteBtn.addEventListener('click', handleUitgifte);
+      }
+      if (sluitAfBtn) {
+        sluitAfBtn.addEventListener('click', handleSluitAf);
+      }
+      if (sluitBtn) {
+        sluitBtn.addEventListener('click', handleSluit);
+      }
+
       return () => {
         verzendButton.removeEventListener('click', handleVerzendClick);
         kladblok.removeEventListener('keydown', handleKeyDown);
@@ -1001,6 +1188,20 @@ export default function Dashboard() {
         if (plaatsnaamField) {
           plaatsnaamField.removeEventListener('input', handleHeaderFieldChange);
           plaatsnaamField.removeEventListener('change', handleHeaderFieldChange);
+        }
+
+        // Remove status button event listeners
+        if (eindrapportBtn) {
+          eindrapportBtn.removeEventListener('click', handleEindrapport);
+        }
+        if (uitgifteBtn) {
+          uitgifteBtn.removeEventListener('click', handleUitgifte);
+        }
+        if (sluitAfBtn) {
+          sluitAfBtn.removeEventListener('click', handleSluitAf);
+        }
+        if (sluitBtn) {
+          sluitBtn.removeEventListener('click', handleSluit);
         }
       };
     };
@@ -1752,10 +1953,10 @@ export default function Dashboard() {
                       <span>Woensdag 18 november 2015, 08:27:38</span>
                     </div>
                     <div className="gms-status-right">
-                      <button className="gms-status-btn">Eindrapport</button>
-                      <button className="gms-status-btn">Uitgifte</button>
-                      <button className="gms-status-btn" id="gmsSaveButton">Sluit af</button>
-                      <button className="gms-status-btn">Sluit</button>
+                      <button className="gms-status-btn" id="gmsEindrapportButton">Eindrapport</button>
+                      <button className="gms-status-btn" id="gmsUitgifteButton">Uitgifte</button>
+                      <button className="gms-status-btn" id="gmsSluitAfButton">Sluit af</button>
+                      <button className="gms-status-btn" id="gmsSluitButton">Sluit</button>
                     </div>
                   </div>
                 </div>
