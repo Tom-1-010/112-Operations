@@ -792,15 +792,28 @@ export default function Dashboard() {
             throw new Error('Invalid response format');
           }
           
-          const data = await response.json();
+          const text = await response.text();
+          console.log('Raw response:', text.substring(0, 200));
+          
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            console.error('JSON parse error:', parseError, 'Response:', text.substring(0, 100));
+            throw new Error('Invalid JSON response');
+          }
+          
+          console.log('Parsed data:', data);
           
           if (data.error) {
             throw new Error(data.error);
           }
           
           if (data.response && data.response.docs && Array.isArray(data.response.docs) && data.response.docs.length > 0) {
+            console.log('Showing suggestions:', data.response.docs.length);
             showSuggestions(data.response.docs);
           } else {
+            console.log('No results found');
             showNoResults();
           }
         } catch (error) {
@@ -822,13 +835,25 @@ export default function Dashboard() {
             throw new Error('Invalid response format');
           }
           
-          const data = await response.json();
+          const text = await response.text();
+          console.log('Lookup raw response:', text.substring(0, 200));
+          
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            console.error('Lookup JSON parse error:', parseError, 'Response:', text.substring(0, 100));
+            throw new Error('Invalid JSON response from lookup');
+          }
+          
+          console.log('Lookup parsed data:', data);
           
           if (data.error) {
             throw new Error(data.error);
           }
           
           if (data.response && data.response.docs && Array.isArray(data.response.docs) && data.response.docs[0]) {
+            console.log('Address details found:', data.response.docs[0]);
             return data.response.docs[0];
           }
         } catch (error) {
