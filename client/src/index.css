@@ -519,11 +519,98 @@ body {
   display: block;
 }
 
-/* GMS Styles */
+/* GMS Styles - Restructured Layout */
 .gms-content {
   padding: 24px;
 }
 
+.gms-main-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Top Row: Kladblok (left) + Info columns (right) */
+.gms-top-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+}
+
+.gms-kladblok-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gms-info-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.gms-melder-section,
+.gms-melding-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid hsl(214, 13%, 91%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Middle Row: Logging (left) + Classifications (right) */
+.gms-middle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.gms-logging-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gms-classificatie-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid hsl(214, 13%, 91%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Bottom Row: Additional fields + Actions */
+.gms-bottom-row {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 32px;
+  align-items: end;
+}
+
+.gms-additional-fields {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid hsl(214, 13%, 91%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.gms-actions-section {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+}
+
+/* Legacy grid styles for compatibility */
 .gms-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -541,13 +628,6 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 24px;
-}
-
-.gms-melder-section,
-.gms-melding-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 .gms-section-title {
@@ -1305,6 +1385,32 @@ body {
     padding: 16px;
   }
   
+  /* Responsive adjustments for new layout */
+  .gms-top-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .gms-info-columns {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .gms-middle-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .gms-bottom-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .gms-additional-fields {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Legacy responsive styles */
   .gms-form-grid {
     gap: 16px;
   }
