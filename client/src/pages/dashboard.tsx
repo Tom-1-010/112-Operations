@@ -880,9 +880,9 @@ export default function Dashboard() {
           
           // Refresh logging display
           loadIncidentLogging(incidentId);
-        }
+        };
 
-        function assignUnitToIncident(incidentId: string, unitNumber: string) {
+        const assignUnitToIncident = (incidentId: string, unitNumber: string) => {
           const timestamp = new Date().toLocaleString('nl-NL', {
             day: '2-digit',
             month: '2-digit',
@@ -920,7 +920,29 @@ export default function Dashboard() {
           // Reset select
           const unitSelect = document.getElementById('unitAssignmentSelect') as HTMLSelectElement;
           if (unitSelect) unitSelect.value = '';
-        }
+        };
+
+        // Add row selection functionality and modal opening
+        (window as any).selectIncidentRow = function(row: HTMLElement) {
+          // Remove previous selection
+          const previousSelected = incidentsList.querySelector('.selected');
+          if (previousSelected) {
+            previousSelected.classList.remove('selected');
+          }
+          
+          // Add selection to clicked row
+          row.classList.add('selected');
+          
+          // Get incident data and open modal
+          const incidentId = row.getAttribute('data-incident-id');
+          if (incidentId) {
+            const incident = sortedIncidenten.find((inc: any) => String(inc.id || sortedIncidenten.indexOf(inc)) === incidentId);
+            
+            if (incident) {
+              openIncidentModal(incident, incidentId);
+            }
+          }
+        };
 
         // Initialize modal event listeners
         setupModalEventListeners();
