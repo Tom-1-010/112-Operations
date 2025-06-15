@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politie Meldkamer Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            color: #2c3e50;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #74b9ff;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            border-left-color: white;
+            color: white;
+        }
+
+        .nav-item .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            color: #2a5298;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-time {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: #2a5298;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        /* GMS Form Styles */
+        .gms-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .form-section h3 {
+            color: #2a5298;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .notes-area {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .priority-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(42, 82, 152, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(42, 82, 152, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* JSON Output */
+        .json-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+
+        .json-output:empty::before {
+            content: "Vul het formulier in en klik op 'Melding opslaan' om de JSON-output te zien...";
+            color: #95a5a6;
+        }
+
+        /* Placeholder sections */
+        .placeholder-content {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .placeholder-content .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .gms-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div style="font-size: 32px;">🛡️</div>
+                <h1>Politie Meldkamer</h1>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-item active" data-section="dashboard">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-section="incidenten">
+                    <span class="icon">⚠️</span>
+                    <span>Incidenten</span>
+                </div>
+                <div class="nav-item" data-section="eenheden">
+                    <span class="icon">🚔</span>
+                    <span>Eenheden</span>
+                </div>
+                <div class="nav-item" data-section="gms">
+                    <span class="icon">📝</span>
+                    <span>GMS</span>
+                </div>
+                <div class="nav-item" data-section="kaart">
+                    <span class="icon">🗺️</span>
+                    <span>Kaart</span>
+                </div>
+                <div class="nav-item" data-section="archief">
+                    <span class="icon">📁</span>
+                    <span>Archief</span>
+                </div>
+                <div class="nav-item" data-section="rapporten">
+                    <span class="icon">📋</span>
+                    <span>Rapporten</span>
+                </div>
+                <div class="nav-item" data-section="instellingen">
+                    <span class="icon">⚙️</span>
+                    <span>Instellingen</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h2 id="page-title">Dashboard</h2>
+                <div class="header-time" id="current-time"></div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h3 class="section-title">Welkom bij de Politie Meldkamer</h3>
+                <div class="placeholder-content">
+                    <div class="icon">📊</div>
+                    <p>Dashboard overzicht wordt geladen...</p>
+                </div>
+            </section>
+
+            <!-- Incidenten Section -->
+            <section id="incidenten" class="content-section">
+                <h3 class="section-title">Incidenten Overzicht</h3>
+                <div class="placeholder-content">
+                    <div class="icon">⚠️</div>
+                    <p>Incidenten beheer wordt geladen...</p>
+                </div>
+            </section>
+
+            <!-- Eenheden Section -->
+            <section id="eenheden" class="content-section">
+                <h3 class="section-title">Eenheden Beheer</h3>
+                <div class="placeholder-content">
+                    <div class="icon">🚔</div>
+                    <p>Eenheden overzicht wordt geladen...</p>
+                </div>
+            </section>
+
+            <!-- GMS Section -->
+            <section id="gms" class="content-section">
+                <h3 class="section-title">GMS - Geïntegreerd Meldkamer Systeem</h3>
+                
+                <div class="gms-content">
+                    <!-- Notes Section -->
+                    <div class="form-section">
+                        <h3>📝 Vrije Notitie</h3>
+                        <textarea 
+                            id="notes" 
+                            class="form-control notes-area" 
+                            placeholder="Typ hier uw notities over het incident..."
+                        ></textarea>
+                        <div style="margin-top: 8px; font-size: 12px; color: #7f8c8d;" id="notes-timestamp">
+                            Laatst bijgewerkt: Nog niet gewijzigd
+                        </div>
+                    </div>
+
+                    <!-- Form Section -->
+                    <div class="form-section">
+                        <h3>📋 Incident Details</h3>
+                        <form id="gms-form">
+                            <div class="form-group">
+                                <label for="locatie">📍 Locatie</label>
+                                <input 
+                                    type="text" 
+                                    id="locatie" 
+                                    class="form-control" 
+                                    placeholder="Voer de locatie in..."
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tijdstip">⏰ Tijdstip</label>
+                                <input 
+                                    type="datetime-local" 
+                                    id="tijdstip" 
+                                    class="form-control"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="soort-melding">🚨 Soort Melding</label>
+                                <select id="soort-melding" class="form-control" required>
+                                    <option value="">Selecteer soort melding...</option>
+                                    <option value="Inbraak woning">Inbraak woning</option>
+                                    <option value="Brandmelding">Brandmelding</option>
+                                    <option value="Verkeersongeval">Verkeersongeval</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prioriteit">⚡ Prioriteit (1-5)</label>
+                                <input 
+                                    type="number" 
+                                    id="prioriteit" 
+                                    class="form-control" 
+                                    min="1" 
+                                    max="5" 
+                                    value="3"
+                                    required
+                                >
+                                <div class="priority-display" id="priority-display">
+                                    <span id="priority-emoji">⚠️</span>
+                                    <span id="priority-badge" class="priority-badge" style="background-color: #f39c12;">GEMIDDELD</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn">
+                                💾 Melding Opslaan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- JSON Output -->
+                <div class="form-section">
+                    <h3>📊 Incident Data (JSON)</h3>
+                    <pre id="json-output" class="json-output"></pre>
+                </div>
+            </section>
+
+            <!-- Kaart Section -->
+            <section id="kaart" class="content-section">
+                <h3 class="section-title">Kaart Overzicht</h3>
+                <div class="placeholder-content">
+                    <div class="icon">🗺️</div>
+                    <p>Kaart interface wordt geladen...</p>
+                </div>
+            </section>
+
+            <!-- Archief Section -->
+            <section id="archief" class="content-section">
+                <h3 class="section-title">Archief</h3>
+                <div class="placeholder-content">
+                    <div class="icon">📁</div>
+                    <p>Archief systeem wordt geladen...</p>
+                </div>
+            </section>
+
+            <!-- Rapporten Section -->
+            <section id="rapporten" class="content-section">
+                <h3 class="section-title">Rapporten</h3>
+                <div class="placeholder-content">
+                    <div class="icon">📋</div>
+                    <p>Rapport generator wordt geladen...</p>
+                </div>
+            </section>
+
+            <!-- Instellingen Section -->
+            <section id="instellingen" class="content-section">
+                <h3 class="section-title">Instellingen</h3>
+                <div class="placeholder-content">
+                    <div class="icon">⚙️</div>
+                    <p>Systeem instellingen worden geladen...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTime();
+            setupNavigation();
+            setupGMSForm();
+            updateTimeDisplay();
+        });
+
+        // Navigation functionality
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.content-section');
+            const pageTitle = document.getElementById('page-title');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Hide all sections
+                    sections.forEach(section => section.classList.remove('active'));
+                    
+                    // Show target section
+                    const target = document.getElementById(targetSection);
+                    if (target) {
+                        target.classList.add('active');
+                        
+                        // Update page title
+                        const sectionName = this.querySelector('span:last-child').textContent;
+                        pageTitle.textContent = sectionName;
+                    }
+                });
+            });
+        }
+
+        // Time functionality
+        function initializeTime() {
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString().slice(0, 16);
+            document.getElementById('tijdstip').value = localDateTime;
+        }
+
+        function updateTimeDisplay() {
+            const timeElement = document.getElementById('current-time');
+            
+            function updateTime() {
+                const now = new Date();
+                const timeString = now.toLocaleString('nl-NL', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                timeElement.textContent = timeString;
+            }
+            
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        // GMS Form functionality
+        function setupGMSForm() {
+            const form = document.getElementById('gms-form');
+            const priorityInput = document.getElementById('prioriteit');
+            const notesTextarea = document.getElementById('notes');
+            const notesTimestamp = document.getElementById('notes-timestamp');
+
+            // Priority change handler
+            priorityInput.addEventListener('input', updatePriorityDisplay);
+            
+            // Notes change handler
+            notesTextarea.addEventListener('input', function() {
+                const now = new Date();
+                const timeString = now.toLocaleString('nl-NL');
+                notesTimestamp.textContent = `Laatst bijgewerkt: ${timeString}`;
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleFormSubmission();
+            });
+
+            // Initialize priority display
+            updatePriorityDisplay();
+        }
+
+        function updatePriorityDisplay() {
+            const priority = parseInt(document.getElementById('prioriteit').value);
+            const emoji = document.getElementById('priority-emoji');
+            const badge = document.getElementById('priority-badge');
+
+            const priorities = {
+                1: { emoji: '🟢', text: 'ZEER LAAG', color: '#27ae60' },
+                2: { emoji: '🟡', text: 'LAAG', color: '#f1c40f' },
+                3: { emoji: '⚠️', text: 'GEMIDDELD', color: '#f39c12' },
+                4: { emoji: '🔴', text: 'HOOG', color: '#e74c3c' },
+                5: { emoji: '🚨', text: 'ZEER HOOG', color: '#8e44ad' }
+            };
+
+            const priorityData = priorities[priority] || priorities[3];
+            emoji.textContent = priorityData.emoji;
+            badge.textContent = priorityData.text;
+            badge.style.backgroundColor = priorityData.color;
+        }
+
+        function handleFormSubmission() {
+            const formData = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                notities: document.getElementById('notes').value.trim(),
+                locatie: document.getElementById('locatie').value.trim(),
+                tijdstip: document.getElementById('tijdstip').value,
+                soortMelding: document.getElementById('soort-melding').value,
+                prioriteit: parseInt(document.getElementById('prioriteit').value),
+                status: 'Nieuw',
+                aangemaaktOp: new Date().toLocaleString('nl-NL')
+            };
+
+            // Display JSON output
+            const jsonOutput = document.getElementById('json-output');
+            jsonOutput.textContent = JSON.stringify(formData, null, 2);
+
+            // Show success feedback
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '✅ Melding Opgeslagen!';
+            submitBtn.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+            
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.style.background = 'linear-gradient(135deg, #2a5298 0%, #1e3c72 100%)';
+            }, 2000);
+        }
+
+        // Auto-update time every minute
+        setInterval(initializeTime, 60000);
+    </script>
+</body>
+</html>
