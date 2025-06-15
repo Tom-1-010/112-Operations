@@ -728,6 +728,161 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
+  // Address autocomplete functionality
+  useEffect(() => {
+    const initializeAddressAutocomplete = () => {
+      const addressInput = document.getElementById('gmsMeldingsadres') as HTMLInputElement;
+      const suggestionsContainer = document.getElementById('addressSuggestions');
+      const postcodeInput = document.getElementById('gmsPostcode') as HTMLInputElement;
+      const gemeenteInput = document.getElementById('gmsGemeente') as HTMLInputElement;
+
+      if (!addressInput || !suggestionsContainer) return;
+
+      let debounceTimer: NodeJS.Timeout;
+
+      const showLoading = () => {
+        suggestionsContainer.innerHTML = `
+          <div class="address-loading">
+            Zoeken naar adressen...
+          </div>
+        `;
+        suggestionsContainer.classList.add('show');
+      };
+
+      const showError = (message: string) => {
+        suggestionsContainer.innerHTML = `
+          <div class="address-error">
+            ${message}
+          </div>
+        `;
+        suggestionsContainer.classList.add('show');
+      };
+
+      const showNoResults = () => {
+        suggestionsContainer.innerHTML = `
+          <div class="address-error">
+            Geen adressen gevonden
+          </div>
+        `;
+        suggestionsContainer.classList.add('show');
+      };
+
+      const hideSuggestions = () => {
+        suggestionsContainer.classList.remove('show');
+        suggestionsContainer.innerHTML = '';
+      };
+
+      const searchAddresses = async (query: string) => {
+        if (query.length < 3) {
+          hideSuggestions();
+          return;
+        }
+
+        showLoading();
+
+        try {
+          // Using PDOK Locatieserver API for Dutch addresses
+          const response = await fetch(
+            `https://api.pdok.nl/bzk/locatieserver/search/v3_1/suggest?q=${encodeURIComponent(query)}&fq=type:adres&rows=8&fl=weergavenaam,id,score`
+          );
+          
+          if (!response.ok) throw new Error('API request failed');
+          
+          const data = await response.json();
+          
+          if (data.response && data.response.docs && data.response.docs.length > 0) {
+            showSuggestions(data.response.docs);
+          } else {
+            showNoResults();
+          }
+        } catch (error) {
+          console.error('Address search error:', error);
+          showError('Fout bij zoeken naar adressen. Probeer opnieuw.');
+        }
+      };
+
+      const getAddressDetails = async (addressId: string) => {
+        try {
+          const response = await fetch(
+            `https://api.pdok.nl/bzk/locatieserver/search/v3_1/lookup?id=${addressId}&fl=weergavenaam,postcode,woonplaatsnaam,straatnaam,huis_nlt`
+          );
+          
+          if (!response.ok) throw new Error('Address lookup failed');
+          
+          const data = await response.json();
+          
+          if (data.response && data.response.docs && data.response.docs[0]) {
+            return data.response.docs[0];
+          }
+        } catch (error) {
+          console.error('Address lookup error:', error);
+        }
+        return null;
+      };
+
+      const showSuggestions = (addresses: any[]) => {
+        suggestionsContainer.innerHTML = addresses.map(address => `
+          <div class="address-suggestion" data-id="${address.id}">
+            <div class="address-suggestion-main">${address.weergavenaam}</div>
+          </div>
+        `).join('');
+        
+        suggestionsContainer.classList.add('show');
+
+        // Add click handlers to suggestions
+        suggestionsContainer.querySelectorAll('.address-suggestion').forEach(suggestion => {
+          suggestion.addEventListener('click', async (e) => {
+            const addressId = (e.currentTarget as HTMLElement).getAttribute('data-id');
+            if (addressId) {
+              const details = await getAddressDetails(addressId);
+              if (details) {
+                // Fill the address field
+                addressInput.value = `${details.straatnaam} ${details.huis_nlt}`;
+                
+                // Fill postcode and gemeente
+                if (postcodeInput) postcodeInput.value = details.postcode || '';
+                if (gemeenteInput) gemeenteInput.value = details.woonplaatsnaam || '';
+                
+                hideSuggestions();
+              }
+            }
+          });
+        });
+      };
+
+      const handleInput = (e: Event) => {
+        const query = (e.target as HTMLInputElement).value.trim();
+        
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          searchAddresses(query);
+        }, 300);
+      };
+
+      const handleClickOutside = (e: Event) => {
+        if (!addressInput.contains(e.target as Node) && 
+            !suggestionsContainer.contains(e.target as Node)) {
+          hideSuggestions();
+        }
+      };
+
+      addressInput.addEventListener('input', handleInput);
+      document.addEventListener('click', handleClickOutside);
+
+      return () => {
+        clearTimeout(debounceTimer);
+        addressInput.removeEventListener('input', handleInput);
+        document.removeEventListener('click', handleClickOutside);
+      };
+    };
+
+    // Only initialize if GMS section is active
+    if (activeSection === 'gms') {
+      const cleanup = initializeAddressAutocomplete();
+      return cleanup;
+    }
+  }, [activeSection]);
+
   const showNotificationMessage = (message: string) => {
     setNotification(message);
     setShowNotification(true);
@@ -1140,14 +1295,22 @@ export default function Dashboard() {
                     {/* Melding Locatie - Right Column */}
                     <div className="gms-melding-section">
                       <h4 className="gms-section-title">📍 Melding Locatie</h4>
-                      <div className="gms-form-group">
+                      <div className="gms-form-group gms-address-autocomplete">
                         <label className="gms-label" htmlFor="gmsMeldingsadres">📍 Meldingsadres</label>
-                        <input
-                          type="text"
-                          id="gmsMeldingsadres"
-                          className="gms-input"
-                          placeholder="Adres van het incident..."
-                        />
+                        <div className="address-input-container">
+                          <input
+                            type="text"
+                            id="gmsMeldingsadres"
+                            className="gms-input"
+                            placeholder="Adres van het incident..."
+                            autoComplete="off"
+                          />
+                          <div id="addressSuggestions" className="address-suggestions">
+                            <div id="addressLoading" className="address-loading" style={{display: 'none'}}>
+                              Zoeken naar adressen...
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       
                       <div className="gms-form-group">
