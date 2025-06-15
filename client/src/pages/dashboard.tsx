@@ -877,9 +877,23 @@ export default function Dashboard() {
           }
         };
 
+        // Process special karakteristiek commands
+        const processKarakteristiekCommands = (text: string) => {
+          const words = text.split(/\s+/);
+          
+          for (const word of words) {
+            if (word === '-bae') {
+              // Add or update "Bericht alle eenheden" karakteristiek
+              addOrUpdateKarakteristiek('Bericht alle eenheden', 'Ja');
+              break;
+            }
+          }
+        };
+
         // Process auto-classification (only for non-urgent messages)
         if (!isUrgent) {
           processAutoClassification(message);
+          processKarakteristiekCommands(message);
         }
 
         // Create timestamp in HH:MM:SS format for urgent messages, HH:MM for regular
@@ -916,6 +930,38 @@ export default function Dashboard() {
         sendMessage();
       };
 
+      // Add or update a karakteristiek entry
+      const addOrUpdateKarakteristiek = (name: string, value: string) => {
+        // Check if entry already exists
+        const existingEntries = Array.from(karakteristiekenList.querySelectorAll('.gms-kar-entry'));
+        let existingEntry = null;
+
+        for (const entry of existingEntries) {
+          const nameElement = entry.querySelector('.gms-kar-entry-name');
+          if (nameElement && nameElement.textContent === name) {
+            existingEntry = entry;
+            break;
+          }
+        }
+
+        if (existingEntry) {
+          // Update existing entry
+          const valueElement = existingEntry.querySelector('.gms-kar-entry-value');
+          if (valueElement) {
+            valueElement.textContent = value;
+          }
+        } else {
+          // Create new entry
+          const entry = document.createElement('div');
+          entry.className = 'gms-kar-entry';
+          entry.innerHTML = `
+            <div class="gms-kar-entry-name">${name}</div>
+            <div class="gms-kar-entry-value">${value}</div>
+          `;
+          karakteristiekenList.appendChild(entry);
+        }
+      };
+
       // Handle Alert button click for urgent messages
       const handleAlertClick = () => {
         sendMessage(true);
@@ -926,16 +972,7 @@ export default function Dashboard() {
         const hintsValue = hintsInput.value.trim();
         if (!hintsValue) return;
 
-        // Create new characteristic entry
-        const entry = document.createElement('div');
-        entry.className = 'gms-kar-entry';
-        entry.innerHTML = `
-          <div class="gms-kar-entry-name">${hintsValue}</div>
-          <div class="gms-kar-entry-value">-</div>
-        `;
-
-        // Add to the list
-        karakteristiekenList.appendChild(entry);
+        addOrUpdateKarakteristiek(hintsValue, '-');
 
         // Clear the input
         hintsInput.value = '';
