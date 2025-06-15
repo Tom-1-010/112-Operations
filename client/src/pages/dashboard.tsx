@@ -1398,15 +1398,13 @@ export default function Dashboard() {
                 <h3 className="section-title">GMS - Meldkamer Simulator</h3>
               </div>
               <div className="gms-content">
-                {/* New restructured layout */}
-                <div className="gms-main-grid">
+                {/* Vertical flow layout */}
+                <div className="gms-vertical-container">
                   
-                  {/* Top Row: Kladblok (left) + Melder/Melding Info (right) */}
-                  <div className="gms-top-row">
-                    
-                    {/* Left: Kladblok Section */}
-                    <div className="gms-kladblok-section">
-                      <label className="gms-label">📝 Kladblok</label>
+                  {/* 1. Kladblok Section */}
+                  <div className="gms-section-card">
+                    <h4 className="gms-section-title">📝 Kladblok</h4>
+                    <div className="gms-form-group">
                       <div
                         id="gmsKladblok"
                         contentEditable="true"
@@ -1419,135 +1417,129 @@ export default function Dashboard() {
                         📤 Verzend
                       </button>
                     </div>
+                  </div>
+
+                  {/* 2. Melder Informatie Section */}
+                  <div className="gms-section-card">
+                    <h4 className="gms-section-title">👤 Melder Informatie</h4>
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsMeldernaam">🧍 Naam</label>
+                      <input
+                        type="text"
+                        id="gmsMeldernaam"
+                        className="gms-input"
+                        placeholder="Naam van de melder..."
+                      />
+                    </div>
                     
-                    {/* Right: Two-column info sections */}
-                    <div className="gms-info-columns">
-                      {/* Melder Informatie */}
-                      <div className="gms-melder-section">
-                        <h4 className="gms-section-title">👤 Melder Informatie</h4>
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsMeldernaam">🧍 Naam</label>
-                          <input
-                            type="text"
-                            id="gmsMeldernaam"
-                            className="gms-input"
-                            placeholder="Naam van de melder..."
-                          />
-                        </div>
-                        
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsMelderadres">🏠 Adres</label>
-                          <input
-                            type="text"
-                            id="gmsMelderadres"
-                            className="gms-input"
-                            placeholder="Adres van de melder..."
-                          />
-                        </div>
-                        
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsTelefoonnummer">📞 Telefoonnummer</label>
-                          <input
-                            type="tel"
-                            id="gmsTelefoonnummer"
-                            className="gms-input"
-                            placeholder="Telefoonnummer..."
-                          />
-                        </div>
-                      </div>
-
-                      {/* Melding Locatie */}
-                      <div className="gms-melding-section">
-                        <h4 className="gms-section-title">📍 Melding Locatie</h4>
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsMeldingsadres">📍 Meldingsadres</label>
-                          <input
-                            type="text"
-                            id="gmsMeldingsadres"
-                            className="gms-input"
-                            placeholder="Adres van het incident..."
-                          />
-                        </div>
-                        
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsPostcode">🔢 Postcode</label>
-                          <input
-                            type="text"
-                            id="gmsPostcode"
-                            className="gms-input"
-                            placeholder="1234 AB"
-                          />
-                        </div>
-                        
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsGemeente">🏙️ Gemeente</label>
-                          <input
-                            type="text"
-                            id="gmsGemeente"
-                            className="gms-input"
-                            placeholder="Gemeente naam..."
-                          />
-                        </div>
-                      </div>
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsMelderadres">🏠 Adres</label>
+                      <input
+                        type="text"
+                        id="gmsMelderadres"
+                        className="gms-input"
+                        placeholder="Adres van de melder..."
+                      />
+                    </div>
+                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsTelefoonnummer">📞 Telefoonnummer</label>
+                      <input
+                        type="tel"
+                        id="gmsTelefoonnummer"
+                        className="gms-input"
+                        placeholder="Telefoonnummer..."
+                      />
                     </div>
                   </div>
 
-                  {/* Second Row: LMC Classificaties */}
-                  <div className="gms-classificatie-row">
-                    <div className="gms-classificatie-section">
-                      <h4 className="gms-section-title">📋 LMC Classificatie</h4>
-                      <div className="gms-classificatie-grid">
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsClassificatie1">Classificatie 1</label>
-                          <select id="gmsClassificatie1" className="gms-input">
-                            <option value="">Selecteer classificatie 1...</option>
-                            <option value="Verkeer">Verkeer</option>
-                            <option value="Geweld">Geweld</option>
-                            <option value="Diefstal">Diefstal</option>
-                            <option value="Brand">Brand</option>
-                            <option value="Overlast">Overlast</option>
-                          </select>
-                        </div>
-                        
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsClassificatie2">Classificatie 2</label>
-                          <select id="gmsClassificatie2" className="gms-input">
-                            <option value="">Selecteer classificatie 2...</option>
-                            <option value="Wegverkeer">Wegverkeer</option>
-                            <option value="Fietsverkeer">Fietsverkeer</option>
-                            <option value="Voetganger">Voetganger</option>
-                            <option value="Openbaar vervoer">Openbaar vervoer</option>
-                          </select>
-                        </div>
-                        
-                        <div className="gms-form-group">
-                          <label className="gms-label" htmlFor="gmsClassificatie3">Classificatie 3</label>
-                          <select id="gmsClassificatie3" className="gms-input">
-                            <option value="">Selecteer classificatie 3...</option>
-                            <option value="Onder invloed">Onder invloed</option>
-                            <option value="Materiële schade">Materiële schade</option>
-                            <option value="Letselschade">Letselschade</option>
-                            <option value="Dodelijk ongeval">Dodelijk ongeval</option>
-                          </select>
-                        </div>
+                  {/* 3. Melding Locatie Section */}
+                  <div className="gms-section-card">
+                    <h4 className="gms-section-title">📍 Melding Locatie</h4>
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsMeldingsadres">📍 Meldingsadres</label>
+                      <input
+                        type="text"
+                        id="gmsMeldingsadres"
+                        className="gms-input"
+                        placeholder="Adres van het incident..."
+                      />
+                    </div>
+                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsPostcode">🔢 Postcode</label>
+                      <input
+                        type="text"
+                        id="gmsPostcode"
+                        className="gms-input"
+                        placeholder="1234 AB"
+                      />
+                    </div>
+                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsGemeente">🏙️ Gemeente</label>
+                      <input
+                        type="text"
+                        id="gmsGemeente"
+                        className="gms-input"
+                        placeholder="Gemeente naam..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* 4. LMC Classificatie Section */}
+                  <div className="gms-section-card">
+                    <h4 className="gms-section-title">📋 LMC Classificatie</h4>
+                    <div className="gms-classificatie-grid">
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsClassificatie1">Classificatie 1</label>
+                        <select id="gmsClassificatie1" className="gms-input">
+                          <option value="">Selecteer classificatie 1...</option>
+                          <option value="Verkeer">Verkeer</option>
+                          <option value="Geweld">Geweld</option>
+                          <option value="Diefstal">Diefstal</option>
+                          <option value="Brand">Brand</option>
+                          <option value="Overlast">Overlast</option>
+                        </select>
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsClassificatie2">Classificatie 2</label>
+                        <select id="gmsClassificatie2" className="gms-input">
+                          <option value="">Selecteer classificatie 2...</option>
+                          <option value="Wegverkeer">Wegverkeer</option>
+                          <option value="Fietsverkeer">Fietsverkeer</option>
+                          <option value="Voetganger">Voetganger</option>
+                          <option value="Openbaar vervoer">Openbaar vervoer</option>
+                        </select>
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsClassificatie3">Classificatie 3</label>
+                        <select id="gmsClassificatie3" className="gms-input">
+                          <option value="">Selecteer classificatie 3...</option>
+                          <option value="Onder invloed">Onder invloed</option>
+                          <option value="Materiële schade">Materiële schade</option>
+                          <option value="Letselschade">Letselschade</option>
+                          <option value="Dodelijk ongeval">Dodelijk ongeval</option>
+                        </select>
                       </div>
                     </div>
                   </div>
 
-                  {/* Third Row: Melding Logging (now below classifications) */}
-                  <div className="gms-logging-row">
-                    <div className="gms-logging-section">
-                      <label className="gms-label">📋 Melding Logging</label>
-                      <div
-                        id="gmsMeldingLogging"
-                        className="gms-melding-logging"
-                      ></div>
-                    </div>
+                  {/* 5. Melding Logging Section */}
+                  <div className="gms-section-card">
+                    <h4 className="gms-section-title">📋 Melding Logging</h4>
+                    <div
+                      id="gmsMeldingLogging"
+                      className="gms-melding-logging"
+                    ></div>
                   </div>
 
-                  {/* Bottom Row: Additional fields and actions */}
-                  <div className="gms-bottom-row">
-                    <div className="gms-additional-fields">
+                  {/* 6. Tijdstip en Prioriteit Section */}
+                  <div className="gms-section-card">
+                    <h4 className="gms-section-title">⚡ Tijdstip en Prioriteit</h4>
+                    <div className="gms-compact-fields">
                       <div className="gms-form-group">
                         <label className="gms-label" htmlFor="gmsTijdstip">⏰ Tijdstip</label>
                         <input
@@ -1579,15 +1571,16 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="gms-actions-section">
-                      <button
-                        id="gmsSaveButton"
-                        className="btn btn-primary gms-save-btn"
-                      >
-                        💾 Melding opslaan
-                      </button>
-                    </div>
+                  </div>
+
+                  {/* 7. Save Button Section */}
+                  <div className="gms-section-card gms-save-section">
+                    <button
+                      id="gmsSaveButton"
+                      className="btn btn-primary gms-save-btn"
+                    >
+                      💾 Melding opslaan
+                    </button>
                   </div>
                 </div>
 
