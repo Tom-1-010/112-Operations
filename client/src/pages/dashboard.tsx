@@ -818,6 +818,16 @@ export default function Dashboard() {
           `;
           meldingLogging.appendChild(logEntry);
           meldingLogging.scrollTop = meldingLogging.scrollHeight;
+
+          // Update header after auto-filling address fields
+          const dynamicHeader = document.getElementById('gmsDynamicHeader');
+          if (dynamicHeader) {
+            const mc1Select = document.getElementById('gmsClassificatie1') as HTMLSelectElement;
+            const mc1Value = mc1Select?.value || 'Onbekend';
+            const updatedStraatnaam = straatnaamField?.value || 'Onbekend';
+            const updatedPlaatsnaam = plaatsnaamField?.value || 'Onbekend';
+            dynamicHeader.textContent = `${mc1Value} – ${updatedStraatnaam} ${updatedPlaatsnaam}`;
+          }
         };
 
         // Check for smart commands first
@@ -927,16 +937,71 @@ export default function Dashboard() {
       // Initialize priority indicator with default value
       updatePriorityIndicator();
 
+      // Update dynamic header function
+      const updateDynamicHeader = () => {
+        const mc1Select = document.getElementById('gmsClassificatie1') as HTMLSelectElement;
+        const straatnaamField = document.getElementById('gmsStraatnaam') as HTMLInputElement;
+        const plaatsnaamField = document.getElementById('gmsPlaatsnaam') as HTMLInputElement;
+        const dynamicHeader = document.getElementById('gmsDynamicHeader');
+
+        if (!dynamicHeader) return;
+
+        const mc1Value = mc1Select?.value || 'Onbekend';
+        const straatnaam = straatnaamField?.value || 'Onbekend';
+        const plaatsnaam = plaatsnaamField?.value || 'Onbekend';
+
+        dynamicHeader.textContent = `${mc1Value} – ${straatnaam} ${plaatsnaam}`;
+      };
+
+      // Handle form field changes for dynamic header
+      const handleHeaderFieldChange = () => {
+        updateDynamicHeader();
+      };
+
+      // Get form field references for header updates
+      const mc1Select = document.getElementById('gmsClassificatie1') as HTMLSelectElement;
+      const straatnaamField = document.getElementById('gmsStraatnaam') as HTMLInputElement;
+      const plaatsnaamField = document.getElementById('gmsPlaatsnaam') as HTMLInputElement;
+
       verzendButton.addEventListener('click', handleVerzendClick);
       kladblok.addEventListener('keydown', handleKeyDown);
       priorityInput.addEventListener('input', handlePriorityChange);
       priorityInput.addEventListener('change', handlePriorityChange);
+
+      // Add event listeners for dynamic header updates
+      if (mc1Select) {
+        mc1Select.addEventListener('change', handleHeaderFieldChange);
+      }
+      if (straatnaamField) {
+        straatnaamField.addEventListener('input', handleHeaderFieldChange);
+        straatnaamField.addEventListener('change', handleHeaderFieldChange);
+      }
+      if (plaatsnaamField) {
+        plaatsnaamField.addEventListener('input', handleHeaderFieldChange);
+        plaatsnaamField.addEventListener('change', handleHeaderFieldChange);
+      }
+
+      // Initialize header with current values
+      updateDynamicHeader();
 
       return () => {
         verzendButton.removeEventListener('click', handleVerzendClick);
         kladblok.removeEventListener('keydown', handleKeyDown);
         priorityInput.removeEventListener('input', handlePriorityChange);
         priorityInput.removeEventListener('change', handlePriorityChange);
+        
+        // Remove header update event listeners
+        if (mc1Select) {
+          mc1Select.removeEventListener('change', handleHeaderFieldChange);
+        }
+        if (straatnaamField) {
+          straatnaamField.removeEventListener('input', handleHeaderFieldChange);
+          straatnaamField.removeEventListener('change', handleHeaderFieldChange);
+        }
+        if (plaatsnaamField) {
+          plaatsnaamField.removeEventListener('input', handleHeaderFieldChange);
+          plaatsnaamField.removeEventListener('change', handleHeaderFieldChange);
+        }
       };
     };
 
@@ -1499,7 +1564,7 @@ export default function Dashboard() {
                     <div className="gms-incident-info">
                       <span className="gms-incident-id">P Zaakafhandel 1</span>
                       <span className="gms-incident-time" id="gmsHeaderTime"></span>
-                      <span className="gms-incident-type">Gewone melding</span>
+                      <span className="gms-incident-type" id="gmsDynamicHeader">Onbekend – Onbekend Onbekend</span>
                     </div>
                   </div>
 
