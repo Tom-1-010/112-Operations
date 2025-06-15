@@ -293,6 +293,11 @@ body {
   font-size: 14px;
 }
 
+/* Specific grid for incidents page */
+.incidents-content .incident-row {
+  grid-template-columns: 150px 1fr 1fr 100px 80px;
+}
+
 .incident-row:hover {
   background: hsl(210, 14%, 97%);
 }

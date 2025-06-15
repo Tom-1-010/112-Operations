@@ -456,35 +456,36 @@ export default function Dashboard() {
           status: "Nieuw",
           
           // Melder informatie
-          melder: {
-            naam: meldernaam?.value.trim() || "",
-            adres: melderadres?.value.trim() || "",
-            telefoonnummer: telefoonnummer?.value.trim() || ""
-          },
+          meldernaam: meldernaam?.value.trim() || "",
+          melderadres: melderadres?.value.trim() || "",
+          telefoonnummer: telefoonnummer?.value.trim() || "",
           
           // Melding locatie
-          melding: {
-            adres: meldingsadres?.value.trim() || "",
-            postcode: postcode?.value.trim() || "",
-            gemeente: gemeente?.value.trim() || ""
-          },
+          meldingsadres: meldingsadres?.value.trim() || "",
+          postcode: postcode?.value.trim() || "",
+          gemeente: gemeente?.value.trim() || "",
           
           // LMC Classificatie
-          classificatie: {
-            niveau1: classificatie1?.value || "",
-            niveau2: classificatie2?.value || "",
-            niveau3: classificatie3?.value || ""
-          },
+          classificatie1: classificatie1?.value || "",
+          classificatie2: classificatie2?.value || "",
+          classificatie3: classificatie3?.value || "",
           
           // Aanvullende informatie
-          details: {
-            kladblok: kladblok.textContent || "",
-            locatieLegacy: locatie?.value.trim() || "",
-            tijdstip: tijdstip?.value || "",
-            soortMelding: soortMelding?.value || "",
-            prioriteit: parseInt(prioriteit?.value || "3")
-          }
+          opmerkingen: kladblok.textContent || "",
+          locatie: locatie?.value.trim() || "",
+          tijdstip: tijdstip?.value || "",
+          soortMelding: soortMelding?.value || "",
+          prioriteit: parseInt(prioriteit?.value || "3")
         };
+
+        // Save to localStorage incidenten array
+        try {
+          const existingIncidenten = JSON.parse(localStorage.getItem('incidenten') || '[]');
+          existingIncidenten.push(gmsData);
+          localStorage.setItem('incidenten', JSON.stringify(existingIncidenten));
+        } catch (error) {
+          console.error('Error saving to localStorage:', error);
+        }
 
         // Display JSON output
         output.textContent = JSON.stringify(gmsData, null, 2);
@@ -653,6 +654,80 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
+  // Incidents page functionality
+  useEffect(() => {
+    const loadIncidentsFromStorage = () => {
+      const incidentsList = document.getElementById('allIncidentsList');
+      if (!incidentsList) return;
+
+      try {
+        const storedIncidenten = JSON.parse(localStorage.getItem('incidenten') || '[]');
+        
+        if (storedIncidenten.length === 0) {
+          incidentsList.innerHTML = `
+            <div style="padding: 40px; text-align: center; color: #666;">
+              Geen incidenten gevonden
+            </div>
+          `;
+          return;
+        }
+
+        // Sort by timestamp (newest first)
+        const sortedIncidenten = storedIncidenten.sort((a: any, b: any) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        incidentsList.innerHTML = sortedIncidenten.map((incident: any) => {
+          const formattedTime = new Date(incident.timestamp).toLocaleString('nl-NL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          const prioriteitLabel = incident.prioriteit === 1 ? 'Zeer Hoog' :
+                                 incident.prioriteit === 2 ? 'Hoog' :
+                                 incident.prioriteit === 3 ? 'Gemiddeld' :
+                                 incident.prioriteit === 4 ? 'Laag' :
+                                 incident.prioriteit === 5 ? 'Zeer Laag' :
+                                 'Gemiddeld';
+
+          const prioriteitClass = incident.prioriteit <= 2 ? 'priority-high' :
+                                 incident.prioriteit === 3 ? 'priority-medium' :
+                                 'priority-low';
+
+          return `
+            <div class="incident-row">
+              <div class="incident-time">${formattedTime}</div>
+              <div class="incident-location">${incident.gemeente || incident.locatie || 'Onbekend'}</div>
+              <div class="incident-type">${incident.soortMelding || 'Onbekend'}</div>
+              <div>
+                <span class="priority-tag ${prioriteitClass}">
+                  ${prioriteitLabel}
+                </span>
+              </div>
+              <div class="incident-status">${incident.status}</div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Error loading incidents:', error);
+        incidentsList.innerHTML = `
+          <div style="padding: 40px; text-align: center; color: #666;">
+            Fout bij laden van incidenten
+          </div>
+        `;
+      }
+    };
+
+    // Only initialize if incidents section is active
+    if (activeSection === 'incidents') {
+      loadIncidentsFromStorage();
+    }
+  }, [activeSection]);
+
   const showNotificationMessage = (message: string) => {
     setNotification(message);
     setShowNotification(true);
@@ -790,8 +865,29 @@ export default function Dashboard() {
           </div>
         )}
 
-        {activeSection === "incidents" &&
-          renderPlaceholderSection("Alle Incidenten", "exclamation-triangle")}
+        {activeSection === "incidents" && (
+          <div className="content-section active">
+            <div className="section">
+              <div className="section-header">
+                <h3 className="section-title">Alle Incidenten</h3>
+              </div>
+              <div className="incidents-content">
+                <div className="incidents-table">
+                  <div className="incident-row" style={{ background: '#f8f9fa', fontWeight: 600 }}>
+                    <div>Tijdstip</div>
+                    <div>Gemeente</div>
+                    <div>Soort Melding</div>
+                    <div>Prioriteit</div>
+                    <div>Status</div>
+                  </div>
+                  <div id="allIncidentsList">
+                    {/* Incidents will be loaded here */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeSection === "units" && (
           <div className="content-section active">
             <div className="section">
