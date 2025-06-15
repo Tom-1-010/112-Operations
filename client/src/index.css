@@ -468,6 +468,51 @@ body {
   flex-direction: column;
 }
 
+.gms-form-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.gms-melder-section,
+.gms-melding-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gms-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid hsl(208, 79%, 51%);
+}
+
+.gms-classificatie-section {
+  margin-bottom: 24px;
+}
+
+.gms-classificatie-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.gms-existing-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.gms-existing-fields .gms-save-btn {
+  grid-column: span 2;
+  justify-self: start;
+}
+
 .gms-form-section {
   display: flex;
   flex-direction: column;

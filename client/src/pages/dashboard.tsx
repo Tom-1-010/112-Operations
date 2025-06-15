@@ -1,18 +1,21 @@
-import { useState, useEffect } from 'react';
-import Sidebar from '../components/sidebar';
-import StatsGrid from '../components/stats-grid';
-import IncidentTable from '../components/incident-table';
-import UnitsPanel from '../components/units-panel';
-import { useLocalStorage } from '../hooks/use-local-storage';
-import { Incident, Unit, Stats } from '../types';
+import { useState, useEffect } from "react";
+import Sidebar from "../components/sidebar";
+import StatsGrid from "../components/stats-grid";
+import IncidentTable from "../components/incident-table";
+import UnitsPanel from "../components/units-panel";
+import { useLocalStorage } from "../hooks/use-local-storage";
+import { Incident, Unit, Stats } from "../types";
 
 export default function Dashboard() {
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [activeSection, setActiveSection] = useState("dashboard");
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [notification, setNotification] = useState('');
+  const [notification, setNotification] = useState("");
   const [showNotification, setShowNotification] = useState(false);
 
-  const [incidents, setIncidents] = useLocalStorage<Incident[]>('policeIncidents', []);
+  const [incidents, setIncidents] = useLocalStorage<Incident[]>(
+    "policeIncidents",
+    [],
+  );
   interface PoliceUnit {
     id: string;
     roepnaam: string;
@@ -22,116 +25,167 @@ export default function Dashboard() {
     status: string;
   }
 
-  const [policeUnits, setPoliceUnits] = useLocalStorage<PoliceUnit[]>('policeUnitsDB', [
-    { id: 'RT11-01', roepnaam: 'RT11-01', mensen: 2, rollen: ['Patrouille', 'Noodhulp'], voertuigtype: 'Audi A6 Avant (Snelle Interventie)', status: 'Beschikbaar' },
-    { id: 'RT11-02', roepnaam: 'RT11-02', mensen: 2, rollen: ['Patrouille'], voertuigtype: 'Mercedes-Benz B‑klasse (Politieauto)', status: 'Onderweg' },
-    { id: 'MT21-01', roepnaam: 'MT21-01', mensen: 1, rollen: ['Verkeer', 'Surveillance'], voertuigtype: 'BMW R1250 RT (Motoragent)', status: 'Beschikbaar' },
-    { id: 'BT31-01', roepnaam: 'BT31-01', mensen: 4, rollen: ['Surveillance', 'Onderzoek'], voertuigtype: 'Volkswagen Transporter T6 (Bus)', status: 'Bezig' },
-    { id: 'HE41-01', roepnaam: 'HE41-01', mensen: 3, rollen: ['Surveillance', 'Noodhulp'], voertuigtype: 'Airbus EC135 (Helikopter)', status: 'Onderhoud' },
-  ]);
+  const [policeUnits, setPoliceUnits] = useLocalStorage<PoliceUnit[]>(
+    "policeUnitsDB",
+    [
+      {
+        id: "RT11-01",
+        roepnaam: "RT11-01",
+        mensen: 2,
+        rollen: ["Patrouille", "Noodhulp"],
+        voertuigtype: "Audi A6 Avant (Snelle Interventie)",
+        status: "Beschikbaar",
+      },
+      {
+        id: "RT11-02",
+        roepnaam: "RT11-02",
+        mensen: 2,
+        rollen: ["Patrouille"],
+        voertuigtype: "Mercedes-Benz B‑klasse (Politieauto)",
+        status: "Onderweg",
+      },
+      {
+        id: "MT21-01",
+        roepnaam: "MT21-01",
+        mensen: 1,
+        rollen: ["Verkeer", "Surveillance"],
+        voertuigtype: "BMW R1250 RT (Motoragent)",
+        status: "Beschikbaar",
+      },
+      {
+        id: "BT31-01",
+        roepnaam: "BT31-01",
+        mensen: 4,
+        rollen: ["Surveillance", "Onderzoek"],
+        voertuigtype: "Volkswagen Transporter T6 (Bus)",
+        status: "Bezig",
+      },
+      {
+        id: "HE41-01",
+        roepnaam: "HE41-01",
+        mensen: 3,
+        rollen: ["Surveillance", "Noodhulp"],
+        voertuigtype: "Airbus EC135 (Helikopter)",
+        status: "Onderhoud",
+      },
+    ],
+  );
 
   // Keep old units for compatibility with existing incident system
-  const [units, setUnits] = useLocalStorage<Unit[]>('policeUnits', [
-    { id: 'PC01', type: 'patrol', status: 'active', name: '5901' },
-    { id: 'PC02', type: 'patrol', status: 'busy', name: '5902' },
-    { id: 'PC03', type: 'patrol', status: 'inactive', name: '5903' },
-    { id: 'MC01', type: 'motorcycle', status: 'active', name: '4501' },
-    { id: 'MC02', type: 'motorcycle', status: 'active', name: '4502' },
-    { id: 'DU01', type: 'dog', status: 'active', name: '7801' },
-    { id: 'RU01', type: 'riot', status: 'inactive', name: '9101' },
-    { id: 'RU02', type: 'riot', status: 'inactive', name: '9102' },
+  const [units, setUnits] = useLocalStorage<Unit[]>("policeUnits", [
+    { id: "PC01", type: "patrol", status: "active", name: "5901" },
+    { id: "PC02", type: "patrol", status: "busy", name: "5902" },
+    { id: "PC03", type: "patrol", status: "inactive", name: "5903" },
+    { id: "MC01", type: "motorcycle", status: "active", name: "4501" },
+    { id: "MC02", type: "motorcycle", status: "active", name: "4502" },
+    { id: "DU01", type: "dog", status: "active", name: "7801" },
+    { id: "RU01", type: "riot", status: "inactive", name: "9101" },
+    { id: "RU02", type: "riot", status: "inactive", name: "9102" },
   ]);
 
   const getUnitIcon = (type: string) => {
     switch (type) {
-      case 'patrol': return 'truck';
-      case 'motorcycle': return 'bicycle';
-      case 'dog': return 'heart';
-      case 'riot': return 'shield';
-      default: return 'truck';
+      case "patrol":
+        return "truck";
+      case "motorcycle":
+        return "bicycle";
+      case "dog":
+        return "heart";
+      case "riot":
+        return "shield";
+      default:
+        return "truck";
     }
   };
 
   const getUnitTypeName = (type: string) => {
     switch (type) {
-      case 'patrol': return 'Patrouillewagen';
-      case 'motorcycle': return 'Motoragent';
-      case 'dog': return 'Hondeneenheid';
-      case 'riot': return 'ME-eenheid';
-      default: return type;
+      case "patrol":
+        return "Patrouillewagen";
+      case "motorcycle":
+        return "Motoragent";
+      case "dog":
+        return "Hondeneenheid";
+      case "riot":
+        return "ME-eenheid";
+      default:
+        return type;
     }
   };
 
   const getStatusName = (status: string) => {
     switch (status) {
-      case 'active': return 'Actief';
-      case 'inactive': return 'Inactief';
-      case 'busy': return 'Bezet';
-      default: return status;
+      case "active":
+        return "Actief";
+      case "inactive":
+        return "Inactief";
+      case "busy":
+        return "Bezet";
+      default:
+        return status;
     }
   };
 
   const [showAddUnitForm, setShowAddUnitForm] = useState(false);
-  const [newUnit, setNewUnit] = useState<Omit<PoliceUnit, 'id'>>({
-    roepnaam: '',
+  const [newUnit, setNewUnit] = useState<Omit<PoliceUnit, "id">>({
+    roepnaam: "",
     mensen: 2,
     rollen: [],
-    voertuigtype: '',
-    status: 'Beschikbaar'
+    voertuigtype: "",
+    status: "Beschikbaar",
   });
 
   const vehicleTypes = [
-    'Audi A6 Avant (Snelle Interventie)',
-    'BMW R1250 RT (Motoragent)',
-    'Mercedes-Benz B‑klasse (Politieauto)',
-    'Volkswagen Transporter T6 (Bus)',
-    'Airbus EC135 (Helikopter)'
+    "Audi A6 Avant (Snelle Interventie)",
+    "BMW R1250 RT (Motoragent)",
+    "Mercedes-Benz B‑klasse (Politieauto)",
+    "Volkswagen Transporter T6 (Bus)",
+    "Airbus EC135 (Helikopter)",
   ];
 
   const inzetRollen = [
-    'Patrouille',
-    'Verkeer',
-    'Surveillance',
-    'Noodhulp',
-    'Onderzoek'
+    "Patrouille",
+    "Verkeer",
+    "Surveillance",
+    "Noodhulp",
+    "Onderzoek",
   ];
 
-  const npStatuses = [
-    'Beschikbaar',
-    'Onderweg',
-    'Bezig',
-    'Onderhoud'
-  ];
+  const npStatuses = ["Beschikbaar", "Onderweg", "Bezig", "Onderhoud"];
 
   const addNewUnit = () => {
-    if (!newUnit.roepnaam || !newUnit.voertuigtype || newUnit.rollen.length === 0) {
-      alert('Vul alle verplichte velden in.');
+    if (
+      !newUnit.roepnaam ||
+      !newUnit.voertuigtype ||
+      newUnit.rollen.length === 0
+    ) {
+      alert("Vul alle verplichte velden in.");
       return;
     }
 
     const unitToAdd: PoliceUnit = {
       ...newUnit,
-      id: newUnit.roepnaam
+      id: newUnit.roepnaam,
     };
 
-    setPoliceUnits(prev => [...prev, unitToAdd]);
+    setPoliceUnits((prev) => [...prev, unitToAdd]);
     setNewUnit({
-      roepnaam: '',
+      roepnaam: "",
       mensen: 2,
       rollen: [],
-      voertuigtype: '',
-      status: 'Beschikbaar'
+      voertuigtype: "",
+      status: "Beschikbaar",
     });
     setShowAddUnitForm(false);
-    showNotificationMessage('Nieuwe eenheid toegevoegd');
+    showNotificationMessage("Nieuwe eenheid toegevoegd");
   };
 
   const toggleRole = (role: string) => {
-    setNewUnit(prev => ({
+    setNewUnit((prev) => ({
       ...prev,
       rollen: prev.rollen.includes(role)
-        ? prev.rollen.filter(r => r !== role)
-        : [...prev.rollen, role]
+        ? prev.rollen.filter((r) => r !== role)
+        : [...prev.rollen, role],
     }));
   };
 
@@ -146,54 +200,174 @@ export default function Dashboard() {
   // Complete basisteams database for Regionale Eenheid Rotterdam
   const basisteamsData: BasisTeam[] = [
     // Rotterdam Stadsregio (A-teams)
-    { code: "A1", naam: "Waterweg", gemeenten: ["Vlaardingen", "Maassluis", "Schiedam"], regio: "Rotterdam Stadsregio" },
-    { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
-    { code: "A3", naam: "Noord", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
-    { code: "A4", naam: "Oost", gemeenten: ["Rotterdam", "Capelle aan den IJssel"], regio: "Rotterdam Stadsregio" },
-    { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam", "Barendrecht"], regio: "Rotterdam Stadsregio" },
-    { code: "A6", naam: "West", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
-    { code: "A7", naam: "IJsselmonde", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
-    { code: "A8", naam: "Charlois", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
-    
+    {
+      code: "A001",
+      naam: "Basisteam Waterweg",
+      gemeenten: ["Vlaardingen", "Maassluis", "Hoek van Holland"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A2",
+      naam: "Centrum",
+      gemeenten: ["Rotterdam"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A3",
+      naam: "Noord",
+      gemeenten: ["Rotterdam"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A4",
+      naam: "Oost",
+      gemeenten: ["Rotterdam", "Capelle aan den IJssel"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A5",
+      naam: "Zuid",
+      gemeenten: ["Rotterdam", "Barendrecht"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A6",
+      naam: "West",
+      gemeenten: ["Rotterdam"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A7",
+      naam: "IJsselmonde",
+      gemeenten: ["Rotterdam"],
+      regio: "Rotterdam Stadsregio",
+    },
+    {
+      code: "A8",
+      naam: "Charlois",
+      gemeenten: ["Rotterdam"],
+      regio: "Rotterdam Stadsregio",
+    },
+
     // Voorne-Putten & Eilanden (B-teams)
-    { code: "B1", naam: "Voorne-Putten", gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"], regio: "Voorne-Putten" },
-    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard", "Binnenmaas"], regio: "Voorne-Putten" },
-    { code: "B3", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"], regio: "Goeree-Overflakkee" },
-    
+    {
+      code: "B1",
+      naam: "Voorne-Putten",
+      gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"],
+      regio: "Voorne-Putten",
+    },
+    {
+      code: "B2",
+      naam: "Hoeksche Waard",
+      gemeenten: ["Hoeksche Waard", "Binnenmaas"],
+      regio: "Voorne-Putten",
+    },
+    {
+      code: "B3",
+      naam: "Goeree-Overflakkee",
+      gemeenten: ["Goeree-Overflakkee"],
+      regio: "Goeree-Overflakkee",
+    },
+
     // Drechtsteden & Molenwaard (C-teams)
-    { code: "C1", naam: "Drechtsteden Noord", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"], regio: "Drechtsteden" },
-    { code: "C2", naam: "Drechtsteden Zuid", gemeenten: ["Alblasserdam", "Hendrik-Ido-Ambacht", "Sliedrecht"], regio: "Drechtsteden" },
-    { code: "C3", naam: "Molenwaard", gemeenten: ["Molenwaard", "Liesveld"], regio: "Molenwaard" },
-    
+    {
+      code: "C1",
+      naam: "Drechtsteden Noord",
+      gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"],
+      regio: "Drechtsteden",
+    },
+    {
+      code: "C2",
+      naam: "Drechtsteden Zuid",
+      gemeenten: ["Alblasserdam", "Hendrik-Ido-Ambacht", "Sliedrecht"],
+      regio: "Drechtsteden",
+    },
+    {
+      code: "C3",
+      naam: "Molenwaard",
+      gemeenten: ["Molenwaard", "Liesveld"],
+      regio: "Molenwaard",
+    },
+
     // Westland & Midden-Delfland (D-teams)
-    { code: "D1", naam: "Westland", gemeenten: ["Westland"], regio: "Westland" },
-    { code: "D2", naam: "Midden-Delfland", gemeenten: ["Midden-Delfland", "Delft"], regio: "Westland" },
-    { code: "D3", naam: "Lansingerland", gemeenten: ["Lansingerland", "Pijnacker-Nootdorp"], regio: "Westland" },
-    
+    {
+      code: "D1",
+      naam: "Westland",
+      gemeenten: ["Westland"],
+      regio: "Westland",
+    },
+    {
+      code: "D2",
+      naam: "Midden-Delfland",
+      gemeenten: ["Midden-Delfland", "Delft"],
+      regio: "Westland",
+    },
+    {
+      code: "D3",
+      naam: "Lansingerland",
+      gemeenten: ["Lansingerland", "Pijnacker-Nootdorp"],
+      regio: "Westland",
+    },
+
     // Den Haag Regio (E-teams)
-    { code: "E1", naam: "Rijswijk", gemeenten: ["Rijswijk", "Voorburg", "Leidschendam-Voorburg"], regio: "Den Haag" },
-    { code: "E2", naam: "Zoetermeer", gemeenten: ["Zoetermeer", "Waddinxveen"], regio: "Den Haag" },
-    { code: "E3", naam: "Zuidas", gemeenten: ["Zuidplas", "Nieuwkoop"], regio: "Den Haag" }
+    {
+      code: "E1",
+      naam: "Rijswijk",
+      gemeenten: ["Rijswijk", "Voorburg", "Leidschendam-Voorburg"],
+      regio: "Den Haag",
+    },
+    {
+      code: "E2",
+      naam: "Zoetermeer",
+      gemeenten: ["Zoetermeer", "Waddinxveen"],
+      regio: "Den Haag",
+    },
+    {
+      code: "E3",
+      naam: "Zuidas",
+      gemeenten: ["Zuidplas", "Nieuwkoop"],
+      regio: "Den Haag",
+    },
   ];
 
   // Initialize localStorage if not present
-  if (typeof window !== 'undefined' && !localStorage.getItem('basisteams')) {
-    localStorage.setItem('basisteams', JSON.stringify(basisteamsData));
+  if (typeof window !== "undefined" && !localStorage.getItem("basisteams")) {
+    localStorage.setItem("basisteams", JSON.stringify(basisteamsData));
   }
 
-  const [basisTeams] = useLocalStorage<BasisTeam[]>('basisteams', basisteamsData);
+  const [basisTeams] = useLocalStorage<BasisTeam[]>(
+    "basisteams",
+    basisteamsData,
+  );
 
   const incidentTypes = [
-    'Diefstal', 'Verkeersongeval', 'Vermiste persoon', 'Huiselijk geweld',
-    'Inbraak', 'Openbare orde verstoring', 'Bedreiging', 'Geweld',
-    'Drugsdelict', 'Vandalisme', 'Fraude', 'Overlast'
+    "Diefstal",
+    "Verkeersongeval",
+    "Vermiste persoon",
+    "Huiselijk geweld",
+    "Inbraak",
+    "Openbare orde verstoring",
+    "Bedreiging",
+    "Geweld",
+    "Drugsdelict",
+    "Vandalisme",
+    "Fraude",
+    "Overlast",
   ];
 
   const locations = [
-    'Marktplein 15, Amsterdam', 'Hoofdstraat 42, Rotterdam', 'Kerkstraat 8, Utrecht',
-    'Stationsweg 156, Den Haag', 'Dorpsstraat 23, Eindhoven', 'Schoolstraat 67, Groningen',
-    'Nieuwstraat 89, Tilburg', 'Oude Gracht 34, Utrecht', 'Kalverstraat 123, Amsterdam',
-    'Binnenhof 2, Den Haag', 'Witte de Withstraat 45, Rotterdam', 'Grote Markt 12, Haarlem'
+    "Marktplein 15, Amsterdam",
+    "Hoofdstraat 42, Rotterdam",
+    "Kerkstraat 8, Utrecht",
+    "Stationsweg 156, Den Haag",
+    "Dorpsstraat 23, Eindhoven",
+    "Schoolstraat 67, Groningen",
+    "Nieuwstraat 89, Tilburg",
+    "Oude Gracht 34, Utrecht",
+    "Kalverstraat 123, Amsterdam",
+    "Binnenhof 2, Den Haag",
+    "Witte de Withstraat 45, Rotterdam",
+    "Grote Markt 12, Haarlem",
   ];
 
   // Update time every second
@@ -207,11 +381,17 @@ export default function Dashboard() {
   // Update incident times every second
   useEffect(() => {
     const timer = setInterval(() => {
-      setIncidents(prev => prev.map(incident => {
-        const now = new Date();
-        const timeDiff = Math.floor((now.getTime() - new Date(incident.timestamp).getTime()) / 1000 / 60);
-        return { ...incident, timeAgo: timeDiff + ' min geleden' };
-      }));
+      setIncidents((prev) =>
+        prev.map((incident) => {
+          const now = new Date();
+          const timeDiff = Math.floor(
+            (now.getTime() - new Date(incident.timestamp).getTime()) /
+              1000 /
+              60,
+          );
+          return { ...incident, timeAgo: timeDiff + " min geleden" };
+        }),
+      );
     }, 1000);
     return () => clearInterval(timer);
   }, [setIncidents]);
@@ -221,60 +401,125 @@ export default function Dashboard() {
     const initializeGMS = () => {
       // Initialize current time in the GMS form
       const updateGMSTime = () => {
-        const timeInput = document.getElementById('gmsTijdstip') as HTMLInputElement;
+        const timeInput = document.getElementById(
+          "gmsTijdstip",
+        ) as HTMLInputElement;
         if (timeInput) {
           const now = new Date();
-          const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          const localDateTime = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000,
+          )
+            .toISOString()
+            .slice(0, 16);
           timeInput.value = localDateTime;
         }
       };
 
       // Handle GMS form submission
       const handleGMSSubmit = () => {
-        const kladblok = document.getElementById('gmsKladblok');
-        const locatie = document.getElementById('gmsLocatie') as HTMLInputElement;
-        const tijdstip = document.getElementById('gmsTijdstip') as HTMLInputElement;
-        const soortMelding = document.getElementById('gmsSoortMelding') as HTMLSelectElement;
-        const prioriteit = document.getElementById('gmsPrioriteit') as HTMLInputElement;
-        const output = document.getElementById('gmsOutput');
+        const kladblok = document.getElementById("gmsKladblok");
         
-        if (!kladblok || !locatie || !tijdstip || !soortMelding || !prioriteit || !output) return;
+        // Melder informatie
+        const meldernaam = document.getElementById("gmsMeldernaam") as HTMLInputElement;
+        const melderadres = document.getElementById("gmsMelderadres") as HTMLInputElement;
+        const telefoonnummer = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
+        
+        // Melding locatie
+        const meldingsadres = document.getElementById("gmsMeldingsadres") as HTMLInputElement;
+        const postcode = document.getElementById("gmsPostcode") as HTMLInputElement;
+        const gemeente = document.getElementById("gmsGemeente") as HTMLInputElement;
+        
+        // Classificaties
+        const classificatie1 = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+        const classificatie2 = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+        const classificatie3 = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+        
+        // Bestaande velden
+        const locatie = document.getElementById("gmsLocatie") as HTMLInputElement;
+        const tijdstip = document.getElementById("gmsTijdstip") as HTMLInputElement;
+        const soortMelding = document.getElementById("gmsSoortMelding") as HTMLSelectElement;
+        const prioriteit = document.getElementById("gmsPrioriteit") as HTMLInputElement;
+        const output = document.getElementById("gmsOutput");
+
+        if (!kladblok || !output) return;
 
         // Validate required fields
-        if (!locatie.value.trim() || !soortMelding.value) {
-          alert('Vul alle verplichte velden in.');
+        if (!meldingsadres?.value.trim() && !locatie?.value.trim()) {
+          alert("Vul minimaal het meldingsadres of locatie in.");
           return;
         }
 
         const gmsData = {
           id: Date.now(),
           timestamp: new Date().toISOString(),
-          kladblok: kladblok.textContent || '',
-          locatie: locatie.value.trim(),
-          tijdstip: tijdstip.value,
-          soortMelding: soortMelding.value,
-          prioriteit: parseInt(prioriteit.value),
-          status: 'Nieuw',
-          aangemaaktOp: new Date().toLocaleString('nl-NL')
+          aangemaaktOp: new Date().toLocaleString("nl-NL"),
+          status: "Nieuw",
+          
+          // Melder informatie
+          melder: {
+            naam: meldernaam?.value.trim() || "",
+            adres: melderadres?.value.trim() || "",
+            telefoonnummer: telefoonnummer?.value.trim() || ""
+          },
+          
+          // Melding locatie
+          melding: {
+            adres: meldingsadres?.value.trim() || "",
+            postcode: postcode?.value.trim() || "",
+            gemeente: gemeente?.value.trim() || ""
+          },
+          
+          // LMC Classificatie
+          classificatie: {
+            niveau1: classificatie1?.value || "",
+            niveau2: classificatie2?.value || "",
+            niveau3: classificatie3?.value || ""
+          },
+          
+          // Aanvullende informatie
+          details: {
+            kladblok: kladblok.textContent || "",
+            locatieLegacy: locatie?.value.trim() || "",
+            tijdstip: tijdstip?.value || "",
+            soortMelding: soortMelding?.value || "",
+            prioriteit: parseInt(prioriteit?.value || "3")
+          }
         };
 
         // Display JSON output
         output.textContent = JSON.stringify(gmsData, null, 2);
 
         // Reset form
-        kladblok.textContent = '';
-        locatie.value = '';
-        soortMelding.value = '';
-        prioriteit.value = '3';
+        kladblok.textContent = "";
+        
+        // Reset melder informatie
+        if (meldernaam) meldernaam.value = "";
+        if (melderadres) melderadres.value = "";
+        if (telefoonnummer) telefoonnummer.value = "";
+        
+        // Reset melding locatie
+        if (meldingsadres) meldingsadres.value = "";
+        if (postcode) postcode.value = "";
+        if (gemeente) gemeente.value = "";
+        
+        // Reset classificaties
+        if (classificatie1) classificatie1.value = "";
+        if (classificatie2) classificatie2.value = "";
+        if (classificatie3) classificatie3.value = "";
+        
+        // Reset bestaande velden
+        if (locatie) locatie.value = "";
+        if (soortMelding) soortMelding.value = "";
+        if (prioriteit) prioriteit.value = "3";
         updateGMSTime();
 
-        showNotificationMessage('GMS melding opgeslagen');
+        showNotificationMessage("GMS melding opgeslagen");
       };
 
       // Add event listeners
-      const saveButton = document.getElementById('gmsSaveButton');
+      const saveButton = document.getElementById("gmsSaveButton");
       if (saveButton) {
-        saveButton.addEventListener('click', handleGMSSubmit);
+        saveButton.addEventListener("click", handleGMSSubmit);
       }
 
       // Initialize time immediately and then every minute
@@ -284,13 +529,13 @@ export default function Dashboard() {
       return () => {
         clearInterval(timeTimer);
         if (saveButton) {
-          saveButton.removeEventListener('click', handleGMSSubmit);
+          saveButton.removeEventListener("click", handleGMSSubmit);
         }
       };
     };
 
     // Only initialize if GMS section is active
-    if (activeSection === 'gms') {
+    if (activeSection === "gms") {
       const cleanup = initializeGMS();
       return cleanup;
     }
@@ -299,50 +544,54 @@ export default function Dashboard() {
   // Units filter functionality
   useEffect(() => {
     const initializeUnitsFilter = () => {
-      const filterInput = document.getElementById('unitsFilter') as HTMLInputElement;
+      const filterInput = document.getElementById(
+        "unitsFilter",
+      ) as HTMLInputElement;
       if (!filterInput) return;
 
       const handleFilterChange = () => {
         const filterValue = filterInput.value.toLowerCase();
-        const unitRows = document.querySelectorAll('.unit-row');
-        
+        const unitRows = document.querySelectorAll(".unit-row");
+
         unitRows.forEach((row) => {
-          const unitData = row.getAttribute('data-unit');
+          const unitData = row.getAttribute("data-unit");
           if (unitData) {
             try {
               const unit = JSON.parse(unitData);
               const roepnaam = unit.roepnaam.toLowerCase();
-              const rollen = unit.rollen.map((rol: string) => rol.toLowerCase()).join(' ');
+              const rollen = unit.rollen
+                .map((rol: string) => rol.toLowerCase())
+                .join(" ");
               const voertuig = unit.voertuigtype.toLowerCase();
               const status = unit.status.toLowerCase();
-              
-              const matchesFilter = 
+
+              const matchesFilter =
                 roepnaam.includes(filterValue) ||
                 rollen.includes(filterValue) ||
                 voertuig.includes(filterValue) ||
                 status.includes(filterValue);
-              
+
               if (matchesFilter) {
-                (row as HTMLElement).style.display = 'table-row';
+                (row as HTMLElement).style.display = "table-row";
               } else {
-                (row as HTMLElement).style.display = 'none';
+                (row as HTMLElement).style.display = "none";
               }
             } catch (error) {
-              console.error('Error parsing unit data:', error);
+              console.error("Error parsing unit data:", error);
             }
           }
         });
       };
 
-      filterInput.addEventListener('input', handleFilterChange);
-      
+      filterInput.addEventListener("input", handleFilterChange);
+
       return () => {
-        filterInput.removeEventListener('input', handleFilterChange);
+        filterInput.removeEventListener("input", handleFilterChange);
       };
     };
 
     // Only initialize if units section is active
-    if (activeSection === 'units') {
+    if (activeSection === "units") {
       const cleanup = initializeUnitsFilter();
       return cleanup;
     }
@@ -351,50 +600,54 @@ export default function Dashboard() {
   // Basisteams filter functionality
   useEffect(() => {
     const initializeBasisteamsFilter = () => {
-      const filterInput = document.getElementById('basisteamsFilter') as HTMLInputElement;
+      const filterInput = document.getElementById(
+        "basisteamsFilter",
+      ) as HTMLInputElement;
       if (!filterInput) return;
 
       const handleFilterChange = () => {
         const filterValue = filterInput.value.toLowerCase();
-        const teamRows = document.querySelectorAll('.basisteam-row');
-        
+        const teamRows = document.querySelectorAll(".basisteam-row");
+
         teamRows.forEach((row) => {
-          const teamData = row.getAttribute('data-team');
+          const teamData = row.getAttribute("data-team");
           if (teamData) {
             try {
               const team = JSON.parse(teamData);
               const code = team.code.toLowerCase();
               const naam = team.naam.toLowerCase();
               const regio = team.regio.toLowerCase();
-              const gemeenten = team.gemeenten.map((gemeente: string) => gemeente.toLowerCase()).join(' ');
-              
-              const matchesFilter = 
+              const gemeenten = team.gemeenten
+                .map((gemeente: string) => gemeente.toLowerCase())
+                .join(" ");
+
+              const matchesFilter =
                 code.includes(filterValue) ||
                 naam.includes(filterValue) ||
                 regio.includes(filterValue) ||
                 gemeenten.includes(filterValue);
-              
+
               if (matchesFilter) {
-                (row as HTMLElement).style.display = 'table-row';
+                (row as HTMLElement).style.display = "table-row";
               } else {
-                (row as HTMLElement).style.display = 'none';
+                (row as HTMLElement).style.display = "none";
               }
             } catch (error) {
-              console.error('Error parsing team data:', error);
+              console.error("Error parsing team data:", error);
             }
           }
         });
       };
 
-      filterInput.addEventListener('input', handleFilterChange);
-      
+      filterInput.addEventListener("input", handleFilterChange);
+
       return () => {
-        filterInput.removeEventListener('input', handleFilterChange);
+        filterInput.removeEventListener("input", handleFilterChange);
       };
     };
 
     // Only initialize if settings section is active
-    if (activeSection === 'settings') {
+    if (activeSection === "settings") {
       const cleanup = initializeBasisteamsFilter();
       return cleanup;
     }
@@ -409,10 +662,13 @@ export default function Dashboard() {
   };
 
   const simulateNewIncident = () => {
-    const priorities: ('low' | 'medium' | 'high')[] = ['low', 'medium', 'high'];
-    const randomPriority = priorities[Math.floor(Math.random() * priorities.length)];
-    const randomType = incidentTypes[Math.floor(Math.random() * incidentTypes.length)];
-    const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+    const priorities: ("low" | "medium" | "high")[] = ["low", "medium", "high"];
+    const randomPriority =
+      priorities[Math.floor(Math.random() * priorities.length)];
+    const randomType =
+      incidentTypes[Math.floor(Math.random() * incidentTypes.length)];
+    const randomLocation =
+      locations[Math.floor(Math.random() * locations.length)];
     const randomUnits = Math.floor(Math.random() * 3) + 1;
 
     const newIncident: Incident = {
@@ -420,45 +676,54 @@ export default function Dashboard() {
       type: randomType,
       location: randomLocation,
       timestamp: new Date().toISOString(),
-      timeAgo: '0 min geleden',
+      timeAgo: "0 min geleden",
       unitsAssigned: randomUnits,
       priority: randomPriority,
-      status: 'active'
+      status: "active",
     };
 
-    setIncidents(prev => [newIncident, ...prev]);
-    showNotificationMessage('Nieuwe melding ontvangen: ' + randomType);
+    setIncidents((prev) => [newIncident, ...prev]);
+    showNotificationMessage("Nieuwe melding ontvangen: " + randomType);
   };
 
   const acceptIncident = (id: number) => {
-    setIncidents(prev => prev.map(inc => 
-      inc.id === id ? { ...inc, status: 'accepted' as const } : inc
-    ));
-    showNotificationMessage('Incident geaccepteerd');
+    setIncidents((prev) =>
+      prev.map((inc) =>
+        inc.id === id ? { ...inc, status: "accepted" as const } : inc,
+      ),
+    );
+    showNotificationMessage("Incident geaccepteerd");
   };
 
   const closeIncident = (id: number) => {
-    setIncidents(prev => prev.map(inc => 
-      inc.id === id ? { ...inc, status: 'closed' as const } : inc
-    ));
-    showNotificationMessage('Incident gesloten');
+    setIncidents((prev) =>
+      prev.map((inc) =>
+        inc.id === id ? { ...inc, status: "closed" as const } : inc,
+      ),
+    );
+    showNotificationMessage("Incident gesloten");
   };
 
   const removeIncident = (id: number) => {
-    setIncidents(prev => prev.filter(inc => inc.id !== id));
-    showNotificationMessage('Incident verwijderd');
+    setIncidents((prev) => prev.filter((inc) => inc.id !== id));
+    showNotificationMessage("Incident verwijderd");
   };
 
   const calculateStats = (): Stats => {
-    const activeIncidents = incidents.filter(inc => inc.status === 'active' || inc.status === 'accepted');
-    const newIncidents = incidents.filter(inc => {
+    const activeIncidents = incidents.filter(
+      (inc) => inc.status === "active" || inc.status === "accepted",
+    );
+    const newIncidents = incidents.filter((inc) => {
       const incidentTime = new Date(inc.timestamp);
       const now = new Date();
-      const diffMinutes = (now.getTime() - incidentTime.getTime()) / (1000 * 60);
-      return diffMinutes <= 30 && inc.status === 'active';
+      const diffMinutes =
+        (now.getTime() - incidentTime.getTime()) / (1000 * 60);
+      return diffMinutes <= 30 && inc.status === "active";
     });
-    const highPriorityIncidents = activeIncidents.filter(inc => inc.priority === 'high');
-    const activeUnits = units.filter(unit => unit.status === 'active');
+    const highPriorityIncidents = activeIncidents.filter(
+      (inc) => inc.priority === "high",
+    );
+    const activeUnits = units.filter((unit) => unit.status === "active");
     const emergencyCallsToday = Math.floor(Math.random() * 50) + 20; // Simulated
 
     return {
@@ -470,14 +735,14 @@ export default function Dashboard() {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleString('nl-NL', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+    return date.toLocaleString("nl-NL", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
   };
 
@@ -486,8 +751,11 @@ export default function Dashboard() {
       <div className="section-header">
         <h3 className="section-title">{title}</h3>
       </div>
-      <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-        <i className={`bi bi-${icon}`} style={{ fontSize: '48px', marginBottom: '16px' }}></i>
+      <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+        <i
+          className={`bi bi-${icon}`}
+          style={{ fontSize: "48px", marginBottom: "16px" }}
+        ></i>
         <p>{title} wordt geladen...</p>
       </div>
     </div>
@@ -495,15 +763,18 @@ export default function Dashboard() {
 
   return (
     <div className="app-container">
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      
+      <Sidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+
       <main className="main-content">
         <div className="header">
           <h1>Meldkamer Dashboard</h1>
           <div className="header-time">{formatTime(currentTime)}</div>
         </div>
 
-        {activeSection === 'dashboard' && (
+        {activeSection === "dashboard" && (
           <div className="content-section active">
             <StatsGrid stats={calculateStats()} />
             <div className="content-grid">
@@ -519,13 +790,14 @@ export default function Dashboard() {
           </div>
         )}
 
-        {activeSection === 'incidents' && renderPlaceholderSection('Alle Incidenten', 'exclamation-triangle')}
-        {activeSection === 'units' && (
+        {activeSection === "incidents" &&
+          renderPlaceholderSection("Alle Incidenten", "exclamation-triangle")}
+        {activeSection === "units" && (
           <div className="content-section active">
             <div className="section">
               <div className="section-header">
                 <h3 className="section-title">Eenheden Beheer</h3>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => setShowAddUnitForm(true)}
                 >
@@ -535,7 +807,9 @@ export default function Dashboard() {
               </div>
               <div className="units-management-content">
                 <div className="units-filter-section">
-                  <label htmlFor="unitsFilter" className="filter-label">🔍 Filter eenheden</label>
+                  <label htmlFor="unitsFilter" className="filter-label">
+                    🔍 Filter eenheden
+                  </label>
                   <input
                     type="text"
                     id="unitsFilter"
@@ -543,7 +817,7 @@ export default function Dashboard() {
                     placeholder="Zoek op roepnaam of rol..."
                   />
                 </div>
-                
+
                 <div className="units-table-container">
                   <table className="units-table">
                     <thead>
@@ -557,7 +831,11 @@ export default function Dashboard() {
                     </thead>
                     <tbody id="unitsTableBody">
                       {policeUnits.map((unit) => (
-                        <tr key={unit.id} className="unit-row" data-unit={JSON.stringify(unit)}>
+                        <tr
+                          key={unit.id}
+                          className="unit-row"
+                          data-unit={JSON.stringify(unit)}
+                        >
                           <td className="unit-roepnaam">
                             <strong>{unit.roepnaam}</strong>
                           </td>
@@ -566,13 +844,15 @@ export default function Dashboard() {
                             {unit.rollen.map((rol, index) => (
                               <span key={rol} className="role-tag">
                                 {rol}
-                                {index < unit.rollen.length - 1 && ', '}
+                                {index < unit.rollen.length - 1 && ", "}
                               </span>
                             ))}
                           </td>
                           <td className="unit-voertuig">{unit.voertuigtype}</td>
                           <td>
-                            <span className={`status-badge status-${unit.status.toLowerCase().replace(' ', '-')}`}>
+                            <span
+                              className={`status-badge status-${unit.status.toLowerCase().replace(" ", "-")}`}
+                            >
                               {unit.status}
                             </span>
                           </td>
@@ -585,11 +865,17 @@ export default function Dashboard() {
             </div>
 
             {showAddUnitForm && (
-              <div className="modal-overlay" onClick={() => setShowAddUnitForm(false)}>
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="modal-overlay"
+                onClick={() => setShowAddUnitForm(false)}
+              >
+                <div
+                  className="modal-content"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="modal-header">
                     <h3>Nieuwe Eenheid Toevoegen</h3>
-                    <button 
+                    <button
                       className="modal-close"
                       onClick={() => setShowAddUnitForm(false)}
                     >
@@ -602,7 +888,12 @@ export default function Dashboard() {
                       <input
                         type="text"
                         value={newUnit.roepnaam}
-                        onChange={(e) => setNewUnit(prev => ({ ...prev, roepnaam: e.target.value }))}
+                        onChange={(e) =>
+                          setNewUnit((prev) => ({
+                            ...prev,
+                            roepnaam: e.target.value,
+                          }))
+                        }
                         placeholder="bijv. RT11-03"
                         className="form-input"
                       />
@@ -615,7 +906,12 @@ export default function Dashboard() {
                         min="1"
                         max="10"
                         value={newUnit.mensen}
-                        onChange={(e) => setNewUnit(prev => ({ ...prev, mensen: parseInt(e.target.value) }))}
+                        onChange={(e) =>
+                          setNewUnit((prev) => ({
+                            ...prev,
+                            mensen: parseInt(e.target.value),
+                          }))
+                        }
                         className="form-input"
                       />
                     </div>
@@ -624,12 +920,19 @@ export default function Dashboard() {
                       <label>Voertuigtype *</label>
                       <select
                         value={newUnit.voertuigtype}
-                        onChange={(e) => setNewUnit(prev => ({ ...prev, voertuigtype: e.target.value }))}
+                        onChange={(e) =>
+                          setNewUnit((prev) => ({
+                            ...prev,
+                            voertuigtype: e.target.value,
+                          }))
+                        }
                         className="form-input"
                       >
                         <option value="">Selecteer voertuig...</option>
-                        {vehicleTypes.map(type => (
-                          <option key={type} value={type}>{type}</option>
+                        {vehicleTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -638,11 +941,18 @@ export default function Dashboard() {
                       <label>Status</label>
                       <select
                         value={newUnit.status}
-                        onChange={(e) => setNewUnit(prev => ({ ...prev, status: e.target.value }))}
+                        onChange={(e) =>
+                          setNewUnit((prev) => ({
+                            ...prev,
+                            status: e.target.value,
+                          }))
+                        }
                         className="form-input"
                       >
-                        {npStatuses.map(status => (
-                          <option key={status} value={status}>{status}</option>
+                        {npStatuses.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -650,7 +960,7 @@ export default function Dashboard() {
                     <div className="form-group">
                       <label>Inzetrollen * (selecteer één of meer)</label>
                       <div className="checkbox-group">
-                        {inzetRollen.map(role => (
+                        {inzetRollen.map((role) => (
                           <label key={role} className="checkbox-label">
                             <input
                               type="checkbox"
@@ -664,16 +974,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="modal-footer">
-                    <button 
+                    <button
                       className="btn btn-secondary"
                       onClick={() => setShowAddUnitForm(false)}
                     >
                       Annuleren
                     </button>
-                    <button 
-                      className="btn btn-primary"
-                      onClick={addNewUnit}
-                    >
+                    <button className="btn btn-primary" onClick={addNewUnit}>
                       Eenheid Toevoegen
                     </button>
                   </div>
@@ -682,7 +989,7 @@ export default function Dashboard() {
             )}
           </div>
         )}
-        {activeSection === 'gms' && (
+        {activeSection === "gms" && (
           <div className="content-section active">
             <div id="gms" className="section">
               <div className="section-header">
@@ -698,10 +1005,121 @@ export default function Dashboard() {
                       className="gms-kladblok"
                     ></div>
                   </div>
-                  
-                  <div className="gms-form-section">
+
+                  <div className="gms-form-sections">
+                    {/* Melder Informatie - Left Column */}
+                    <div className="gms-melder-section">
+                      <h4 className="gms-section-title">👤 Melder Informatie</h4>
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsMeldernaam">🧍 Meldernaam</label>
+                        <input
+                          type="text"
+                          id="gmsMeldernaam"
+                          className="gms-input"
+                          placeholder="Naam van de melder..."
+                        />
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsMelderadres">🏠 Melderadres</label>
+                        <input
+                          type="text"
+                          id="gmsMelderadres"
+                          className="gms-input"
+                          placeholder="Adres van de melder..."
+                        />
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsTelefoonnummer">📞 Telefoonnummer melder</label>
+                        <input
+                          type="tel"
+                          id="gmsTelefoonnummer"
+                          className="gms-input"
+                          placeholder="Telefoonnummer..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Melding Locatie - Right Column */}
+                    <div className="gms-melding-section">
+                      <h4 className="gms-section-title">📍 Melding Locatie</h4>
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsMeldingsadres">📍 Meldingsadres</label>
+                        <input
+                          type="text"
+                          id="gmsMeldingsadres"
+                          className="gms-input"
+                          placeholder="Adres van het incident..."
+                        />
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsPostcode">🔢 Postcode</label>
+                        <input
+                          type="text"
+                          id="gmsPostcode"
+                          className="gms-input"
+                          placeholder="1234 AB"
+                        />
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsGemeente">🏙️ Gemeente</label>
+                        <input
+                          type="text"
+                          id="gmsGemeente"
+                          className="gms-input"
+                          placeholder="Gemeente naam..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Classificatie Section */}
+                  <div className="gms-classificatie-section">
+                    <h4 className="gms-section-title">📋 LMC Classificatie</h4>
+                    <div className="gms-classificatie-grid">
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsClassificatie1">Classificatie 1</label>
+                        <select id="gmsClassificatie1" className="gms-input">
+                          <option value="">Selecteer classificatie 1...</option>
+                          <option value="Verkeer">Verkeer</option>
+                          <option value="Geweld">Geweld</option>
+                          <option value="Diefstal">Diefstal</option>
+                          <option value="Brand">Brand</option>
+                          <option value="Overlast">Overlast</option>
+                        </select>
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsClassificatie2">Classificatie 2</label>
+                        <select id="gmsClassificatie2" className="gms-input">
+                          <option value="">Selecteer classificatie 2...</option>
+                          <option value="Wegverkeer">Wegverkeer</option>
+                          <option value="Fietsverkeer">Fietsverkeer</option>
+                          <option value="Voetganger">Voetganger</option>
+                          <option value="Openbaar vervoer">Openbaar vervoer</option>
+                        </select>
+                      </div>
+                      
+                      <div className="gms-form-group">
+                        <label className="gms-label" htmlFor="gmsClassificatie3">Classificatie 3</label>
+                        <select id="gmsClassificatie3" className="gms-input">
+                          <option value="">Selecteer classificatie 3...</option>
+                          <option value="Onder invloed">Onder invloed</option>
+                          <option value="Materiële schade">Materiële schade</option>
+                          <option value="Letselschade">Letselschade</option>
+                          <option value="Dodelijk ongeval">Dodelijk ongeval</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bestaande velden */}
+                  <div className="gms-existing-fields">
                     <div className="gms-form-group">
-                      <label className="gms-label" htmlFor="gmsLocatie">📍 Locatie</label>
+                      <label className="gms-label" htmlFor="gmsLocatie">📍 Locatie (legacy)</label>
                       <input
                         type="text"
                         id="gmsLocatie"
@@ -742,24 +1160,32 @@ export default function Dashboard() {
                       />
                     </div>
                     
-                    <button id="gmsSaveButton" className="btn btn-primary gms-save-btn">
+                    <button
+                      id="gmsSaveButton"
+                      className="btn btn-primary gms-save-btn"
+                    >
                       💾 Melding opslaan
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="gms-output-section">
-                  <h4 className="gms-output-title">📊 Opgeslagen Melding (JSON)</h4>
+                  <h4 className="gms-output-title">
+                    📊 Opgeslagen Melding (JSON)
+                  </h4>
                   <pre id="gmsOutput" className="gms-output"></pre>
                 </div>
               </div>
             </div>
           </div>
         )}
-        {activeSection === 'map' && renderPlaceholderSection('Kaart Overzicht', 'geo-alt')}
-        {activeSection === 'archive' && renderPlaceholderSection('Archief', 'archive')}
-        {activeSection === 'reports' && renderPlaceholderSection('Rapporten', 'file-text')}
-        {activeSection === 'settings' && (
+        {activeSection === "map" &&
+          renderPlaceholderSection("Kaart Overzicht", "geo-alt")}
+        {activeSection === "archive" &&
+          renderPlaceholderSection("Archief", "archive")}
+        {activeSection === "reports" &&
+          renderPlaceholderSection("Rapporten", "file-text")}
+        {activeSection === "settings" && (
           <div className="content-section active">
             <div className="section">
               <div className="section-header">
@@ -767,7 +1193,9 @@ export default function Dashboard() {
               </div>
               <div className="basisteams-content">
                 <div className="basisteams-filter-section">
-                  <label htmlFor="basisteamsFilter" className="filter-label">🔍 Filter basisteams</label>
+                  <label htmlFor="basisteamsFilter" className="filter-label">
+                    🔍 Filter basisteams
+                  </label>
                   <input
                     type="text"
                     id="basisteamsFilter"
@@ -775,7 +1203,7 @@ export default function Dashboard() {
                     placeholder="Zoek op teamcode, naam of gemeente..."
                   />
                 </div>
-                
+
                 <div className="basisteams-table-container">
                   <table className="basisteams-table">
                     <thead>
@@ -788,7 +1216,11 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                       {basisTeams.map((team) => (
-                        <tr key={team.code} className="basisteam-row" data-team={JSON.stringify(team)}>
+                        <tr
+                          key={team.code}
+                          className="basisteam-row"
+                          data-team={JSON.stringify(team)}
+                        >
                           <td className="team-code">
                             <strong>{team.code}</strong>
                           </td>
@@ -798,7 +1230,7 @@ export default function Dashboard() {
                             {team.gemeenten.map((gemeente, index) => (
                               <span key={gemeente} className="gemeente-tag">
                                 {gemeente}
-                                {index < team.gemeenten.length - 1 && ', '}
+                                {index < team.gemeenten.length - 1 && ", "}
                               </span>
                             ))}
                           </td>
@@ -813,7 +1245,7 @@ export default function Dashboard() {
         )}
       </main>
 
-      <div className={`notification ${showNotification ? 'show' : ''}`}>
+      <div className={`notification ${showNotification ? "show" : ""}`}>
         {notification}
       </div>
     </div>
