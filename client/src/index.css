@@ -954,6 +954,13 @@ body {
   width: 200px;
 }
 
+.team-regio {
+  color: hsl(208, 79%, 51%);
+  font-weight: 500;
+  width: 150px;
+  font-size: 13px;
+}
+
 .team-gemeenten {
   color: hsl(220, 9%, 40%);
 }

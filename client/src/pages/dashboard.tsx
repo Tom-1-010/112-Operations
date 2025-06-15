@@ -135,44 +135,45 @@ export default function Dashboard() {
     }));
   };
 
-  // Basisteams data for Rotterdam
+  // Enhanced basisteams interface with regional organization
   interface BasisTeam {
     code: string;
     naam: string;
     gemeenten: string[];
+    regio: string;
   }
 
   // Complete basisteams database for Regionale Eenheid Rotterdam
   const basisteamsData: BasisTeam[] = [
-    // Rotterdam Stadsregio
-    { code: "A1", naam: "Waterweg", gemeenten: ["Vlaardingen", "Maassluis", "Schiedam"] },
-    { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam"] },
-    { code: "A3", naam: "Noord", gemeenten: ["Rotterdam"] },
-    { code: "A4", naam: "Oost", gemeenten: ["Rotterdam", "Capelle aan den IJssel"] },
-    { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam", "Barendrecht"] },
-    { code: "A6", naam: "West", gemeenten: ["Rotterdam"] },
-    { code: "A7", naam: "IJsselmonde", gemeenten: ["Rotterdam"] },
-    { code: "A8", naam: "Charlois", gemeenten: ["Rotterdam"] },
+    // Rotterdam Stadsregio (A-teams)
+    { code: "A1", naam: "Waterweg", gemeenten: ["Vlaardingen", "Maassluis", "Schiedam"], regio: "Rotterdam Stadsregio" },
+    { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
+    { code: "A3", naam: "Noord", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
+    { code: "A4", naam: "Oost", gemeenten: ["Rotterdam", "Capelle aan den IJssel"], regio: "Rotterdam Stadsregio" },
+    { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam", "Barendrecht"], regio: "Rotterdam Stadsregio" },
+    { code: "A6", naam: "West", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
+    { code: "A7", naam: "IJsselmonde", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
+    { code: "A8", naam: "Charlois", gemeenten: ["Rotterdam"], regio: "Rotterdam Stadsregio" },
     
-    // Voorne-Putten & Hoeksche Waard
-    { code: "B1", naam: "Voorne-Putten", gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"] },
-    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard", "Binnenmaas"] },
-    { code: "B3", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"] },
+    // Voorne-Putten & Eilanden (B-teams)
+    { code: "B1", naam: "Voorne-Putten", gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"], regio: "Voorne-Putten" },
+    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard", "Binnenmaas"], regio: "Voorne-Putten" },
+    { code: "B3", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"], regio: "Goeree-Overflakkee" },
     
-    // Drechtsteden
-    { code: "C1", naam: "Drechtsteden Noord", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"] },
-    { code: "C2", naam: "Drechtsteden Zuid", gemeenten: ["Alblasserdam", "Hendrik-Ido-Ambacht", "Sliedrecht"] },
-    { code: "C3", naam: "Molenwaard", gemeenten: ["Molenwaard", "Liesveld"] },
+    // Drechtsteden & Molenwaard (C-teams)
+    { code: "C1", naam: "Drechtsteden Noord", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"], regio: "Drechtsteden" },
+    { code: "C2", naam: "Drechtsteden Zuid", gemeenten: ["Alblasserdam", "Hendrik-Ido-Ambacht", "Sliedrecht"], regio: "Drechtsteden" },
+    { code: "C3", naam: "Molenwaard", gemeenten: ["Molenwaard", "Liesveld"], regio: "Molenwaard" },
     
-    // Westland & Midden-Delfland
-    { code: "D1", naam: "Westland", gemeenten: ["Westland"] },
-    { code: "D2", naam: "Midden-Delfland", gemeenten: ["Midden-Delfland", "Delft"] },
-    { code: "D3", naam: "Lansingerland", gemeenten: ["Lansingerland", "Pijnacker-Nootdorp"] },
+    // Westland & Midden-Delfland (D-teams)
+    { code: "D1", naam: "Westland", gemeenten: ["Westland"], regio: "Westland" },
+    { code: "D2", naam: "Midden-Delfland", gemeenten: ["Midden-Delfland", "Delft"], regio: "Westland" },
+    { code: "D3", naam: "Lansingerland", gemeenten: ["Lansingerland", "Pijnacker-Nootdorp"], regio: "Westland" },
     
-    // Den Haag Regio
-    { code: "E1", naam: "Rijswijk", gemeenten: ["Rijswijk", "Voorburg", "Leidschendam-Voorburg"] },
-    { code: "E2", naam: "Zoetermeer", gemeenten: ["Zoetermeer", "Waddinxveen"] },
-    { code: "E3", naam: "Zuidplas", gemeenten: ["Zuidplas", "Nieuwkoop"] }
+    // Den Haag Regio (E-teams)
+    { code: "E1", naam: "Rijswijk", gemeenten: ["Rijswijk", "Voorburg", "Leidschendam-Voorburg"], regio: "Den Haag" },
+    { code: "E2", naam: "Zoetermeer", gemeenten: ["Zoetermeer", "Waddinxveen"], regio: "Den Haag" },
+    { code: "E3", naam: "Zuidas", gemeenten: ["Zuidplas", "Nieuwkoop"], regio: "Den Haag" }
   ];
 
   // Initialize localStorage if not present
@@ -364,11 +365,13 @@ export default function Dashboard() {
               const team = JSON.parse(teamData);
               const code = team.code.toLowerCase();
               const naam = team.naam.toLowerCase();
+              const regio = team.regio.toLowerCase();
               const gemeenten = team.gemeenten.map((gemeente: string) => gemeente.toLowerCase()).join(' ');
               
               const matchesFilter = 
                 code.includes(filterValue) ||
                 naam.includes(filterValue) ||
+                regio.includes(filterValue) ||
                 gemeenten.includes(filterValue);
               
               if (matchesFilter) {
@@ -779,6 +782,7 @@ export default function Dashboard() {
                       <tr>
                         <th>Teamcode</th>
                         <th>Teamnaam</th>
+                        <th>Regio</th>
                         <th>Gemeenten</th>
                       </tr>
                     </thead>
@@ -789,6 +793,7 @@ export default function Dashboard() {
                             <strong>{team.code}</strong>
                           </td>
                           <td className="team-naam">{team.naam}</td>
+                          <td className="team-regio">{team.regio}</td>
                           <td className="team-gemeenten">
                             {team.gemeenten.map((gemeente, index) => (
                               <span key={gemeente} className="gemeente-tag">
