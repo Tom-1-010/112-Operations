@@ -1027,43 +1027,7 @@ export default function Dashboard() {
         };
       };
 
-      const createIncidentFromGMS = (status: 'Afgesloten' | 'Openstaand') => {
-        const formData = collectGMSFormData();
-        const now = new Date();
 
-        // Map status to expected incident status
-        const getIncidentStatus = (gmsStatus: string): 'active' | 'accepted' | 'closed' => {
-          if (gmsStatus === 'Afgesloten') return 'closed';
-          if (gmsStatus === 'Openstaand') return 'accepted';
-          return 'active';
-        };
-        
-        const incident = {
-          id: Date.now(),
-          type: formData.classificatie1 || 'Algemeen',
-          location: formData.location,
-          timestamp: now.toISOString(),
-          timeAgo: '0 min geleden',
-          unitsAssigned: 0,
-          priority: formData.prioriteit, // Keep numeric priority for dashboard display
-          status: getIncidentStatus(status),
-          // Additional GMS data (as extended properties)
-          meldernaam: formData.meldernaam,
-          telefoonnummer: formData.telefoonnummer,
-          melderadres: formData.melderadres,
-          straatnaam: formData.straatnaam,
-          huisnummer: formData.huisnummer,
-          toevoeging: formData.toevoeging,
-          postcode: formData.postcode,
-          plaatsnaam: formData.plaatsnaam,
-          gemeente: formData.gemeente,
-          classificatie2: formData.classificatie2,
-          classificatie3: formData.classificatie3,
-          notities: formData.notities
-        } as any; // Cast to any to allow additional properties
-
-        return incident as Incident;
-      };
 
       const resetGMSForm = () => {
         // Reset all input fields
@@ -1107,12 +1071,75 @@ export default function Dashboard() {
         updateDynamicHeader();
       };
 
+      // Save incident to localStorage for incidents tab
+      const saveIncidentToStorage = (incidentData: any) => {
+        try {
+          const existingIncidents = JSON.parse(localStorage.getItem('incidenten') || '[]');
+          const updatedIncidents = [incidentData, ...existingIncidents];
+          localStorage.setItem('incidenten', JSON.stringify(updatedIncidents));
+          
+          // Refresh incidents tab if currently active
+          if (activeSection === 'incidents') {
+            const loadIncidentsFromStorage = () => {
+              const incidentsList = document.getElementById('allIncidentsList');
+              if (!incidentsList) return;
+
+              const sortedIncidenten = updatedIncidents.sort((a: any, b: any) => 
+                new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+              );
+
+              incidentsList.innerHTML = sortedIncidenten.map((incident: any) => {
+                const formattedTime = new Date(incident.timestamp).toLocaleString('nl-NL', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+
+                const prioriteitLabel = `Prio ${incident.prioriteit}`;
+                const prioriteitClass = incident.prioriteit === 1 ? 'priority-1' :
+                                       incident.prioriteit === 2 ? 'priority-2' :
+                                       incident.prioriteit === 3 ? 'priority-3' :
+                                       (incident.prioriteit === 4 || incident.prioriteit === 5) ? 'priority-4-5' :
+                                       'priority-3';
+
+                return `
+                  <div class="incident-row">
+                    <div class="incident-time">${formattedTime}</div>
+                    <div class="incident-location">${incident.gemeente || incident.plaatsnaam || 'Onbekend'}</div>
+                    <div class="incident-type">${incident.classificatie1 || 'Onbekend'}</div>
+                    <div>
+                      <span class="priority-tag ${prioriteitClass}">
+                        ${prioriteitLabel}
+                      </span>
+                    </div>
+                    <div class="incident-status status-${incident.status.toLowerCase().replace(' ', '-')}">${incident.status}</div>
+                  </div>
+                `;
+              }).join('');
+            };
+            loadIncidentsFromStorage();
+          }
+        } catch (error) {
+          console.error('Error saving incident:', error);
+        }
+      };
+
       // Event handlers for status buttons
       const handleEindrapport = () => {
-        const incident = createIncidentFromGMS('Afgesloten');
+        const formData = collectGMSFormData();
+        const now = new Date();
         
-        // Add to incidents list
-        setIncidents(prev => [incident, ...prev]);
+        const incidentData = {
+          ...formData,
+          id: Date.now(),
+          timestamp: now.toISOString(),
+          status: 'Afgesloten'
+        };
+        
+        // Save to incidents tab only
+        saveIncidentToStorage(incidentData);
         
         // Show notification
         showNotificationMessage('Eindrapport opgeslagen en naar Incidenten verzonden');
@@ -1122,10 +1149,18 @@ export default function Dashboard() {
       };
 
       const handleUitgifte = () => {
-        const incident = createIncidentFromGMS('Openstaand');
+        const formData = collectGMSFormData();
+        const now = new Date();
         
-        // Add to incidents list
-        setIncidents(prev => [incident, ...prev]);
+        const incidentData = {
+          ...formData,
+          id: Date.now(),
+          timestamp: now.toISOString(),
+          status: 'Openstaand'
+        };
+        
+        // Save to incidents tab only
+        saveIncidentToStorage(incidentData);
         
         // Show notification
         showNotificationMessage('Incident uitgegeven en naar Incidenten verzonden');
