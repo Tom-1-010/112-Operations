@@ -660,7 +660,7 @@ export default function Dashboard() {
   // Incidents page functionality
   useEffect(() => {
     const loadIncidentsFromStorage = () => {
-      const incidentsList = document.getElementById('allIncidentsList');
+      const incidentsList = document.getElementById('allIncidentsLegacyList');
       if (!incidentsList) return;
 
       try {
@@ -668,7 +668,7 @@ export default function Dashboard() {
         
         if (storedIncidenten.length === 0) {
           incidentsList.innerHTML = `
-            <div style="padding: 40px; text-align: center; color: #666;">
+            <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
               Geen incidenten gevonden
             </div>
           `;
@@ -680,42 +680,65 @@ export default function Dashboard() {
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         );
 
-        incidentsList.innerHTML = sortedIncidenten.map((incident: any) => {
-          const formattedTime = new Date(incident.timestamp).toLocaleString('nl-NL', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
+        incidentsList.innerHTML = sortedIncidenten.map((incident: any, index: number) => {
+          const incidentNumber = `I${String(incident.id || index + 1).padStart(6, '0')}`;
+          const formattedTime = new Date(incident.timestamp).toLocaleTimeString('nl-NL', {
             hour: '2-digit',
             minute: '2-digit'
           });
 
-          const prioriteitLabel = `Prio ${incident.prioriteit}`;
+          const mc = incident.classificatie1 ? incident.classificatie1.substring(0, 10) : '-';
+          const omschrijving = incident.classificatie1 || 'Onbekend';
+          const locatie = incident.straatnaam && incident.huisnummer 
+            ? `${incident.straatnaam} ${incident.huisnummer}` 
+            : incident.meldingsadres || '-';
+          const plaats = incident.plaatsnaam || incident.gemeente || '-';
+          const prioriteit = `PRIO ${incident.prioriteit || 3}`;
+          
+          // Map status to legacy format
+          let status = 'Nieuw';
+          if (incident.status === 'Uitgegeven') status = 'Openstaand';
+          if (incident.status === 'Openstaand') status = 'Openstaand';
+          if (incident.status === 'In wacht') status = 'Nieuw';
+          if (incident.status === 'Afgesloten') status = 'Afgesloten';
 
-          const prioriteitClass = incident.prioriteit === 1 ? 'priority-1' :
-                                 incident.prioriteit === 2 ? 'priority-2' :
-                                 incident.prioriteit === 3 ? 'priority-3' :
-                                 (incident.prioriteit === 4 || incident.prioriteit === 5) ? 'priority-4-5' :
-                                 'priority-3';
+          const priorityClass = `legacy-prio-${incident.prioriteit || 3}`;
+          const statusClass = `legacy-status-${status.toLowerCase()}`;
 
           return `
-            <div class="incident-row">
-              <div class="incident-time">${formattedTime}</div>
-              <div class="incident-location">${incident.gemeente || incident.meldingsadres || 'Onbekend'}</div>
-              <div class="incident-type">${incident.classificatie1 || 'Onbekend'}</div>
-              <div>
-                <span class="priority-tag ${prioriteitClass}">
-                  ${prioriteitLabel}
-                </span>
-              </div>
-              <div class="incident-status status-${incident.status.toLowerCase().replace(' ', '-')}">${incident.status}</div>
+            <div class="legacy-incident-row" data-incident-id="${incident.id || index}" onclick="selectIncidentRow(this)">
+              <div class="legacy-col-id">${incidentNumber}</div>
+              <div class="legacy-col-tijd">${formattedTime}</div>
+              <div class="legacy-col-mc">${mc}</div>
+              <div class="legacy-col-omschrijving" title="${omschrijving}">${omschrijving}</div>
+              <div class="legacy-col-locatie" title="${locatie}">${locatie}</div>
+              <div class="legacy-col-plaats" title="${plaats}">${plaats}</div>
+              <div class="legacy-col-prio ${priorityClass}">${prioriteit}</div>
+              <div class="legacy-col-status ${statusClass}">${status}</div>
             </div>
           `;
         }).join('');
 
+        // Add row selection functionality
+        window.selectIncidentRow = function(row: HTMLElement) {
+          // Remove previous selection
+          const previousSelected = incidentsList.querySelector('.selected');
+          if (previousSelected) {
+            previousSelected.classList.remove('selected');
+          }
+          
+          // Add selection to clicked row
+          row.classList.add('selected');
+          
+          // You can add modal or navigation logic here
+          const incidentId = row.getAttribute('data-incident-id');
+          console.log('Selected incident:', incidentId);
+        };
+
       } catch (error) {
         console.error('Error loading incidents:', error);
         incidentsList.innerHTML = `
-          <div style="padding: 40px; text-align: center; color: #666;">
+          <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
             Fout bij laden van incidenten
           </div>
         `;
@@ -1763,16 +1786,19 @@ export default function Dashboard() {
               <div className="section-header">
                 <h3 className="section-title">Alle Incidenten</h3>
               </div>
-              <div className="incidents-content">
-                <div className="incidents-table">
-                  <div className="incident-row" style={{ background: '#f8f9fa', fontWeight: 600 }}>
-                    <div>Tijdstip</div>
-                    <div>Gemeente</div>
-                    <div>Soort Melding</div>
-                    <div>Prioriteit</div>
-                    <div>Status</div>
+              <div className="incidents-legacy-content">
+                <div className="incidents-legacy-table">
+                  <div className="legacy-table-header">
+                    <div className="legacy-col-id">Incidentnummer</div>
+                    <div className="legacy-col-tijd">Tijd</div>
+                    <div className="legacy-col-mc">MC</div>
+                    <div className="legacy-col-omschrijving">Omschrijving</div>
+                    <div className="legacy-col-locatie">Locatie</div>
+                    <div className="legacy-col-plaats">Plaats</div>
+                    <div className="legacy-col-prio">Prio</div>
+                    <div className="legacy-col-status">Status</div>
                   </div>
-                  <div id="allIncidentsList">
+                  <div className="legacy-table-body" id="allIncidentsLegacyList">
                     {/* Incidents will be loaded here */}
                   </div>
                 </div>
