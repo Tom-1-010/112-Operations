@@ -728,178 +728,75 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
-  // Address autocomplete functionality
+  // Simple address autocomplete functionality
   useEffect(() => {
-    const initializeAddressAutocomplete = () => {
-      const addressInput = document.getElementById('gmsMeldingsadres') as HTMLInputElement;
-      const suggestionsContainer = document.getElementById('addressSuggestions');
-      const postcodeInput = document.getElementById('gmsPostcode') as HTMLInputElement;
-      const gemeenteInput = document.getElementById('gmsGemeente') as HTMLInputElement;
+    if (activeSection !== 'gms') return;
 
-      if (!addressInput || !suggestionsContainer) return;
+    const addressInput = document.getElementById('gmsMeldingsadres') as HTMLInputElement;
+    const suggestionsContainer = document.getElementById('addressSuggestions');
+    
+    if (!addressInput || !suggestionsContainer) return;
 
-      let debounceTimer: NodeJS.Timeout;
+    let timeoutId: NodeJS.Timeout;
 
-      const showLoading = () => {
-        suggestionsContainer.innerHTML = `
-          <div class="address-loading">
-            Zoeken naar adressen...
-          </div>
-        `;
-        suggestionsContainer.classList.add('show');
-      };
+    const handleInput = async (e: Event) => {
+      const query = (e.target as HTMLInputElement).value.trim();
+      
+      clearTimeout(timeoutId);
+      
+      if (query.length < 3) {
+        suggestionsContainer.style.display = 'none';
+        return;
+      }
 
-      const showError = (message: string) => {
-        suggestionsContainer.innerHTML = `
-          <div class="address-error">
-            ${message}
-          </div>
-        `;
-        suggestionsContainer.classList.add('show');
-      };
-
-      const showNoResults = () => {
-        suggestionsContainer.innerHTML = `
-          <div class="address-error">
-            Geen adressen gevonden
-          </div>
-        `;
-        suggestionsContainer.classList.add('show');
-      };
-
-      const hideSuggestions = () => {
-        suggestionsContainer.classList.remove('show');
-        suggestionsContainer.innerHTML = '';
-      };
-
-      const searchAddresses = async (query: string) => {
-        if (query.length < 3) {
-          hideSuggestions();
-          return;
-        }
-
-        showLoading();
-
+      timeoutId = setTimeout(async () => {
         try {
           const response = await fetch(`/api/address/search?q=${encodeURIComponent(query)}`);
-          
-          if (!response.ok) {
-            throw new Error('API request failed');
-          }
-          
           const data = await response.json();
           
-          if (data && data.response && data.response.docs && data.response.docs.length > 0) {
-            showSuggestions(data.response.docs);
-          } else {
-            showNoResults();
-          }
-        } catch (error) {
-          console.error('Address search error:', error);
-          showError('Fout bij zoeken naar adressen. Probeer opnieuw.');
-        }
-      };
-
-      const getAddressDetails = async (addressId: string) => {
-        try {
-          const response = await fetch(`/api/address/lookup?id=${encodeURIComponent(addressId)}`);
-          
-          if (!response.ok) {
-            throw new Error('Address lookup failed');
-          }
-          
-          const data = await response.json();
-          
-          if (data && data.response && data.response.docs && data.response.docs[0]) {
-            return data.response.docs[0];
-          }
-        } catch (error) {
-          console.error('Address lookup error:', error);
-        }
-        return null;
-      };
-
-      const showSuggestions = (addresses: any[]) => {
-        try {
-          suggestionsContainer.innerHTML = addresses.map(address => `
-            <div class="address-suggestion" data-id="${address.id || ''}" data-display="${address.weergavenaam || ''}">
-              <div class="address-suggestion-main">${address.weergavenaam || 'Onbekend adres'}</div>
-            </div>
-          `).join('');
-          
-          suggestionsContainer.classList.add('show');
-
-          // Add click handlers to suggestions
-          suggestionsContainer.querySelectorAll('.address-suggestion').forEach(suggestion => {
-            suggestion.addEventListener('click', async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              
-              try {
-                const addressId = (e.currentTarget as HTMLElement).getAttribute('data-id');
-                const displayName = (e.currentTarget as HTMLElement).getAttribute('data-display');
-                
-                if (addressId && displayName) {
-                  showLoading();
-                  const details = await getAddressDetails(addressId);
-                  
-                  if (details && details.straatnaam && details.huis_nlt) {
-                    // Fill the address field
-                    addressInput.value = `${details.straatnaam} ${details.huis_nlt}`;
-                    
-                    // Fill postcode and gemeente
-                    if (postcodeInput) postcodeInput.value = details.postcode || '';
-                    if (gemeenteInput) gemeenteInput.value = details.woonplaatsnaam || '';
-                  } else {
-                    // Fallback to display name parsing
-                    addressInput.value = displayName.split(',')[0] || displayName;
-                  }
-                  
-                  hideSuggestions();
-                }
-              } catch (error) {
-                console.error('Address selection error:', error);
-                hideSuggestions();
-              }
+          if (data?.response?.docs?.length > 0) {
+            const suggestions = data.response.docs.slice(0, 5);
+            suggestionsContainer.innerHTML = suggestions.map((addr: any) => `
+              <div class="address-suggestion" data-full="${addr.weergavenaam}">
+                ${addr.weergavenaam}
+              </div>
+            `).join('');
+            
+            suggestionsContainer.style.display = 'block';
+            
+            // Add click handlers
+            suggestions.forEach((_: any, index: number) => {
+              const suggestionEl = suggestionsContainer.children[index] as HTMLElement;
+              suggestionEl.onclick = () => {
+                const fullAddress = suggestionEl.getAttribute('data-full') || '';
+                addressInput.value = fullAddress.split(',')[0];
+                suggestionsContainer.style.display = 'none';
+              };
             });
-          });
+          } else {
+            suggestionsContainer.style.display = 'none';
+          }
         } catch (error) {
-          console.error('Error showing suggestions:', error);
-          showError('Fout bij tonen van suggesties');
+          console.error('Address search failed:', error);
+          suggestionsContainer.style.display = 'none';
         }
-      };
-
-      const handleInput = (e: Event) => {
-        const query = (e.target as HTMLInputElement).value.trim();
-        
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          searchAddresses(query);
-        }, 300);
-      };
-
-      const handleClickOutside = (e: Event) => {
-        if (!addressInput.contains(e.target as Node) && 
-            !suggestionsContainer.contains(e.target as Node)) {
-          hideSuggestions();
-        }
-      };
-
-      addressInput.addEventListener('input', handleInput);
-      document.addEventListener('click', handleClickOutside);
-
-      return () => {
-        clearTimeout(debounceTimer);
-        addressInput.removeEventListener('input', handleInput);
-        document.removeEventListener('click', handleClickOutside);
-      };
+      }, 300);
     };
 
-    // Only initialize if GMS section is active
-    if (activeSection === 'gms') {
-      const cleanup = initializeAddressAutocomplete();
-      return cleanup;
-    }
+    const handleClickOutside = (e: Event) => {
+      if (!addressInput.contains(e.target as Node) && !suggestionsContainer.contains(e.target as Node)) {
+        suggestionsContainer.style.display = 'none';
+      }
+    };
+
+    addressInput.addEventListener('input', handleInput);
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      clearTimeout(timeoutId);
+      addressInput.removeEventListener('input', handleInput);
+      document.removeEventListener('click', handleClickOutside);
+    };
   }, [activeSection]);
 
   const showNotificationMessage = (message: string) => {
