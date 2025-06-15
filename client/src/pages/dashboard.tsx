@@ -737,8 +737,10 @@ export default function Dashboard() {
       const meldingLogging = document.getElementById('gmsMeldingLogging');
       const priorityInput = document.getElementById('gmsPrioriteit') as HTMLInputElement;
       const priorityIndicator = document.getElementById('gmsPriorityIndicator');
+      const hintsInput = document.getElementById('gmsHintsInput') as HTMLInputElement;
+      const karakteristiekenList = document.getElementById('gmsKarakteristiekenList');
       
-      if (!kladblok || !verzendButton || !alertButton || !meldingLogging || !priorityInput || !priorityIndicator) return;
+      if (!kladblok || !verzendButton || !alertButton || !meldingLogging || !priorityInput || !priorityIndicator || !hintsInput || !karakteristiekenList) return;
 
       const sendMessage = (isUrgent = false) => {
         const message = kladblok.textContent?.trim();
@@ -919,6 +921,35 @@ export default function Dashboard() {
         sendMessage(true);
       };
 
+      // Handle adding characteristics from Hints/Kar input
+      const addKarakteristiek = () => {
+        const hintsValue = hintsInput.value.trim();
+        if (!hintsValue) return;
+
+        // Create new characteristic entry
+        const entry = document.createElement('div');
+        entry.className = 'gms-kar-entry';
+        entry.innerHTML = `
+          <div class="gms-kar-entry-name">${hintsValue}</div>
+          <div class="gms-kar-entry-value">-</div>
+        `;
+
+        // Add to the list
+        karakteristiekenList.appendChild(entry);
+
+        // Clear the input
+        hintsInput.value = '';
+        hintsInput.focus();
+      };
+
+      // Handle Enter key on Hints/Kar input
+      const handleHintsKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addKarakteristiek();
+        }
+      };
+
       // Handle Enter key (but not Shift+Enter or Alt+Enter)
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
@@ -977,6 +1008,7 @@ export default function Dashboard() {
       verzendButton.addEventListener('click', handleVerzendClick);
       alertButton.addEventListener('click', handleAlertClick);
       kladblok.addEventListener('keydown', handleKeyDown);
+      hintsInput.addEventListener('keydown', handleHintsKeyDown);
       priorityInput.addEventListener('input', handlePriorityChange);
       priorityInput.addEventListener('change', handlePriorityChange);
 
@@ -1315,6 +1347,7 @@ export default function Dashboard() {
         verzendButton.removeEventListener('click', handleVerzendClick);
         alertButton.removeEventListener('click', handleAlertClick);
         kladblok.removeEventListener('keydown', handleKeyDown);
+        hintsInput.removeEventListener('keydown', handleHintsKeyDown);
         priorityInput.removeEventListener('input', handlePriorityChange);
         priorityInput.removeEventListener('change', handlePriorityChange);
         
@@ -2040,7 +2073,23 @@ export default function Dashboard() {
                         </div>
                         <div className="gms-hints-section">
                           <label>Hints/Kar</label>
-                          <input type="text" className="gms-field" placeholder="Karakteristieken..." />
+                          <input 
+                            type="text" 
+                            id="gmsHintsInput"
+                            className="gms-field" 
+                            placeholder="Karakteristieken..." 
+                          />
+                        </div>
+                        
+                        {/* Karakteristieken Overview */}
+                        <div className="gms-karakteristieken-section">
+                          <div className="gms-karakteristieken-header">
+                            <span className="gms-kar-col-name">Karakteristieknaam</span>
+                            <span className="gms-kar-col-value">Waarde</span>
+                          </div>
+                          <div className="gms-karakteristieken-list" id="gmsKarakteristiekenList">
+                            {/* Dynamic entries will be added here */}
+                          </div>
                         </div>
                       </div>
                     </div>

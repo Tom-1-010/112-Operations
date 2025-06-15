@@ -754,6 +754,62 @@ body {
   font-weight: bold;
 }
 
+/* Karakteristieken Overview Section */
+.gms-karakteristieken-section {
+  margin-top: 8px;
+  border: 1px solid #808080;
+  background: white;
+  font-size: 10px;
+}
+
+.gms-karakteristieken-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.gms-kar-col-name,
+.gms-kar-col-value {
+  padding: 3px 6px;
+  border-right: 1px solid #808080;
+}
+
+.gms-kar-col-value {
+  border-right: none;
+}
+
+.gms-karakteristieken-list {
+  max-height: 80px;
+  overflow-y: auto;
+  background: white;
+}
+
+.gms-kar-entry {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #d0d0d0;
+  font-size: 10px;
+}
+
+.gms-kar-entry:last-child {
+  border-bottom: none;
+}
+
+.gms-kar-entry-name,
+.gms-kar-entry-value {
+  padding: 3px 6px;
+  border-right: 1px solid #d0d0d0;
+}
+
+.gms-kar-entry-value {
+  border-right: none;
+  color: #666;
+  font-style: italic;
+}
+
 /* Text Areas */
 .gms-text-block {
   flex: 1;
