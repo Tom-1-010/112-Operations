@@ -281,6 +281,11 @@
                 <h2>📊 Incident Object (JSON)</h2>
                 <pre id="jsonOutput" class="json-output"></pre>
             </div>
+
+            <div class="section result-section">
+                <h2>📋 Opgeslagen Meldingen</h2>
+                <div id="incidentsList" style="max-height: 400px; overflow-y: auto;"></div>
+            </div>
         </div>
     </div>
 
@@ -321,35 +326,131 @@
         }
 
         // Handle form submission
-        function handleFormSubmit(event) {
+        async function handleFormSubmit(event) {
             event.preventDefault();
             
-            const formData = {
-                id: Date.now(),
-                timestamp: new Date().toISOString(),
-                vrije_notitie: document.getElementById('notepad').value.trim(),
-                locatie: document.getElementById('location').value.trim(),
-                tijdstip: document.getElementById('time').value,
-                soort_melding: document.getElementById('incidentType').value,
-                prioriteit: parseInt(document.getElementById('priority').value),
-                status: 'Nieuw',
-                aangemaakt_op: new Date().toLocaleString('nl-NL')
-            };
-
-            // Display JSON output
-            const jsonOutput = document.getElementById('jsonOutput');
-            jsonOutput.textContent = JSON.stringify(formData, null, 2);
-            
-            // Show success message
             const saveBtn = document.querySelector('.save-btn');
             const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '✅ Melding Opgeslagen!';
-            saveBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            saveBtn.innerHTML = '⏳ Opslaan...';
+            saveBtn.disabled = true;
             
-            setTimeout(() => {
-                saveBtn.innerHTML = originalText;
+            const formData = {
+                vrijeLnotitie: document.getElementById('notepad').value.trim(),
+                locatie: document.getElementById('location').value.trim(),
+                tijdstip: document.getElementById('time').value,
+                soortMelding: document.getElementById('incidentType').value,
+                prioriteit: parseInt(document.getElementById('priority').value),
+                status: 'Nieuw'
+            };
+
+            try {
+                const response = await fetch('/api/gms-incidents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save incident');
+                }
+
+                const savedIncident = await response.json();
+                
+                // Display JSON output
+                const jsonOutput = document.getElementById('jsonOutput');
+                jsonOutput.textContent = JSON.stringify(savedIncident, null, 2);
+                
+                // Show success message
+                saveBtn.innerHTML = '✅ Melding Opgeslagen!';
                 saveBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-            }, 2000);
+                
+                // Reset form
+                document.getElementById('incidentForm').reset();
+                document.getElementById('notepad').value = '';
+                initializeTime();
+                updatePriorityDisplay();
+                updateNotepadTimestamp();
+                
+                // Load and display all incidents
+                loadAllIncidents();
+                
+            } catch (error) {
+                console.error('Error saving incident:', error);
+                saveBtn.innerHTML = '❌ Fout bij opslaan';
+                saveBtn.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+            } finally {
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                    saveBtn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Load all incidents from database
+        async function loadAllIncidents() {
+            try {
+                const response = await fetch('/api/gms-incidents');
+                if (!response.ok) {
+                    throw new Error('Failed to load incidents');
+                }
+                
+                const incidents = await response.json();
+                displayIncidentsList(incidents);
+            } catch (error) {
+                console.error('Error loading incidents:', error);
+            }
+        }
+
+        // Display incidents list
+        function displayIncidentsList(incidents) {
+            const incidentsList = document.getElementById('incidentsList');
+            if (!incidentsList) return;
+            
+            if (incidents.length === 0) {
+                incidentsList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Geen meldingen gevonden</p>';
+                return;
+            }
+            
+            incidentsList.innerHTML = incidents.map(incident => {
+                const priorityData = getPriorityData(incident.prioriteit);
+                const formatTime = (dateString) => {
+                    return new Date(dateString).toLocaleString('nl-NL');
+                };
+                
+                return `
+                    <div class="incident-item" style="border: 1px solid #e9ecef; margin-bottom: 10px; padding: 15px; border-radius: 8px; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <div>
+                                <strong style="color: #2a5298;">${incident.soortMelding}</strong>
+                                <span style="margin-left: 10px; padding: 3px 8px; border-radius: 12px; font-size: 11px; color: white; background: ${priorityData.color};">
+                                    ${priorityData.emoji} ${priorityData.text}
+                                </span>
+                            </div>
+                            <small style="color: #666;">#${incident.id}</small>
+                        </div>
+                        <div style="margin-bottom: 8px;"><strong>Locatie:</strong> ${incident.locatie}</div>
+                        <div style="margin-bottom: 8px;"><strong>Tijdstip:</strong> ${formatTime(incident.tijdstip)}</div>
+                        <div style="margin-bottom: 8px;"><strong>Status:</strong> ${incident.status}</div>
+                        <div style="margin-bottom: 8px;"><strong>Aangemaakt:</strong> ${formatTime(incident.aangemaaktOp)}</div>
+                        <div><strong>Notitie:</strong> ${incident.vrijeLnotitie}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Get priority display data
+        function getPriorityData(priority) {
+            const priorities = {
+                1: { emoji: '🟢', text: 'Zeer Laag', color: '#28a745' },
+                2: { emoji: '🟡', text: 'Laag', color: '#ffc107' },
+                3: { emoji: '⚠️', text: 'Gemiddeld', color: '#fd7e14' },
+                4: { emoji: '🔴', text: 'Hoog', color: '#dc3545' },
+                5: { emoji: '🚨', text: 'Zeer Hoog', color: '#6f42c1' }
+            };
+            return priorities[priority] || priorities[3];
         }
 
         // Event listeners
@@ -357,6 +458,7 @@
             initializeTime();
             updatePriorityDisplay();
             updateNotepadTimestamp();
+            loadAllIncidents(); // Load incidents on page load
 
             // Form submission
             document.getElementById('incidentForm').addEventListener('submit', handleFormSubmit);
@@ -369,6 +471,9 @@
 
             // Auto-update time every minute
             setInterval(initializeTime, 60000);
+            
+            // Auto-refresh incidents every 30 seconds
+            setInterval(loadAllIncidents, 30000);
         });
     </script>
 </body>
