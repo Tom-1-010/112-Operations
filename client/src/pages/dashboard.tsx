@@ -142,23 +142,37 @@ export default function Dashboard() {
     gemeenten: string[];
   }
 
-  // Complete basisteams database for Eenheid Rotterdam
+  // Complete basisteams database for Regionale Eenheid Rotterdam
   const basisteamsData: BasisTeam[] = [
+    // Rotterdam Stadsregio
     { code: "A1", naam: "Waterweg", gemeenten: ["Vlaardingen", "Maassluis", "Schiedam"] },
     { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam"] },
     { code: "A3", naam: "Noord", gemeenten: ["Rotterdam"] },
     { code: "A4", naam: "Oost", gemeenten: ["Rotterdam", "Capelle aan den IJssel"] },
     { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam", "Barendrecht"] },
     { code: "A6", naam: "West", gemeenten: ["Rotterdam"] },
+    { code: "A7", naam: "IJsselmonde", gemeenten: ["Rotterdam"] },
+    { code: "A8", naam: "Charlois", gemeenten: ["Rotterdam"] },
+    
+    // Voorne-Putten & Hoeksche Waard
     { code: "B1", naam: "Voorne-Putten", gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"] },
-    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard"] },
+    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard", "Binnenmaas"] },
     { code: "B3", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"] },
+    
+    // Drechtsteden
     { code: "C1", naam: "Drechtsteden Noord", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"] },
     { code: "C2", naam: "Drechtsteden Zuid", gemeenten: ["Alblasserdam", "Hendrik-Ido-Ambacht", "Sliedrecht"] },
-    { code: "D1", naam: "Westland", gemeenten: ["Westland", "'s-Gravenzande", "Naaldwijk", "De Lier"] },
-    { code: "D2", naam: "Midden-Delfland", gemeenten: ["Midden-Delfland", "Delft", "Pijnacker-Nootdorp"] },
-    { code: "E1", naam: "Rijswijk", gemeenten: ["Rijswijk", "Voorburg", "Leidschendam"] },
-    { code: "E2", naam: "Zoetermeer", gemeenten: ["Zoetermeer", "Waddinxveen", "Zuidplas"] }
+    { code: "C3", naam: "Molenwaard", gemeenten: ["Molenwaard", "Liesveld"] },
+    
+    // Westland & Midden-Delfland
+    { code: "D1", naam: "Westland", gemeenten: ["Westland"] },
+    { code: "D2", naam: "Midden-Delfland", gemeenten: ["Midden-Delfland", "Delft"] },
+    { code: "D3", naam: "Lansingerland", gemeenten: ["Lansingerland", "Pijnacker-Nootdorp"] },
+    
+    // Den Haag Regio
+    { code: "E1", naam: "Rijswijk", gemeenten: ["Rijswijk", "Voorburg", "Leidschendam-Voorburg"] },
+    { code: "E2", naam: "Zoetermeer", gemeenten: ["Zoetermeer", "Waddinxveen"] },
+    { code: "E3", naam: "Zuidplas", gemeenten: ["Zuidplas", "Nieuwkoop"] }
   ];
 
   // Initialize localStorage if not present
