@@ -14,15 +14,44 @@ export default function Dashboard() {
 
   const [incidents, setIncidents] = useLocalStorage<Incident[]>('policeIncidents', []);
   const [units, setUnits] = useLocalStorage<Unit[]>('policeUnits', [
-    { id: 'PC01', type: 'patrol', status: 'active', name: 'Patrouille 01' },
-    { id: 'PC02', type: 'patrol', status: 'busy', name: 'Patrouille 02' },
-    { id: 'PC03', type: 'patrol', status: 'inactive', name: 'Patrouille 03' },
-    { id: 'MC01', type: 'motorcycle', status: 'active', name: 'Motor 01' },
-    { id: 'MC02', type: 'motorcycle', status: 'active', name: 'Motor 02' },
-    { id: 'DU01', type: 'dog', status: 'active', name: 'Hondeneenheid 01' },
-    { id: 'RU01', type: 'riot', status: 'inactive', name: 'ME Eenheid 01' },
-    { id: 'RU02', type: 'riot', status: 'inactive', name: 'ME Eenheid 02' },
+    { id: 'PC01', type: 'patrol', status: 'active', name: '5901' },
+    { id: 'PC02', type: 'patrol', status: 'busy', name: '5902' },
+    { id: 'PC03', type: 'patrol', status: 'inactive', name: '5903' },
+    { id: 'MC01', type: 'motorcycle', status: 'active', name: '4501' },
+    { id: 'MC02', type: 'motorcycle', status: 'active', name: '4502' },
+    { id: 'DU01', type: 'dog', status: 'active', name: '7801' },
+    { id: 'RU01', type: 'riot', status: 'inactive', name: '9101' },
+    { id: 'RU02', type: 'riot', status: 'inactive', name: '9102' },
   ]);
+
+  const getUnitIcon = (type: string) => {
+    switch (type) {
+      case 'patrol': return 'truck';
+      case 'motorcycle': return 'bicycle';
+      case 'dog': return 'heart';
+      case 'riot': return 'shield';
+      default: return 'truck';
+    }
+  };
+
+  const getUnitTypeName = (type: string) => {
+    switch (type) {
+      case 'patrol': return 'Patrouillewagen';
+      case 'motorcycle': return 'Motoragent';
+      case 'dog': return 'Hondeneenheid';
+      case 'riot': return 'ME-eenheid';
+      default: return type;
+    }
+  };
+
+  const getStatusName = (status: string) => {
+    switch (status) {
+      case 'active': return 'Actief';
+      case 'inactive': return 'Inactief';
+      case 'busy': return 'Bezet';
+      default: return status;
+    }
+  };
 
   const incidentTypes = [
     'Diefstal', 'Verkeersongeval', 'Vermiste persoon', 'Huiselijk geweld',
@@ -133,6 +162,58 @@ export default function Dashboard() {
     // Only initialize if GMS section is active
     if (activeSection === 'gms') {
       const cleanup = initializeGMS();
+      return cleanup;
+    }
+  }, [activeSection]);
+
+  // Units filter functionality
+  useEffect(() => {
+    const initializeUnitsFilter = () => {
+      const filterInput = document.getElementById('unitsFilter') as HTMLInputElement;
+      if (!filterInput) return;
+
+      const handleFilterChange = () => {
+        const filterValue = filterInput.value.toLowerCase();
+        const unitCards = document.querySelectorAll('.unit-card');
+        
+        unitCards.forEach((card) => {
+          const unitData = card.getAttribute('data-unit');
+          if (unitData) {
+            try {
+              const unit = JSON.parse(unitData);
+              const unitType = getUnitTypeName(unit.type).toLowerCase();
+              const callsign = unit.name.toLowerCase();
+              const status = getStatusName(unit.status).toLowerCase();
+              const unitId = unit.id.toLowerCase();
+              
+              const matchesFilter = 
+                unitType.includes(filterValue) ||
+                callsign.includes(filterValue) ||
+                status.includes(filterValue) ||
+                unitId.includes(filterValue);
+              
+              if (matchesFilter) {
+                (card as HTMLElement).style.display = 'block';
+              } else {
+                (card as HTMLElement).style.display = 'none';
+              }
+            } catch (error) {
+              console.error('Error parsing unit data:', error);
+            }
+          }
+        });
+      };
+
+      filterInput.addEventListener('input', handleFilterChange);
+      
+      return () => {
+        filterInput.removeEventListener('input', handleFilterChange);
+      };
+    };
+
+    // Only initialize if units section is active
+    if (activeSection === 'units') {
+      const cleanup = initializeUnitsFilter();
       return cleanup;
     }
   }, [activeSection]);
@@ -257,7 +338,53 @@ export default function Dashboard() {
         )}
 
         {activeSection === 'incidents' && renderPlaceholderSection('Alle Incidenten', 'exclamation-triangle')}
-        {activeSection === 'units' && renderPlaceholderSection('Eenheden Beheer', 'truck')}
+        {activeSection === 'units' && (
+          <div className="content-section active">
+            <div className="section">
+              <div className="section-header">
+                <h3 className="section-title">Eenheden Beheer</h3>
+              </div>
+              <div className="units-management-content">
+                <div className="units-filter-section">
+                  <label htmlFor="unitsFilter" className="filter-label">🔍 Filter eenheden</label>
+                  <input
+                    type="text"
+                    id="unitsFilter"
+                    className="filter-input"
+                    placeholder="Zoek op eenheidstype, roepnummer of status..."
+                  />
+                </div>
+                
+                <div className="units-grid" id="unitsGrid">
+                  {units.map((unit) => (
+                    <div key={unit.id} className="unit-card" data-unit={JSON.stringify(unit)}>
+                      <div className="unit-card-header">
+                        <div className="unit-type">
+                          <i className={`bi bi-${getUnitIcon(unit.type)}`}></i>
+                          <span>{getUnitTypeName(unit.type)}</span>
+                        </div>
+                        <div className={`unit-status-badge unit-status-${unit.status}`}>
+                          <span className={`status-dot status-${unit.status}`}></span>
+                          {getStatusName(unit.status)}
+                        </div>
+                      </div>
+                      <div className="unit-card-body">
+                        <div className="unit-info">
+                          <div className="unit-callsign">
+                            <strong>Roepnummer:</strong> {unit.name}
+                          </div>
+                          <div className="unit-id">
+                            <strong>Eenheid ID:</strong> {unit.id}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeSection === 'gms' && (
           <div className="content-section active">
             <div id="gms" className="section">

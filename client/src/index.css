@@ -569,6 +569,135 @@ body {
   color: hsl(240, 5%, 64.9%);
 }
 
+/* Units Management Styles */
+.units-management-content {
+  padding: 24px;
+}
+
+.units-filter-section {
+  margin-bottom: 24px;
+}
+
+.filter-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 8px;
+}
+
+.filter-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  border: 2px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: hsl(208, 79%, 51%);
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+.units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.unit-card {
+  background: white;
+  border: 1px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.unit-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.unit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+}
+
+.unit-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+}
+
+.unit-type i {
+  font-size: 16px;
+  color: hsl(208, 79%, 51%);
+}
+
+.unit-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.unit-status-active {
+  background: hsl(122, 41%, 92%);
+  color: hsl(123, 38%, 44%);
+}
+
+.unit-status-inactive {
+  background: hsl(0, 86%, 94%);
+  color: hsl(0, 65%, 51%);
+}
+
+.unit-status-busy {
+  background: hsl(32, 100%, 94%);
+  color: hsl(32, 95%, 44%);
+}
+
+.unit-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.unit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.unit-callsign,
+.unit-id {
+  font-size: 14px;
+  color: hsl(220, 9%, 40%);
+}
+
+.unit-callsign strong,
+.unit-id strong {
+  color: hsl(213, 22%, 24%);
+}
+
+.unit-card.hidden {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .content-grid {
