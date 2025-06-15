@@ -743,6 +743,43 @@ export default function Dashboard() {
         const message = kladblok.textContent?.trim();
         if (!message) return;
 
+        // Auto-classification based on keywords
+        const processAutoClassification = (text: string) => {
+          const classificatie1Select = document.getElementById('gmsClassificatie1') as HTMLSelectElement;
+          if (!classificatie1Select) return;
+
+          // Define keyword mappings
+          const keywordMappings: { [key: string]: string } = {
+            'verkeer': 'Verkeer',
+            'geweld': 'Geweld',
+            'diefstal': 'Diefstal',
+            'brand': 'Brand',
+            'overlast': 'Overlast'
+          };
+
+          // Look for keywords that start with dash
+          const words = text.split(/\s+/);
+          for (const word of words) {
+            if (word.startsWith('-')) {
+              const keyword = word.substring(1).toLowerCase();
+              if (keywordMappings[keyword]) {
+                classificatie1Select.value = keywordMappings[keyword];
+                // Add visual feedback
+                classificatie1Select.style.backgroundColor = '#d4edda';
+                classificatie1Select.style.borderColor = '#28a745';
+                setTimeout(() => {
+                  classificatie1Select.style.backgroundColor = '';
+                  classificatie1Select.style.borderColor = '';
+                }, 2000);
+                break;
+              }
+            }
+          }
+        };
+
+        // Process auto-classification
+        processAutoClassification(message);
+
         // Create timestamp in HH:MM format
         const now = new Date();
         const timestamp = now.toLocaleTimeString('nl-NL', { 
