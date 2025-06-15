@@ -860,6 +860,186 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
+  // Classification data management
+  const defaultClassifications = [
+    { code: "-alarm", MC1: "Alarm", MC2: "Autom. brand", MC3: "Autom. brand OMS" },
+    { code: "-verkeer", MC1: "Verkeer", MC2: "Wegverkeer", MC3: "Materiële schade" },
+    { code: "-geweld", MC1: "Geweld", MC2: "Huiselijk geweld", MC3: "Letselschade" },
+    { code: "-brand", MC1: "Brand", MC2: "Woningbrand", MC3: "Dodelijk ongeval" },
+    { code: "-diefstal", MC1: "Diefstal", MC2: "Inbraak woning", MC3: "Materiële schade" },
+    { code: "-overlast", MC1: "Overlast", MC2: "Geluidshinder", MC3: "Geen letsel" },
+    { code: "-drugs", MC1: "Drugs", MC2: "Handel drugs", MC3: "Grote hoeveelheid" },
+    { code: "-vermist", MC1: "Vermissing", MC2: "Vermiste persoon", MC3: "Kwetsbare persoon" },
+    { code: "-water", MC1: "Water", MC2: "Waterongeval", MC3: "Verdrinking" },
+    { code: "-terrorist", MC1: "Terrorisme", MC2: "Verdacht object", MC3: "Evacuatie" }
+  ];
+
+  const getClassifications = () => {
+    try {
+      const stored = localStorage.getItem('classifications');
+      return stored ? JSON.parse(stored) : defaultClassifications;
+    } catch (error) {
+      console.error('Error loading classifications:', error);
+      return defaultClassifications;
+    }
+  };
+
+  const saveClassifications = (classifications: any[]) => {
+    try {
+      localStorage.setItem('classifications', JSON.stringify(classifications));
+    } catch (error) {
+      console.error('Error saving classifications:', error);
+    }
+  };
+
+  // Initialize classifications in localStorage if not present
+  useEffect(() => {
+    if (!localStorage.getItem('classifications')) {
+      saveClassifications(defaultClassifications);
+    }
+  }, []);
+
+  // Classificaties page functionality
+  useEffect(() => {
+    const loadClassificationsData = () => {
+      const tableBody = document.getElementById('classificatiesTableBody');
+      if (!tableBody) return;
+
+      const classifications = getClassifications();
+      
+      if (classifications.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 40px; color: #666;">
+              Geen classificaties gevonden
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = classifications.map((classification: any, index: number) => {
+        return `
+          <tr class="classificatie-row" data-index="${index}">
+            <td class="classificatie-code">
+              <strong>${classification.code}</strong>
+            </td>
+            <td class="classificatie-mc1">${classification.MC1}</td>
+            <td class="classificatie-mc2">${classification.MC2}</td>
+            <td class="classificatie-mc3">${classification.MC3}</td>
+            <td class="classificatie-actions">
+              <button class="btn btn-secondary btn-sm edit-classification" data-index="${index}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-danger btn-sm delete-classification" data-index="${index}">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Add event listeners for edit and delete buttons
+      const editButtons = document.querySelectorAll('.edit-classification');
+      const deleteButtons = document.querySelectorAll('.delete-classification');
+
+      editButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = parseInt((e.target as HTMLElement).closest('button')?.getAttribute('data-index') || '0');
+          editClassification(index);
+        });
+      });
+
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = parseInt((e.target as HTMLElement).closest('button')?.getAttribute('data-index') || '0');
+          deleteClassification(index);
+        });
+      });
+    };
+
+    const editClassification = (index: number) => {
+      const classifications = getClassifications();
+      const classification = classifications[index];
+      
+      if (classification) {
+        const newCode = prompt('Code:', classification.code);
+        const newMC1 = prompt('MC1 (Niveau 1):', classification.MC1);
+        const newMC2 = prompt('MC2 (Niveau 2):', classification.MC2);
+        const newMC3 = prompt('MC3 (Niveau 3):', classification.MC3);
+
+        if (newCode && newMC1 && newMC2 && newMC3) {
+          classifications[index] = {
+            code: newCode,
+            MC1: newMC1,
+            MC2: newMC2,
+            MC3: newMC3
+          };
+          saveClassifications(classifications);
+          loadClassificationsData();
+          showNotificationMessage('Classificatie bijgewerkt');
+        }
+      }
+    };
+
+    const deleteClassification = (index: number) => {
+      if (confirm('Weet je zeker dat je deze classificatie wilt verwijderen?')) {
+        const classifications = getClassifications();
+        classifications.splice(index, 1);
+        saveClassifications(classifications);
+        loadClassificationsData();
+        showNotificationMessage('Classificatie verwijderd');
+      }
+    };
+
+    const addNewClassification = () => {
+      const code = prompt('Code (bijv. -brand):');
+      const MC1 = prompt('MC1 (Niveau 1):');
+      const MC2 = prompt('MC2 (Niveau 2):');
+      const MC3 = prompt('MC3 (Niveau 3):');
+
+      if (code && MC1 && MC2 && MC3) {
+        const classifications = getClassifications();
+        
+        // Check if code already exists
+        const existingIndex = classifications.findIndex((c: any) => c.code === code);
+        if (existingIndex !== -1) {
+          alert('Deze code bestaat al. Gebruik een andere code.');
+          return;
+        }
+
+        classifications.push({
+          code: code,
+          MC1: MC1,
+          MC2: MC2,
+          MC3: MC3
+        });
+
+        saveClassifications(classifications);
+        loadClassificationsData();
+        showNotificationMessage('Nieuwe classificatie toegevoegd');
+      }
+    };
+
+    // Add event listener for new classification button
+    const addButton = document.getElementById('addNewClassificationBtn');
+    if (addButton) {
+      addButton.addEventListener('click', addNewClassification);
+    }
+
+    // Only initialize if classificaties section is active
+    if (activeSection === 'classificaties') {
+      loadClassificationsData();
+    }
+
+    // Cleanup function
+    return () => {
+      if (addButton) {
+        addButton.removeEventListener('click', addNewClassification);
+      }
+    };
+  }, [activeSection]);
+
   const showNotificationMessage = (message: string) => {
     setNotification(message);
     setShowNotification(true);
@@ -1441,7 +1621,10 @@ export default function Dashboard() {
             <div className="section">
               <div className="section-header">
                 <h3 className="section-title">Classificaties Beheer</h3>
-                <button className="btn btn-primary">
+                <button 
+                  className="btn btn-primary"
+                  id="addNewClassificationBtn"
+                >
                   <i className="bi bi-plus-lg"></i>
                   Nieuwe Classificatie
                 </button>
@@ -1451,84 +1634,15 @@ export default function Dashboard() {
                   <table className="classificaties-table">
                     <thead>
                       <tr>
-                        <th>Niveau</th>
                         <th>Code</th>
-                        <th>Omschrijving</th>
-                        <th>Prioriteit</th>
+                        <th>MC1 (Niveau 1)</th>
+                        <th>MC2 (Niveau 2)</th>
+                        <th>MC3 (Niveau 3)</th>
                         <th>Acties</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr className="classificatie-row">
-                        <td><span className="niveau-badge niveau-1">1</span></td>
-                        <td className="classificatie-code"><strong>VRK001</strong></td>
-                        <td className="classificatie-omschrijving">Verkeer - Wegverkeer</td>
-                        <td><span className="priority-tag priority-medium">Gemiddeld</span></td>
-                        <td className="classificatie-actions">
-                          <button className="btn btn-secondary btn-sm">
-                            <i className="bi bi-pencil"></i>
-                          </button>
-                          <button className="btn btn-danger btn-sm">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="classificatie-row">
-                        <td><span className="niveau-badge niveau-1">1</span></td>
-                        <td className="classificatie-code"><strong>GWL001</strong></td>
-                        <td className="classificatie-omschrijving">Geweld - Huiselijk geweld</td>
-                        <td><span className="priority-tag priority-high">Hoog</span></td>
-                        <td className="classificatie-actions">
-                          <button className="btn btn-secondary btn-sm">
-                            <i className="bi bi-pencil"></i>
-                          </button>
-                          <button className="btn btn-danger btn-sm">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="classificatie-row">
-                        <td><span className="niveau-badge niveau-2">2</span></td>
-                        <td className="classificatie-code"><strong>VRK002</strong></td>
-                        <td className="classificatie-omschrijving">Verkeer - Fietsverkeer</td>
-                        <td><span className="priority-tag priority-low">Laag</span></td>
-                        <td className="classificatie-actions">
-                          <button className="btn btn-secondary btn-sm">
-                            <i className="bi bi-pencil"></i>
-                          </button>
-                          <button className="btn btn-danger btn-sm">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="classificatie-row">
-                        <td><span className="niveau-badge niveau-1">1</span></td>
-                        <td className="classificatie-code"><strong>BRD001</strong></td>
-                        <td className="classificatie-omschrijving">Brand - Woningbrand</td>
-                        <td><span className="priority-tag priority-high">Hoog</span></td>
-                        <td className="classificatie-actions">
-                          <button className="btn btn-secondary btn-sm">
-                            <i className="bi bi-pencil"></i>
-                          </button>
-                          <button className="btn btn-danger btn-sm">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="classificatie-row">
-                        <td><span className="niveau-badge niveau-2">2</span></td>
-                        <td className="classificatie-code"><strong>DST001</strong></td>
-                        <td className="classificatie-omschrijving">Diefstal - Inbraak woning</td>
-                        <td><span className="priority-tag priority-medium">Gemiddeld</span></td>
-                        <td className="classificatie-actions">
-                          <button className="btn btn-secondary btn-sm">
-                            <i className="bi bi-pencil"></i>
-                          </button>
-                          <button className="btn btn-danger btn-sm">
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
+                    <tbody id="classificatiesTableBody">
+                      {/* Classifications will be loaded here dynamically */}
                     </tbody>
                   </table>
                 </div>
