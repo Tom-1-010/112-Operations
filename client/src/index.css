@@ -556,6 +556,59 @@ body {
   pointer-events: none;
 }
 
+.gms-verzend-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.gms-logging-section {
+  margin-top: 20px;
+}
+
+.gms-melding-logging {
+  min-height: 150px;
+  max-height: 300px;
+  border: 2px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  padding: 12px;
+  background: hsl(210, 14%, 98%);
+  color: hsl(213, 22%, 24%);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.gms-melding-logging:empty::before {
+  content: "Geen berichten in de logging...";
+  color: hsl(220, 9%, 60%);
+  font-style: italic;
+}
+
+.gms-log-entry {
+  margin-bottom: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+}
+
+.gms-log-entry:last-child {
+  border-bottom: none;
+}
+
+.gms-log-time {
+  color: hsl(208, 79%, 51%);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.gms-log-message {
+  color: hsl(213, 22%, 24%);
+}
+
 .gms-input {
   width: 100%;
   padding: 12px;

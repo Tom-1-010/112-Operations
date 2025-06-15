@@ -728,6 +728,74 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
+  // GMS Kladblok functionality
+  useEffect(() => {
+    const initializeKladblokFeatures = () => {
+      const kladblok = document.getElementById('gmsKladblok');
+      const verzendButton = document.getElementById('gmsVerzendButton');
+      const meldingLogging = document.getElementById('gmsMeldingLogging');
+      
+      if (!kladblok || !verzendButton || !meldingLogging) return;
+
+      const sendMessage = () => {
+        const message = kladblok.textContent?.trim();
+        if (!message) return;
+
+        // Create timestamp in HH:MM format
+        const now = new Date();
+        const timestamp = now.toLocaleTimeString('nl-NL', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+
+        // Create log entry
+        const logEntry = document.createElement('div');
+        logEntry.className = 'gms-log-entry';
+        logEntry.innerHTML = `
+          <span class="gms-log-time">${timestamp}</span>
+          <span class="gms-log-message">${message}</span>
+        `;
+
+        // Add to logging area (latest at bottom)
+        meldingLogging.appendChild(logEntry);
+        
+        // Scroll to bottom
+        meldingLogging.scrollTop = meldingLogging.scrollHeight;
+
+        // Clear the kladblok
+        kladblok.textContent = '';
+        kladblok.focus();
+      };
+
+      // Handle Verzend button click
+      const handleVerzendClick = () => {
+        sendMessage();
+      };
+
+      // Handle Enter key (but not Shift+Enter or Alt+Enter)
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+          event.preventDefault();
+          sendMessage();
+        }
+      };
+
+      verzendButton.addEventListener('click', handleVerzendClick);
+      kladblok.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        verzendButton.removeEventListener('click', handleVerzendClick);
+        kladblok.removeEventListener('keydown', handleKeyDown);
+      };
+    };
+
+    // Only initialize if GMS section is active
+    if (activeSection === 'gms') {
+      const cleanup = initializeKladblokFeatures();
+      return cleanup;
+    }
+  }, [activeSection]);
+
   const showNotificationMessage = (message: string) => {
     setNotification(message);
     setShowNotification(true);
@@ -1100,6 +1168,20 @@ export default function Dashboard() {
                       contentEditable="true"
                       className="gms-kladblok"
                     ></div>
+                    <button
+                      id="gmsVerzendButton"
+                      className="btn btn-secondary gms-verzend-btn"
+                    >
+                      📤 Verzend
+                    </button>
+                    
+                    <div className="gms-logging-section">
+                      <label className="gms-label">📋 Melding Logging</label>
+                      <div
+                        id="gmsMeldingLogging"
+                        className="gms-melding-logging"
+                      ></div>
+                    </div>
                   </div>
 
                   <div className="gms-form-sections">
