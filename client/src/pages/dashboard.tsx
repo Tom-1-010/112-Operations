@@ -13,6 +13,24 @@ export default function Dashboard() {
   const [showNotification, setShowNotification] = useState(false);
 
   const [incidents, setIncidents] = useLocalStorage<Incident[]>('policeIncidents', []);
+  interface PoliceUnit {
+    id: string;
+    roepnaam: string;
+    mensen: number;
+    rollen: string[];
+    voertuigtype: string;
+    status: string;
+  }
+
+  const [policeUnits, setPoliceUnits] = useLocalStorage<PoliceUnit[]>('policeUnitsDB', [
+    { id: 'RT11-01', roepnaam: 'RT11-01', mensen: 2, rollen: ['Patrouille', 'Noodhulp'], voertuigtype: 'Audi A6 Avant (Snelle Interventie)', status: 'Beschikbaar' },
+    { id: 'RT11-02', roepnaam: 'RT11-02', mensen: 2, rollen: ['Patrouille'], voertuigtype: 'Mercedes-Benz B‑klasse (Politieauto)', status: 'Onderweg' },
+    { id: 'MT21-01', roepnaam: 'MT21-01', mensen: 1, rollen: ['Verkeer', 'Surveillance'], voertuigtype: 'BMW R1250 RT (Motoragent)', status: 'Beschikbaar' },
+    { id: 'BT31-01', roepnaam: 'BT31-01', mensen: 4, rollen: ['Surveillance', 'Onderzoek'], voertuigtype: 'Volkswagen Transporter T6 (Bus)', status: 'Bezig' },
+    { id: 'HE41-01', roepnaam: 'HE41-01', mensen: 3, rollen: ['Surveillance', 'Noodhulp'], voertuigtype: 'Airbus EC135 (Helikopter)', status: 'Onderhoud' },
+  ]);
+
+  // Keep old units for compatibility with existing incident system
   const [units, setUnits] = useLocalStorage<Unit[]>('policeUnits', [
     { id: 'PC01', type: 'patrol', status: 'active', name: '5901' },
     { id: 'PC02', type: 'patrol', status: 'busy', name: '5902' },
@@ -51,6 +69,70 @@ export default function Dashboard() {
       case 'busy': return 'Bezet';
       default: return status;
     }
+  };
+
+  const [showAddUnitForm, setShowAddUnitForm] = useState(false);
+  const [newUnit, setNewUnit] = useState<Omit<PoliceUnit, 'id'>>({
+    roepnaam: '',
+    mensen: 2,
+    rollen: [],
+    voertuigtype: '',
+    status: 'Beschikbaar'
+  });
+
+  const vehicleTypes = [
+    'Audi A6 Avant (Snelle Interventie)',
+    'BMW R1250 RT (Motoragent)',
+    'Mercedes-Benz B‑klasse (Politieauto)',
+    'Volkswagen Transporter T6 (Bus)',
+    'Airbus EC135 (Helikopter)'
+  ];
+
+  const inzetRollen = [
+    'Patrouille',
+    'Verkeer',
+    'Surveillance',
+    'Noodhulp',
+    'Onderzoek'
+  ];
+
+  const npStatuses = [
+    'Beschikbaar',
+    'Onderweg',
+    'Bezig',
+    'Onderhoud'
+  ];
+
+  const addNewUnit = () => {
+    if (!newUnit.roepnaam || !newUnit.voertuigtype || newUnit.rollen.length === 0) {
+      alert('Vul alle verplichte velden in.');
+      return;
+    }
+
+    const unitToAdd: PoliceUnit = {
+      ...newUnit,
+      id: newUnit.roepnaam
+    };
+
+    setPoliceUnits(prev => [...prev, unitToAdd]);
+    setNewUnit({
+      roepnaam: '',
+      mensen: 2,
+      rollen: [],
+      voertuigtype: '',
+      status: 'Beschikbaar'
+    });
+    setShowAddUnitForm(false);
+    showNotificationMessage('Nieuwe eenheid toegevoegd');
+  };
+
+  const toggleRole = (role: string) => {
+    setNewUnit(prev => ({
+      ...prev,
+      rollen: prev.rollen.includes(role)
+        ? prev.rollen.filter(r => r !== role)
+        : [...prev.rollen, role]
+    }));
   };
 
   const incidentTypes = [
@@ -174,28 +256,28 @@ export default function Dashboard() {
 
       const handleFilterChange = () => {
         const filterValue = filterInput.value.toLowerCase();
-        const unitCards = document.querySelectorAll('.unit-card');
+        const unitRows = document.querySelectorAll('.unit-row');
         
-        unitCards.forEach((card) => {
-          const unitData = card.getAttribute('data-unit');
+        unitRows.forEach((row) => {
+          const unitData = row.getAttribute('data-unit');
           if (unitData) {
             try {
               const unit = JSON.parse(unitData);
-              const unitType = getUnitTypeName(unit.type).toLowerCase();
-              const callsign = unit.name.toLowerCase();
-              const status = getStatusName(unit.status).toLowerCase();
-              const unitId = unit.id.toLowerCase();
+              const roepnaam = unit.roepnaam.toLowerCase();
+              const rollen = unit.rollen.map((rol: string) => rol.toLowerCase()).join(' ');
+              const voertuig = unit.voertuigtype.toLowerCase();
+              const status = unit.status.toLowerCase();
               
               const matchesFilter = 
-                unitType.includes(filterValue) ||
-                callsign.includes(filterValue) ||
-                status.includes(filterValue) ||
-                unitId.includes(filterValue);
+                roepnaam.includes(filterValue) ||
+                rollen.includes(filterValue) ||
+                voertuig.includes(filterValue) ||
+                status.includes(filterValue);
               
               if (matchesFilter) {
-                (card as HTMLElement).style.display = 'block';
+                (row as HTMLElement).style.display = 'table-row';
               } else {
-                (card as HTMLElement).style.display = 'none';
+                (row as HTMLElement).style.display = 'none';
               }
             } catch (error) {
               console.error('Error parsing unit data:', error);
@@ -343,6 +425,13 @@ export default function Dashboard() {
             <div className="section">
               <div className="section-header">
                 <h3 className="section-title">Eenheden Beheer</h3>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowAddUnitForm(true)}
+                >
+                  <i className="bi bi-plus-lg"></i>
+                  Eenheid toevoegen
+                </button>
               </div>
               <div className="units-management-content">
                 <div className="units-filter-section">
@@ -351,38 +440,146 @@ export default function Dashboard() {
                     type="text"
                     id="unitsFilter"
                     className="filter-input"
-                    placeholder="Zoek op eenheidstype, roepnummer of status..."
+                    placeholder="Zoek op roepnaam of rol..."
                   />
                 </div>
                 
-                <div className="units-grid" id="unitsGrid">
-                  {units.map((unit) => (
-                    <div key={unit.id} className="unit-card" data-unit={JSON.stringify(unit)}>
-                      <div className="unit-card-header">
-                        <div className="unit-type">
-                          <i className={`bi bi-${getUnitIcon(unit.type)}`}></i>
-                          <span>{getUnitTypeName(unit.type)}</span>
-                        </div>
-                        <div className={`unit-status-badge unit-status-${unit.status}`}>
-                          <span className={`status-dot status-${unit.status}`}></span>
-                          {getStatusName(unit.status)}
-                        </div>
-                      </div>
-                      <div className="unit-card-body">
-                        <div className="unit-info">
-                          <div className="unit-callsign">
-                            <strong>Roepnummer:</strong> {unit.name}
-                          </div>
-                          <div className="unit-id">
-                            <strong>Eenheid ID:</strong> {unit.id}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="units-table-container">
+                  <table className="units-table">
+                    <thead>
+                      <tr>
+                        <th>Roepnaam</th>
+                        <th># Mensen</th>
+                        <th>Rollen</th>
+                        <th>Voertuig</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="unitsTableBody">
+                      {policeUnits.map((unit) => (
+                        <tr key={unit.id} className="unit-row" data-unit={JSON.stringify(unit)}>
+                          <td className="unit-roepnaam">
+                            <strong>{unit.roepnaam}</strong>
+                          </td>
+                          <td className="unit-mensen">{unit.mensen}</td>
+                          <td className="unit-rollen">
+                            {unit.rollen.map((rol, index) => (
+                              <span key={rol} className="role-tag">
+                                {rol}
+                                {index < unit.rollen.length - 1 && ', '}
+                              </span>
+                            ))}
+                          </td>
+                          <td className="unit-voertuig">{unit.voertuigtype}</td>
+                          <td>
+                            <span className={`status-badge status-${unit.status.toLowerCase().replace(' ', '-')}`}>
+                              {unit.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
+
+            {showAddUnitForm && (
+              <div className="modal-overlay" onClick={() => setShowAddUnitForm(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>Nieuwe Eenheid Toevoegen</h3>
+                    <button 
+                      className="modal-close"
+                      onClick={() => setShowAddUnitForm(false)}
+                    >
+                      <i className="bi bi-x"></i>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="form-group">
+                      <label>Roepnaam *</label>
+                      <input
+                        type="text"
+                        value={newUnit.roepnaam}
+                        onChange={(e) => setNewUnit(prev => ({ ...prev, roepnaam: e.target.value }))}
+                        placeholder="bijv. RT11-03"
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Aantal Mensen</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={newUnit.mensen}
+                        onChange={(e) => setNewUnit(prev => ({ ...prev, mensen: parseInt(e.target.value) }))}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Voertuigtype *</label>
+                      <select
+                        value={newUnit.voertuigtype}
+                        onChange={(e) => setNewUnit(prev => ({ ...prev, voertuigtype: e.target.value }))}
+                        className="form-input"
+                      >
+                        <option value="">Selecteer voertuig...</option>
+                        {vehicleTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Status</label>
+                      <select
+                        value={newUnit.status}
+                        onChange={(e) => setNewUnit(prev => ({ ...prev, status: e.target.value }))}
+                        className="form-input"
+                      >
+                        {npStatuses.map(status => (
+                          <option key={status} value={status}>{status}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Inzetrollen * (selecteer één of meer)</label>
+                      <div className="checkbox-group">
+                        {inzetRollen.map(role => (
+                          <label key={role} className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={newUnit.rollen.includes(role)}
+                              onChange={() => toggleRole(role)}
+                            />
+                            <span>{role}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={() => setShowAddUnitForm(false)}
+                    >
+                      Annuleren
+                    </button>
+                    <button 
+                      className="btn btn-primary"
+                      onClick={addNewUnit}
+                    >
+                      Eenheid Toevoegen
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {activeSection === 'gms' && (

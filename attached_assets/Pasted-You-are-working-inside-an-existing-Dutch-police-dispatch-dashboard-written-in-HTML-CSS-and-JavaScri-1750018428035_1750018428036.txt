@@ -1,0 +1,43 @@
+You are working inside an existing Dutch police dispatch dashboard written in HTML, CSS and JavaScript.
+
+Focus solely on enhancing the "Eenheden" section. Do not rebuild the layout or change other parts.
+
+Implement the following:
+
+1. **Database for units**:
+   - Store and load unit data using `localStorage` (or Replit DB).
+   - Schema per unit:
+     - `roepnaam` (e.g., "RT11-01")
+     - `mensen` (integer: number of personnel)
+     - `rol(len)` (array of inzetrollen), e.g.: ["Patrouille", "Verkeer"]
+     - `voertuigtype` (string), based on Nationale Politie types (e.g., "Audi A6 Snel Interventie", "BMW R1250 RT", "Helikopter", "Mercedes-Benz B-klasse")
+     - `status` (string), select from NP statuses like "Beschikbaar", "Onderweg", "Bezig", "Onderhoud"
+
+2. **Display units** in a table or card layout under “Eenheden”:
+   - Columns/headings in Dutch: Roepnaam, # Mensen, Rollen, Voertuig, Status
+   - Load from the database dynamically
+
+3. **Filtering/search input** already exists; ensure it filters based on `roepnaam` or `rol`.
+
+4. **UI & Interaction**:
+   - Add a button “Eenheid toevoegen” that opens a small input form/modal to create a new unit with all schema fields.
+   - On submit, save the new unit to database and update the table.
+
+5. **Use correct NP-specific values**:
+   - Offer dropdown/autocomplete for `voertuigtype` using common NP models:
+     - Audi A6 Avant (Snelle Interventie)
+     - BMW R1250 RT (Motoragent)
+     - Mercedes-Benz B‑klasse (Politieauto)
+     - Volkswagen Transporter T6 (Bus)
+     - Airbus EC135 (Helikopter)
+   - Provide checkboxes or multi-select for inzetrollen: “Patrouille”, “Verkeer”, “Surveillance”, “Noodhulp”, “Onderzoek”
+
+6. **Styling**:
+   - Match the existing dashboard style (blauw/grijs, kaarten of tabellen)
+   - Ensure readability and responsive layout
+
+7. **Implementation**:
+   - Use vanilla HTML, CSS, JavaScript only
+   - All text must be in Dutch
+
+Focus on building the **functional core**: database + display + add-unit form. We will extend later with unit dispatch, map integration, statuses.

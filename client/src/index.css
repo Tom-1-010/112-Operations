@@ -698,6 +698,209 @@ body {
   display: none;
 }
 
+/* Units Table Styles */
+.units-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid hsl(214, 13%, 91%);
+  background: white;
+}
+
+.units-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.units-table th {
+  background: hsl(210, 14%, 97%);
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  border-bottom: 2px solid hsl(214, 13%, 91%);
+}
+
+.units-table td {
+  padding: 12px;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+  vertical-align: middle;
+}
+
+.unit-row:hover {
+  background: hsl(210, 14%, 97%);
+}
+
+.unit-roepnaam {
+  font-weight: 600;
+  color: hsl(208, 79%, 51%);
+}
+
+.unit-mensen {
+  text-align: center;
+  font-weight: 600;
+}
+
+.role-tag {
+  color: hsl(220, 9%, 40%);
+}
+
+.unit-voertuig {
+  font-size: 13px;
+  color: hsl(220, 9%, 40%);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-beschikbaar {
+  background: hsl(122, 41%, 92%);
+  color: hsl(123, 38%, 44%);
+}
+
+.status-onderweg {
+  background: hsl(32, 100%, 94%);
+  color: hsl(32, 95%, 44%);
+}
+
+.status-bezig {
+  background: hsl(207, 100%, 94%);
+  color: hsl(208, 79%, 51%);
+}
+
+.status-onderhoud {
+  background: hsl(0, 86%, 94%);
+  color: hsl(0, 65%, 51%);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid hsl(214, 13%, 91%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: hsl(213, 22%, 24%);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: hsl(220, 9%, 40%);
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: hsl(210, 14%, 97%);
+  color: hsl(213, 22%, 24%);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid hsl(214, 13%, 91%);
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: hsl(208, 79%, 51%);
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+  background: hsl(210, 14%, 97%);
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid hsl(214, 13%, 91%);
+  background: hsl(210, 14%, 97%);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .content-grid {
