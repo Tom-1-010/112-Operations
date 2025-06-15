@@ -781,10 +781,7 @@ export default function Dashboard() {
         showLoading();
 
         try {
-          // Using PDOK Locatieserver API for Dutch addresses
-          const response = await fetch(
-            `https://api.pdok.nl/bzk/locatieserver/search/v3_1/suggest?q=${encodeURIComponent(query)}&fq=type:adres&rows=8&fl=weergavenaam,id,score`
-          );
+          const response = await fetch(`/api/address/search?q=${encodeURIComponent(query)}`);
           
           if (!response.ok) throw new Error('API request failed');
           
@@ -803,9 +800,7 @@ export default function Dashboard() {
 
       const getAddressDetails = async (addressId: string) => {
         try {
-          const response = await fetch(
-            `https://api.pdok.nl/bzk/locatieserver/search/v3_1/lookup?id=${addressId}&fl=weergavenaam,postcode,woonplaatsnaam,straatnaam,huis_nlt`
-          );
+          const response = await fetch(`/api/address/lookup?id=${encodeURIComponent(addressId)}`);
           
           if (!response.ok) throw new Error('Address lookup failed');
           
