@@ -1073,6 +1073,12 @@ export default function Dashboard() {
           btn.classList.remove('active');
         });
 
+        // Reset service buttons (B/A)
+        const serviceButtons = document.querySelectorAll('.gms-service-btn');
+        serviceButtons.forEach((btn) => {
+          btn.classList.remove('active');
+        });
+
         // Update header
         updateDynamicHeader();
       };
@@ -1223,9 +1229,45 @@ export default function Dashboard() {
         }
       };
 
+      // Service button functionality for B/A buttons
+      const handleServiceButtonClick = (event: Event) => {
+        const button = event.target as HTMLButtonElement;
+        const service = button.getAttribute('data-service');
+        const isActive = button.classList.contains('active');
+        
+        // Toggle button state
+        button.classList.toggle('active');
+        
+        // Add log entry
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('nl-NL', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        const emoji = service === 'Brandweer' ? '🚒' : '🚑';
+        const action = isActive ? 'gedeeld beëindigd met' : 'gedeeld met';
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = 'gms-log-entry';
+        logEntry.innerHTML = `
+          <span class="gms-log-time">${timeString}</span>
+          <span class="gms-log-message">${emoji} Melding ${action} ${service}</span>
+        `;
+        
+        if (meldingLogging) {
+          meldingLogging.appendChild(logEntry);
+          meldingLogging.scrollTop = meldingLogging.scrollHeight;
+        }
+      };
+
       // Get sharing button references
       const politieBtn = document.getElementById('gmsSharePolitie');
       const brandweerBtn = document.getElementById('gmsShareBrandweer');
+
+      // Get service button references
+      const serviceBrandweerBtn = document.getElementById('gmsServiceBrandweer');
+      const serviceAmbulanceBtn = document.getElementById('gmsServiceAmbulance');
 
       // Add event listeners for status buttons
       if (eindrapportBtn) {
@@ -1247,6 +1289,14 @@ export default function Dashboard() {
       }
       if (brandweerBtn) {
         brandweerBtn.addEventListener('click', handleSharingButtonClick);
+      }
+
+      // Add event listeners for service buttons (B/A)
+      if (serviceBrandweerBtn) {
+        serviceBrandweerBtn.addEventListener('click', handleServiceButtonClick);
+      }
+      if (serviceAmbulanceBtn) {
+        serviceAmbulanceBtn.addEventListener('click', handleServiceButtonClick);
       }
 
       return () => {
@@ -1288,6 +1338,14 @@ export default function Dashboard() {
         }
         if (brandweerBtn) {
           brandweerBtn.removeEventListener('click', handleSharingButtonClick);
+        }
+
+        // Remove service button event listeners
+        if (serviceBrandweerBtn) {
+          serviceBrandweerBtn.removeEventListener('click', handleServiceButtonClick);
+        }
+        if (serviceAmbulanceBtn) {
+          serviceAmbulanceBtn.removeEventListener('click', handleServiceButtonClick);
         }
       };
     };
@@ -2026,6 +2084,26 @@ export default function Dashboard() {
                                 defaultValue="3"
                               />
                               <div id="gmsPriorityIndicator" className="gms-priority-dot"></div>
+                              <div className="gms-service-buttons">
+                                <button 
+                                  type="button" 
+                                  id="gmsServiceBrandweer" 
+                                  className="gms-service-btn"
+                                  data-service="Brandweer"
+                                  title="Brandweer"
+                                >
+                                  B
+                                </button>
+                                <button 
+                                  type="button" 
+                                  id="gmsServiceAmbulance" 
+                                  className="gms-service-btn"
+                                  data-service="Ambulance"
+                                  title="Ambulance"
+                                >
+                                  A
+                                </button>
+                              </div>
                             </div>
                           </div>
                           <div className="gms-field-group">
