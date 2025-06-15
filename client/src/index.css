@@ -451,10 +451,133 @@ body {
   display: block;
 }
 
+/* GMS Styles */
+.gms-content {
+  padding: 24px;
+}
+
+.gms-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.gms-notepad-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.gms-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.gms-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 8px;
+}
+
+.gms-kladblok {
+  min-height: 300px;
+  padding: 16px;
+  border: 2px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  background: white;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.gms-kladblok:focus {
+  border-color: hsl(208, 79%, 51%);
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+.gms-kladblok:empty::before {
+  content: "Typ hier uw notities...";
+  color: hsl(220, 9%, 40%);
+  pointer-events: none;
+}
+
+.gms-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.gms-input:focus {
+  outline: none;
+  border-color: hsl(208, 79%, 51%);
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
+
+.gms-priority-input {
+  max-width: 120px;
+}
+
+.gms-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.gms-save-btn {
+  align-self: flex-start;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.gms-output-section {
+  border-top: 1px solid hsl(214, 13%, 91%);
+  padding-top: 24px;
+}
+
+.gms-output-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 16px;
+}
+
+.gms-output {
+  background: hsl(240, 10%, 3.9%);
+  color: hsl(0, 0%, 98%);
+  padding: 20px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  border: 2px solid hsl(240, 3.7%, 15.9%);
+  min-height: 120px;
+}
+
+.gms-output:empty::before {
+  content: "Vul het formulier in en klik op 'Melding opslaan' om de JSON-output te zien...";
+  color: hsl(240, 5%, 64.9%);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .content-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .gms-form-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 }
 
@@ -480,5 +603,13 @@ body {
 
   .incident-actions {
     justify-content: flex-start;
+  }
+  
+  .gms-content {
+    padding: 16px;
+  }
+  
+  .gms-form-grid {
+    gap: 16px;
   }
 }

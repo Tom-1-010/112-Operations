@@ -57,6 +57,86 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, [setIncidents]);
 
+  // GMS functionality
+  useEffect(() => {
+    const initializeGMS = () => {
+      // Initialize current time in the GMS form
+      const updateGMSTime = () => {
+        const timeInput = document.getElementById('gmsTijdstip') as HTMLInputElement;
+        if (timeInput) {
+          const now = new Date();
+          const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          timeInput.value = localDateTime;
+        }
+      };
+
+      // Handle GMS form submission
+      const handleGMSSubmit = () => {
+        const kladblok = document.getElementById('gmsKladblok');
+        const locatie = document.getElementById('gmsLocatie') as HTMLInputElement;
+        const tijdstip = document.getElementById('gmsTijdstip') as HTMLInputElement;
+        const soortMelding = document.getElementById('gmsSoortMelding') as HTMLSelectElement;
+        const prioriteit = document.getElementById('gmsPrioriteit') as HTMLInputElement;
+        const output = document.getElementById('gmsOutput');
+        
+        if (!kladblok || !locatie || !tijdstip || !soortMelding || !prioriteit || !output) return;
+
+        // Validate required fields
+        if (!locatie.value.trim() || !soortMelding.value) {
+          alert('Vul alle verplichte velden in.');
+          return;
+        }
+
+        const gmsData = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          kladblok: kladblok.textContent || '',
+          locatie: locatie.value.trim(),
+          tijdstip: tijdstip.value,
+          soortMelding: soortMelding.value,
+          prioriteit: parseInt(prioriteit.value),
+          status: 'Nieuw',
+          aangemaaktOp: new Date().toLocaleString('nl-NL')
+        };
+
+        // Display JSON output
+        output.textContent = JSON.stringify(gmsData, null, 2);
+
+        // Reset form
+        kladblok.textContent = '';
+        locatie.value = '';
+        soortMelding.value = '';
+        prioriteit.value = '3';
+        updateGMSTime();
+
+        showNotificationMessage('GMS melding opgeslagen');
+      };
+
+      // Add event listeners
+      const saveButton = document.getElementById('gmsSaveButton');
+      if (saveButton) {
+        saveButton.addEventListener('click', handleGMSSubmit);
+      }
+
+      // Initialize time immediately and then every minute
+      updateGMSTime();
+      const timeTimer = setInterval(updateGMSTime, 60000);
+
+      return () => {
+        clearInterval(timeTimer);
+        if (saveButton) {
+          saveButton.removeEventListener('click', handleGMSSubmit);
+        }
+      };
+    };
+
+    // Only initialize if GMS section is active
+    if (activeSection === 'gms') {
+      const cleanup = initializeGMS();
+      return cleanup;
+    }
+  }, [activeSection]);
+
   const showNotificationMessage = (message: string) => {
     setNotification(message);
     setShowNotification(true);
@@ -180,17 +260,76 @@ export default function Dashboard() {
         {activeSection === 'units' && renderPlaceholderSection('Eenheden Beheer', 'truck')}
         {activeSection === 'gms' && (
           <div className="content-section active">
-            <iframe 
-              src="/gms" 
-              style={{ 
-                width: '100%', 
-                height: '90vh', 
-                border: 'none',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}
-              title="GMS Dispatch Simulator"
-            />
+            <div id="gms" className="section">
+              <div className="section-header">
+                <h3 className="section-title">GMS - Meldkamer Simulator</h3>
+              </div>
+              <div className="gms-content">
+                <div className="gms-form-grid">
+                  <div className="gms-notepad-section">
+                    <label className="gms-label">📝 Kladblok</label>
+                    <div
+                      id="gmsKladblok"
+                      contentEditable="true"
+                      className="gms-kladblok"
+                    ></div>
+                  </div>
+                  
+                  <div className="gms-form-section">
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsLocatie">📍 Locatie</label>
+                      <input
+                        type="text"
+                        id="gmsLocatie"
+                        className="gms-input"
+                        placeholder="Voer locatie in..."
+                      />
+                    </div>
+                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsTijdstip">⏰ Tijdstip</label>
+                      <input
+                        type="datetime-local"
+                        id="gmsTijdstip"
+                        className="gms-input"
+                        readOnly
+                      />
+                    </div>
+                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsSoortMelding">🚨 Soort melding</label>
+                      <select id="gmsSoortMelding" className="gms-input">
+                        <option value="">Selecteer soort melding...</option>
+                        <option value="Inbraak woning">Inbraak woning</option>
+                        <option value="Brandmelding">Brandmelding</option>
+                        <option value="Verkeersongeval">Verkeersongeval</option>
+                      </select>
+                    </div>
+                    
+                    <div className="gms-form-group">
+                      <label className="gms-label" htmlFor="gmsPrioriteit">⚡ Prioriteit (1-5)</label>
+                      <input
+                        type="number"
+                        id="gmsPrioriteit"
+                        className="gms-input gms-priority-input"
+                        min="1"
+                        max="5"
+                        defaultValue="3"
+                      />
+                    </div>
+                    
+                    <button id="gmsSaveButton" className="btn btn-primary gms-save-btn">
+                      💾 Melding opslaan
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="gms-output-section">
+                  <h4 className="gms-output-title">📊 Opgeslagen Melding (JSON)</h4>
+                  <pre id="gmsOutput" className="gms-output"></pre>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {activeSection === 'map' && renderPlaceholderSection('Kaart Overzicht', 'geo-alt')}
