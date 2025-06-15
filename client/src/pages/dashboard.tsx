@@ -1067,6 +1067,12 @@ export default function Dashboard() {
           timeInput.value = localDateTime;
         }
 
+        // Reset sharing buttons
+        const sharingButtons = document.querySelectorAll('.gms-share-btn');
+        sharingButtons.forEach((btn) => {
+          btn.classList.remove('active');
+        });
+
         // Update header
         updateDynamicHeader();
       };
@@ -1185,6 +1191,42 @@ export default function Dashboard() {
       const sluitAfBtn = document.getElementById('gmsSluitAfButton');
       const sluitBtn = document.getElementById('gmsSluitButton');
 
+      // Sharing button functionality
+      const handleSharingButtonClick = (event: Event) => {
+        const button = event.target as HTMLButtonElement;
+        const service = button.getAttribute('data-service');
+        const isActive = button.classList.contains('active');
+        
+        // Toggle button state
+        button.classList.toggle('active');
+        
+        // Add log entry
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('nl-NL', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        const emoji = service === 'Politie' ? '🚓' : '🚒';
+        const action = isActive ? 'gedeeld beëindigd met' : 'gedeeld met';
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = 'gms-log-entry';
+        logEntry.innerHTML = `
+          <span class="gms-log-time">${timeString}</span>
+          <span class="gms-log-message">${emoji} Melding ${action} ${service}</span>
+        `;
+        
+        if (meldingLogging) {
+          meldingLogging.appendChild(logEntry);
+          meldingLogging.scrollTop = meldingLogging.scrollHeight;
+        }
+      };
+
+      // Get sharing button references
+      const politieBtn = document.getElementById('gmsSharePolitie');
+      const brandweerBtn = document.getElementById('gmsShareBrandweer');
+
       // Add event listeners for status buttons
       if (eindrapportBtn) {
         eindrapportBtn.addEventListener('click', handleEindrapport);
@@ -1197,6 +1239,14 @@ export default function Dashboard() {
       }
       if (sluitBtn) {
         sluitBtn.addEventListener('click', handleSluit);
+      }
+
+      // Add event listeners for sharing buttons
+      if (politieBtn) {
+        politieBtn.addEventListener('click', handleSharingButtonClick);
+      }
+      if (brandweerBtn) {
+        brandweerBtn.addEventListener('click', handleSharingButtonClick);
       }
 
       return () => {
@@ -1230,6 +1280,14 @@ export default function Dashboard() {
         }
         if (sluitBtn) {
           sluitBtn.removeEventListener('click', handleSluit);
+        }
+
+        // Remove sharing button event listeners
+        if (politieBtn) {
+          politieBtn.removeEventListener('click', handleSharingButtonClick);
+        }
+        if (brandweerBtn) {
+          brandweerBtn.removeEventListener('click', handleSharingButtonClick);
         }
       };
     };
@@ -1968,6 +2026,27 @@ export default function Dashboard() {
                                 defaultValue="3"
                               />
                               <div id="gmsPriorityIndicator" className="gms-priority-dot"></div>
+                            </div>
+                          </div>
+                          <div className="gms-field-group">
+                            <label>Delen met</label>
+                            <div className="gms-sharing-buttons">
+                              <button 
+                                type="button" 
+                                id="gmsSharePolitie" 
+                                className="gms-share-btn"
+                                data-service="Politie"
+                              >
+                                🚓 Politie
+                              </button>
+                              <button 
+                                type="button" 
+                                id="gmsShareBrandweer" 
+                                className="gms-share-btn"
+                                data-service="Brandweer"
+                              >
+                                🚒 Brandweer
+                              </button>
                             </div>
                           </div>
                         </div>

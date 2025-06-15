@@ -1708,3 +1708,39 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* GMS Sharing Buttons */
+.gms-sharing-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.gms-share-btn {
+  padding: 6px 12px;
+  border: 1px solid #d0d0d0;
+  background: #f8f8f8;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  text-align: center;
+}
+
+.gms-share-btn:hover {
+  background: #e8e8e8;
+  border-color: #bbb;
+}
+
+.gms-share-btn.active {
+  background: #007acc;
+  color: white;
+  border-color: #0066aa;
+}
+
+.gms-share-btn.active:hover {
+  background: #0066aa;
+}
