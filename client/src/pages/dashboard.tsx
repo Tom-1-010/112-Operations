@@ -142,18 +142,31 @@ export default function Dashboard() {
     gemeenten: string[];
   }
 
-  const [basisTeams] = useLocalStorage<BasisTeam[]>('basisTeamsRotterdam', [
-    { code: "A1", naam: "Waterweg", gemeenten: ["Schiedam", "Maassluis", "Vlaardingen"] },
-    { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam Centrum"] },
-    { code: "A3", naam: "Noord", gemeenten: ["Rotterdam Noord", "Bergschenhoek"] },
-    { code: "A4", naam: "Oost", gemeenten: ["Rotterdam Oost", "Capelle aan den IJssel"] },
-    { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam Zuid", "Barendrecht"] },
-    { code: "A6", naam: "West", gemeenten: ["Rotterdam West", "Westland"] },
+  // Complete basisteams database for Eenheid Rotterdam
+  const basisteamsData: BasisTeam[] = [
+    { code: "A1", naam: "Waterweg", gemeenten: ["Vlaardingen", "Maassluis", "Schiedam"] },
+    { code: "A2", naam: "Centrum", gemeenten: ["Rotterdam"] },
+    { code: "A3", naam: "Noord", gemeenten: ["Rotterdam"] },
+    { code: "A4", naam: "Oost", gemeenten: ["Rotterdam", "Capelle aan den IJssel"] },
+    { code: "A5", naam: "Zuid", gemeenten: ["Rotterdam", "Barendrecht"] },
+    { code: "A6", naam: "West", gemeenten: ["Rotterdam"] },
     { code: "B1", naam: "Voorne-Putten", gemeenten: ["Hellevoetsluis", "Brielle", "Westvoorne"] },
-    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard", "Binnenmaas"] },
-    { code: "C1", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"] },
-    { code: "D1", naam: "Drechtsteden", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"] }
-  ]);
+    { code: "B2", naam: "Hoeksche Waard", gemeenten: ["Hoeksche Waard"] },
+    { code: "B3", naam: "Goeree-Overflakkee", gemeenten: ["Goeree-Overflakkee"] },
+    { code: "C1", naam: "Drechtsteden Noord", gemeenten: ["Dordrecht", "Zwijndrecht", "Papendrecht"] },
+    { code: "C2", naam: "Drechtsteden Zuid", gemeenten: ["Alblasserdam", "Hendrik-Ido-Ambacht", "Sliedrecht"] },
+    { code: "D1", naam: "Westland", gemeenten: ["Westland", "'s-Gravenzande", "Naaldwijk", "De Lier"] },
+    { code: "D2", naam: "Midden-Delfland", gemeenten: ["Midden-Delfland", "Delft", "Pijnacker-Nootdorp"] },
+    { code: "E1", naam: "Rijswijk", gemeenten: ["Rijswijk", "Voorburg", "Leidschendam"] },
+    { code: "E2", naam: "Zoetermeer", gemeenten: ["Zoetermeer", "Waddinxveen", "Zuidplas"] }
+  ];
+
+  // Initialize localStorage if not present
+  if (typeof window !== 'undefined' && !localStorage.getItem('basisteams')) {
+    localStorage.setItem('basisteams', JSON.stringify(basisteamsData));
+  }
+
+  const [basisTeams] = useLocalStorage<BasisTeam[]>('basisteams', basisteamsData);
 
   const incidentTypes = [
     'Diefstal', 'Verkeersongeval', 'Vermiste persoon', 'Huiselijk geweld',
