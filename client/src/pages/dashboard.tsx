@@ -1003,15 +1003,24 @@ export default function Dashboard() {
 
       // Handle notepad note submission (Verzend button in notepad)
       const handleNotePadSubmit = () => {
-        console.log('📝 NOTEPAD SUBMIT - Processing note from kladblok');
+        console.log('🚀 CLASSIFICATION DETECTION TRIGGERED');
         
         const kladblok = document.getElementById("gmsKladblok");
         const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
         
-        if (!kladblok || !loggingPanel) return;
+        if (!kladblok) {
+          console.error('❌ Kladblok element not found!');
+          return;
+        }
         
-        const notitieText = kladblok.textContent || '';
-        console.log('📝 Note content:', notitieText);
+        const notitieText = kladblok.textContent || kladblok.innerText || '';
+        console.log('📝 Raw note content:', JSON.stringify(notitieText));
+        console.log('📝 Note length:', notitieText.length);
+        
+        if (!notitieText.trim()) {
+          console.log('⚠️ Empty note content, skipping classification');
+          return;
+        }
         
         // Only process classification detection, don't save full form
         if (notitieText.trim()) {
@@ -1450,37 +1459,33 @@ export default function Dashboard() {
           handleNotePadSubmit();
         });
         
-        // Add manual test button for debugging
-        const addTestButton = () => {
-          const existingButton = document.getElementById('testClassificationBtn');
+        // Add debug button to test event listeners
+        const addDebugButton = () => {
+          const existingButton = document.getElementById('debugBtn');
           if (existingButton) return;
           
-          const testButton = document.createElement('button');
-          testButton.id = 'testClassificationBtn';
-          testButton.textContent = 'Test Classification Detection';
-          testButton.style.cssText = 'margin: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;';
+          const debugButton = document.createElement('button');
+          debugButton.id = 'debugBtn';
+          debugButton.textContent = 'DEBUG: Test Event';
+          debugButton.style.cssText = 'margin: 10px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
           
-          testButton.addEventListener('click', () => {
+          debugButton.addEventListener('click', () => {
+            console.log('🔧 DEBUG: Manual button clicked');
             const kladblok = document.getElementById("gmsKladblok");
             if (kladblok) {
-              const testCodes = ['-vkwebz', '-bz', '-wegverkeer onder invloed'];
-              testCodes.forEach((code, index) => {
-                setTimeout(() => {
-                  console.log(`Testing code: ${code}`);
-                  kladblok.textContent = code;
-                  handleNotePadSubmit();
-                }, index * 2000);
-              });
+              kladblok.textContent = '-vkwebz';
+              console.log('🔧 DEBUG: Set content to -vkwebz');
+              handleNotePadSubmit();
+            } else {
+              console.error('🔧 DEBUG: Kladblok not found');
             }
           });
           
-          const gmsSection = document.querySelector('.gms-notepad-section');
-          if (gmsSection) {
-            gmsSection.appendChild(testButton);
-          }
+          const gmsSection = document.querySelector('.gms-section') || document.body;
+          gmsSection.appendChild(debugButton);
         };
         
-        setTimeout(addTestButton, 1000);
+        setTimeout(addDebugButton, 1000);
         
         // Basic classification system verification
         const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
