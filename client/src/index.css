@@ -2022,6 +2022,56 @@ body {
   color: hsl(240, 5%, 64.9%);
 }
 
+/* GMS Logging Styles */
+.gms-log-entry {
+  padding: 8px 12px;
+  margin-bottom: 2px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.4;
+  background: hsl(210, 16%, 98%);
+  border-left: 3px solid hsl(208, 79%, 51%);
+  transition: background-color 0.2s ease;
+}
+
+.gms-log-entry:nth-child(even) {
+  background: hsl(210, 16%, 95%);
+}
+
+.gms-log-entry:hover {
+  background: hsl(210, 16%, 93%);
+}
+
+.gms-log-timestamp {
+  font-weight: 600;
+  color: hsl(208, 79%, 51%);
+  margin-right: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.gms-log-content {
+  color: hsl(213, 22%, 24%);
+}
+
+#gmsMeldingLogging {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid hsl(214, 13%, 91%);
+  border-radius: 6px;
+  padding: 4px;
+  background: white;
+}
+
+#gmsMeldingLogging:empty::before {
+  content: "Notities verschijnen hier na het verzenden...";
+  color: hsl(240, 5%, 64.9%);
+  font-style: italic;
+  padding: 12px;
+  display: block;
+  text-align: center;
+}
+
 /* Units Management Styles */
 .units-management-content {
   padding: 24px;

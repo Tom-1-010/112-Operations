@@ -1339,9 +1339,33 @@ export default function Dashboard() {
             }
           }
           
-          // Log the note to console
-          const timestamp = new Date().toLocaleTimeString('nl-NL');
-          console.log(`${timestamp} Note: ${notitieText}`);
+          // Add the note to the logging section
+          const meldingLogging = document.getElementById("gmsMeldingLogging");
+          if (meldingLogging && notitieText.trim()) {
+            const timestamp = new Date().toLocaleString('nl-NL', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            });
+            
+            // Create log entry element
+            const logEntry = document.createElement('div');
+            logEntry.className = 'gms-log-entry';
+            logEntry.innerHTML = `
+              <span class="gms-log-timestamp">[${timestamp}]</span>
+              <span class="gms-log-content">${notitieText}</span>
+            `;
+            
+            // Insert at the top of the logging area
+            if (meldingLogging.firstChild) {
+              meldingLogging.insertBefore(logEntry, meldingLogging.firstChild);
+            } else {
+              meldingLogging.appendChild(logEntry);
+            }
+            
+            // Also log to console
+            console.log(`${timestamp} Note: ${notitieText}`);
+          }
           
           // Clear the notepad after sending
           kladblok.textContent = '';
@@ -3359,7 +3383,7 @@ export default function Dashboard() {
         // Only override empty fields, keep existing data
         Object.keys(parsedData).forEach(key => {
           if (parsedData[key] && parsedData[key] !== '') {
-            gmsData[key] = parsedData[key];
+            (gmsData as any)[key] = parsedData[key];
           }
         });
         console.log('🔄 Merged existing GMS data for incident:', incident.id);
