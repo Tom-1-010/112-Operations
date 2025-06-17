@@ -1414,10 +1414,10 @@ export default function Dashboard() {
             }
           }
           
-          // Filter out command lines (= and m/) from the logging display
+          // Filter out only m/ command lines from the logging display (keep = lines)
           const filteredText = notitieText
             .split('\n')
-            .filter(line => !line.trim().startsWith('=') && !line.trim().startsWith('m/'))
+            .filter(line => !line.trim().startsWith('m/'))
             .join('\n')
             .trim();
           
