@@ -1001,24 +1001,25 @@ export default function Dashboard() {
 
 
 
-      // Handle GMS form submission
-      const handleGMSSubmit = () => {
-        console.log('🚀 VERZEND BUTTON CLICKED - Starting GMS submission process');
+      // Handle notepad note submission (Verzend button in notepad)
+      const handleNotePadSubmit = () => {
+        console.log('📝 NOTEPAD SUBMIT - Processing note from kladblok');
         
         const kladblok = document.getElementById("gmsKladblok");
-        console.log('📝 Kladblok element:', kladblok);
-
-        // Process classification codes from notitieveld before submitting
-        if (kladblok) {
-          const notitieText = kladblok.textContent || '';
-          console.log('📝 Notitie text content:', notitieText);
-          
-          // Process classification codes inline
+        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
+        
+        if (!kladblok || !loggingPanel) return;
+        
+        const notitieText = kladblok.textContent || '';
+        console.log('📝 Note content:', notitieText);
+        
+        // Only process classification detection, don't save full form
+        if (notitieText.trim()) {
+          // Process classification codes
           const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
           const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
           const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
           const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-          const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
           
           console.log('🔧 Dropdown elements found:', {
             mc1Select: !!mc1Select,
@@ -1247,7 +1248,25 @@ export default function Dashboard() {
               })));
             }
           }
+          
+          // Log the note to the logging panel
+          const timestamp = new Date().toLocaleTimeString('nl-NL');
+          const logEntry = document.createElement('div');
+          logEntry.className = 'log-entry';
+          logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ${notitieText}`;
+          loggingPanel.appendChild(logEntry);
+          loggingPanel.scrollTop = loggingPanel.scrollHeight;
+          
+          // Clear the notepad after sending
+          kladblok.textContent = '';
         }
+      };
+
+      // Handle full GMS form submission (separate function for actual form saving)
+      const handleGMSFormSubmit = () => {
+        console.log('💾 FORM SUBMIT - Saving full GMS form');
+        
+        const kladblok = document.getElementById("gmsKladblok");
 
         // Melder informatie
         const meldernaam = document.getElementById(
@@ -1388,8 +1407,8 @@ export default function Dashboard() {
       const kladblokElement = document.getElementById("gmsKladblok");
       
       if (verzendButton) {
-        console.log('📌 Verzend button found, attaching event listener');
-        verzendButton.addEventListener("click", handleGMSSubmit);
+        console.log('📌 Verzend button found, attaching notepad submit listener');
+        verzendButton.addEventListener("click", handleNotePadSubmit);
       } else {
         console.error('❌ Verzend button not found!');
       }
@@ -1400,17 +1419,17 @@ export default function Dashboard() {
         kladblokElement.addEventListener("keydown", (e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            console.log('⌨️ Enter key pressed in kladblok, triggering classification detection');
-            handleGMSSubmit();
+            console.log('⌨️ Enter key pressed in kladblok, triggering notepad submit');
+            handleNotePadSubmit();
           }
         });
       }
       
-      // Also try backup button ID in case of mismatch
+      // Form save button (for full form submission)
       const saveButton = document.getElementById("gmsSaveButton");
       if (saveButton) {
-        console.log('📌 Save button found, attaching event listener');
-        saveButton.addEventListener("click", handleGMSSubmit);
+        console.log('📌 Save button found, attaching form submit listener');
+        saveButton.addEventListener("click", handleGMSFormSubmit);
       }
 
       // Initialize time immediately and then every minute
@@ -1588,7 +1607,10 @@ export default function Dashboard() {
         clearInterval(timeTimer);
         clearInterval(statusDateTimeTimer);
         if (saveButton) {
-          saveButton.removeEventListener("click", handleGMSSubmit);
+          saveButton.removeEventListener("click", handleGMSFormSubmit);
+        }
+        if (verzendButton) {
+          verzendButton.removeEventListener("click", handleNotePadSubmit);
         }
       };
     };
