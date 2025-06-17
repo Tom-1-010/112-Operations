@@ -1563,7 +1563,7 @@ body {
 }
 
 .gms-text-block-compact {
-  flex: 0.7; /* Reduced from 1 to 0.7 for more compact notes field */
+  flex: 0.35; /* Further reduced to 50% of original size for compact notes field */
 }
 
 .gms-text-area {
@@ -1578,7 +1578,8 @@ body {
 }
 
 .gms-text-area-compact {
-  min-height: 100px; /* Reduced from 150px to 100px for compact layout */
+  min-height: 50px; /* Reduced to 50% of original size */
+  max-height: 75px; /* Limit maximum height to maintain compact layout */
 }
 
 .gms-text-area:focus {
