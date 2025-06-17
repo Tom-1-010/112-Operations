@@ -829,59 +829,203 @@ export default function Dashboard() {
       updateGMSStatusDateTime();
       const statusDateTimeTimer = setInterval(updateGMSStatusDateTime, 1000);
 
-      // Setup classification cascading dropdowns
+      // Setup classification cascading dropdowns with priority integration
       const setupClassificationDropdowns = () => {
-        const mc1Select = document.getElementById(
-          "gmsClassificatie1",
-        ) as HTMLSelectElement;
-        const mc2Select = document.getElementById(
-          "gmsClassificatie2",
-        ) as HTMLSelectElement;
-        const mc3Select = document.getElementById(
-          "gmsClassificatie3",
-        ) as HTMLSelectElement;
+        const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+        const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+        const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+        const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+        const notitieveld = document.getElementById("gmsNotitie") as HTMLTextAreaElement;
+        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
+
+        // Function to update priority based on selected classification
+        const updatePriorityFromClassification = () => {
+          const selectedMC1 = mc1Select.value;
+          const selectedMC2 = mc2Select.value;
+          const selectedMC3 = mc3Select.value;
+
+          if (selectedMC1) {
+            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            
+            // Find most specific match (MC3 > MC2 > MC1)
+            let matchingClassification;
+            if (selectedMC3) {
+              matchingClassification = storedClassifications.find(c => 
+                c.mc1 === selectedMC1 && c.mc2 === selectedMC2 && c.mc3 === selectedMC3
+              );
+            } else if (selectedMC2) {
+              matchingClassification = storedClassifications.find(c => 
+                c.mc1 === selectedMC1 && c.mc2 === selectedMC2 && !c.mc3
+              );
+            } else {
+              matchingClassification = storedClassifications.find(c => 
+                c.mc1 === selectedMC1 && !c.mc2 && !c.mc3
+              );
+            }
+
+            if (matchingClassification && prioriteitSelect) {
+              prioriteitSelect.value = matchingClassification.prio.toString();
+              
+              // Update priority visual indicator
+              const priorityIndicator = document.getElementById("gmsPriorityIndicator");
+              if (priorityIndicator) {
+                // Remove existing priority classes
+                priorityIndicator.className = "gms-priority-dot";
+                // Add new priority class
+                priorityIndicator.classList.add(`priority-${matchingClassification.prio}`);
+              }
+              
+              // Log the priority update
+              if (loggingPanel) {
+                const timestamp = new Date().toLocaleTimeString('nl-NL');
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry priority-auto';
+                logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Prioriteit automatisch ingesteld op ${matchingClassification.prio} voor classificatie ${matchingClassification.code}`;
+                loggingPanel.appendChild(logEntry);
+                loggingPanel.scrollTop = loggingPanel.scrollHeight;
+              }
+            }
+          }
+        };
+
+        // Function to select classification by code
+        const selectClassificationByCode = (code: string) => {
+          const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+          const classification = storedClassifications.find(c => c.code.toLowerCase() === code.toLowerCase());
+          
+          if (classification) {
+            // Set MC1
+            mc1Select.value = classification.mc1;
+            
+            // Populate and set MC2 if exists
+            if (classification.mc2) {
+              mc2Select.innerHTML = '<option value="">Selecteer...</option>';
+              const mc2Options = getUniqueClassificationsByLevel("mc2", classification.mc1);
+              mc2Options.forEach(mc2 => {
+                const option = document.createElement('option');
+                option.value = mc2;
+                option.textContent = mc2;
+                mc2Select.appendChild(option);
+              });
+              mc2Select.value = classification.mc2;
+              
+              // Populate and set MC3 if exists
+              if (classification.mc3) {
+                mc3Select.innerHTML = '<option value="">Selecteer...</option>';
+                const mc3Options = getUniqueClassificationsByLevel("mc3", classification.mc2);
+                mc3Options.forEach(mc3 => {
+                  const option = document.createElement('option');
+                  option.value = mc3;
+                  option.textContent = mc3;
+                  mc3Select.appendChild(option);
+                });
+                mc3Select.value = classification.mc3;
+              }
+            }
+            
+            // Update priority
+            updatePriorityFromClassification();
+            
+            // Log the automatic selection
+            if (loggingPanel) {
+              const timestamp = new Date().toLocaleTimeString('nl-NL');
+              const logEntry = document.createElement('div');
+              logEntry.className = 'log-entry classification-auto';
+              logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Classificatie automatisch geselecteerd: ${classification.mc1}${classification.mc2 ? ' > ' + classification.mc2 : ''}${classification.mc3 ? ' > ' + classification.mc3 : ''} (Code: ${classification.code})`;
+              loggingPanel.appendChild(logEntry);
+              loggingPanel.scrollTop = loggingPanel.scrollHeight;
+            }
+            
+            return true;
+          }
+          return false;
+        };
 
         if (mc1Select && mc2Select && mc3Select) {
           // Handle MC1 change
           mc1Select.addEventListener("change", () => {
             const selectedMC1 = mc1Select.value;
-
+            
             // Clear and populate MC2
             mc2Select.innerHTML = '<option value="">Selecteer...</option>';
             mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-
+            
             if (selectedMC1) {
-              const mc2Options = getUniqueClassificationsByLevel(
-                "mc2",
-                selectedMC1,
-              );
-              mc2Options.forEach((mc2) => {
-                const option = document.createElement("option");
+              const mc2Options = getUniqueClassificationsByLevel("mc2", selectedMC1);
+              mc2Options.forEach(mc2 => {
+                const option = document.createElement('option');
                 option.value = mc2;
                 option.textContent = mc2;
                 mc2Select.appendChild(option);
               });
             }
+            
+            updatePriorityFromClassification();
           });
 
           // Handle MC2 change
           mc2Select.addEventListener("change", () => {
             const selectedMC2 = mc2Select.value;
-
+            
             // Clear and populate MC3
             mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-
+            
             if (selectedMC2) {
-              const mc3Options = getUniqueClassificationsByLevel(
-                "mc3",
-                selectedMC2,
-              );
-              mc3Options.forEach((mc3) => {
-                const option = document.createElement("option");
+              const mc3Options = getUniqueClassificationsByLevel("mc3", selectedMC2);
+              mc3Options.forEach(mc3 => {
+                const option = document.createElement('option');
                 option.value = mc3;
                 option.textContent = mc3;
                 mc3Select.appendChild(option);
               });
+            }
+            
+            updatePriorityFromClassification();
+          });
+
+          // Handle MC3 change
+          mc3Select.addEventListener("change", () => {
+            updatePriorityFromClassification();
+          });
+        }
+
+        // Setup notitieveld keyword detection
+        if (notitieveld) {
+          notitieveld.addEventListener("input", () => {
+            const text = notitieveld.value;
+            const lines = text.split('\n');
+            const lastLine = lines[lines.length - 1].trim();
+            
+            // Check if last line starts with a dash (classification code)
+            if (lastLine.startsWith('-') && lastLine.length > 1) {
+              const code = lastLine.substring(1); // Remove the dash
+              
+              // Try to find and select classification
+              if (selectClassificationByCode(code)) {
+                // Remove the code from the text area since it was processed
+                lines[lines.length - 1] = lines[lines.length - 1].replace(lastLine, '');
+                notitieveld.value = lines.join('\n').trim();
+              }
+            }
+            
+            // Also check for keyword matches in classification names
+            const keywords = lastLine.toLowerCase().split(/\s+/);
+            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            
+            for (const keyword of keywords) {
+              if (keyword.length > 3) { // Only check meaningful keywords
+                const matchingClassification = storedClassifications.find(c => 
+                  c.mc1.toLowerCase().includes(keyword) ||
+                  c.mc2.toLowerCase().includes(keyword) ||
+                  c.mc3.toLowerCase().includes(keyword) ||
+                  c.definitie.toLowerCase().includes(keyword)
+                );
+                
+                if (matchingClassification) {
+                  selectClassificationByCode(matchingClassification.code);
+                  break;
+                }
+              }
             }
           });
         }
