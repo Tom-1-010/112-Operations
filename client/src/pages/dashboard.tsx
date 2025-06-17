@@ -1003,11 +1003,15 @@ export default function Dashboard() {
 
       // Handle GMS form submission
       const handleGMSSubmit = () => {
+        console.log('🚀 VERZEND BUTTON CLICKED - Starting GMS submission process');
+        
         const kladblok = document.getElementById("gmsKladblok");
+        console.log('📝 Kladblok element:', kladblok);
 
         // Process classification codes from notitieveld before submitting
         if (kladblok) {
           const notitieText = kladblok.textContent || '';
+          console.log('📝 Notitie text content:', notitieText);
           
           // Process classification codes inline
           const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
@@ -1015,6 +1019,13 @@ export default function Dashboard() {
           const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
           const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
           const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
+          
+          console.log('🔧 Dropdown elements found:', {
+            mc1Select: !!mc1Select,
+            mc2Select: !!mc2Select,
+            mc3Select: !!mc3Select,
+            prioriteitSelect: !!prioriteitSelect
+          });
 
           if (mc1Select && mc2Select && mc3Select) {
             const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
@@ -1318,8 +1329,18 @@ export default function Dashboard() {
       };
 
       // Add event listeners
+      const verzendButton = document.getElementById("gmsVerzendButton");
+      if (verzendButton) {
+        console.log('📌 Verzend button found, attaching event listener');
+        verzendButton.addEventListener("click", handleGMSSubmit);
+      } else {
+        console.error('❌ Verzend button not found!');
+      }
+      
+      // Also try backup button ID in case of mismatch
       const saveButton = document.getElementById("gmsSaveButton");
       if (saveButton) {
+        console.log('📌 Save button found, attaching event listener');
         saveButton.addEventListener("click", handleGMSSubmit);
       }
 
