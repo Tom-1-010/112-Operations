@@ -746,6 +746,54 @@ export default function Dashboard() {
       updateGMSStatusDateTime();
       const statusDateTimeTimer = setInterval(updateGMSStatusDateTime, 1000);
 
+      // Setup classification cascading dropdowns
+      const setupClassificationDropdowns = () => {
+        const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+        const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+        const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+
+        if (mc1Select && mc2Select && mc3Select) {
+          // Handle MC1 change
+          mc1Select.addEventListener("change", () => {
+            const selectedMC1 = mc1Select.value;
+            
+            // Clear and populate MC2
+            mc2Select.innerHTML = '<option value="">Selecteer...</option>';
+            mc3Select.innerHTML = '<option value="">Selecteer...</option>';
+            
+            if (selectedMC1) {
+              const mc2Options = getUniqueClassificationsByLevel('MC2', selectedMC1);
+              mc2Options.forEach(mc2 => {
+                const option = document.createElement('option');
+                option.value = mc2;
+                option.textContent = mc2;
+                mc2Select.appendChild(option);
+              });
+            }
+          });
+
+          // Handle MC2 change
+          mc2Select.addEventListener("change", () => {
+            const selectedMC2 = mc2Select.value;
+            
+            // Clear and populate MC3
+            mc3Select.innerHTML = '<option value="">Selecteer...</option>';
+            
+            if (selectedMC2) {
+              const mc3Options = getUniqueClassificationsByLevel('MC3', selectedMC2);
+              mc3Options.forEach(mc3 => {
+                const option = document.createElement('option');
+                option.value = mc3;
+                option.textContent = mc3;
+                mc3Select.appendChild(option);
+              });
+            }
+          });
+        }
+      };
+
+      setupClassificationDropdowns();
+
       return () => {
         clearInterval(timeTimer);
         clearInterval(statusDateTimeTimer);
