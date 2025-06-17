@@ -2048,12 +2048,12 @@ body {
   border: 1px inset #c0c0c0;
 }
 
-/* Legacy grid styles for compatibility */
+/* Restore compact GMS form grid styling */
 .gms-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 32px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .gms-notepad-section {
@@ -2064,21 +2064,20 @@ body {
 .gms-form-sections {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .gms-section-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: hsl(213, 22%, 24%);
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid hsl(208, 79%, 51%);
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .gms-classificatie-section {
-  margin-bottom: 24px;
+  margin-bottom: 8px;
 }
 
 .gms-classificatie-grid {
@@ -2262,37 +2261,13 @@ body {
   margin-top: 1px;
 }
 
-.gms-input {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid hsl(214, 13%, 91%);
-  border-radius: 8px;
-  font-size: 14px;
-  background: white;
-  transition: border-color 0.3s ease;
-}
-
-.gms-input:focus {
-  outline: none;
-  border-color: hsl(208, 79%, 51%);
-  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
-}
+/* Removed conflicting .gms-input styles to restore original compact sizing */
 
 .gms-priority-input {
   max-width: 120px;
 }
 
-.gms-form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.gms-save-btn {
-  align-self: flex-start;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-}
+/* Removed conflicting form group styles to maintain compact GMS layout */
 
 .gms-output-section {
   border-top: 1px solid hsl(214, 13%, 91%);
@@ -3017,30 +2992,18 @@ body {
 }
 
 
-/* Phone Numbers Management Styling */
+/* Phone Numbers Management Styling - Compact */
 .telefoonnummers-content {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 16px;
 }
 
 .gms-form-container {
   background: white;
   border: 1px solid #d0d0d0;
-  border-radius: 8px;
-  padding: 24px;
-}
-
-.gms-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.gms-field-group {
-  display: flex;
-  flex-direction: column;
+  border-radius: 4px;
+  padding: 12px;
 }
 
 .gms-field-group.gms-field-wide {
