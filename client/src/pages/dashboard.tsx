@@ -45,14 +45,23 @@ export default function Dashboard() {
   const generateColleagueResponse = (contact: any, userMessage: string, conversationHistory: any[] = []) => {
     const message = userMessage.toLowerCase();
     
-    // Analyze user message for context
-    const isUrgent = /urgent|spoed|direct|nu|emergency|prio|meteen/.test(message);
-    const isLocation = /waar|locatie|adres|plaats|richting/.test(message);
-    const isStatus = /status|situatie|stand|update/.test(message);
-    const isRequest = /kun je|kan je|wil je|zou je|help|stuur|regel/.test(message);
+    // Enhanced Dutch emergency terminology analysis
+    const isUrgent = /urgent|spoed|direct|nu|emergency|prio|meteen|code rood|code geel|alarm|acuut/.test(message);
+    const isLocation = /waar|locatie|adres|plaats|richting|straat|wijk|gebied|route/.test(message);
+    const isStatus = /status|situatie|stand|update|rapport|overzicht/.test(message);
+    const isRequest = /kun je|kan je|wil je|zou je|help|stuur|regel|informeer|activeer|mobiliseer/.test(message);
     const isQuestion = /\?/.test(userMessage) || /wat|wie|waar|wanneer|waarom|hoe/.test(message);
     
-    // Role-specific personality and knowledge base
+    // Emergency incident types detection
+    const incidentTypes = {
+      fire: /brand|vuur|rook|brandweer|blussen|woningbrand|bedrijfsbrand/.test(message),
+      medical: /ambulance|ziekenwagen|gewond|letsel|onwel|hartstilstand|reanimatie/.test(message),
+      police: /politie|inbraak|diefstal|geweld|arrestatie|verdachte|overval/.test(message),
+      traffic: /verkeer|ongeval|aanrijding|file|wegafsluiting|a20|snelweg/.test(message),
+      public: /overlast|verstoring|openbare orde|relschoppers|vechtpartij/.test(message)
+    };
+    
+    // Role-specific personality and knowledge base with incident-specific responses
     const roleProfiles = {
       "Dienstchef": {
         tone: "autoritair en beslissend",
@@ -77,6 +86,21 @@ export default function Dashboard() {
             "Akkoord, ik regel dat direct via mijn kanalen.",
             "Geen probleem, ik heb de autoriteit om dat goed te keuren.",
             "Dat valt onder mijn verantwoordelijkheid - wordt onmiddellijk geregeld."
+          ],
+          fire: [
+            "Brand geregistreerd. Ik schakel direct de brandweer in en regel perimeter.",
+            "Woningbrand - ik activeer tankautospuit en hoogwerker. Evacuatie nodig?",
+            "Code rood brand. Ik regel omliggende korpsen voor bijstand."
+          ],
+          medical: [
+            "Medische nood - ambulance wordt direct ingezet. Traumahelikopter nodig?",
+            "Ik schakel A1 ambulance in. MMT wordt gealarmeerd voor ondersteuning.",
+            "Spoedeisende hulp geactiveerd. Ziekenhuis is geïnformeerd."
+          ],
+          police: [
+            "Politie-inzet geregeld. Hoeveel eenheden zijn ter plaatse nodig?",
+            "Ik stuur surveillanceteams. Arrestatieteam wordt geactiveerd.",
+            "Politieoptreden - ik coördineer met OvdD en regel ondersteuning."
           ],
           default: [
             "Spreek je met urgentie? Dan neem ik direct actie.",
@@ -171,10 +195,71 @@ export default function Dashboard() {
             "Verzoek gelogd en doorgestuurd. Ik houd de status bij en inform je over updates.",
             "Direct opgepakt. Ik neem contact op met de betreffende dienst namens jou."
           ],
+          fire: [
+            "Brand melding ontvangen. Ik informeer direct de brandweer en regel coördinatie.",
+            "Woningbrand - tankautospuit wordt gealarmeerd. Adres doorgestuurd.",
+            "Brandmelding geregistreerd. Ik schakel automatisch door naar de kazerne."
+          ],
+          medical: [
+            "Ambulance wordt direct gealarmeerd. Ik geef de details door aan de bemanning.",
+            "Medische spoed - A1 rit geactiveerd. ETA wordt doorgegeven.",
+            "Ziekenwagen onderweg. Ik houd contact met de ambulancedienst."
+          ],
+          police: [
+            "Politiemelding doorgegeven. Surveillancewagen wordt naar locatie gestuurd.",
+            "Ik schakel direct door naar de eerstvolgende politie-eenheid.",
+            "Melding geregistreerd en doorgezet naar de wijkagent."
+          ],
           default: [
             "Meldkamer centraal - ik houd alle lijnen open en ondersteun waar nodig.",
             "Communicatie hub actief. Wat kan ik voor je betekenen in de operatie?",
             "Alle systemen online. Ik sta klaar voor ondersteuning en coördinatie."
+          ]
+        }
+      },
+      "ACO OC Rotterdam": {
+        tone: "operationeel commandocentrum",
+        expertise: ["regionale coördinatie", "operationele commando", "eenheid dispatch", "situational awareness"],
+        responses: {
+          urgent: [
+            "ACO OC Rotterdam - spoedmelding genoteerd. Ik activeer onmiddellijk de benodigde eenheden.",
+            "Operationeel commando geactiveerd. Welke ondersteuning is vereist ter plaatse?",
+            "Rotterdam OC hier - ik schakel direct over naar spoedroutine."
+          ],
+          location: [
+            "Rotterdam gebied - ik ken de locatie. Beste aanrijroute wordt berekend.",
+            "OC Rotterdam coördineert toegang tot die locatie. Verkeer wordt omgeleid.",
+            "Gebied Rotterdam-centrum/zuid/noord - onze eenheden zijn in de buurt."
+          ],
+          status: [
+            "OC Rotterdam operationeel status: alle eenheden beschikbaar, systemen online.",
+            "Huidige operaties Rotterdam: 8 actieve incidenten, voldoende capaciteit.",
+            "Commandocentrum Rotterdam - alle communicatielijnen helder."
+          ],
+          request: [
+            "ACO Rotterdam regelt dat direct. Ik coördineer met de betreffende diensten.",
+            "Operationeel commando Rotterdam neemt het over. Wordt direct uitgevoerd.",
+            "OC Rotterdam heeft de autoriteit - ik handel dit persoonlijk af."
+          ],
+          fire: [
+            "Brandmelding Rotterdam - ik informeer direct de brandweer en regel ondersteuning.",
+            "Woningbrand gemeld - ACO Rotterdam activeert tankautospuit en hoogwerker.",
+            "Brand Rotterdam gebied - ik coördineer met kazerne Charlois voor snelle inzet."
+          ],
+          medical: [
+            "Medische noodsituatie - ACO Rotterdam schakelt ambulancedienst in.",
+            "Rotterdam ambulancedienst wordt gealarmeerd. Ik regel spoedinzet.",
+            "Medische spoed Rotterdam - ik activeer A1 rit en informeer het ziekenhuis."
+          ],
+          police: [
+            "Politie Rotterdam wordt ingeschakeld. Ik stuur surveillanceteam ter plaatse.",
+            "ACO Rotterdam coördineert politie-inzet. Welke ondersteuning is nodig?",
+            "Rotterdam politie ontvangt melding. Ik regel directe respons."
+          ],
+          default: [
+            "ACO OC Rotterdam operationeel. Hoe kan ik de situatie ondersteunen?",
+            "Operationeel Commando Rotterdam staat klaar. Wat vereist onze aandacht?",
+            "Rotterdam commandocentrum hier - alle middelen zijn beschikbaar."
           ]
         }
       }
@@ -225,9 +310,23 @@ export default function Dashboard() {
       }
     }
 
-    // Select appropriate response category
+    // Select appropriate response category based on context and incident type
     let selectedResponses;
-    if (isUrgent) {
+    
+    // Priority 1: Check for specific incident types
+    if (incidentTypes.fire && profile.responses.fire) {
+      selectedResponses = profile.responses.fire;
+    } else if (incidentTypes.medical && profile.responses.medical) {
+      selectedResponses = profile.responses.medical;
+    } else if (incidentTypes.police && profile.responses.police) {
+      selectedResponses = profile.responses.police;
+    } else if (incidentTypes.traffic && profile.responses.traffic) {
+      selectedResponses = profile.responses.traffic;
+    } else if (incidentTypes.public && profile.responses.public) {
+      selectedResponses = profile.responses.public;
+    }
+    // Priority 2: Check for context categories
+    else if (isUrgent) {
       selectedResponses = profile.responses.urgent;
     } else if (isLocation) {
       selectedResponses = profile.responses.location;
