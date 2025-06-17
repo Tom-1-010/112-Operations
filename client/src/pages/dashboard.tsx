@@ -2059,14 +2059,20 @@ export default function Dashboard() {
           console.log('Redirecting incident to GMS:', incidentId);
           
           // Create incident object in the expected format
-          const incidentForGMS = {
+          let priority: 'low' | 'medium' | 'high' = 'low';
+          if (incident.prioriteit === 1) priority = 'high';
+          else if (incident.prioriteit === 2) priority = 'medium';
+          
+          const incidentForGMS: Incident = {
             id: incident.id,
             type: incident.classificatie1 || 'Onbekend',
             location: incident.straatnaam && incident.huisnummer 
               ? `${incident.straatnaam} ${incident.huisnummer}` 
               : incident.meldingsadres || 'Onbekend',
             timestamp: incident.timestamp,
-            priority: incident.prioriteit === 1 ? 'high' : incident.prioriteit === 2 ? 'medium' : 'low',
+            timeAgo: '', // Will be calculated automatically
+            unitsAssigned: 0, // Default value
+            priority: priority,
             status: 'active'
           };
           
@@ -2078,11 +2084,14 @@ export default function Dashboard() {
         (window as any).redirectToGMS = redirectToGMS;
       } catch (error) {
         console.error("Error loading incidents:", error);
-        incidentsList.innerHTML = `
-          <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
-            Fout bij laden van incidenten
-          </div>
-        `;
+        const incidentsList = document.getElementById("allIncidentsLegacyList");
+        if (incidentsList) {
+          incidentsList.innerHTML = `
+            <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
+              Fout bij laden van incidenten
+            </div>
+          `;
+        }
       }
     };
 
