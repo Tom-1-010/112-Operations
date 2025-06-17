@@ -1467,54 +1467,107 @@ export default function Dashboard() {
           prioriteit: parseInt(prioriteit?.value || "3"),
         };
 
-        // Save to localStorage with incident persistence
+        // Save to localStorage and create incident for Incidents tab
         try {
-          // Get current incident data if exists
+          // Get current incident data if exists (for updates)
           const currentIncidentData = localStorage.getItem('currentGmsIncident');
           let incidentId = null;
+          let isNewIncident = false;
           
           if (currentIncidentData) {
             const parsedIncident = JSON.parse(currentIncidentData);
             incidentId = parsedIncident.incidentId;
-            
-            // Update the current incident data with form values
-            const updatedIncidentData = {
-              ...parsedIncident,
-              melderNaam: gmsData.meldernaam,
-              melderAdres: gmsData.melderadres,
-              telefoonnummer: gmsData.telefoonnummer,
-              straatnaam: gmsData.straatnaam,
-              huisnummer: gmsData.huisnummer,
-              toevoeging: gmsData.toevoeging,
-              postcode: gmsData.postcode,
-              plaatsnaam: gmsData.plaatsnaam,
-              gemeente: gmsData.gemeente,
-              mc1: gmsData.classificatie1,
-              mc2: gmsData.classificatie2,
-              mc3: gmsData.classificatie3,
-              priority: gmsData.prioriteit,
-              notities: gmsData.opmerkingen,
-              lastUpdated: new Date().toISOString()
+          } else {
+            // Create new incident ID
+            incidentId = Date.now();
+            isNewIncident = true;
+          }
+          
+          // Create comprehensive incident data with all GMS form information
+          const completeIncidentData = {
+            incidentId: incidentId,
+            type: gmsData.classificatie1 || 'Onbekend',
+            location: gmsData.straatnaam && gmsData.huisnummer 
+              ? `${gmsData.straatnaam} ${gmsData.huisnummer}` 
+              : gmsData.straatnaam || 'Onbekend',
+            timestamp: new Date().toISOString(),
+            priority: gmsData.prioriteit === 1 ? 'high' : gmsData.prioriteit === 2 ? 'medium' : 'low',
+            status: 'active',
+            // Complete GMS form data
+            melderNaam: gmsData.meldernaam,
+            melderAdres: gmsData.melderadres,
+            telefoonnummer: gmsData.telefoonnummer,
+            straatnaam: gmsData.straatnaam,
+            huisnummer: gmsData.huisnummer,
+            toevoeging: gmsData.toevoeging,
+            postcode: gmsData.postcode,
+            plaatsnaam: gmsData.plaatsnaam,
+            gemeente: gmsData.gemeente,
+            mc1: gmsData.classificatie1,
+            mc2: gmsData.classificatie2,
+            mc3: gmsData.classificatie3,
+            notities: gmsData.opmerkingen,
+            tijdstip: gmsData.tijdstip,
+            lastUpdated: new Date().toISOString()
+          };
+          
+          // Save complete incident data
+          localStorage.setItem('currentGmsIncident', JSON.stringify(completeIncidentData));
+          localStorage.setItem(`gmsData_${incidentId}`, JSON.stringify(completeIncidentData));
+          
+          // Add to main incidents list for Incidents tab
+          if (isNewIncident) {
+            const newIncident: Incident = {
+              id: incidentId,
+              type: gmsData.classificatie1 || 'Onbekend',
+              location: gmsData.straatnaam && gmsData.huisnummer 
+                ? `${gmsData.straatnaam} ${gmsData.huisnummer}` 
+                : gmsData.straatnaam || 'Onbekend',
+              timestamp: new Date().toISOString(),
+              timeAgo: 'Nu',
+              unitsAssigned: 0,
+              priority: gmsData.prioriteit === 1 ? 'high' : gmsData.prioriteit === 2 ? 'medium' : 'low',
+              status: 'active'
             };
             
-            // Save updated incident data
-            localStorage.setItem('currentGmsIncident', JSON.stringify(updatedIncidentData));
-            localStorage.setItem(`gmsData_${incidentId}`, JSON.stringify(updatedIncidentData));
+            // Add to React state incidents list
+            setIncidents(prev => [newIncident, ...prev]);
             
-            console.log(`GMS data saved for incident ${incidentId}`);
+            console.log(`Created new incident ${incidentId} and added to Incidents tab`);
+          } else {
+            // Update existing incident in React state
+            setIncidents(prev => prev.map(inc => 
+              inc.id === incidentId 
+                ? {
+                    ...inc,
+                    type: gmsData.classificatie1 || inc.type,
+                    location: gmsData.straatnaam && gmsData.huisnummer 
+                      ? `${gmsData.straatnaam} ${gmsData.huisnummer}` 
+                      : gmsData.straatnaam || inc.location,
+                    priority: gmsData.prioriteit === 1 ? 'high' : gmsData.prioriteit === 2 ? 'medium' : 'low',
+                    lastUpdated: new Date().toISOString()
+                  }
+                : inc
+            ));
+            
+            console.log(`Updated existing incident ${incidentId}`);
           }
           
           // Also save to legacy incidenten array for compatibility
           const existingIncidenten = JSON.parse(
             localStorage.getItem("incidenten") || "[]",
           );
-          existingIncidenten.push(gmsData);
-          localStorage.setItem(
-            "incidenten",
-            JSON.stringify(existingIncidenten),
-          );
+          
+          if (isNewIncident) {
+            existingIncidenten.push(gmsData);
+            localStorage.setItem(
+              "incidenten",
+              JSON.stringify(existingIncidenten),
+            );
+          }
+          
         } catch (error) {
-          console.error("Error saving to localStorage:", error);
+          console.error("Error saving incident data:", error);
         }
 
         // Display JSON output
@@ -1545,11 +1598,26 @@ export default function Dashboard() {
         if (prioriteit) prioriteit.value = "3";
         updateGMSTime();
 
-        showNotificationMessage("GMS melding opgeslagen");
+        showNotificationMessage("GMS melding opgeslagen en toegevoegd aan incidenten");
+      };
+
+      // Handle "Uitgifte" button - saves incident and redirects to Incidents tab
+      const handleUitgifte = () => {
+        console.log('📤 Uitgifte button clicked - Saving incident');
+        
+        // First save the current form data
+        handleGMSFormSubmit();
+        
+        // Then redirect to incidents tab after a brief delay
+        setTimeout(() => {
+          setActiveSection('incidents');
+          showNotificationMessage("Incident uitgegeven en toegevoegd aan overzicht");
+        }, 500);
       };
 
       // Add event listeners for both button click and Enter key
       const verzendButton = document.getElementById("gmsVerzendButton");
+      const uitgifteButton = document.getElementById("gmsUitgifteButton");
       const kladblokElement = document.getElementById("gmsKladblok");
       
       if (verzendButton) {
@@ -1589,6 +1657,12 @@ export default function Dashboard() {
       if (saveButton) {
         console.log('📌 Save button found, attaching form submit listener');
         saveButton.addEventListener("click", handleGMSFormSubmit);
+      }
+
+      // Uitgifte button (for incident dispatch)
+      if (uitgifteButton) {
+        console.log('📌 Uitgifte button found, attaching dispatch listener');
+        uitgifteButton.addEventListener("click", handleUitgifte);
       }
 
       // Handle incident closure buttons
@@ -1873,26 +1947,77 @@ export default function Dashboard() {
               gemeenteField.value = incidentData.gemeente;
               console.log('✅ Set gemeente:', incidentData.gemeente);
             }
-            if (tijdstipField && incidentData.timestamp) {
+            if (tijdstipField && incidentData.tijdstip) {
+              tijdstipField.value = incidentData.tijdstip;
+              console.log('✅ Set tijdstip:', incidentData.tijdstip);
+            } else if (tijdstipField && incidentData.timestamp) {
               tijdstipField.value = incidentData.timestamp;
-              console.log('✅ Set tijdstip:', incidentData.timestamp);
+              console.log('✅ Set tijdstip from timestamp:', incidentData.timestamp);
             }
-            if (prioriteitField && incidentData.priority) {
-              prioriteitField.value = incidentData.priority.toString();
-              console.log('✅ Set prioriteit:', incidentData.priority);
+            
+            // Set priority field properly
+            if (prioriteitField) {
+              let priorityValue = '3'; // default
+              if (incidentData.prioriteit) {
+                priorityValue = incidentData.prioriteit.toString();
+              } else if (incidentData.priority) {
+                // Convert string priority to number
+                if (incidentData.priority === 'high') priorityValue = '1';
+                else if (incidentData.priority === 'medium') priorityValue = '2';
+                else priorityValue = '3';
+              }
+              prioriteitField.value = priorityValue;
+              console.log('✅ Set prioriteit:', priorityValue);
             }
-            if (mc1Field && incidentData.mc1) {
-              mc1Field.value = incidentData.mc1;
-              console.log('✅ Set MC1:', incidentData.mc1);
-            }
-            if (mc2Field && incidentData.mc2) {
-              mc2Field.value = incidentData.mc2;
-              console.log('✅ Set MC2:', incidentData.mc2);
-            }
-            if (mc3Field && incidentData.mc3) {
-              mc3Field.value = incidentData.mc3;
-              console.log('✅ Set MC3:', incidentData.mc3);
-            }
+            
+            // Restore classification dropdowns with proper cascading
+            const restoreClassifications = () => {
+              if (mc1Field && incidentData.mc1) {
+                // First populate MC1 dropdown
+                mc1Field.innerHTML = '<option value="">Selecteer...</option>';
+                const mc1Options = getUniqueClassificationsByLevel("MC1");
+                mc1Options.forEach(mc1 => {
+                  const option = document.createElement('option');
+                  option.value = mc1;
+                  option.textContent = mc1;
+                  mc1Field.appendChild(option);
+                });
+                mc1Field.value = incidentData.mc1;
+                console.log('✅ Restored MC1:', incidentData.mc1);
+                
+                // Then populate and set MC2 if available
+                if (mc2Field && incidentData.mc2) {
+                  mc2Field.innerHTML = '<option value="">Selecteer...</option>';
+                  const mc2Options = getUniqueClassificationsByLevel("MC2", incidentData.mc1);
+                  mc2Options.forEach(mc2 => {
+                    const option = document.createElement('option');
+                    option.value = mc2;
+                    option.textContent = mc2;
+                    mc2Field.appendChild(option);
+                  });
+                  mc2Field.value = incidentData.mc2;
+                  console.log('✅ Restored MC2:', incidentData.mc2);
+                  
+                  // Finally populate and set MC3 if available
+                  if (mc3Field && incidentData.mc3) {
+                    mc3Field.innerHTML = '<option value="">Selecteer...</option>';
+                    const mc3Options = getUniqueClassificationsByLevel("MC3", incidentData.mc2);
+                    mc3Options.forEach(mc3 => {
+                      const option = document.createElement('option');
+                      option.value = mc3;
+                      option.textContent = mc3;
+                      mc3Field.appendChild(option);
+                    });
+                    mc3Field.value = incidentData.mc3;
+                    console.log('✅ Restored MC3:', incidentData.mc3);
+                  }
+                }
+              }
+            };
+            
+            // Restore classifications after a brief delay to ensure dropdown setup is complete
+            setTimeout(restoreClassifications, 100);
+            
             if (kladblokField && incidentData.notities) {
               kladblokField.textContent = incidentData.notities;
               console.log('✅ Set kladblok:', incidentData.notities);
@@ -1924,6 +2049,9 @@ export default function Dashboard() {
         }
         if (verzendButton) {
           verzendButton.removeEventListener("click", handleNotePadSubmit);
+        }
+        if (uitgifteButton) {
+          uitgifteButton.removeEventListener("click", handleUitgifte);
         }
         if (sluitAfButton) {
           sluitAfButton.removeEventListener("click", () => handleIncidentClosure('close'));
