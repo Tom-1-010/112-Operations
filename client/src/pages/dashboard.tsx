@@ -5546,7 +5546,7 @@ export default function Dashboard() {
                             <tr key={phone.id}>
                               <td>{phone.naam}</td>
                               <td>
-                                <span className="clickable-phone" onClick={() => window.simulatePhoneCall?.(phone.telefoonnummer, phone.naam)}>
+                                <span className="clickable-phone" onClick={() => (window as any).simulatePhoneCall?.(phone.telefoonnummer, phone.naam)}>
                                   {phone.telefoonnummer}
                                 </span>
                               </td>
