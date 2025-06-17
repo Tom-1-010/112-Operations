@@ -1582,6 +1582,25 @@ body {
   max-height: 75px; /* Limit maximum height to maintain compact layout */
 }
 
+/* Extra Input Block */
+.gms-extra-input-block {
+  flex: 0.3;
+  display: flex;
+  flex-direction: column;
+}
+
+.gms-extra-input-area {
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 4px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 60px;
+  max-height: 80px;
+}
+
 .gms-text-area:focus {
   outline: none;
   background: #ffffcc;

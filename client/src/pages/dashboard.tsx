@@ -4612,6 +4612,17 @@ export default function Dashboard() {
                         </div>
                       </div>
 
+                      {/* New Section - Extra Input Area */}
+                      <div className="gms-block gms-extra-input-block">
+                        <div className="gms-block-title">Extra Informatie</div>
+                        <div
+                          id="gmsExtraInfo"
+                          contentEditable="true"
+                          className="gms-text-area gms-extra-input-area"
+                          data-placeholder="Aanvullende informatie..."
+                        ></div>
+                      </div>
+
                       {/* Additional Fields */}
                       <div className="gms-block gms-additional-block">
                         <div className="gms-form-row">
