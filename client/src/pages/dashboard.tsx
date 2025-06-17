@@ -1160,6 +1160,18 @@ export default function Dashboard() {
         const notitieveld = document.getElementById("gmsKladblok") as HTMLElement;
         const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
 
+        // Populate MC1 dropdown without auto-selecting any value
+        if (mc1Select && gmsClassifications.length > 0) {
+          mc1Select.innerHTML = '<option value="">Selecteer...</option>';
+          const mc1Options = getUniqueClassificationsByLevel("MC1");
+          mc1Options.forEach(mc1 => {
+            const option = document.createElement('option');
+            option.value = mc1;
+            option.textContent = mc1;
+            mc1Select.appendChild(option);
+          });
+        }
+
         // Function to update priority based on selected classification
         const updatePriorityFromClassification = () => {
           const selectedMC1 = mc1Select.value;
@@ -1470,15 +1482,8 @@ export default function Dashboard() {
                     loggingPanel.scrollTop = loggingPanel.scrollHeight;
                   }
                   
-                  // Remove the processed code/text from the input
-                  if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
-                    const newText = text.replace(lastLine, '').trim();
-                    (element as HTMLTextAreaElement | HTMLInputElement).value = newText;
-                  } else {
-                    // For contentEditable elements
-                    const newText = text.replace(lastLine, '').trim();
-                    element.textContent = newText;
-                  }
+                  // Keep the processed code/text in the input for reference
+                  // Don't remove the text to allow users to see what triggered the classification
                 }
               }
             }
@@ -3863,13 +3868,6 @@ export default function Dashboard() {
                               className="gms-field"
                             >
                               <option value="">Selecteer...</option>
-                              {getUniqueClassificationsByLevel("MC1").map(
-                                (mc1: string) => (
-                                  <option key={mc1} value={mc1}>
-                                    {mc1}
-                                  </option>
-                                ),
-                              )}
                             </select>
                             <select
                               id="gmsClassificatie2"
