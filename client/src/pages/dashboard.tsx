@@ -1064,7 +1064,7 @@ export default function Dashboard() {
                 );
                 console.log('🔍 1. Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 
-                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
+                // 2. Try partial code match (e.g., -bz matches bzdsap, bzdsbr, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
@@ -1072,10 +1072,28 @@ export default function Dashboard() {
                   console.log('🔍 2. Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
-                // 3. Try text matches for full classification strings (e.g., "ongeval wegvervoer letsel")
+                // 3. Special mappings for common abbreviations
+                if (!matchedClassification) {
+                  const specialMappings = {
+                    'wegverkeer onder invloed': 'vkweoi',
+                    'onder invloed': 'vkweoi',
+                    'bz': 'bzdsap', // Default to first bz code
+                    'brgb': 'brgb01' // Default to first brgb code
+                  };
+                  
+                  const mappedCode = specialMappings[searchQuery.toLowerCase()];
+                  if (mappedCode) {
+                    matchedClassification = storedClassifications.find(c => 
+                      c.code.toLowerCase() === mappedCode.toLowerCase()
+                    );
+                    console.log('🔍 3. Special mapping result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  }
+                }
+                
+                // 4. Try text matches for full classification strings
                 if (!matchedClassification) {
                   const searchWords = searchQuery.toLowerCase().split(' ').filter(word => word.length > 2);
-                  console.log('🔍 3. Searching for words:', searchWords);
+                  console.log('🔍 4. Searching for words:', searchWords);
                   
                   matchedClassification = storedClassifications.find(c => {
                     const fullClassification = `${c.MC1} ${c.MC2} ${c.MC3}`.toLowerCase();
@@ -1090,10 +1108,10 @@ export default function Dashboard() {
                       c.MC3.toLowerCase().includes(word)
                     );
                   });
-                  console.log('🔍 3. Multi-word match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log('🔍 4. Multi-word match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
-                // 4. Try individual text matches for MC1, MC2, MC3
+                // 5. Try individual text matches for MC1, MC2, MC3
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1423,22 +1441,34 @@ export default function Dashboard() {
             const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
             console.log('🧪 BRGB test results:', testBrgb.length, testBrgb.slice(0, 2));
             
-            // Test the actual classification detection function
-            console.log('🧪 Testing handleNotePadSubmit with mock data...');
+            // Test the actual classification detection function with multiple codes
+            console.log('🧪 Testing handleNotePadSubmit with various codes...');
             const kladblok = document.getElementById("gmsKladblok");
             if (kladblok) {
-              // Temporarily set test content
               const originalContent = kladblok.textContent;
-              kladblok.textContent = '-brgb';
-              console.log('🧪 Set test content to "-brgb"');
+              const testCodes = ['-bz', '-wegverkeer onder invloed', '-brgb'];
               
-              // Test the function
-              setTimeout(() => {
-                console.log('🧪 Running classification test...');
-                handleNotePadSubmit();
-                // Restore original content
-                kladblok.textContent = originalContent;
-              }, 1000);
+              let testIndex = 0;
+              const runNextTest = () => {
+                if (testIndex < testCodes.length) {
+                  const testCode = testCodes[testIndex];
+                  kladblok.textContent = testCode;
+                  console.log(`🧪 Test ${testIndex + 1}: Set content to "${testCode}"`);
+                  
+                  setTimeout(() => {
+                    console.log(`🧪 Running test ${testIndex + 1}...`);
+                    handleNotePadSubmit();
+                    testIndex++;
+                    setTimeout(runNextTest, 1000);
+                  }, 500);
+                } else {
+                  // Restore original content after all tests
+                  kladblok.textContent = originalContent;
+                  console.log('🧪 All tests completed, content restored');
+                }
+              };
+              
+              setTimeout(runNextTest, 1000);
             }
           }
         };
