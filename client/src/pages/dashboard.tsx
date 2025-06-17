@@ -4661,27 +4661,7 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          <div className="gms-field-group">
-                            <label>Delen met</label>
-                            <div className="gms-sharing-buttons">
-                              <button
-                                type="button"
-                                id="gmsSharePolitie"
-                                className="gms-share-btn"
-                                data-service="Politie"
-                              >
-                                🚓 Politie
-                              </button>
-                              <button
-                                type="button"
-                                id="gmsShareBrandweer"
-                                className="gms-share-btn"
-                                data-service="Brandweer"
-                              >
-                                🚒 Brandweer
-                              </button>
-                            </div>
-                          </div>
+
                         </div>
                       </div>
                     </div>
