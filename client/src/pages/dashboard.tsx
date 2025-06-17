@@ -230,302 +230,427 @@ export default function Dashboard() {
   }
 
   // Complete basisteams database for Regionale Eenheid Rotterdam
-  // GMS Classifications database
+  // Official LMC Classifications database - using exact structure from LMC_classificaties.json
   interface GmsClassification {
+    MC1: string;
+    MC2: string;
+    MC3: string;
     code: string;
-    mc1: string;
-    mc2: string;
-    mc3: string;
     prio: number;
-    definitie: string;
+    uitleg: string;
   }
 
-  // Official LMC classifications - complete dataset from authentic Dutch police file
+  // Load official LMC classifications from the provided JSON file
   const getOfficialLMCClassifications = (): GmsClassification[] => {
     return [
-      { code: "al", mc1: "Alarm", mc2: "", mc3: "", prio: 5, definitie: "Alle soorten alarmen van detectiesystemen die rechtstreeks op de meldkamer binnenkomen, en meldingen door derden over het afgaan van alarmen van detectiesystemen." },
-      { code: "alab", mc1: "Alarm", mc2: "Autom. brand", mc3: "", prio: 2, definitie: "Alarmen van aangesloten OMS die direct op de meldkamer binnenkomen en automatische brandmeldingen door PAC aan de meldkamer doorgegeven." },
-      { code: "alabab", mc1: "Alarm", mc2: "Autom. brand", mc3: "Autom. brand OMS", prio: 2, definitie: "Melding via OMS van inwerkingtreding van een automatische brandmelder" },
-      { code: "alabbb", mc1: "Alarm", mc2: "Autom. brand", mc3: "Br beheerssysteem", prio: 2, definitie: "Melding via OMS van inwerkingtreding van een automatische blusinstallatie" },
-      { code: "alabbm", mc1: "Alarm", mc2: "Autom. brand", mc3: "Brandmelding PAC", prio: 2, definitie: "Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen." },
-      { code: "alabdk", mc1: "Alarm", mc2: "Autom. brand", mc3: "Drukknopmelding OMS", prio: 2, definitie: "Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding." },
-      { code: "alabhm", mc1: "Alarm", mc2: "Autom. brand", mc3: "Handmelder OMS", prio: 2, definitie: "Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven." },
-      { code: "algs", mc1: "Alarm", mc2: "Autom. Gev stof", mc3: "", prio: 2, definitie: "Automatische meldingen van ontsnapping van een gevaarlijke stof via direct op de meldkamer aangesloten OMS en door PAC aan de meldkamer doorgegeven." },
-      { code: "algsom", mc1: "Alarm", mc2: "Autom. Gev stof", mc3: "Gev. stof OMS", prio: 2, definitie: "Melding via OMS van detectie van een gevaarlijke stof." },
-      { code: "algspa", mc1: "Alarm", mc2: "Autom. Gev stof", mc3: "Gev. stof PAC", prio: 2, definitie: "Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen." },
-      { code: "alas", mc1: "Alarm", mc2: "Autom. systeemmelding", mc3: "", prio: 4, definitie: "Alle binnenkomende meldingen via de OMS waarvoor, op basis van de aard van de melding, geen repressieve brandweer inzet nodig is. Het betreft in hoofdzaak storings-, onderhouds-, test en buiten werking stelling meldingen van OMS systemen." },
-      { code: "alhw", mc1: "Alarm", mc2: "Hoog water alarm", mc3: "", prio: 4, definitie: "Alarmen/waarschuwingen afgegeven door Rijkswaterstaat/waterschappen i.v.m. dreigend bijzonder hoogwater." },
-      { code: "allo", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "", prio: 3, definitie: "Melding door een persoon aan de meldkamer dat ergens een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas alarm) hoor- of zichtbaar is, en waarop door de beheerder /gebruiker van het betreffende object niet gereageerd lijkt te worden." },
-      { code: "alloco", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "CO-melder", prio: 3, definitie: "" },
-      { code: "allogb", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "Gebouw", prio: 3, definitie: "Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden." },
-      { code: "allorm", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "Rookmelder", prio: 3, definitie: "Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden." },
-      { code: "allovv", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "Voertuig/Vaartuig", prio: 3, definitie: "Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden." },
-      { code: "alpa", mc1: "Alarm", mc2: "PAC alarm", mc3: "", prio: 2, definitie: "Alarmmeldingen die via de PAC op de meldkamer binnenkomen." },
-      { code: "alpaib", mc1: "Alarm", mc2: "PAC alarm", mc3: "Inbraakalarm", prio: 2, definitie: "Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen." },
-      { code: "alpaov", mc1: "Alarm", mc2: "PAC alarm", mc3: "Overvalalarm", prio: 2, definitie: "(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding." },
-      { code: "alpaps", mc1: "Alarm", mc2: "PAC alarm", mc3: "Persoonsalarm", prio: 1, definitie: "Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is." },
-      { code: "alra", mc1: "Alarm", mc2: "RAC alarm", mc3: "", prio: 1, definitie: "Inbraakmeldingen die via de RAC binnenkomen." },
-      { code: "alraib", mc1: "Alarm", mc2: "RAC alarm", mc3: "Inbraakalarm", prio: 1, definitie: "Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen." },
-      { code: "alraov", mc1: "Alarm", mc2: "RAC alarm", mc3: "Overvalalarm", prio: 1, definitie: "(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding." },
-      { code: "alraps", mc1: "Alarm", mc2: "RAC alarm", mc3: "Persoonsalarm", prio: 1, definitie: "Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel." },
-      { code: "alse", mc1: "Alarm", mc2: "Sensing", mc3: "", prio: 2, definitie: "" },
-      { code: "alseal", mc1: "Alarm", mc2: "Sensing", mc3: "Alert", prio: 2, definitie: "Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen." },
-      { code: "alseah", mc1: "Alarm", mc2: "Sensing", mc3: "ANPR-hit", prio: 2, definitie: "" },
-      { code: "alseom", mc1: "Alarm", mc2: "Sensing", mc3: "Opsporingsmiddel", prio: 2, definitie: "" },
-      { code: "alsetz", mc1: "Alarm", mc2: "Sensing", mc3: "Toezichtsalarm", prio: 1, definitie: "Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP." },
-      { code: "altu", mc1: "Alarm", mc2: "Tunnelalarm", mc3: "", prio: 2, definitie: "Automatische alarmmelding via vanuit tunnel zonder indicatie dat het een brandmelding betreft." },
-      { code: "alma", mc1: "Alarm", mc2: "Weeralarm", mc3: "", prio: 4, definitie: "Alarmen/waarschuwingen afgegeven door meteorologische diensten i.v.m. dreigend gevaarlijk/extreem weer." },
-      { code: "bz", mc1: "Bezitsaantasting", mc2: "", mc3: "", prio: 5, definitie: "Aantasting van andermans bezit of een poging daartoe." },
-      { code: "bzds", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "", prio: 3, definitie: "Het wegnemen of toe-eigenen van enig goed dat geheel of gedeeltelijk aan een ander toebehoort." },
-      { code: "bzdsap", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Afpersing", prio: 3, definitie: "Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging." },
-      { code: "bzdsbr", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Beroving", prio: 1, definitie: "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport." },
-      { code: "bzdsdi", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Dier", prio: 3, definitie: "Diefstal van een dier." },
-      { code: "bzdsfd", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Fraude", prio: 3, definitie: "Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen." },
-      { code: "bzdsgd", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Goederen", prio: 3, definitie: "Diefstal van goederen." },
-      { code: "bzdshl", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Heling", prio: 3, definitie: "Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft." },
-      { code: "bzdslu", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Luchtvaartuig", prio: 3, definitie: "Diefstal van een luchtvaartuig." },
-      { code: "bzdsol", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Oplichting", prio: 3, definitie: "Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen." },
-      { code: "bzdsva", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Vaartuig", prio: 3, definitie: "Zie diefstal." },
-      { code: "bzdsvd", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Verduistering", prio: 3, definitie: "Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft." },
-      { code: "bzdsvo", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Voertuig", prio: 3, definitie: "Diefstal van een voertuig" },
-      { code: "bzdswk", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Winkeldiefstal", prio: 2, definitie: "Diefstal uit een winkel" },
-      { code: "bzdszk", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Zakkenrollerij", prio: 3, definitie: "Diefstal door een zakkenroller" },
-      { code: "bzib", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "", prio: 3, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen." },
-      { code: "bzibbi", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Bedrijf/Instelling", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen." },
-      { code: "bzibbg", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Bijgebouw", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen." },
-      { code: "bziblu", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Luchtvaartuig", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen." },
-      { code: "bzibsp", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Spoorvervoer", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen." },
-      { code: "bzibva", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Vaartuig", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen." },
-      { code: "bzibvo", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Voertuig", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen." },
-      { code: "bzibwn", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Woning", prio: 2, definitie: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen." },
-      { code: "bzov", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "", prio: 1, definitie: "Het dwingen tot afgifte van enig goed door middel van geweld of het dreigen met geweld met voorbedachte rade." },
-      { code: "bzovbi", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Bedrijf/Instelling", prio: 1, definitie: "Een geplande overval op een bedrijf of instelling" },
-      { code: "bzovlu", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Luchtvaartuig", prio: 1, definitie: "Een geplande overval op of in luchtvaartuig niet zijnde een kaping." },
-      { code: "bzovvv", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Voertuig/Vaartuig", prio: 1, definitie: "Een geplande overval op een voer- of vaartuig." },
-      { code: "bzovwd", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Waardetransport", prio: 1, definitie: "Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe." },
-      { code: "bzovwn", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Woning", prio: 1, definitie: "Een geplande overval op een particulier persoon vaak binnenshuis" },
-      { code: "bzsp", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "", prio: 2, definitie: "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten, dieren etc. wegnemen met het oogmerk van toe-eigening." },
-      { code: "bzspdi", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "Dier", prio: 2, definitie: "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening." },
-      { code: "bzspgd", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "Goederen", prio: 2, definitie: "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening." },
-      { code: "bzvn", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "", prio: 3, definitie: "Het opzettelijk en wederrechtelijk vernielen, beschadigen, onbruikbaar of wegmaken van enig goed dat aan een ander toebehoort." },
-      { code: "bzvngb", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Gebouw", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvngd", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Goederen", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvngf", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Graffiti", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvnlu", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Luchtvaartuig", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvnsp", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Spoorvervoer", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvnva", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Vaartuig", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvnvo", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Voertuig", prio: 3, definitie: "Zie vernieling." },
-      { code: "br", mc1: "Brand", mc2: "", mc3: "", prio: 5, definitie: "Incident waarbij het primair om brand gaat/ging of waarbij een explosie heeft plaatsgevonden met brand als overheersend effect tot gevolg." },
-      { code: "brbg", mc1: "Brand", mc2: "Bijgebouw", mc3: "", prio: 1, definitie: "Brand in een bijgebouw dat dienstbaar is aan een hoofdgebouw en bevat geen verblijfsobjecten." },
-      { code: "brbt", mc1: "Brand", mc2: "Buiten", mc3: "", prio: 2, definitie: "Alle buiten brandmeldingen, maar geen industrie/natuur/vervoer/scenario of gebouwen." },
-      { code: "brbtar", mc1: "Brand", mc2: "Buiten", mc3: "Afval/Rommel", prio: 2, definitie: "Brandmelding van afval/rommel. Geen grote als industrieel aangemerkte objecten met opslag van afval." },
-      { code: "brbtbb", mc1: "Brand", mc2: "Buiten", mc3: "Berm/Ruigte/Bosschage", prio: 2, definitie: "Brandmelding van begroeiing op een terrein dat niet als bos heide veen of riet gebied aan te merken is." },
-      { code: "brbtct", mc1: "Brand", mc2: "Buiten", mc3: "Container", prio: 2, definitie: "Brandmelding van, in principe alleen voor opslag van afval of goederen bedoelde, containers/bakken." },
-      { code: "brbtid", mc1: "Brand", mc2: "Buiten", mc3: "Industrie", prio: 2, definitie: "Brandmelding van industrieel aangemerkt terrein." },
-      { code: "brbtnt", mc1: "Brand", mc2: "Buiten", mc3: "Natuur", prio: 2, definitie: "Brandmelding van natuur terrein" },
-      { code: "brgb", mc1: "Brand", mc2: "Gebouw", mc3: "", prio: 1, definitie: "Brandmeldingen van/in gebouwen die niet vallen onder industriegebouwen of speciale scenario's." },
-      { code: "brgb01", mc1: "Brand", mc2: "Gebouw", mc3: "01 Woning/Woongebouw", prio: 1, definitie: "Gebruiksfunctie voor het wonen. Woongebouw: gebouw of gedeelte van gebouw waarin twee of meer woonfuncties zijn ondergebracht." },
-      { code: "brgb02", mc1: "Brand", mc2: "Gebouw", mc3: "02 Bijeenkomst", prio: 1, definitie: "Gebruiksfunctie voor het samenkomen van mensen voor kunst, cultuur, godsdienst, communicatie, kinderopvang." },
-      { code: "brgb03", mc1: "Brand", mc2: "Gebouw", mc3: "03 Cel", prio: 1, definitie: "Gebruiksfunctie voor dwangverblijf van mensen. Cellengebouw: gebouw of gedeelte van gebouw waarin twee of meer celfuncties liggen." },
-      { code: "brgb04", mc1: "Brand", mc2: "Gebouw", mc3: "04 Gezondheidszorg", prio: 1, definitie: "Gebruiksfunctie voor medisch onderzoek, verpleging, verzorging of behandeling" },
-      { code: "brgb05", mc1: "Brand", mc2: "Gebouw", mc3: "05 Agrarisch", prio: 1, definitie: "Gebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goeden, of voor agrarische doeleinden." },
-      { code: "brgb06", mc1: "Brand", mc2: "Gebouw", mc3: "06 Kantoor", prio: 1, definitie: "Gebruiksfunctie voor administratie" },
-      { code: "brgb07", mc1: "Brand", mc2: "Gebouw", mc3: "07 Logies", prio: 1, definitie: "Gebruiksfunctie voor het bieden van recreatief verblijf of tijdelijk onderdak aan mensen" },
-      { code: "brgb08", mc1: "Brand", mc2: "Gebouw", mc3: "08 Onderwijs", prio: 1, definitie: "Gebruiksfunctie voor het geven van onderwijs" },
-      { code: "brgb09", mc1: "Brand", mc2: "Gebouw", mc3: "09 Sport", prio: 1, definitie: "Gebruiksfunctie voor het beoefenen van sport" },
-      { code: "brgb10", mc1: "Brand", mc2: "Gebouw", mc3: "10 Winkel", prio: 1, definitie: "Gebruiksfunctie voor het verhandelen van materialen, goederen of diensten" },
-      { code: "brgb11", mc1: "Brand", mc2: "Gebouw", mc3: "11 Overige Gebruiksfunctie", prio: 1, definitie: "Een niet in de andere categorieën onder te brengen gebruiksfunctie" },
-      { code: "brgb12", mc1: "Brand", mc2: "Gebouw", mc3: "12 Industriefunctie", prio: 1, definitie: "Gebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goederen" },
-      { code: "brlu", mc1: "Brand", mc2: "Luchtvaartuig", mc3: "", prio: 1, definitie: "Brand aan of in een luchtvaartuig." },
-      { code: "brluav", mc1: "Brand", mc2: "Luchtvaartuig", mc3: "Aan vliegtuig", prio: 1, definitie: "Brand aan vliegtuig" },
-      { code: "brluin", mc1: "Brand", mc2: "Luchtvaartuig", mc3: "In vliegtuig", prio: 1, definitie: "Brand in vliegtuig" },
-      { code: "brra", mc1: "Brand", mc2: "Railvervoer", mc3: "", prio: 1, definitie: "Brand aan of in railvoer/spoorvervoer." },
-      { code: "brraat", mc1: "Brand", mc2: "Railvervoer", mc3: "Aan trein", prio: 1, definitie: "Brand aan trein" },
-      { code: "brrain", mc1: "Brand", mc2: "Railvervoer", mc3: "In trein", prio: 1, definitie: "Brand in trein" },
-      { code: "brraov", mc1: "Brand", mc2: "Railvervoer", mc3: "Overig railvervoer", prio: 1, definitie: "Brand aan of in ander railvervoer dan trein" },
-      { code: "brva", mc1: "Brand", mc2: "Vaartuig", mc3: "", prio: 1, definitie: "Brand aan of in een vaartuig." },
-      { code: "brvaav", mc1: "Brand", mc2: "Vaartuig", mc3: "Aan vaartuig", prio: 1, definitie: "Brand aan vaartuig" },
-      { code: "brvain", mc1: "Brand", mc2: "Vaartuig", mc3: "In vaartuig", prio: 1, definitie: "Brand in vaartuig" },
-      { code: "brvo", mc1: "Brand", mc2: "Voertuig", mc3: "", prio: 2, definitie: "Brand aan of in een voertuig." },
-      { code: "brvoav", mc1: "Brand", mc2: "Voertuig", mc3: "Aan voertuig", prio: 2, definitie: "Brand aan voertuig" },
-      { code: "brvoin", mc1: "Brand", mc2: "Voertuig", mc3: "In voertuig", prio: 2, definitie: "Brand in voertuig" },
-      { code: "dr", mc1: "Drank en drugs", mc2: "", mc3: "", prio: 5, definitie: "Incidenten gerelateerd aan alcohol- en drugsmisbruik." },
-      { code: "drdb", mc1: "Drank en drugs", mc2: "Drugsbezit", mc3: "", prio: 3, definitie: "Het in bezit hebben van harddrugs of softdrugs." },
-      { code: "drdbbe", mc1: "Drank en drugs", mc2: "Drugsbezit", mc3: "Bezit eigen gebruik", prio: 3, definitie: "Het in bezit hebben van drugs voor eigen gebruik." },
-      { code: "drdbha", mc1: "Drank en drugs", mc2: "Drugsbezit", mc3: "Handel", prio: 3, definitie: "Het in bezit hebben van drugs met het oogmerk te handelen." },
-      { code: "drdg", mc1: "Drank en drugs", mc2: "Drugsgebruik", mc3: "", prio: 3, definitie: "Het gebruiken van harddrugs of softdrugs in de openbare ruimte." },
-      { code: "drdgha", mc1: "Drank en drugs", mc2: "Drugsgebruik", mc3: "Harddrugs", prio: 3, definitie: "Het gebruiken van harddrugs" },
-      { code: "drdgso", mc1: "Drank en drugs", mc2: "Drugsgebruik", mc3: "Softdrugs", prio: 4, definitie: "Het gebruiken van softdrugs" },
-      { code: "drla", mc1: "Drank en drugs", mc2: "Lachgas", mc3: "", prio: 4, definitie: "Het gebruik of handel in lachgas." },
-      { code: "drladr", mc1: "Drank en drugs", mc2: "Lachgas", mc3: "Onder invloed rijden", prio: 2, definitie: "Het rijden onder invloed van lachgas" },
-      { code: "drlage", mc1: "Drank en drugs", mc2: "Lachgas", mc3: "Gebruik", prio: 4, definitie: "Het gebruik van lachgas" },
-      { code: "drlaha", mc1: "Drank en drugs", mc2: "Lachgas", mc3: "Handel", prio: 3, definitie: "Het handelen in lachgas" },
-      { code: "drov", mc1: "Drank en drugs", mc2: "Overig verdovend middel", mc3: "", prio: 3, definitie: "Incidenten met andere verdovende middelen dan drugs of alcohol." },
-      { code: "gw", mc1: "Geweld", mc2: "", mc3: "", prio: 5, definitie: "Geweld of bedreiging tegen een persoon of groep personen danwel tussen personen onderling." },
-      { code: "gwam", mc1: "Geweld", mc2: "Ambtsdelict", mc3: "", prio: 2, definitie: "Geweld tegen of ernstige belediging van een ambtenaar in functie." },
-      { code: "gwamag", mc1: "Geweld", mc2: "Ambtsdelict", mc3: "Tegen agent", prio: 2, definitie: "Geweld tegen politieagent" },
-      { code: "gwamam", mc1: "Geweld", mc2: "Ambtsdelict", mc3: "Tegen ambtenaar", prio: 2, definitie: "Geweld tegen andere ambtenaar dan politie" },
-      { code: "gwambb", mc1: "Geweld", mc2: "Ambtsdelict", mc3: "Belediging/Bedreiging", prio: 2, definitie: "Belediging of bedreiging van ambtenaar" },
-      { code: "gwbd", mc1: "Geweld", mc2: "Bedreiging", mc3: "", prio: 2, definitie: "Het dreigen met geweld tegen een persoon." },
-      { code: "gwbdan", mc1: "Geweld", mc2: "Bedreiging", mc3: "Anoniem", prio: 2, definitie: "Anonieme bedreiging" },
-      { code: "gwbdbo", mc1: "Geweld", mc2: "Bedreiging", mc3: "Bomb threat", prio: 1, definitie: "Bommelding/bomdreiging" },
-      { code: "gwbdin", mc1: "Geweld", mc2: "Bedreiging", mc3: "Internet", prio: 2, definitie: "Bedreiging via internet/social media" },
-      { code: "gwbdte", mc1: "Geweld", mc2: "Bedreiging", mc3: "Telefoon", prio: 2, definitie: "Bedreiging via telefoon" },
-      { code: "gwbddi", mc1: "Geweld", mc2: "Bedreiging", mc3: "Direct", prio: 2, definitie: "Directe bedreiging van persoon tot persoon" },
-      { code: "gwhg", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "", prio: 1, definitie: "Geweld binnen de huiselijke kring." },
-      { code: "gwhgpa", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "Partnergeweld", prio: 1, definitie: "Geweld tussen (ex)partners" },
-      { code: "gwhgki", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "Kindermishandeling", prio: 1, definitie: "Mishandeling van kinderen" },
-      { code: "gwhgfa", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "Familiegeweld", prio: 1, definitie: "Geweld binnen de familie" },
-      { code: "gwmi", mc1: "Geweld", mc2: "Mishandeling", mc3: "", prio: 2, definitie: "Het opzettelijk toebrengen van pijn of letsel aan een persoon." },
-      { code: "gwmile", mc1: "Geweld", mc2: "Mishandeling", mc3: "Licht letsel", prio: 2, definitie: "Mishandeling met licht letsel" },
-      { code: "gwmizw", mc1: "Geweld", mc2: "Mishandeling", mc3: "Zwaar letsel", prio: 1, definitie: "Mishandeling met zwaar lichamelijk letsel" },
-      { code: "gwmido", mc1: "Geweld", mc2: "Mishandeling", mc3: "Dodelijk", prio: 1, definitie: "Mishandeling met dodelijke afloop" },
-      { code: "gwve", mc1: "Geweld", mc2: "Vechtpartij", mc3: "", prio: 2, definitie: "Vechtpartij tussen meerdere personen." },
-      { code: "gwvekl", mc1: "Geweld", mc2: "Vechtpartij", mc3: "Klein", prio: 2, definitie: "Kleine vechtpartij (2-5 personen)" },
-      { code: "gwvegr", mc1: "Geweld", mc2: "Vechtpartij", mc3: "Groot", prio: 1, definitie: "Grote vechtpartij (meer dan 5 personen)" },
-      { code: "hv", mc1: "Hulpverlening", mc2: "", mc3: "", prio: 5, definitie: "Hulpverleningsincidenten waarbij politie assistentie verleent." },
-      { code: "hvam", mc1: "Hulpverlening", mc2: "Ambulance", mc3: "", prio: 2, definitie: "Assistentie aan ambulancedienst." },
-      { code: "hvamto", mc1: "Hulpverlening", mc2: "Ambulance", mc3: "Toegang verschaffen", prio: 2, definitie: "Toegang verschaffen voor ambulance" },
-      { code: "hvambe", mc1: "Hulpverlening", mc2: "Ambulance", mc3: "Begeleiding", prio: 2, definitie: "Begeleiding van ambulance" },
-      { code: "hvbr", mc1: "Hulpverlening", mc2: "Brandweer", mc3: "", prio: 2, definitie: "Assistentie aan brandweer." },
-      { code: "hvbrto", mc1: "Hulpverlening", mc2: "Brandweer", mc3: "Toegang verschaffen", prio: 2, definitie: "Toegang verschaffen voor brandweer" },
-      { code: "hvbrbe", mc1: "Hulpverlening", mc2: "Brandweer", mc3: "Begeleiding", prio: 2, definitie: "Begeleiding van brandweer" },
-      { code: "hvdi", mc1: "Hulpverlening", mc2: "Dieren", mc3: "", prio: 3, definitie: "Hulpverlening aan dieren." },
-      { code: "hvdire", mc1: "Hulpverlening", mc2: "Dieren", mc3: "Redding", prio: 3, definitie: "Redding van dieren in nood" },
-      { code: "hvdilo", mc1: "Hulpverlening", mc2: "Dieren", mc3: "Loslopend", prio: 3, definitie: "Loslopende dieren" },
-      { code: "hvme", mc1: "Hulpverlening", mc2: "Medisch", mc3: "", prio: 1, definitie: "Medische hulpverlening." },
-      { code: "hvmere", mc1: "Hulpverlening", mc2: "Medisch", mc3: "Reanimatie", prio: 1, definitie: "Reanimatie van persoon" },
-      { code: "hvmeow", mc1: "Hulpverlening", mc2: "Medisch", mc3: "Onwel worden", prio: 2, definitie: "Onwel worden van persoon" },
-      { code: "hvmeon", mc1: "Hulpverlening", mc2: "Medisch", mc3: "Ongeval", prio: 2, definitie: "Medische hulp bij ongeval" },
-      { code: "hvps", mc1: "Hulpverlening", mc2: "Psychiatrisch", mc3: "", prio: 2, definitie: "Psychiatrische hulpverlening." },
-      { code: "hvpssz", mc1: "Hulpverlening", mc2: "Psychiatrisch", mc3: "Zelfmoordpoging", prio: 1, definitie: "Zelfmoordpoging of dreiging" },
-      { code: "hvpsps", mc1: "Hulpverlening", mc2: "Psychiatrisch", mc3: "Psychische crisis", prio: 2, definitie: "Persoon in psychische crisis" },
-      { code: "hvpsco", mc1: "Hulpverlening", mc2: "Psychiatrisch", mc3: "Confused persoon", prio: 2, definitie: "Verwarde persoon" },
-      { code: "hvte", mc1: "Hulpverlening", mc2: "Technisch", mc3: "", prio: 3, definitie: "Technische hulpverlening." },
-      { code: "hvtebe", mc1: "Hulpverlening", mc2: "Technisch", mc3: "Beknelling", prio: 2, definitie: "Persoon bekneld" },
-      { code: "hvteva", mc1: "Hulpverlening", mc2: "Technisch", mc3: "Vastgelopen", prio: 3, definitie: "Persoon vastgelopen/klem" },
-      { code: "hvteli", mc1: "Hulpverlening", mc2: "Technisch", mc3: "Lift storing", prio: 3, definitie: "Personen vast in lift" },
-      { code: "in", mc1: "Informatie", mc2: "", mc3: "", prio: 5, definitie: "Algemene informatievragen en meldingen." },
-      { code: "inin", mc1: "Informatie", mc2: "Informatievraag", mc3: "", prio: 4, definitie: "Algemene informatievragen." },
-      { code: "ininpo", mc1: "Informatie", mc2: "Informatievraag", mc3: "Politie", prio: 4, definitie: "Vragen over politie" },
-      { code: "ininov", mc1: "Informatie", mc2: "Informatievraag", mc3: "Overig", prio: 4, definitie: "Overige informatievragen" },
-      { code: "inme", mc1: "Informatie", mc2: "Melding", mc3: "", prio: 4, definitie: "Algemene meldingen ter informatie." },
-      { code: "inmein", mc1: "Informatie", mc2: "Melding", mc3: "Informatief", prio: 4, definitie: "Informatieve melding" },
-      { code: "inmeov", mc1: "Informatie", mc2: "Melding", mc3: "Overig", prio: 4, definitie: "Overige melding" },
-      { code: "ov", mc1: "Overlast", mc2: "", mc3: "", prio: 5, definitie: "Overlastincidenten zonder direct gevaar." },
-      { code: "ovdi", mc1: "Overlast", mc2: "Dieren", mc3: "", prio: 4, definitie: "Overlast door dieren." },
-      { code: "ovdilo", mc1: "Overlast", mc2: "Dieren", mc3: "Loslopend", prio: 4, definitie: "Overlast door loslopende dieren" },
-      { code: "ovdige", mc1: "Overlast", mc2: "Dieren", mc3: "Geluidsoverlast", prio: 4, definitie: "Geluidsoverlast door dieren" },
-      { code: "ovge", mc1: "Overlast", mc2: "Geluidshinder", mc3: "", prio: 4, definitie: "Geluidshinder." },
-      { code: "ovgemu", mc1: "Overlast", mc2: "Geluidshinder", mc3: "Muziek", prio: 4, definitie: "Geluidshinder door muziek" },
-      { code: "ovgefe", mc1: "Overlast", mc2: "Geluidshinder", mc3: "Feest", prio: 4, definitie: "Geluidshinder door feest" },
-      { code: "ovgebu", mc1: "Overlast", mc2: "Geluidshinder", mc3: "Buren", prio: 4, definitie: "Geluidsoverlast van buren" },
-      { code: "ovje", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "", prio: 3, definitie: "Overlast door jongeren." },
-      { code: "ovjeha", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "Hangjeugd", prio: 3, definitie: "Hangjeugd die overlast veroorzaakt" },
-      { code: "ovjeva", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "Vandalisme", prio: 3, definitie: "Vandalisme door jongeren" },
-      { code: "ovjedr", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "Drugs", prio: 3, definitie: "Drugsgebruik door jongeren" },
-      { code: "ovpe", mc1: "Overlast", mc2: "Personen", mc3: "", prio: 3, definitie: "Overlast door personen." },
-      { code: "ovpead", mc1: "Overlast", mc2: "Personen", mc3: "Agressief/Dranksucht", prio: 3, definitie: "Overlast door agressieve of dronken personen" },
-      { code: "ovpebe", mc1: "Overlast", mc2: "Personen", mc3: "Bedelen", prio: 4, definitie: "Overlast door bedelen" },
-      { code: "ovpezw", mc1: "Overlast", mc2: "Personen", mc3: "Zwervers", prio: 4, definitie: "Overlast door zwervers" },
-      { code: "ovve", mc1: "Overlast", mc2: "Verkeer", mc3: "", prio: 4, definitie: "Verkeersoverlast." },
-      { code: "ovvefo", mc1: "Overlast", mc2: "Verkeer", mc3: "Fout parkeren", prio: 4, definitie: "Fout parkeren" },
-      { code: "ovvesn", mc1: "Overlast", mc2: "Verkeer", mc3: "Snelheid", prio: 4, definitie: "Snelheidsovertreding" },
-      { code: "ovvela", mc1: "Overlast", mc2: "Verkeer", mc3: "Lawaai", prio: 4, definitie: "Lawaai door verkeer" },
-      { code: "pe", mc1: "Personen", mc2: "", mc3: "", prio: 5, definitie: "Incidenten betreffende personen." },
-      { code: "peve", mc1: "Personen", mc2: "Vermist", mc3: "", prio: 2, definitie: "Vermiste personen." },
-      { code: "pevemi", mc1: "Personen", mc2: "Vermist", mc3: "Minderjarige", prio: 1, definitie: "Vermiste minderjarige" },
-      { code: "pevevo", mc1: "Personen", mc2: "Vermist", mc3: "Volwassene", prio: 2, definitie: "Vermiste volwassene" },
-      { code: "pevede", mc1: "Personen", mc2: "Vermist", mc3: "Demente", prio: 1, definitie: "Vermiste demente persoon" },
-      { code: "pevd", mc1: "Personen", mc2: "Verdacht", mc3: "", prio: 3, definitie: "Verdachte personen of gedrag." },
-      { code: "pevdin", mc1: "Personen", mc2: "Verdacht", mc3: "Inbreker", prio: 2, definitie: "Verdachte inbreker" },
-      { code: "pevddi", mc1: "Personen", mc2: "Verdacht", mc3: "Dief", prio: 2, definitie: "Verdachte dief" },
-      { code: "pevddr", mc1: "Personen", mc2: "Verdacht", mc3: "Dealer", prio: 2, definitie: "Verdachte drugsdealer" },
-      { code: "peaa", mc1: "Personen", mc2: "Aanhouding", mc3: "", prio: 2, definitie: "Aanhouding van personen." },
-      { code: "peaabe", mc1: "Personen", mc2: "Aanhouding", mc3: "Bevel", prio: 2, definitie: "Aanhouding op bevel" },
-      { code: "peaavo", mc1: "Personen", mc2: "Aanhouding", mc3: "Vonnis", prio: 2, definitie: "Aanhouding wegens vonnis" },
-      { code: "sc", mc1: "Scenario", mc2: "", mc3: "", prio: 5, definitie: "Bijzondere scenario's en grootschalige incidenten." },
-      { code: "scbo", mc1: "Scenario", mc2: "Bommelding", mc3: "", prio: 1, definitie: "Bommelding of verdacht voorwerp." },
-      { code: "scbovp", mc1: "Scenario", mc2: "Bommelding", mc3: "Verdacht pakket", prio: 1, definitie: "Verdacht pakket" },
-      { code: "scbobm", mc1: "Scenario", mc2: "Bommelding", mc3: "Bommelding", prio: 1, definitie: "Bommelding" },
-      { code: "scgr", mc1: "Scenario", mc2: "Grootschalig", mc3: "", prio: 1, definitie: "Grootschalige incidenten." },
-      { code: "scgrev", mc1: "Scenario", mc2: "Grootschalig", mc3: "Evenement", prio: 2, definitie: "Grootschalig evenement" },
-      { code: "scgron", mc1: "Scenario", mc2: "Grootschalig", mc3: "Ongeval", prio: 1, definitie: "Grootschalig ongeval" },
-      { code: "scgrra", mc1: "Scenario", mc2: "Grootschalig", mc3: "Ramp", prio: 1, definitie: "Ramp of crisis" },
-      { code: "scte", mc1: "Scenario", mc2: "Terrorisme", mc3: "", prio: 1, definitie: "Terrorisme gerelateerde incidenten." },
-      { code: "sctead", mc1: "Scenario", mc2: "Terrorisme", mc3: "Aanslag dreiging", prio: 1, definitie: "Dreiging van terroristische aanslag" },
-      { code: "scteaa", mc1: "Scenario", mc2: "Terrorisme", mc3: "Aanslag", prio: 1, definitie: "Terroristische aanslag" },
-      { code: "vo", mc1: "Veiligheid en openbare orde", mc2: "", mc3: "", prio: 5, definitie: "Incidenten betreffende veiligheid en openbare orde." },
-      { code: "vocy", mc1: "Veiligheid en openbare orde", mc2: "Cybercrime", mc3: "", prio: 3, definitie: "Cybercrime gerelateerde incidenten." },
-      { code: "vocyha", mc1: "Veiligheid en openbare orde", mc2: "Cybercrime", mc3: "Hacking", prio: 3, definitie: "Hacking en inbraak in computersystemen" },
-      { code: "vocyid", mc1: "Veiligheid en openbare orde", mc2: "Cybercrime", mc3: "Identiteitsdiefstal", prio: 3, definitie: "Identiteitsdiefstal online" },
-      { code: "vocyph", mc1: "Veiligheid en openbare orde", mc2: "Cybercrime", mc3: "Phishing", prio: 3, definitie: "Phishing en online oplichting" },
-      { code: "vosd", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "", prio: 2, definitie: "Seksuele delicten." },
-      { code: "vosdar", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Aanranding", prio: 2, definitie: "" },
-      { code: "vosdag", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Aanstootgevend gedrag", prio: 2, definitie: "Tonen geslachtsdeel (bijv potloodventer), kan ook live via internet" },
-      { code: "vosdkp", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Kinderpornografie", prio: 2, definitie: "" },
-      { code: "vozdom", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Ontucht minderjarigen", prio: 2, definitie: "Het plegen van ontucht (seksuele handelingen) met een minderjarig persoon. Onder ontucht wordt hier ook verstaan het betasten van intieme delen." },
-      { code: "vosdpt", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Prostitutie", prio: 2, definitie: "" },
-      { code: "vosdbk", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Seksueel benaderen kind", prio: 2, definitie: "Seksuele benadering van een kind, schriftelijk of mondeling (sexchatting of grooming)" },
-      { code: "vosdmk", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Seksueel misbruik kind", prio: 2, definitie: "Seksuele handelingen met kind (verkrachting of aanranding kind)." },
-      { code: "vosdsi", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Seksuele intimidatie", prio: 2, definitie: "Seksuele intimidatie in het openbaar (op straat of online). Kan gaan om opmerkingen, geluiden, gebaren of aanrakingen." },
-      { code: "vosdvk", mc1: "Veiligheid en openbare orde", mc2: "Seksueel delict", mc3: "Verkrachting", prio: 1, definitie: "" },
-      { code: "vk", mc1: "Verkeer", mc2: "", mc3: "", prio: 5, definitie: "Een verkeersgebeurtenis niet zijnde een ongeval." },
-      { code: "vklu", mc1: "Verkeer", mc2: "Luchtvaart", mc3: "", prio: 3, definitie: "Betreft alle luchtvaartvervoermiddelen." },
-      { code: "vklulv", mc1: "Verkeer", mc2: "Luchtvaart", mc3: "Laag vliegen", prio: 2, definitie: "Het lager vliegen dan de voorgeschreven minimale hoogte." },
-      { code: "vkluov", mc1: "Verkeer", mc2: "Luchtvaart", mc3: "Onbevoegd vliegen", prio: 2, definitie: "Zonder daarvoor voorafgegane toestemming vliegen met een luchtvaartuig." },
-      { code: "vkluol", mc1: "Verkeer", mc2: "Luchtvaart", mc3: "Onbevoegde landing", prio: 2, definitie: "Zonder daarvoor voorafgegane toestemming op een luchtvaartterrein of ander terrein landen." },
-      { code: "vkluoi", mc1: "Verkeer", mc2: "Luchtvaart", mc3: "Onder invloed", prio: 2, definitie: "Een luchtvaartuig besturen terwijl de gezagvoerder onder invloed van alcoholische drank of drugs verkeert." },
-      { code: "vkluri", mc1: "Verkeer", mc2: "Luchtvaart", mc3: "Runway incursion", prio: 2, definitie: "Er is sprake van een runway incursion wanneer een vliegtuig, een voertuig of een persoon zich ten onrechte op de start- en of landingsbaan bevindt of binnen de beschermende zone daarvan." },
-      { code: "vkog", mc1: "Verkeer", mc2: "Ongeval", mc3: "", prio: 2, definitie: "Verkeersongevallen." },
-      { code: "vkoglt", mc1: "Verkeer", mc2: "Ongeval", mc3: "Letsel", prio: 1, definitie: "Verkeersongeval met letsel" },
-      { code: "vkogma", mc1: "Verkeer", mc2: "Ongeval", mc3: "Materieel", prio: 3, definitie: "Verkeersongeval alleen materiële schade" },
-      { code: "vkogdo", mc1: "Verkeer", mc2: "Ongeval", mc3: "Dodelijk", prio: 1, definitie: "Dodelijk verkeersongeval" },
-      { code: "vkogvi", mc1: "Verkeer", mc2: "Ongeval", mc3: "Vluchtmisdrijf", prio: 2, definitie: "Vluchtmisdrijf na ongeval" },
-      { code: "vkoi", mc1: "Verkeer", mc2: "Onder invloed", mc3: "", prio: 2, definitie: "Rijden onder invloed van alcohol of drugs." },
-      { code: "vkoial", mc1: "Verkeer", mc2: "Onder invloed", mc3: "Alcohol", prio: 2, definitie: "Rijden onder invloed van alcohol" },
-      { code: "vkoidr", mc1: "Verkeer", mc2: "Onder invloed", mc3: "Drugs", prio: 2, definitie: "Rijden onder invloed van drugs" },
-      { code: "vksh", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "", prio: 3, definitie: "Incidenten die het vervoer op het water aangaan." },
-      { code: "vkshap", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Aanmeerproblemen", prio: 3, definitie: "Er doen zich problemen voor bij het afmeren aan een steiger of kade of bij het ankeren." },
-      { code: "vkshal", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Afgevallen lading", prio: 3, definitie: "Lading dat van een schip is gevallen." },
-      { code: "vkshav", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "ASO-vaargedrag", prio: 3, definitie: "Gedrag op het water waar anderen hinder van ondervinden." },
-      { code: "vkshdr", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Drijvende obstakels", prio: 3, definitie: "Drijvende obstakels in het water." },
-      { code: "vkshoi", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Onder invloed", prio: 2, definitie: "Varen onder invloed van alcohol of drugs." },
-      { code: "vkshon", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Ongeval", prio: 2, definitie: "Ongeval met vaartuig." },
-      { code: "vkshoz", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Onzeewaardig", prio: 3, definitie: "Onzeewaardig of slecht onderhouden vaartuig." },
-      { code: "vkshov", mc1: "Verkeer", mc2: "Scheepvaart", mc3: "Overtreding", prio: 3, definitie: "Overtreding scheepvaartregels." },
-      { code: "vkst", mc1: "Verkeer", mc2: "Storing", mc3: "", prio: 4, definitie: "Verkeersstoring." },
-      { code: "vkstfi", mc1: "Verkeer", mc2: "Storing", mc3: "File", prio: 4, definitie: "File op de weg" },
-      { code: "vkstwe", mc1: "Verkeer", mc2: "Storing", mc3: "Wegafsluiting", prio: 3, definitie: "Wegafsluiting" },
-      { code: "vkstob", mc1: "Verkeer", mc2: "Storing", mc3: "Obstakel", prio: 3, definitie: "Obstakel op de weg" },
-      { code: "vkwr", mc1: "Verkeer", mc2: "Wegverkeer", mc3: "", prio: 3, definitie: "Algemene verkeersincidenten op de weg." },
-      { code: "vkwrfo", mc1: "Verkeer", mc2: "Wegverkeer", mc3: "Fout parkeren", prio: 4, definitie: "Fout parkeren" },
-      { code: "vkwrri", mc1: "Verkeer", mc2: "Wegverkeer", mc3: "Roekeloos rijden", prio: 3, definitie: "Roekeloos of gevaarlijk rijgedrag" },
-      { code: "vkwrsn", mc1: "Verkeer", mc2: "Wegverkeer", mc3: "Snelheidsovertreding", prio: 3, definitie: "Snelheidsovertreding" },
-      { code: "vkwrst", mc1: "Verkeer", mc2: "Wegverkeer", mc3: "Street racing", prio: 2, definitie: "Illegale straatracen" },
-      { code: "wa", mc1: "Water", mc2: "", mc3: "", prio: 5, definitie: "Water gerelateerde incidenten." },
-      { code: "wadr", mc1: "Water", mc2: "Drenkeling", mc3: "", prio: 1, definitie: "Drenkeling in het water." },
-      { code: "wadrre", mc1: "Water", mc2: "Drenkeling", mc3: "Reddingsactie", prio: 1, definitie: "Reddingsactie voor drenkeling" },
-      { code: "wadrve", mc1: "Water", mc2: "Drenkeling", mc3: "Vermist in water", prio: 1, definitie: "Persoon vermist in water" },
-      { code: "wavo", mc1: "Water", mc2: "Verontreiniging", mc3: "", prio: 3, definitie: "Waterverontreiniging." },
-      { code: "wavooi", mc1: "Water", mc2: "Verontreiniging", mc3: "Olie", prio: 3, definitie: "Olieverontreiniging in water" },
-      { code: "wavoch", mc1: "Water", mc2: "Verontreiniging", mc3: "Chemisch", prio: 2, definitie: "Chemische verontreiniging van water" },
-      { code: "wavn", mc1: "Water", mc2: "Vaartuig in nood", mc3: "", prio: 2, definitie: "Vaartuig in nood." },
-      { code: "wavnmo", mc1: "Water", mc2: "Vaartuig in nood", mc3: "Motorpech", prio: 2, definitie: "Vaartuig met motorpech" },
-      { code: "wavnzi", mc1: "Water", mc2: "Vaartuig in nood", mc3: "Zinken", prio: 1, definitie: "Zinkend vaartuig" },
-      { code: "wavnan", mc1: "Water", mc2: "Vaartuig in nood", mc3: "Aanvaring", prio: 2, definitie: "Aanvaring tussen vaartuigen" },
-      { code: "wavndr", mc1: "Water", mc2: "Vaartuig in nood", mc3: "Drift", prio: 2, definitie: "Vaartuig op drift" },
-      { code: "we", mc1: "Weerincident", mc2: "", mc3: "", prio: 5, definitie: "Incidenten gerelateerd aan weersomstandigheden." },
-      { code: "west", mc1: "Weerincident", mc2: "Storm", mc3: "", prio: 3, definitie: "Storm gerelateerde incidenten." },
-      { code: "westom", mc1: "Weerincident", mc2: "Storm", mc3: "Omgevallen boom", prio: 3, definitie: "Door storm omgevallen boom" },
-      { code: "westda", mc1: "Weerincident", mc2: "Storm", mc3: "Dakschade", prio: 3, definitie: "Dakschade door storm" },
-      { code: "westov", mc1: "Weerincident", mc2: "Storm", mc3: "Overig", prio: 3, definitie: "Overige stormschade" },
-      { code: "weij", mc1: "Weerincident", mc2: "IJzel/Sneeuw", mc3: "", prio: 3, definitie: "IJzel en sneeuw gerelateerde incidenten." },
-      { code: "weijgl", mc1: "Weerincident", mc2: "IJzel/Sneeuw", mc3: "Gladheid", prio: 3, definitie: "Gladheid door ijs of sneeuw" },
-      { code: "weijov", mc1: "Weerincident", mc2: "IJzel/Sneeuw", mc3: "Overig", prio: 3, definitie: "Overige schade door ijs/sneeuw" },
-      { code: "weha", mc1: "Weerincident", mc2: "Hagel", mc3: "", prio: 3, definitie: "Hagel gerelateerde incidenten." },
-      { code: "wehavo", mc1: "Weerincident", mc2: "Hagel", mc3: "Voertuigschade", prio: 3, definitie: "Voertuigschade door hagel" },
-      { code: "wehaov", mc1: "Weerincident", mc2: "Hagel", mc3: "Overig", prio: 3, definitie: "Overige hagelschade" }
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. brand",
+        "MC3": "Autom. brand OMS",
+        "code": "alabab",
+        "prio": 2,
+        "uitleg": "Melding via OMS van inwerkingtreding van een automatische brandmelder"
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. brand",
+        "MC3": "Br beheerssysteem",
+        "code": "alabbb",
+        "prio": 2,
+        "uitleg": "Melding via OMS van inwerkingtreding van een automatische blusinstallatie"
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. brand",
+        "MC3": "Brandmelding PAC",
+        "code": "alabbm",
+        "prio": 2,
+        "uitleg": "Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. brand",
+        "MC3": "Drukknopmelding OMS",
+        "code": "alabdk",
+        "prio": 2,
+        "uitleg": "Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. brand",
+        "MC3": "Handmelder OMS",
+        "code": "alabhm",
+        "prio": 2,
+        "uitleg": "Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. Gev stof",
+        "MC3": "Gev. stof OMS",
+        "code": "algsom",
+        "prio": 2,
+        "uitleg": "Melding via OMS van detectie van een gevaarlijke stof."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Autom. Gev stof",
+        "MC3": "Gev. stof PAC",
+        "code": "algspa",
+        "prio": 2,
+        "uitleg": "Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Luid/optisch alarm",
+        "MC3": "Gebouw",
+        "code": "allogb",
+        "prio": 3,
+        "uitleg": "Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Luid/optisch alarm",
+        "MC3": "Rookmelder",
+        "code": "allorm",
+        "prio": 3,
+        "uitleg": "Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Luid/optisch alarm",
+        "MC3": "Voertuig/Vaartuig",
+        "code": "allovv",
+        "prio": 3,
+        "uitleg": "Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "PAC alarm",
+        "MC3": "Inbraakalarm",
+        "code": "alpaib",
+        "prio": 2,
+        "uitleg": "Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "PAC alarm",
+        "MC3": "Overvalalarm",
+        "code": "alpaov",
+        "prio": 2,
+        "uitleg": "(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "PAC alarm",
+        "MC3": "Persoonsalarm",
+        "code": "alpaps",
+        "prio": 1,
+        "uitleg": "Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "RAC alarm",
+        "MC3": "Inbraakalarm",
+        "code": "alraib",
+        "prio": 1,
+        "uitleg": "Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "RAC alarm",
+        "MC3": "Overvalalarm",
+        "code": "alraov",
+        "prio": 1,
+        "uitleg": "(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "RAC alarm",
+        "MC3": "Persoonsalarm",
+        "code": "alraps",
+        "prio": 1,
+        "uitleg": "Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel."
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Sensing",
+        "MC3": "Alert",
+        "code": "alseal",
+        "prio": 2,
+        "uitleg": "Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen. "
+      },
+      {
+        "MC1": "Alarm",
+        "MC2": "Sensing",
+        "MC3": "Toezichtsalarm",
+        "code": "alsetz",
+        "prio": 1,
+        "uitleg": "Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Afpersing",
+        "code": "bzdsap",
+        "prio": 3,
+        "uitleg": "Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Beroving",
+        "code": "bzdsbr",
+        "prio": 1,
+        "uitleg": "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Dier",
+        "code": "bzdsdi",
+        "prio": 3,
+        "uitleg": "Diefstal van een dier."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Fraude",
+        "code": "bzdsfd",
+        "prio": 3,
+        "uitleg": "Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Goederen",
+        "code": "bzdsgd",
+        "prio": 3,
+        "uitleg": "Diefstal van goederen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Heling",
+        "code": "bzdshl",
+        "prio": 3,
+        "uitleg": "Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Luchtvaartuig",
+        "code": "bzdslu",
+        "prio": 3,
+        "uitleg": "Diefstal van een luchtvaartuig."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Oplichting",
+        "code": "bzdsol",
+        "prio": 3,
+        "uitleg": "Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Vaartuig",
+        "code": "bzdsva",
+        "prio": 3,
+        "uitleg": "Zie diefstal."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Verduistering",
+        "code": "bzdsvd",
+        "prio": 3,
+        "uitleg": "Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Voertuig",
+        "code": "bzdsvo",
+        "prio": 3,
+        "uitleg": "Diefstal van een voertuig"
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Winkeldiefstal",
+        "code": "bzdswk",
+        "prio": 2,
+        "uitleg": "Diefstal uit een winkel"
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Diefstal",
+        "MC3": "Zakkenrollerij",
+        "code": "bzdszk",
+        "prio": 3,
+        "uitleg": "Diefstal door een zakkenroller"
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Bedrijf/Instelling",
+        "code": "bzibbi",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Bijgebouw",
+        "code": "bzibbg",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Luchtvaartuig",
+        "code": "bziblu",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Spoorvervoer",
+        "code": "bzibsp",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Vaartuig",
+        "code": "bzibva",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Voertuig",
+        "code": "bzibvo",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Inbraak",
+        "MC3": "Woning",
+        "code": "bzibwn",
+        "prio": 2,
+        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Overval",
+        "MC3": "Bedrijf/Instelling",
+        "code": "bzovbi",
+        "prio": 1,
+        "uitleg": "Een geplande overval op een bedrijf of instelling"
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Overval",
+        "MC3": "Luchtvaartuig",
+        "code": "bzovlu",
+        "prio": 1,
+        "uitleg": "Een geplande overval op of in luchtvaartuig niet zijnde een kaping."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Overval",
+        "MC3": "Voertuig/Vaartuig",
+        "code": "bzovvv",
+        "prio": 1,
+        "uitleg": "Een geplande overval op een voer- of vaartuig."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Overval",
+        "MC3": "Waardetransport",
+        "code": "bzovwd",
+        "prio": 1,
+        "uitleg": "Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Overval",
+        "MC3": "Woning",
+        "code": "bzovwn",
+        "prio": 1,
+        "uitleg": "Een geplande overval op een particulier persoon vaak binnenshuis"
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Stroperij",
+        "MC3": "Dier",
+        "code": "bzspdi",
+        "prio": 2,
+        "uitleg": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Stroperij",
+        "MC3": "Goederen",
+        "code": "bzspgd",
+        "prio": 2,
+        "uitleg": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Vernieling",
+        "MC3": "Gebouw",
+        "code": "bzvngb",
+        "prio": 3,
+        "uitleg": "Zie vernieling."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Vernieling",
+        "MC3": "Goederen",
+        "code": "bzvngd",
+        "prio": 3,
+        "uitleg": "Zie vernieling."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Vernieling",
+        "MC3": "Graffiti",
+        "code": "bzvngf",
+        "prio": 3,
+        "uitleg": "Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Vernieling",
+        "MC3": "Luchtvaartuig",
+        "code": "bzvnlu",
+        "prio": 3,
+        "uitleg": "Zie vernieling."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Vernieling",
+        "MC3": "Spoorvervoer",
+        "code": "bzvnsp",
+        "prio": 3,
+        "uitleg": "Zie vernieling."
+      },
+      {
+        "MC1": "Bezitsaantasting",
+        "MC2": "Vernieling",
+        "MC3": "Vaartuig",
+        "code": "bzvnva",
+        "prio": 3,
+        "uitleg": "Zie vernieling."
+      }
     ];
   };
 
@@ -701,10 +826,10 @@ export default function Dashboard() {
     return gmsClassifications.filter(
       (classification: GmsClassification) =>
         classification.code.toLowerCase().includes(lowerQuery) ||
-        classification.mc1.toLowerCase().includes(lowerQuery) ||
-        classification.mc2.toLowerCase().includes(lowerQuery) ||
-        classification.mc3.toLowerCase().includes(lowerQuery) ||
-        classification.definitie.toLowerCase().includes(lowerQuery),
+        classification.MC1.toLowerCase().includes(lowerQuery) ||
+        classification.MC2.toLowerCase().includes(lowerQuery) ||
+        classification.MC3.toLowerCase().includes(lowerQuery) ||
+        classification.uitleg.toLowerCase().includes(lowerQuery),
     );
   };
 
@@ -1139,7 +1264,7 @@ export default function Dashboard() {
             mc3Select.innerHTML = '<option value="">Selecteer...</option>';
             
             if (selectedMC1) {
-              const mc2Options = getUniqueClassificationsByLevel("mc2", selectedMC1);
+              const mc2Options = getUniqueClassificationsByLevel("MC2", selectedMC1);
               mc2Options.forEach(mc2 => {
                 const option = document.createElement('option');
                 option.value = mc2;
@@ -1159,7 +1284,7 @@ export default function Dashboard() {
             mc3Select.innerHTML = '<option value="">Selecteer...</option>';
             
             if (selectedMC2) {
-              const mc3Options = getUniqueClassificationsByLevel("mc3", selectedMC2);
+              const mc3Options = getUniqueClassificationsByLevel("MC3", selectedMC2);
               mc3Options.forEach(mc3 => {
                 const option = document.createElement('option');
                 option.value = mc3;
