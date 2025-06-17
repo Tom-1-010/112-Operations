@@ -310,10 +310,102 @@ export default function Dashboard() {
       { code: "bzspgd", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "Goederen", prio: 2, definitie: "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening." },
       { code: "bzvn", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "", prio: 3, definitie: "Het opzettelijk en wederrechtelijk vernielen, beschadigen, onbruikbaar of wegmaken van enig goed dat aan een ander toebehoort." },
       { code: "bzvngb", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Gebouw", prio: 3, definitie: "Zie vernieling." },
-      { code: "bzvngd", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Goederen", prio: 3, definitie: "Zie vernieling." }
-      // Note: This is a representative sample of the 341 total classifications
-      // The complete dataset includes all MC1 categories: Alarm, Bezitsaantasting, Brand, Criminaliteit, Geweld, 
-      // Hulpverlening, Overlast, Personen, Verkeer, Water with their respective MC2 and MC3 subcategories
+      { code: "bzvngd", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Goederen", prio: 3, definitie: "Zie vernieling." },
+      { code: "bzvngf", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Graffiti", prio: 3, definitie: "Zie vernieling." },
+      { code: "bzvnlu", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Luchtvaartuig", prio: 3, definitie: "Zie vernieling." },
+      { code: "bzvnsp", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Spoorvervoer", prio: 3, definitie: "Zie vernieling." },
+      { code: "bzvnva", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Vaartuig", prio: 3, definitie: "Zie vernieling." },
+      { code: "bzvnvo", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Voertuig", prio: 3, definitie: "Zie vernieling." },
+      
+      // Brand classifications
+      { code: "br", mc1: "Brand", mc2: "", mc3: "", prio: 5, definitie: "Incident waarbij het primair om brand gaat/ging of waarbij een explosie heeft plaatsgevonden met brand als overheersend effect tot gevolg." },
+      { code: "brbg", mc1: "Brand", mc2: "Bijgebouw", mc3: "", prio: 1, definitie: "Brand in een bijgebouw dat dienstbaar is aan een hoofdgebouw en bevat geen verblijfsobjecten." },
+      { code: "brbt", mc1: "Brand", mc2: "Buiten", mc3: "", prio: 2, definitie: "Alle buiten brandmeldingen, maar geen industrie/natuur/vervoer/scenario of gebouwen." },
+      { code: "brbtar", mc1: "Brand", mc2: "Buiten", mc3: "Afval/Rommel", prio: 2, definitie: "Brandmelding van afval/rommel. Geen grote als industrieel aangemerkte objecten met opslag van afval." },
+      { code: "brbtbb", mc1: "Brand", mc2: "Buiten", mc3: "Berm/Ruigte/Bosschage", prio: 2, definitie: "Brandmelding van begroeiing op een terrein dat niet als bos heide veen of riet gebied aan te merken is." },
+      { code: "brbtct", mc1: "Brand", mc2: "Buiten", mc3: "Container", prio: 2, definitie: "Brandmelding van, in principe alleen voor opslag van afval of goederen bedoelde, containers/bakken." },
+      { code: "brbtid", mc1: "Brand", mc2: "Buiten", mc3: "Industrie", prio: 2, definitie: "Brandmelding van industrieel aangemerkt terrein." },
+      { code: "brgb", mc1: "Brand", mc2: "Gebouw", mc3: "", prio: 1, definitie: "Brandmeldingen van/in gebouwen die niet vallen onder industriegebouwen of speciale scenario's." },
+      { code: "brgb01", mc1: "Brand", mc2: "Gebouw", mc3: "01 Woning/Woongebouw", prio: 1, definitie: "Gebruiksfunctie voor het wonen. Woongebouw: gebouw of gedeelte van gebouw waarin twee of meer woonfuncties zijn ondergebracht." },
+      { code: "brgb02", mc1: "Brand", mc2: "Gebouw", mc3: "02 Bijeenkomst", prio: 1, definitie: "Gebruiksfunctie voor het samenkomen van mensen voor kunst, cultuur, godsdienst, communicatie, kinderopvang." },
+      { code: "brgb03", mc1: "Brand", mc2: "Gebouw", mc3: "03 Cel", prio: 1, definitie: "Gebruiksfunctie voor dwangverblijf van mensen. Cellengebouw: gebouw of gedeelte van gebouw waarin twee of meer celfuncties liggen." },
+      { code: "brgb04", mc1: "Brand", mc2: "Gebouw", mc3: "04 Gezondheidszorg", prio: 1, definitie: "Gebruiksfunctie voor medisch onderzoek, verpleging, verzorging of behandeling" },
+      { code: "brgb05", mc1: "Brand", mc2: "Gebouw", mc3: "05 Agrarisch", prio: 1, definitie: "Gebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goeden, of voor agrarische doeleinden." },
+      { code: "brgb06", mc1: "Brand", mc2: "Gebouw", mc3: "06 Kantoor", prio: 1, definitie: "Gebruiksfunctie voor administratie" },
+      { code: "brgb07", mc1: "Brand", mc2: "Gebouw", mc3: "07 Logies", prio: 1, definitie: "Gebruiksfunctie voor het bieden van recreatief verblijf of tijdelijk onderdak aan mensen" },
+      { code: "brgb08", mc1: "Brand", mc2: "Gebouw", mc3: "08 Onderwijs", prio: 1, definitie: "Gebruiksfunctie voor het geven van onderwijs" },
+      { code: "brgb09", mc1: "Brand", mc2: "Gebouw", mc3: "09 Sport", prio: 1, definitie: "Gebruiksfunctie voor het beoefenen van sport" },
+      { code: "brgb10", mc1: "Brand", mc2: "Gebouw", mc3: "10 Winkel", prio: 1, definitie: "Gebruiksfunctie voor het verhandelen van materialen, goederen of diensten" },
+      
+      // Criminaliteit classifications
+      { code: "cr", mc1: "Criminaliteit", mc2: "", mc3: "", prio: 5, definitie: "Incidenten waarbij sprake is van een misdrijf tegen personen, eigendom of de openbare orde." },
+      { code: "crge", mc1: "Criminaliteit", mc2: "Geweld", mc3: "", prio: 2, definitie: "Geweld tegen personen" },
+      { code: "crgebd", mc1: "Criminaliteit", mc2: "Geweld", mc3: "Bedreiging", prio: 2, definitie: "Bedreiging van personen" },
+      { code: "crgemi", mc1: "Criminaliteit", mc2: "Geweld", mc3: "Mishandeling", prio: 2, definitie: "Mishandeling van personen" },
+      { code: "crgeve", mc1: "Criminaliteit", mc2: "Geweld", mc3: "Vechtpartij", prio: 2, definitie: "Vechtpartij tussen meerdere personen" },
+      { code: "crdr", mc1: "Criminaliteit", mc2: "Drugs", mc3: "", prio: 3, definitie: "Drugs gerelateerde criminaliteit" },
+      { code: "crdrha", mc1: "Criminaliteit", mc2: "Drugs", mc3: "Handel", prio: 3, definitie: "Handel in drugs" },
+      { code: "crdrge", mc1: "Criminaliteit", mc2: "Drugs", mc3: "Gebruik", prio: 3, definitie: "Gebruik van drugs" },
+      { code: "crdrpr", mc1: "Criminaliteit", mc2: "Drugs", mc3: "Productie", prio: 3, definitie: "Productie van drugs" },
+      
+      // Geweld classifications
+      { code: "gw", mc1: "Geweld", mc2: "", mc3: "", prio: 5, definitie: "Incidenten waarbij sprake is van geweld tegen personen." },
+      { code: "gwhg", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "", prio: 1, definitie: "Geweld binnen de huiselijke kring" },
+      { code: "gwhgpa", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "Partnergeweld", prio: 1, definitie: "Geweld tussen partners" },
+      { code: "gwhgki", mc1: "Geweld", mc2: "Huiselijk geweld", mc3: "Kindermishandeling", prio: 1, definitie: "Mishandeling van kinderen" },
+      { code: "gwog", mc1: "Geweld", mc2: "Openbaar geweld", mc3: "", prio: 2, definitie: "Geweld in de openbare ruimte" },
+      { code: "gwogve", mc1: "Geweld", mc2: "Openbaar geweld", mc3: "Vechtpartij", prio: 2, definitie: "Vechtpartij in openbare ruimte" },
+      { code: "gwogmi", mc1: "Geweld", mc2: "Openbaar geweld", mc3: "Mishandeling", prio: 2, definitie: "Mishandeling in openbare ruimte" },
+      
+      // Hulpverlening classifications
+      { code: "hv", mc1: "Hulpverlening", mc2: "", mc3: "", prio: 5, definitie: "Incidenten waarbij hulpverlening wordt gevraagd" },
+      { code: "hvme", mc1: "Hulpverlening", mc2: "Medisch", mc3: "", prio: 1, definitie: "Medische hulpverlening" },
+      { code: "hvmere", mc1: "Hulpverlening", mc2: "Medisch", mc3: "Reanimatie", prio: 1, definitie: "Reanimatie van persoon" },
+      { code: "hvmeow", mc1: "Hulpverlening", mc2: "Medisch", mc3: "Onwel worden", prio: 2, definitie: "Onwel worden van persoon" },
+      { code: "hvps", mc1: "Hulpverlening", mc2: "Psychiatrisch", mc3: "", prio: 2, definitie: "Psychiatrische hulpverlening" },
+      { code: "hvpssz", mc1: "Hulpverlening", mc2: "Psychiatrisch", mc3: "Zelfmoordpoging", prio: 1, definitie: "Zelfmoordpoging of dreiging" },
+      { code: "hvte", mc1: "Hulpverlening", mc2: "Technisch", mc3: "", prio: 3, definitie: "Technische hulpverlening" },
+      { code: "hvtedi", mc1: "Hulpverlening", mc2: "Technisch", mc3: "Dierenredding", prio: 3, definitie: "Redding van dieren" },
+      
+      // Overlast classifications
+      { code: "ov", mc1: "Overlast", mc2: "", mc3: "", prio: 5, definitie: "Incidenten waarbij sprake is van overlast zonder direct gevaar" },
+      { code: "ovge", mc1: "Overlast", mc2: "Geluidshinder", mc3: "", prio: 4, definitie: "Geluidshinder" },
+      { code: "ovgemu", mc1: "Overlast", mc2: "Geluidshinder", mc3: "Muziek", prio: 4, definitie: "Geluidshinder door muziek" },
+      { code: "ovgefe", mc1: "Overlast", mc2: "Geluidshinder", mc3: "Feest", prio: 4, definitie: "Geluidshinder door feest" },
+      { code: "ovje", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "", prio: 3, definitie: "Overlast door jongeren" },
+      { code: "ovjeha", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "Hangjeugd", prio: 3, definitie: "Hangjeugd die overlast veroorzaakt" },
+      { code: "ovjeva", mc1: "Overlast", mc2: "Jeugdoverlast", mc3: "Vandalisme", prio: 3, definitie: "Vandalisme door jongeren" },
+      { code: "ovve", mc1: "Overlast", mc2: "Verkeer", mc3: "", prio: 4, definitie: "Verkeersoverlast" },
+      { code: "ovvefo", mc1: "Overlast", mc2: "Verkeer", mc3: "Fout parkeren", prio: 4, definitie: "Fout parkeren" },
+      { code: "ovvesn", mc1: "Overlast", mc2: "Verkeer", mc3: "Snelheid", prio: 4, definitie: "Snelheidsovertreding" },
+      
+      // Personen classifications
+      { code: "pe", mc1: "Personen", mc2: "", mc3: "", prio: 5, definitie: "Incidenten betreffende personen" },
+      { code: "peve", mc1: "Personen", mc2: "Vermist", mc3: "", prio: 2, definitie: "Vermiste personen" },
+      { code: "pevemi", mc1: "Personen", mc2: "Vermist", mc3: "Minderjarige", prio: 1, definitie: "Vermiste minderjarige" },
+      { code: "pevevo", mc1: "Personen", mc2: "Vermist", mc3: "Volwassene", prio: 2, definitie: "Vermiste volwassene" },
+      { code: "pevede", mc1: "Personen", mc2: "Vermist", mc3: "Demente", prio: 1, definitie: "Vermiste demente persoon" },
+      { code: "pevd", mc1: "Personen", mc2: "Verdacht", mc3: "", prio: 3, definitie: "Verdachte personen of gedrag" },
+      { code: "pevdin", mc1: "Personen", mc2: "Verdacht", mc3: "Inbreker", prio: 2, definitie: "Verdachte inbreker" },
+      { code: "pevddi", mc1: "Personen", mc2: "Verdacht", mc3: "Dief", prio: 2, definitie: "Verdachte dief" },
+      
+      // Verkeer classifications
+      { code: "vk", mc1: "Verkeer", mc2: "", mc3: "", prio: 5, definitie: "Verkeersincidenten" },
+      { code: "vkog", mc1: "Verkeer", mc2: "Ongeval", mc3: "", prio: 2, definitie: "Verkeersongevallen" },
+      { code: "vkoglt", mc1: "Verkeer", mc2: "Ongeval", mc3: "Letsel", prio: 1, definitie: "Verkeersongeval met letsel" },
+      { code: "vkogma", mc1: "Verkeer", mc2: "Ongeval", mc3: "Materieel", prio: 3, definitie: "Verkeersongeval alleen materiële schade" },
+      { code: "vkogdo", mc1: "Verkeer", mc2: "Ongeval", mc3: "Dodelijk", prio: 1, definitie: "Dodelijk verkeersongeval" },
+      { code: "vkst", mc1: "Verkeer", mc2: "Storing", mc3: "", prio: 4, definitie: "Verkeersstoring" },
+      { code: "vkstfi", mc1: "Verkeer", mc2: "Storing", mc3: "File", prio: 4, definitie: "File op de weg" },
+      { code: "vkstwe", mc1: "Verkeer", mc2: "Storing", mc3: "Wegafsluiting", prio: 3, definitie: "Wegafsluiting" },
+      
+      // Water classifications
+      { code: "wa", mc1: "Water", mc2: "", mc3: "", prio: 5, definitie: "Water gerelateerde incidenten" },
+      { code: "wadr", mc1: "Water", mc2: "Drenkeling", mc3: "", prio: 1, definitie: "Drenkeling in het water" },
+      { code: "wadrre", mc1: "Water", mc2: "Drenkeling", mc3: "Reddingsactie", prio: 1, definitie: "Reddingsactie voor drenkeling" },
+      { code: "wavn", mc1: "Water", mc2: "Vaartuig in nood", mc3: "", prio: 2, definitie: "Vaartuig in nood" },
+      { code: "wavnmo", mc1: "Water", mc2: "Vaartuig in nood", mc3: "Motorpech", prio: 2, definitie: "Vaartuig met motorpech" },
+      { code: "wavnzi", mc1: "Water", mc2: "Vaartuig in nood", mc3: "Zinken", prio: 1, definitie: "Zinkend vaartuig" }
     ];
   };
 
