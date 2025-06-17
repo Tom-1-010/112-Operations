@@ -1600,16 +1600,15 @@ body {
 /* Form Elements */
 .gms-form-row {
   display: flex;
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 8px;
+  margin-bottom: 6px;
   align-items: flex-end;
 }
 
 .gms-field-group {
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto;
-  width: auto;
+  flex: 1;
 }
 
 .gms-field-group.gms-field-wide {
@@ -1619,94 +1618,59 @@ body {
 /* Address Layout Specific */
 .gms-address-row {
   display: flex;
-  gap: 3px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 6px;
   align-items: flex-end;
 }
 
 .gms-field-street {
-  width: 70px;
-  max-width: 70px;
-  height: 18px;
+  flex: 3;
 }
 
 .gms-field-number {
-  width: 20px;
-  max-width: 20px;
-  height: 18px;
+  flex: 1;
+  max-width: 60px;
 }
 
 .gms-field-extension {
-  width: 18px;
-  max-width: 18px;
-  height: 18px;
+  flex: 1;
+  max-width: 50px;
 }
 
 .gms-field-postal {
-  width: 35px;
-  max-width: 35px;
-  height: 18px;
+  flex: 1;
+  max-width: 80px;
 }
 
 .gms-field-city {
-  width: 55px;
-  max-width: 55px;
-  height: 18px;
+  flex: 2;
 }
 
 .gms-field-full {
-  width: 90px;
-  max-width: 90px;
-  height: 18px;
+  flex: 1;
+  width: 100%;
 }
 
 .gms-field-group label {
-  font-size: 9px;
-  margin-bottom: 1px;
+  font-size: 10px;
+  margin-bottom: 2px;
   color: #333;
-  font-family: 'MS Sans Serif', sans-serif;
 }
 
 .gms-field {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 1px 3px;
-  font-size: 10px;
-  font-family: 'MS Sans Serif', sans-serif;
-  width: 60px;
-  max-width: 60px;
-  height: 18px;
-}
-
-/* Dropdown specific styling for even more compact appearance */
-select.gms-field {
-  width: 75px;
-  max-width: 75px;
-  height: 20px;
+  padding: 2px 4px;
+  font-size: 11px;
+  font-family: inherit;
 }
 
 .gms-field-small {
-  width: 60px;
   max-width: 60px;
 }
 
 .gms-field-tiny {
-  width: 50px;
-  max-width: 50px;
-  min-width: 50px;
-}
-
-/* Specific styles for priority and time fields */
-.gms-priority-field {
-  width: 35px;
-  max-width: 35px;
-  height: 18px;
-}
-
-.gms-time-field {
-  width: 65px;
-  max-width: 65px;
-  height: 18px;
+  max-width: 40px;
 }
 
 .gms-field:focus {
@@ -1834,14 +1798,12 @@ select.gms-field {
 .gms-text-area {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 2px;
-  font-size: 10px;
-  font-family: 'MS Sans Serif', sans-serif;
-  width: 100px;
-  max-width: 100px;
+  padding: 4px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  flex: 1;
   overflow-y: auto;
-  min-height: 80px;
-  resize: none;
+  min-height: 150px;
 }
 
 .gms-text-area-compact {
@@ -2086,12 +2048,12 @@ select.gms-field {
   border: 1px inset #c0c0c0;
 }
 
-/* Restore compact GMS form grid styling */
+/* Legacy grid styles for compatibility */
 .gms-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 32px;
+  margin-bottom: 32px;
 }
 
 .gms-notepad-section {
@@ -2102,20 +2064,21 @@ select.gms-field {
 .gms-form-sections {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 .gms-section-title {
-  font-size: 11px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 4px;
-  padding-bottom: 2px;
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(213, 22%, 24%);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid hsl(208, 79%, 51%);
 }
 
 .gms-classificatie-section {
-  margin-bottom: 8px;
+  margin-bottom: 24px;
 }
 
 .gms-classificatie-grid {
@@ -2299,13 +2262,37 @@ select.gms-field {
   margin-top: 1px;
 }
 
-/* Removed conflicting .gms-input styles to restore original compact sizing */
+.gms-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.gms-input:focus {
+  outline: none;
+  border-color: hsl(208, 79%, 51%);
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+}
 
 .gms-priority-input {
   max-width: 120px;
 }
 
-/* Removed conflicting form group styles to maintain compact GMS layout */
+.gms-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.gms-save-btn {
+  align-self: flex-start;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
 
 .gms-output-section {
   border-top: 1px solid hsl(214, 13%, 91%);
@@ -3030,18 +3017,30 @@ select.gms-field {
 }
 
 
-/* Phone Numbers Management Styling - Compact */
+/* Phone Numbers Management Styling */
 .telefoonnummers-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
 }
 
 .gms-form-container {
   background: white;
   border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.gms-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.gms-field-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .gms-field-group.gms-field-wide {
@@ -3196,46 +3195,4 @@ select.gms-field {
 .clickable-phone:hover {
   color: #1e3f73;
   text-decoration: none;
-}
-
-/* Caller Information Fields in Intake */
-.caller-info-section {
-  margin-top: 16px;
-  padding: 12px;
-  background: #f8f9fa;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-}
-
-.caller-info-field {
-  margin-bottom: 12px;
-}
-
-.caller-info-field:last-child {
-  margin-bottom: 0;
-}
-
-.caller-info-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #2c5aa0;
-  margin-bottom: 6px;
-}
-
-.caller-info-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  font-size: 11px;
-  background: #f8f9fa;
-  color: #666;
-  font-family: inherit;
-}
-
-.caller-info-input:focus {
-  outline: none;
-  border-color: #2c5aa0;
-  background: #fff;
 }
