@@ -1004,6 +1004,7 @@ export default function Dashboard() {
       // Handle notepad note submission (Verzend button in notepad)
       const handleNotePadSubmit = () => {
         console.log('📝 NOTEPAD SUBMIT - Processing note from kladblok');
+        console.log('🚀 handleNotePadSubmit function triggered');
         
         const kladblok = document.getElementById("gmsKladblok");
         const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
@@ -1408,7 +1409,10 @@ export default function Dashboard() {
       
       if (verzendButton) {
         console.log('📌 Verzend button found, attaching notepad submit listener');
-        verzendButton.addEventListener("click", handleNotePadSubmit);
+        verzendButton.addEventListener("click", () => {
+          console.log('🖱️ Verzend button clicked!');
+          handleNotePadSubmit();
+        });
       } else {
         console.error('❌ Verzend button not found!');
       }
@@ -1419,7 +1423,7 @@ export default function Dashboard() {
         kladblokElement.addEventListener("keydown", (e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            console.log('⌨️ Enter key pressed in kladblok, triggering notepad submit');
+            console.log('⌨️ Enter key pressed in kladblok!');
             handleNotePadSubmit();
           }
         });
