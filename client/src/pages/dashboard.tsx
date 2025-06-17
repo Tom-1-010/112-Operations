@@ -4053,46 +4053,84 @@ export default function Dashboard() {
         const formData = collectGMSFormData();
         const now = new Date();
 
+        // Use existing incident ID if available, otherwise create new
+        const incidentId = currentGmsIncident?.id || Date.now();
+
         const incidentData = {
           ...formData,
-          id: Date.now(),
-          timestamp: now.toISOString(),
+          id: incidentId,
+          timestamp: currentGmsIncident?.timestamp || now.toISOString(),
           status: "Afgesloten",
+          afgesloten: now.toISOString()
         };
 
-        // Save to incidents tab only
+        // Save to incidents tab
         saveIncidentToStorage(incidentData);
+        
+        // Update GMS incidents database
+        setGmsIncidents(prev => {
+          const existing = prev.find(inc => inc.id === incidentId);
+          if (existing) {
+            return prev.map(inc => inc.id === incidentId ? { ...inc, ...incidentData } : inc);
+          } else {
+            return [...prev, incidentData];
+          }
+        });
 
         // Show notification
         showNotificationMessage(
           "Eindrapport opgeslagen en naar Incidenten verzonden",
         );
 
-        // Reset form
-        resetGMSForm();
+        // DO NOT reset form - preserve data for review
+        // Only clear the notepad for new notes
+        const kladblok = document.getElementById("gmsKladblok");
+        if (kladblok) {
+          kladblok.textContent = "";
+        }
       };
 
       const handleUitgifte = () => {
         const formData = collectGMSFormData();
         const now = new Date();
 
+        // Use existing incident ID if available, otherwise create new
+        const incidentId = currentGmsIncident?.id || Date.now();
+        
         const incidentData = {
           ...formData,
-          id: Date.now(),
-          timestamp: now.toISOString(),
+          id: incidentId,
+          timestamp: currentGmsIncident?.timestamp || now.toISOString(),
           status: "Openstaand",
         };
 
-        // Save to incidents tab only
+        // Save to incidents tab and GMS database
         saveIncidentToStorage(incidentData);
+        
+        // Also save to GMS incidents for persistence
+        setGmsIncidents(prev => {
+          const existing = prev.find(inc => inc.id === incidentId);
+          if (existing) {
+            return prev.map(inc => inc.id === incidentId ? { ...inc, ...incidentData } : inc);
+          } else {
+            return [...prev, incidentData];
+          }
+        });
+        
+        // Set as current incident to maintain form state
+        setCurrentGmsIncident(incidentData);
 
         // Show notification
         showNotificationMessage(
           "Incident uitgegeven en naar Incidenten verzonden",
         );
 
-        // Reset form
-        resetGMSForm();
+        // DO NOT reset form - preserve data for continued editing
+        // Only clear the notepad for new notes
+        const kladblok = document.getElementById("gmsKladblok");
+        if (kladblok) {
+          kladblok.textContent = "";
+        }
       };
 
       const handleSluitAf = () => {
