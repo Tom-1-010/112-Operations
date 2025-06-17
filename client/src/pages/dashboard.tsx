@@ -1781,10 +1781,12 @@ export default function Dashboard() {
       // Load incident data if available
       const loadIncidentData = () => {
         const currentIncidentData = localStorage.getItem('currentGmsIncident');
+        console.log('🔍 Checking for incident data in localStorage:', currentIncidentData);
+        
         if (currentIncidentData) {
           try {
             const incidentData = JSON.parse(currentIncidentData);
-            console.log('Loading incident data into GMS:', incidentData.incidentId);
+            console.log('📋 Loading incident data into GMS:', incidentData);
             
             // Pre-fill form fields with incident data
             const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
@@ -1803,32 +1805,87 @@ export default function Dashboard() {
             const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
             const kladblokField = document.getElementById("gmsKladblok") as HTMLElement;
             
-            // Fill in the fields with stored data
-            if (melderNaamField && incidentData.melderNaam) melderNaamField.value = incidentData.melderNaam;
-            if (melderAdresField && incidentData.melderAdres) melderAdresField.value = incidentData.melderAdres;
-            if (telefoonnummerField && incidentData.telefoonnummer) telefoonnummerField.value = incidentData.telefoonnummer;
-            if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
-            if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
-            if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
-            if (postcodeField && incidentData.postcode) postcodeField.value = incidentData.postcode;
-            if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
-            if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
-            if (tijdstipField && incidentData.timestamp) tijdstipField.value = incidentData.timestamp;
-            if (prioriteitField && incidentData.priority) prioriteitField.value = incidentData.priority.toString();
-            if (mc1Field && incidentData.mc1) mc1Field.value = incidentData.mc1;
-            if (mc2Field && incidentData.mc2) mc2Field.value = incidentData.mc2;
-            if (mc3Field && incidentData.mc3) mc3Field.value = incidentData.mc3;
-            if (kladblokField && incidentData.notities) kladblokField.textContent = incidentData.notities;
+            console.log('🔍 Found form fields:', {
+              straatnaam: !!straatnaamField,
+              tijdstip: !!tijdstipField,
+              prioriteit: !!prioriteitField,
+              mc1: !!mc1Field
+            });
+            
+            // Fill in the fields with stored data and log each action
+            if (melderNaamField && incidentData.melderNaam) {
+              melderNaamField.value = incidentData.melderNaam;
+              console.log('✅ Set melder naam:', incidentData.melderNaam);
+            }
+            if (melderAdresField && incidentData.melderAdres) {
+              melderAdresField.value = incidentData.melderAdres;
+              console.log('✅ Set melder adres:', incidentData.melderAdres);
+            }
+            if (telefoonnummerField && incidentData.telefoonnummer) {
+              telefoonnummerField.value = incidentData.telefoonnummer;
+              console.log('✅ Set telefoonnummer:', incidentData.telefoonnummer);
+            }
+            if (straatnaamField && incidentData.straatnaam) {
+              straatnaamField.value = incidentData.straatnaam;
+              console.log('✅ Set straatnaam:', incidentData.straatnaam);
+            }
+            if (huisnummerField && incidentData.huisnummer) {
+              huisnummerField.value = incidentData.huisnummer;
+              console.log('✅ Set huisnummer:', incidentData.huisnummer);
+            }
+            if (toevoegingField && incidentData.toevoeging) {
+              toevoegingField.value = incidentData.toevoeging;
+              console.log('✅ Set toevoeging:', incidentData.toevoeging);
+            }
+            if (postcodeField && incidentData.postcode) {
+              postcodeField.value = incidentData.postcode;
+              console.log('✅ Set postcode:', incidentData.postcode);
+            }
+            if (plaatsnaamField && incidentData.plaatsnaam) {
+              plaatsnaamField.value = incidentData.plaatsnaam;
+              console.log('✅ Set plaatsnaam:', incidentData.plaatsnaam);
+            }
+            if (gemeenteField && incidentData.gemeente) {
+              gemeenteField.value = incidentData.gemeente;
+              console.log('✅ Set gemeente:', incidentData.gemeente);
+            }
+            if (tijdstipField && incidentData.timestamp) {
+              tijdstipField.value = incidentData.timestamp;
+              console.log('✅ Set tijdstip:', incidentData.timestamp);
+            }
+            if (prioriteitField && incidentData.priority) {
+              prioriteitField.value = incidentData.priority.toString();
+              console.log('✅ Set prioriteit:', incidentData.priority);
+            }
+            if (mc1Field && incidentData.mc1) {
+              mc1Field.value = incidentData.mc1;
+              console.log('✅ Set MC1:', incidentData.mc1);
+            }
+            if (mc2Field && incidentData.mc2) {
+              mc2Field.value = incidentData.mc2;
+              console.log('✅ Set MC2:', incidentData.mc2);
+            }
+            if (mc3Field && incidentData.mc3) {
+              mc3Field.value = incidentData.mc3;
+              console.log('✅ Set MC3:', incidentData.mc3);
+            }
+            if (kladblokField && incidentData.notities) {
+              kladblokField.textContent = incidentData.notities;
+              console.log('✅ Set kladblok:', incidentData.notities);
+            }
             
             // If no specific location data, use the incident location
             if (straatnaamField && !incidentData.straatnaam && incidentData.location) {
               straatnaamField.value = incidentData.location;
+              console.log('✅ Set straatnaam from location:', incidentData.location);
             }
             
-            console.log('GMS form pre-filled with incident data');
+            console.log('🎯 GMS form pre-filled with incident data successfully');
           } catch (error) {
-            console.error('Failed to load incident data:', error);
+            console.error('❌ Failed to load incident data:', error);
           }
+        } else {
+          console.log('❌ No incident data found in localStorage');
         }
       };
 
@@ -3250,9 +3307,27 @@ export default function Dashboard() {
 
   // Handle incident click - redirect to GMS with pre-filled data
   const handleIncidentClick = (incident: Incident) => {
-    console.log('Opening incident in GMS:', incident.id);
+    console.log('🚨 Opening incident in GMS:', incident);
     
-    // Store the incident data for GMS to load
+    // Parse location into street and house number if possible
+    const locationParts = incident.location.split(' ');
+    let straatnaam = '';
+    let huisnummer = '';
+    
+    if (locationParts.length >= 2) {
+      // Last part might be house number
+      const lastPart = locationParts[locationParts.length - 1];
+      if (/^\d+/.test(lastPart)) {
+        huisnummer = lastPart;
+        straatnaam = locationParts.slice(0, -1).join(' ');
+      } else {
+        straatnaam = incident.location;
+      }
+    } else {
+      straatnaam = incident.location;
+    }
+    
+    // Store the incident data for GMS to load with basic incident info pre-filled
     const gmsData = {
       incidentId: incident.id,
       type: incident.type,
@@ -3260,29 +3335,34 @@ export default function Dashboard() {
       timestamp: incident.timestamp,
       priority: incident.priority,
       status: incident.status,
-      // Additional fields that might be stored
-      mc1: '',
+      // Map basic incident data to GMS form fields
+      mc1: incident.type || '',
       mc2: '',
       mc3: '',
       melderNaam: '',
       melderAdres: '',
       telefoonnummer: '',
-      straatnaam: '',
-      huisnummer: '',
+      straatnaam: straatnaam,
+      huisnummer: huisnummer,
       toevoeging: '',
       postcode: '',
-      plaatsnaam: '',
-      gemeente: '',
-      notities: ''
+      plaatsnaam: 'Rotterdam', // Default for Rotterdam police region
+      gemeente: 'Rotterdam',
+      notities: `Incident ${incident.id} - ${incident.type}\nLocatie: ${incident.location}\nPrioriteit: ${incident.priority}\nStatus: ${incident.status}`
     };
     
-    // Try to load existing GMS data for this incident
+    // Try to load existing GMS data for this incident (preserve any previously entered data)
     const existingGmsData = localStorage.getItem(`gmsData_${incident.id}`);
     if (existingGmsData) {
       try {
         const parsedData = JSON.parse(existingGmsData);
-        Object.assign(gmsData, parsedData);
-        console.log('Loading existing GMS data for incident:', incident.id);
+        // Only override empty fields, keep existing data
+        Object.keys(parsedData).forEach(key => {
+          if (parsedData[key] && parsedData[key] !== '') {
+            gmsData[key] = parsedData[key];
+          }
+        });
+        console.log('🔄 Merged existing GMS data for incident:', incident.id);
       } catch (error) {
         console.error('Failed to parse existing GMS data:', error);
       }
@@ -3290,6 +3370,7 @@ export default function Dashboard() {
     
     // Store current incident data for GMS
     localStorage.setItem('currentGmsIncident', JSON.stringify(gmsData));
+    console.log('💾 Stored incident data for GMS:', gmsData);
     
     // Switch to GMS section
     setActiveSection('gms');
