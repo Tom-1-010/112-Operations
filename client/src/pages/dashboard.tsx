@@ -5242,7 +5242,8 @@ export default function Dashboard() {
                               console.log('Current phoneNumbers before save:', phoneNumbers);
                               
                               setPhoneNumbers(prev => {
-                                const updated = [...prev, savedPhoneNumber];
+                                const prevArray = Array.isArray(prev) ? prev : [];
+                                const updated = [...prevArray, savedPhoneNumber];
                                 console.log('Updated phoneNumbers:', updated);
                                 return updated;
                               });
@@ -5283,7 +5284,7 @@ export default function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {phoneNumbers.map((phone) => (
+                        {(phoneNumbers || []).map((phone) => (
                           <tr key={phone.id} className="telefoon-row">
                             <td className="telefoon-functie"><strong>{phone.functie}</strong></td>
                             <td className="telefoon-omschrijving">{phone.omschrijving}</td>
@@ -5297,7 +5298,10 @@ export default function Dashboard() {
                                 className="btn btn-danger btn-small"
                                 onClick={() => {
                                   if (confirm("Weet u zeker dat u dit telefoonnummer wilt verwijderen?")) {
-                                    setPhoneNumbers(prev => prev.filter(p => p.id !== phone.id));
+                                    setPhoneNumbers(prev => {
+                                      const prevArray = Array.isArray(prev) ? prev : [];
+                                      return prevArray.filter(p => p.id !== phone.id);
+                                    });
                                     setNotification("Telefoonnummer verwijderd");
                                     setShowNotification(true);
                                     setTimeout(() => setShowNotification(false), 3000);
@@ -5309,7 +5313,7 @@ export default function Dashboard() {
                             </td>
                           </tr>
                         ))}
-                        {phoneNumbers.length === 0 && (
+                        {(!phoneNumbers || phoneNumbers.length === 0) && (
                           <tr>
                             <td colSpan={6} className="no-data">
                               Geen telefoonnummers gevonden. Klik op "Telefoonnummer toevoegen" om een nummer toe te voegen.
