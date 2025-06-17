@@ -1468,6 +1468,42 @@ body {
   min-height: 60px;
 }
 
+/* Phone contact styling for Intake Collega's section */
+.contact-btn.phone-contact {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  position: relative;
+}
+
+.contact-btn.phone-contact:hover {
+  background: #bbdefb;
+}
+
+.contact-btn.phone-contact .contact-number {
+  display: block;
+  font-family: monospace;
+  font-size: 10px;
+  color: #1976d2;
+  margin-top: 2px;
+}
+
+.no-phone-contacts {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 12px;
+  color: #666;
+  font-style: italic;
+  background: #f8f9fa;
+  border: 1px dashed #dee2e6;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.no-phone-contacts small {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
 
 
 

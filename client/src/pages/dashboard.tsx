@@ -4436,6 +4436,31 @@ export default function Dashboard() {
                         Back-up Centralist
                         <span className="contact-status online">Online</span>
                       </button>
+                      
+                      {/* Dynamic phone numbers from Telefoonlijst */}
+                      {phoneNumbersArray.map((phone) => (
+                        <button 
+                          key={phone.id} 
+                          className="contact-btn colleague phone-contact" 
+                          data-colleague={phone.functie}
+                          data-phone={phone.telefoonnummer}
+                          title={`${phone.omschrijving} - ${phone.telefoonnummer}`}
+                        >
+                          {phone.functie}
+                          <span className="contact-number">{phone.telefoonnummer}</span>
+                          {phone.bereikbaar24u ? (
+                            <span className="contact-status online">24/7</span>
+                          ) : (
+                            <span className="contact-status away">Dienst</span>
+                          )}
+                        </button>
+                      ))}
+                      
+                      {phoneNumbersArray.length === 0 && (
+                        <div className="no-phone-contacts">
+                          <small>Geen extra contacten. Voeg nummers toe via Instellingen → Telefoonlijst</small>
+                        </div>
+                      )}
                     </div>
                   </div>
 
