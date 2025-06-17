@@ -1182,7 +1182,10 @@ export default function Dashboard() {
               // Step 1: Populate MC1 dropdown and set value
               console.log('📋 Populating MC1...');
               mc1Select.innerHTML = '<option value="">Selecteer...</option>';
-              const mc1Options = getUniqueClassificationsByLevel("MC1");
+              
+              // Get MC1 options from stored classifications
+              const mc1Values = storedClassifications.map(c => c.MC1).filter(Boolean);
+              const mc1Options = Array.from(new Set(mc1Values)).sort();
               console.log('📋 MC1 options available:', mc1Options.length, mc1Options);
               
               mc1Options.forEach(mc1 => {
@@ -1198,7 +1201,13 @@ export default function Dashboard() {
               if (matchedClassification.MC2 && matchedClassification.MC2.trim() !== '') {
                 console.log('📋 Populating MC2...');
                 mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-                const mc2Options = getUniqueClassificationsByLevel("MC2", matchedClassification.MC1);
+                
+                // Get MC2 options from stored classifications for the selected MC1
+                const mc2Values = storedClassifications
+                  .filter(c => c.MC1 === matchedClassification.MC1)
+                  .map(c => c.MC2)
+                  .filter(Boolean);
+                const mc2Options = Array.from(new Set(mc2Values)).sort();
                 console.log('📋 MC2 options for', matchedClassification.MC1, ':', mc2Options.length, mc2Options);
                 
                 mc2Options.forEach(mc2 => {
@@ -1214,7 +1223,13 @@ export default function Dashboard() {
                 if (matchedClassification.MC3 && matchedClassification.MC3.trim() !== '') {
                   console.log('📋 Populating MC3...');
                   mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-                  const mc3Options = getUniqueClassificationsByLevel("MC3", matchedClassification.MC2);
+                  
+                  // Get MC3 options from stored classifications for the selected MC2
+                  const mc3Values = storedClassifications
+                    .filter(c => c.MC2 === matchedClassification.MC2)
+                    .map(c => c.MC3)
+                    .filter(Boolean);
+                  const mc3Options = Array.from(new Set(mc3Values)).sort();
                   console.log('📋 MC3 options for', matchedClassification.MC2, ':', mc3Options.length, mc3Options);
                   
                   mc3Options.forEach(mc3 => {
