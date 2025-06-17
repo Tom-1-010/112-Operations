@@ -999,9 +999,132 @@ export default function Dashboard() {
         }
       };
 
+
+
       // Handle GMS form submission
       const handleGMSSubmit = () => {
         const kladblok = document.getElementById("gmsKladblok");
+
+        // Process classification codes from notitieveld before submitting
+        if (kladblok) {
+          const notitieText = kladblok.textContent || '';
+          
+          // Process classification codes inline
+          const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+          const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+          const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+          const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+          const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
+
+          if (mc1Select && mc2Select && mc3Select) {
+            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            const lines = notitieText.split('\n');
+            let matchedClassification = null;
+
+            for (const line of lines) {
+              const trimmedLine = line.trim();
+              
+              // Check for hyphen-based codes (-brgb, -wvoi, etc.)
+              if (trimmedLine.startsWith('-') && trimmedLine.length > 1) {
+                const searchQuery = trimmedLine.substring(1).trim();
+                
+                // Try exact code match first
+                matchedClassification = storedClassifications.find(c => 
+                  c.code.toLowerCase() === searchQuery.toLowerCase()
+                );
+                
+                // Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
+                if (!matchedClassification) {
+                  matchedClassification = storedClassifications.find(c => 
+                    c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
+                  );
+                }
+                
+                // Try text matches for MC1, MC2, MC3
+                if (!matchedClassification) {
+                  matchedClassification = storedClassifications.find(c => 
+                    c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
+                  );
+                }
+                
+                if (matchedClassification) break;
+              }
+              
+              // Check for text-based classifications without hyphen
+              else if (trimmedLine.length > 2) {
+                const searchQuery = trimmedLine.toLowerCase();
+                
+                matchedClassification = storedClassifications.find(c => 
+                  c.MC3.toLowerCase().includes(searchQuery) ||
+                  c.MC2.toLowerCase().includes(searchQuery) ||
+                  c.MC1.toLowerCase().includes(searchQuery) ||
+                  searchQuery.includes(c.MC3.toLowerCase()) ||
+                  searchQuery.includes(c.MC2.toLowerCase()) ||
+                  searchQuery.includes(c.MC1.toLowerCase())
+                );
+                
+                if (matchedClassification) break;
+              }
+            }
+
+            // Apply the matched classification
+            if (matchedClassification) {
+              // Set MC1
+              mc1Select.innerHTML = '<option value="">Selecteer...</option>';
+              const mc1Options = getUniqueClassificationsByLevel("MC1");
+              mc1Options.forEach(mc1 => {
+                const option = document.createElement('option');
+                option.value = mc1;
+                option.textContent = mc1;
+                mc1Select.appendChild(option);
+              });
+              mc1Select.value = matchedClassification.MC1;
+              
+              // Set MC2 if exists
+              if (matchedClassification.MC2) {
+                mc2Select.innerHTML = '<option value="">Selecteer...</option>';
+                const mc2Options = getUniqueClassificationsByLevel("MC2", matchedClassification.MC1);
+                mc2Options.forEach(mc2 => {
+                  const option = document.createElement('option');
+                  option.value = mc2;
+                  option.textContent = mc2;
+                  mc2Select.appendChild(option);
+                });
+                mc2Select.value = matchedClassification.MC2;
+                
+                // Set MC3 if exists
+                if (matchedClassification.MC3) {
+                  mc3Select.innerHTML = '<option value="">Selecteer...</option>';
+                  const mc3Options = getUniqueClassificationsByLevel("MC3", matchedClassification.MC2);
+                  mc3Options.forEach(mc3 => {
+                    const option = document.createElement('option');
+                    option.value = mc3;
+                    option.textContent = mc3;
+                    mc3Select.appendChild(option);
+                  });
+                  mc3Select.value = matchedClassification.MC3;
+                }
+              }
+              
+              // Set priority
+              if (prioriteitSelect) {
+                prioriteitSelect.value = matchedClassification.prio.toString();
+              }
+              
+              // Log the automatic classification
+              if (loggingPanel) {
+                const timestamp = new Date().toLocaleTimeString('nl-NL');
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry classification-auto';
+                logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
+                loggingPanel.appendChild(logEntry);
+                loggingPanel.scrollTop = loggingPanel.scrollHeight;
+              }
+            }
+          }
+        }
 
         // Melder informatie
         const meldernaam = document.getElementById(
