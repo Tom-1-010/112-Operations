@@ -1666,8 +1666,8 @@ body {
   padding: 2px 4px;
   font-size: 11px;
   font-family: inherit;
-  width: 80px;
-  max-width: 80px;
+  width: 90px;
+  max-width: 90px;
 }
 
 /* Dropdown specific styling for even more compact appearance */
@@ -1677,11 +1677,26 @@ select.gms-field {
 }
 
 .gms-field-small {
+  width: 60px;
   max-width: 60px;
 }
 
 .gms-field-tiny {
-  max-width: 40px;
+  width: 50px;
+  max-width: 50px;
+  min-width: 50px;
+}
+
+/* Specific styles for priority and time fields */
+.gms-priority-field {
+  width: 50px;
+  max-width: 50px;
+}
+
+.gms-time-field {
+  width: 90px;
+  max-width: 90px;
+  min-width: 90px;
 }
 
 .gms-field:focus {

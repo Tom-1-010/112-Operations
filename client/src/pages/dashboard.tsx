@@ -5233,7 +5233,7 @@ export default function Dashboard() {
                             <input
                               type="datetime-local"
                               id="gmsTijdstip"
-                              className="gms-field"
+                              className="gms-field gms-time-field"
                               readOnly
                             />
                           </div>
@@ -5243,7 +5243,7 @@ export default function Dashboard() {
                               <input
                                 type="number"
                                 id="gmsPrioriteit"
-                                className="gms-field gms-field-tiny"
+                                className="gms-field gms-priority-field"
                                 min="1"
                                 max="5"
                                 defaultValue="3"
