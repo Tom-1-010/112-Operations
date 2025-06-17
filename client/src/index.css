@@ -1578,8 +1578,10 @@ body {
 }
 
 .gms-text-area-compact {
-  min-height: 50px; /* Reduced to 50% of original size */
-  max-height: 75px; /* Limit maximum height to maintain compact layout */
+  min-height: 80px;
+  max-height: 80px;
+  width: 200px;
+  resize: none;
 }
 
 .gms-text-area:focus {
@@ -1605,7 +1607,7 @@ body {
 }
 
 .gms-notitie-left {
-  flex: 1;
+  width: 200px;
   display: flex;
   flex-direction: column;
 }
@@ -1617,6 +1619,7 @@ body {
   align-items: flex-start;
   justify-content: flex-start;
   min-width: 80px;
+  margin-left: 20px;
 }
 
 .gms-text-controls {
