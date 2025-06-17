@@ -2680,87 +2680,7 @@ export default function Dashboard() {
         }
       };
 
-      // Enhanced helper function to load incident data into GMS form with full persistence
-      const loadIncidentIntoGMS = (incidentData: any) => {
-        console.log('Loading comprehensive incident data into GMS form:', incidentData);
-        
-        // Don't clear form - we want to preserve data
-        // clearGMSForm();
-        
-        // Set current incident
-        setCurrentGmsIncident(incidentData);
-        
-        // Get all form field references
-        const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
-        const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
-        const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
-        const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
-        const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
-        const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
-        const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
-        const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
-        const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
-        const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
-        const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-        const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-        const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-        const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-        const meldingLoggingField = document.getElementById("gmsMeldingLogging");
-        const kladblokField = document.getElementById("gmsKladblok");
-        
-        // Fill meldergegevens (support both naming conventions)
-        if (melderNaamField) {
-          melderNaamField.value = incidentData.melderNaam || incidentData.meldernaam || '';
-        }
-        if (melderAdresField) {
-          melderAdresField.value = incidentData.melderAdres || incidentData.melderadres || '';
-        }
-        if (telefoonnummerField && incidentData.telefoonnummer) {
-          telefoonnummerField.value = incidentData.telefoonnummer;
-        }
-        
-        // Fill locatie gegevens
-        if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
-        if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
-        if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
-        if (postcodeField && incidentData.postcode) postcodeField.value = incidentData.postcode;
-        if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
-        if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
-        
-        // Fill operationele gegevens
-        if (tijdstipField && incidentData.tijdstip) {
-          tijdstipField.value = incidentData.tijdstip;
-        }
-        if (prioriteitField && incidentData.prioriteit) {
-          prioriteitField.value = incidentData.prioriteit.toString();
-        }
-        
-        // Restore melding logging with full HTML content
-        if (meldingLoggingField && incidentData.meldingslogging) {
-          meldingLoggingField.innerHTML = incidentData.meldingslogging;
-        }
-        
-        // Restore classificaties with proper cascading (support both naming conventions)
-        setTimeout(() => {
-          const mc1Value = incidentData.mc1 || incidentData.classificatie1 || '';
-          const mc2Value = incidentData.mc2 || incidentData.classificatie2 || '';
-          const mc3Value = incidentData.mc3 || incidentData.classificatie3 || '';
-          
-          if (mc1Field && mc1Value) {
-            populateClassificationDropdowns(mc1Field, mc2Field, mc3Field, mc1Value, mc2Value, mc3Value);
-          }
-        }, 100);
-        
-        // Only clear notepad for new notes, keep existing data
-        if (kladblokField && !incidentData.preserveNotepad) {
-          kladblokField.textContent = '';
-        }
-        
-        // Update dynamic header
-        updateDynamicHeader();
-        
-        console.log('Full incident data loaded into GMS form with persistence');
-      };
+
 
       // Handle incident closure buttons
       const handleIncidentClosure = (actionType: string) => {
@@ -4685,6 +4605,121 @@ export default function Dashboard() {
     // Remove GMS data for this incident when it's deleted
     localStorage.removeItem(`gmsData_${id}`);
     showNotificationMessage("Incident verwijderd");
+  };
+
+  // Helper function for updating dynamic header
+  const updateDynamicHeader = () => {
+    const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+    const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+    const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+    const dynamicHeader = document.getElementById("gmsDynamicHeader");
+
+    if (!dynamicHeader) return;
+
+    const mc1Value = mc1Select?.value || "Onbekend";
+    const straatnaam = straatnaamField?.value || "Onbekend";
+    const plaatsnaam = plaatsnaamField?.value || "Onbekend";
+
+    dynamicHeader.textContent = `${mc1Value} – ${straatnaam} ${plaatsnaam}`;
+  };
+
+  // Enhanced helper function to load incident data into GMS form with full persistence
+  const loadIncidentIntoGMS = (incidentData: any) => {
+    console.log('Loading comprehensive incident data into GMS form:', incidentData);
+    
+    // Set current incident
+    setCurrentGmsIncident(incidentData);
+    
+    // Use setTimeout to ensure DOM elements are available
+    setTimeout(() => {
+      // Get all form field references
+      const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
+      const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
+      const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
+      const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+      const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
+      const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
+      const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
+      const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+      const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
+      const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
+      const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+      const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+      const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+      const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+      const meldingLoggingField = document.getElementById("gmsMeldingLogging");
+      const kladblokField = document.getElementById("gmsKladblok");
+      
+      // Fill meldergegevens (support both naming conventions)
+      if (melderNaamField) {
+        melderNaamField.value = incidentData.melderNaam || incidentData.meldernaam || '';
+      }
+      if (melderAdresField) {
+        melderAdresField.value = incidentData.melderAdres || incidentData.melderadres || '';
+      }
+      if (telefoonnummerField && incidentData.telefoonnummer) {
+        telefoonnummerField.value = incidentData.telefoonnummer;
+      }
+      
+      // Fill locatie gegevens
+      if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
+      if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
+      if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
+      if (postcodeField && incidentData.postcode) postcodeField.value = incidentData.postcode;
+      if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
+      if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
+      
+      // Fill operationele gegevens
+      if (tijdstipField && incidentData.tijdstip) {
+        tijdstipField.value = incidentData.tijdstip;
+      }
+      if (prioriteitField && incidentData.prioriteit) {
+        prioriteitField.value = incidentData.prioriteit.toString();
+      }
+      
+      // Restore melding logging with full HTML content
+      if (meldingLoggingField && incidentData.meldingslogging) {
+        meldingLoggingField.innerHTML = incidentData.meldingslogging;
+      }
+      
+      // Only clear notepad for new notes, keep existing data
+      if (kladblokField && !incidentData.preserveNotepad) {
+        kladblokField.textContent = '';
+      }
+      
+      // Restore classificaties with proper cascading (delayed for dropdown population)
+      setTimeout(() => {
+        const mc1Value = incidentData.mc1 || incidentData.classificatie1 || '';
+        const mc2Value = incidentData.mc2 || incidentData.classificatie2 || '';
+        const mc3Value = incidentData.mc3 || incidentData.classificatie3 || '';
+        
+        if (mc1Field && mc1Value) {
+          mc1Field.value = mc1Value;
+          // Trigger change event to populate cascading dropdowns
+          mc1Field.dispatchEvent(new Event('change', { bubbles: true }));
+          
+          setTimeout(() => {
+            if (mc2Field && mc2Value) {
+              mc2Field.value = mc2Value;
+              mc2Field.dispatchEvent(new Event('change', { bubbles: true }));
+              
+              setTimeout(() => {
+                if (mc3Field && mc3Value) {
+                  mc3Field.value = mc3Value;
+              }
+                // Update dynamic header after all fields are populated
+                updateDynamicHeader();
+              }, 100);
+            }
+          }, 100);
+        } else {
+          // Update header even if no classifications
+          updateDynamicHeader();
+        }
+      }, 200);
+      
+      console.log('Full incident data loaded into GMS form with persistence');
+    }, 50);
   };
 
   // Handle new incident creation in GMS
