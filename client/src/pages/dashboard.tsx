@@ -2213,7 +2213,7 @@ export default function Dashboard() {
         console.log('✅ Form saved successfully, staying on GMS page');
       };
 
-      // Helper function to collect all GMS form data
+      // Enhanced helper function to collect all GMS form data comprehensively
       const collectGMSFormData = () => {
         const melderNaam = (document.getElementById("gmsMeldernaam") as HTMLInputElement)?.value?.trim() || '';
         const melderAdres = (document.getElementById("gmsMelderadres") as HTMLInputElement)?.value?.trim() || '';
@@ -2236,28 +2236,54 @@ export default function Dashboard() {
         const meldingslogging = document.getElementById("gmsMeldingLogging")?.innerHTML || '';
         const notities = document.getElementById("gmsKladblok")?.textContent || '';
         
+        // Create comprehensive location string
+        const locationParts = [straatnaam, huisnummer, plaatsnaam].filter(part => part.trim());
+        const location = locationParts.length > 0 ? locationParts.join(" ") : "Onbekende locatie";
+        
+        // Create incident type from classifications
+        const type = mc3 || mc2 || mc1 || "Onbekend incident";
+        
         if (!straatnaam) {
           showNotificationMessage("Vul minimaal de straatnaam in om uit te geven");
           return null;
         }
         
         return {
+          // Compatibility with both naming conventions
           melderNaam,
+          meldernaam: melderNaam,
           melderAdres,
+          melderadres: melderAdres,
           telefoonnummer,
+          
+          // Location data
           straatnaam,
           huisnummer,
           toevoeging,
           postcode,
           plaatsnaam,
           gemeente,
+          location,
+          
+          // Classification data
           mc1,
           mc2,
           mc3,
+          classificatie1: mc1,
+          classificatie2: mc2,
+          classificatie3: mc3,
+          type,
+          
+          // Operational data
           tijdstip,
           prioriteit,
+          priority: prioriteit <= 2 ? 'high' : prioriteit === 3 ? 'medium' : 'low',
           meldingslogging,
           notities,
+          
+          // Metadata
+          timeAgo: "Nu",
+          unitsAssigned: 0,
           aangemaaktOp: new Date().toISOString()
         };
       };
@@ -2654,17 +2680,17 @@ export default function Dashboard() {
         }
       };
 
-      // Helper function to load incident data into GMS form
+      // Enhanced helper function to load incident data into GMS form with full persistence
       const loadIncidentIntoGMS = (incidentData: any) => {
-        console.log('Loading incident data into GMS form:', incidentData);
+        console.log('Loading comprehensive incident data into GMS form:', incidentData);
         
-        // Clear form first
-        clearGMSForm();
+        // Don't clear form - we want to preserve data
+        // clearGMSForm();
         
         // Set current incident
         setCurrentGmsIncident(incidentData);
         
-        // Fill form fields
+        // Get all form field references
         const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
         const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
         const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
@@ -2680,13 +2706,20 @@ export default function Dashboard() {
         const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
         const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
         const meldingLoggingField = document.getElementById("gmsMeldingLogging");
+        const kladblokField = document.getElementById("gmsKladblok");
         
-        // Fill meldergegevens
-        if (melderNaamField && incidentData.melderNaam) melderNaamField.value = incidentData.melderNaam;
-        if (melderAdresField && incidentData.melderAdres) melderAdresField.value = incidentData.melderAdres;
-        if (telefoonnummerField && incidentData.telefoonnummer) telefoonnummerField.value = incidentData.telefoonnummer;
+        // Fill meldergegevens (support both naming conventions)
+        if (melderNaamField) {
+          melderNaamField.value = incidentData.melderNaam || incidentData.meldernaam || '';
+        }
+        if (melderAdresField) {
+          melderAdresField.value = incidentData.melderAdres || incidentData.melderadres || '';
+        }
+        if (telefoonnummerField && incidentData.telefoonnummer) {
+          telefoonnummerField.value = incidentData.telefoonnummer;
+        }
         
-        // Fill locatie
+        // Fill locatie gegevens
         if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
         if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
         if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
@@ -2694,27 +2727,39 @@ export default function Dashboard() {
         if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
         if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
         
-        // Fill tijdstip en prioriteit
-        if (tijdstipField && incidentData.tijdstip) tijdstipField.value = incidentData.tijdstip;
-        if (prioriteitField && incidentData.prioriteit) prioriteitField.value = incidentData.prioriteit.toString();
+        // Fill operationele gegevens
+        if (tijdstipField && incidentData.tijdstip) {
+          tijdstipField.value = incidentData.tijdstip;
+        }
+        if (prioriteitField && incidentData.prioriteit) {
+          prioriteitField.value = incidentData.prioriteit.toString();
+        }
         
-        // Restore classifications with proper cascading
-        setTimeout(() => {
-          if (mc1Field && incidentData.mc1) {
-            populateClassificationDropdowns(mc1Field, mc2Field, mc3Field, incidentData.mc1, incidentData.mc2, incidentData.mc3);
-          }
-        }, 100);
-        
-        // Restore meldingslogging
+        // Restore melding logging with full HTML content
         if (meldingLoggingField && incidentData.meldingslogging) {
           meldingLoggingField.innerHTML = incidentData.meldingslogging;
         }
         
-        // Keep notepad empty for new notes
-        const kladblokField = document.getElementById("gmsKladblok");
-        if (kladblokField) kladblokField.textContent = '';
+        // Restore classificaties with proper cascading (support both naming conventions)
+        setTimeout(() => {
+          const mc1Value = incidentData.mc1 || incidentData.classificatie1 || '';
+          const mc2Value = incidentData.mc2 || incidentData.classificatie2 || '';
+          const mc3Value = incidentData.mc3 || incidentData.classificatie3 || '';
+          
+          if (mc1Field && mc1Value) {
+            populateClassificationDropdowns(mc1Field, mc2Field, mc3Field, mc1Value, mc2Value, mc3Value);
+          }
+        }, 100);
         
-        console.log('Incident data loaded into GMS form');
+        // Only clear notepad for new notes, keep existing data
+        if (kladblokField && !incidentData.preserveNotepad) {
+          kladblokField.textContent = '';
+        }
+        
+        // Update dynamic header
+        updateDynamicHeader();
+        
+        console.log('Full incident data loaded into GMS form with persistence');
       };
 
       // Handle incident closure buttons
@@ -4650,26 +4695,29 @@ export default function Dashboard() {
     showNotificationMessage('Nieuw incident gestart in GMS');
   };
 
-  // Handle incident click - redirect to GMS with complete pre-filled data
+  // Enhanced incident click handler with comprehensive data loading
   const handleIncidentClick = (incident: Incident) => {
-    console.log('Opening incident in GMS:', incident.id);
+    console.log('Opening incident in GMS with full data persistence:', incident.id);
     
     // Find the complete incident data in GMS database
     const gmsIncident = gmsIncidents.find(gmsInc => gmsInc.id === incident.id);
     
     if (gmsIncident) {
-      console.log('Found complete GMS incident data, loading into form:', gmsIncident);
+      console.log('Found complete GMS incident data, loading all fields:', gmsIncident);
       
-      // Set current incident and switch to GMS tab
-      setCurrentGmsIncident(gmsIncident);
+      // Switch to GMS tab first
       setActiveSection('gms');
       
-      // The form will be populated by the loadCurrentIncidentData function in the GMS useEffect
-      showNotificationMessage(`Incident ${incident.id} geopend in GMS`);
-    } else {
-      console.log('No GMS data found for incident, creating from basic data');
+      // Use a timeout to ensure the GMS tab has loaded before populating fields
+      setTimeout(() => {
+        loadIncidentIntoGMS(gmsIncident);
+      }, 100);
       
-      // Parse location from incident data
+      showNotificationMessage(`Incident ${incident.id} volledig geladen in GMS`);
+    } else {
+      console.log('No GMS data found, reconstructing from incident data');
+      
+      // Parse location from incident data with better handling
       let straatnaam = '';
       let huisnummer = '';
       let plaatsnaam = '';
@@ -4694,11 +4742,13 @@ export default function Dashboard() {
         plaatsnaam = 'Rotterdam';
       }
       
-      // Create basic incident with available data
-      const basicIncident = {
+      // Create comprehensive incident with all available data
+      const reconstructedIncident = {
         id: incident.id,
         melderNaam: '',
+        meldernaam: '',
         melderAdres: '',
+        melderadres: '',
         telefoonnummer: '',
         straatnaam: straatnaam,
         huisnummer: huisnummer,
@@ -4706,20 +4756,43 @@ export default function Dashboard() {
         postcode: '',
         plaatsnaam: plaatsnaam,
         gemeente: plaatsnaam,
+        location: incident.location,
         mc1: incident.type || '',
         mc2: '',
         mc3: '',
+        classificatie1: incident.type || '',
+        classificatie2: '',
+        classificatie3: '',
+        type: incident.type || 'Onbekend incident',
         tijdstip: incident.timestamp,
         prioriteit: incident.priority === 'high' ? 1 : incident.priority === 'medium' ? 2 : 3,
+        priority: incident.priority,
         status: 'Bestaand',
         meldingslogging: '',
         notities: '',
-        aangemaaktOp: new Date().toISOString()
+        timeAgo: incident.timeAgo,
+        unitsAssigned: incident.unitsAssigned,
+        aangemaaktOp: incident.timestamp
       };
       
-      setCurrentGmsIncident(basicIncident);
+      // Switch to GMS tab first
       setActiveSection('gms');
-      showNotificationMessage(`Incident ${incident.id} geopend in GMS`);
+      
+      // Save to GMS incidents for future persistence
+      setGmsIncidents(prev => {
+        const existing = prev.find(inc => inc.id === incident.id);
+        if (!existing) {
+          return [...prev, reconstructedIncident];
+        }
+        return prev;
+      });
+      
+      // Use a timeout to ensure the GMS tab has loaded before populating fields
+      setTimeout(() => {
+        loadIncidentIntoGMS(reconstructedIncident);
+      }, 100);
+      
+      showNotificationMessage(`Incident ${incident.id} gereconstrueerd in GMS`);
     }
   };
 
