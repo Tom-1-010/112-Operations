@@ -1,0 +1,1850 @@
+[
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. brand",
+    "MC3": "Autom. brand OMS",
+    "code": "alabab",
+    "prio": 2,
+    "uitleg": "Melding via OMS van inwerkingtreding van een automatische brandmelder"
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. brand",
+    "MC3": "Br beheerssysteem",
+    "code": "alabbb",
+    "prio": 2,
+    "uitleg": "Melding via OMS van inwerkingtreding van een automatische blusinstallatie"
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. brand",
+    "MC3": "Brandmelding PAC",
+    "code": "alabbm",
+    "prio": 2,
+    "uitleg": "Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. brand",
+    "MC3": "Drukknopmelding OMS",
+    "code": "alabdk",
+    "prio": 2,
+    "uitleg": "Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. brand",
+    "MC3": "Handmelder OMS",
+    "code": "alabhm",
+    "prio": 2,
+    "uitleg": "Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. Gev stof",
+    "MC3": "Gev. stof OMS",
+    "code": "algsom",
+    "prio": 2,
+    "uitleg": "Melding via OMS van detectie van een gevaarlijke stof."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Autom. Gev stof",
+    "MC3": "Gev. stof PAC",
+    "code": "algspa",
+    "prio": 2,
+    "uitleg": "Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Luid/optisch alarm",
+    "MC3": "Gebouw",
+    "code": "allogb",
+    "prio": 3,
+    "uitleg": "Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Luid/optisch alarm",
+    "MC3": "Rookmelder",
+    "code": "allorm",
+    "prio": 3,
+    "uitleg": "Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Luid/optisch alarm",
+    "MC3": "Voertuig/Vaartuig",
+    "code": "allovv",
+    "prio": 3,
+    "uitleg": "Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "PAC alarm",
+    "MC3": "Inbraakalarm",
+    "code": "alpaib",
+    "prio": 2,
+    "uitleg": "Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "PAC alarm",
+    "MC3": "Overvalalarm",
+    "code": "alpaov",
+    "prio": 2,
+    "uitleg": "(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "PAC alarm",
+    "MC3": "Persoonsalarm",
+    "code": "alpaps",
+    "prio": 1,
+    "uitleg": "Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "RAC alarm",
+    "MC3": "Inbraakalarm",
+    "code": "alraib",
+    "prio": 1,
+    "uitleg": "Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "RAC alarm",
+    "MC3": "Overvalalarm",
+    "code": "alraov",
+    "prio": 1,
+    "uitleg": "(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "RAC alarm",
+    "MC3": "Persoonsalarm",
+    "code": "alraps",
+    "prio": 1,
+    "uitleg": "Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel."
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Sensing",
+    "MC3": "Alert",
+    "code": "alseal",
+    "prio": 2,
+    "uitleg": "Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen. "
+  },
+  {
+    "MC1": "Alarm",
+    "MC2": "Sensing",
+    "MC3": "Toezichtsalarm",
+    "code": "alsetz",
+    "prio": 1,
+    "uitleg": "Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Afpersing",
+    "code": "bzdsap",
+    "prio": 3,
+    "uitleg": "Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Beroving",
+    "code": "bzdsbr",
+    "prio": 1,
+    "uitleg": "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Dier",
+    "code": "bzdsdi",
+    "prio": 3,
+    "uitleg": "Diefstal van een dier."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Fraude",
+    "code": "bzdsfd",
+    "prio": 3,
+    "uitleg": "Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Goederen",
+    "code": "bzdsgd",
+    "prio": 3,
+    "uitleg": "Diefstal van goederen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Heling",
+    "code": "bzdshl",
+    "prio": 3,
+    "uitleg": "Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Luchtvaartuig",
+    "code": "bzdslu",
+    "prio": 3,
+    "uitleg": "Diefstal van een luchtvaartuig."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Oplichting",
+    "code": "bzdsol",
+    "prio": 3,
+    "uitleg": "Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Vaartuig",
+    "code": "bzdsva",
+    "prio": 3,
+    "uitleg": "Zie diefstal."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Verduistering",
+    "code": "bzdsvd",
+    "prio": 3,
+    "uitleg": "Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Voertuig",
+    "code": "bzdsvo",
+    "prio": 3,
+    "uitleg": "Diefstal van een voertuig"
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Winkeldiefstal",
+    "code": "bzdswk",
+    "prio": 2,
+    "uitleg": "Diefstal uit een winkel"
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Diefstal",
+    "MC3": "Zakkenrollerij",
+    "code": "bzdszk",
+    "prio": 3,
+    "uitleg": "Diefstal door een zakkenroller"
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Bedrijf/Instelling",
+    "code": "bzibbi",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Bijgebouw",
+    "code": "bzibbg",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Luchtvaartuig",
+    "code": "bziblu",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Spoorvervoer",
+    "code": "bzibsp",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Vaartuig",
+    "code": "bzibva",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Voertuig",
+    "code": "bzibvo",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Inbraak",
+    "MC3": "Woning",
+    "code": "bzibwn",
+    "prio": 2,
+    "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Overval",
+    "MC3": "Bedrijf/Instelling",
+    "code": "bzovbi",
+    "prio": 1,
+    "uitleg": "Een geplande overval op een bedrijf of instelling"
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Overval",
+    "MC3": "Luchtvaartuig",
+    "code": "bzovlu",
+    "prio": 1,
+    "uitleg": "Een geplande overval op of in luchtvaartuig niet zijnde een kaping."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Overval",
+    "MC3": "Voertuig/Vaartuig",
+    "code": "bzovvv",
+    "prio": 1,
+    "uitleg": "Een geplande overval op een voer- of vaartuig."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Overval",
+    "MC3": "Waardetransport",
+    "code": "bzovwd",
+    "prio": 1,
+    "uitleg": "Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Overval",
+    "MC3": "Woning",
+    "code": "bzovwn",
+    "prio": 1,
+    "uitleg": "Een geplande overval op een particulier persoon vaak binnenshuis"
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Stroperij",
+    "MC3": "Dier",
+    "code": "bzspdi",
+    "prio": 2,
+    "uitleg": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Stroperij",
+    "MC3": "Goederen",
+    "code": "bzspgd",
+    "prio": 2,
+    "uitleg": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Gebouw",
+    "code": "bzvngb",
+    "prio": 3,
+    "uitleg": "Zie vernieling."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Goederen",
+    "code": "bzvngd",
+    "prio": 3,
+    "uitleg": "Zie vernieling."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Graffiti",
+    "code": "bzvngf",
+    "prio": 3,
+    "uitleg": "Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Luchtvaartuig",
+    "code": "bzvnlu",
+    "prio": 3,
+    "uitleg": "Zie vernieling."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Spoorvervoer",
+    "code": "bzvnsp",
+    "prio": 3,
+    "uitleg": "Zie vernieling."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Vaartuig",
+    "code": "bzvnva",
+    "prio": 3,
+    "uitleg": "Zie vernieling."
+  },
+  {
+    "MC1": "Bezitsaantasting",
+    "MC2": "Vernieling",
+    "MC3": "Voertuig",
+    "code": "bzvnvo",
+    "prio": 3,
+    "uitleg": "Zie vernieling."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Buiten",
+    "MC3": "Afval/Rommel",
+    "code": "brbtar",
+    "prio": 2,
+    "uitleg": "Brandmelding van afval/rommel. Geen grote als industrieel aangemerkte objecten met opslag van afval. Rommel betreft die goederen die geen of weinig waarde hebben, buiten staande/opgeslagen gebruiksgoederen. "
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Buiten",
+    "MC3": "Berm/Ruigte/Bosschage",
+    "code": "brbtbb",
+    "prio": 2,
+    "uitleg": "Brandmelding van begroeiing op een terrein dat op gebruiks-/natuurkaart en of in GMS NIET als bos heide veen of riet gebied aan te merken is."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Buiten",
+    "MC3": "Container",
+    "code": "brbtct",
+    "prio": 2,
+    "uitleg": "Brandmelding van, in principe alleen voor opslag van afval of goederen bedoelde, containers/bakken. De containers zijn bedoeld om menselijke activiteiten daarin te laten plaatsvinden (toilet-, douche-, schaftcontainers en dergelijke), en vallen onder gebouwen of kleine opstal."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Buiten",
+    "MC3": "Industrie",
+    "code": "brbtid",
+    "prio": 2,
+    "uitleg": "Brandmelding van industrieel aangemerkt terrein."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "01 Woning/Woongebouw",
+    "code": "brgb01",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het wonen. Woongebouw: gebouw of gedeelte van gebouw waarin twee of meer woonfuncties zijn ondergebracht, die zijn aangewezen op een of meer gemeenschappelijke verkeersroutes."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "02 Bijeenkomst",
+    "code": "brgb02",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het samenkomen van mensen voor kunst, cultuur, godsdienst, communicatie, kinderopvang, verstrekken van consumpties voor het gebruik ter plaatse en aanschouwen sport"
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "03 Cel",
+    "code": "brgb03",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor dwangverblijf van mensen. Cellengebouw: gebouw of gedeelte van gebouw waarin twee of meer celfuncties liggen, die zijn aangewezen op een of meer gemeenschappelijke verkeersroutes"
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "04 Gezondheidszorg",
+    "code": "brgb04",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor medisch onderzoek, verpleging, verzorging of behandeling"
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "05 Agrarisch",
+    "code": "brgb05",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goeden, of voor agrarische doeleinden."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "06 Kantoor",
+    "code": "brgb06",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor administratie"
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "07 Logies",
+    "code": "brgb07",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het bieden van recreatief verblijf of tijdelijk onderdak aan mensen Bij de voorbeelden staan ook: vakantiehuisje, een trekkershut en stacaravan! Deze voorbeelden hebben wel logiesfunctie maar zijn geen logiesgebouw. De WOZ vertaal tabel plaatst ze bij de woningen."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "08 Onderwijs",
+    "code": "brgb08",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het geven van onderwijs"
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "09 Sport",
+    "code": "brgb09",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het beoefenen van sport (Dus niet die voor het aanschouwen van sport. Die vallen onder bijeenkomst gebouw)"
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "10 Winkel",
+    "code": "brgb10",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie voor het verhandelen van materialen, goederen of diensten. Bij de voorbeelden staan ook: benzinestation, (auto)showroom, kaartverkoopkantoor, praktijkruimte dierenarts, kapsalon/pedicure, zonnestudie en bordeel."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "11 Overige",
+    "code": "brgb11",
+    "prio": 1,
+    "uitleg": "Gebruiksfunctie van een deel van een gebouw, voor activiteiten waarbij het verblijven van mensen een ondergeschikte rol speelt en die niet valt onder de eerste tien meer specifiek benoemde gebruiksfuncties Met de subgroepen: voor personenvervoer, stallen motorvoertuigen, opslaan afval. Bij de voorbeelden staan: Parkeergarage, bergruimte of garage bij woning, wachtlokaal passagiers op station, telefooncel, transformatorgebouw, sanitairgebouw op camping, observatiehut in bos."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Natuur",
+    "MC3": "Akker/Weide",
+    "code": "brntak",
+    "prio": 2,
+    "uitleg": "Brand van op akker/weide perceel aanwezige landbouwgewassen ook gras. Al dan niet gemaaid of op wiers liggend maar geen hooi/stro bulten of ander landbouwgewas (tussen) opslag op het veld waar het geoogst is."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Natuur",
+    "MC3": "Bos",
+    "code": "brntbo",
+    "prio": 2,
+    "uitleg": "Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als bosgebied wordt aangemerkt."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Natuur",
+    "MC3": "Duin",
+    "code": "brntdu",
+    "prio": 2,
+    "uitleg": "Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als duingebied wordt aangemerkt."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Natuur",
+    "MC3": "Heide",
+    "code": "brnthe",
+    "prio": 2,
+    "uitleg": "Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als heidegebied wordt aangemerkt."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Natuur",
+    "MC3": "Riet",
+    "code": "brntri",
+    "prio": 2,
+    "uitleg": "Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als rietvelden wordt aangemerkt. Het gaat hier om grotere oppervlaktes en dus niet om een strook riet langs een sloot of waterweg. In die laatste gevallen gaat het om een buitenbrand berm/ruigte of bosschage."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Natuur",
+    "MC3": "Veen",
+    "code": "brntve",
+    "prio": 2,
+    "uitleg": "Brandmelding van begroeiing en of veenbodem in gebied dat op gebruiksdoeleinden-/ natuur kaart/ in GMS als veengebied wordt aangemerkt."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Specifiek",
+    "MC3": "Brandgerucht",
+    "code": "brsfbg",
+    "prio": 3,
+    "uitleg": "Meldingen waarbij het zeer twijfelachtig is of er een te blussen brand is. Dit omdat de melder alleen een brandlucht waarneemt of alleen rook of vuurverschijnselen op afstand meldt, waarbij de melder niet kan aangeven wat er dan mogelijk in brand staat."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Specifiek",
+    "MC3": "Nablussen",
+    "code": "brsfnb",
+    "prio": 3,
+    "uitleg": "Meldingen dat er op locatie waar, niet al te lang daarvoor een brand is geblust, het opnieuw begint te branden. Dit is echter niet zodanig dat een inzet met spoed nodig geacht wordt."
+  },
+  {
+    "MC1": "Brand",
+    "MC2": "Specifiek",
+    "MC3": "Nacontrole",
+    "code": "brsfnc",
+    "prio": 3,
+    "uitleg": "Melding van mensen die zelf een brandje geblust hebben maar er niet 100 procent zeker van zijn dat het uit is, of die na blikseminslag zonder direct waarneembare brandverschijnselen aangeven er niet zeker van te zijn of die echt geen brand veroorzaakt heeft en de brandweer verzoeken een nacontrole te doen, of er echt geen brand meer is."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Afgebroken inzet",
+    "code": "dvabai",
+    "prio": 5,
+    "uitleg": "Een gestartte versnelde inzet waarbij na triage duidelijk is dat er geen inzet benodigd is."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Afstemverzoek",
+    "code": "dvabav",
+    "prio": 5,
+    "uitleg": "Verzoek van de alarmcentrale aan contactpersoon van de ambulancedienst in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Bijstand",
+    "code": "dvabbs",
+    "prio": 5,
+    "uitleg": "Bijstand aanvraag/-inzet van de ambulancedienst voor (grootschalige) inzet buiten het werkgebied van de meldkamer"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Dienst aan derden",
+    "code": "dvabdd",
+    "prio": 5,
+    "uitleg": "Het verlenen van diensten aan derden door de ambulancedienst"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Oefening",
+    "code": "dvaboe",
+    "prio": 5,
+    "uitleg": "Het verwerken van een fictief incident, voor trainingsdoeleinden."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Opnamestop",
+    "code": "dvabos",
+    "prio": 5,
+    "uitleg": "Indien een ziekenhuis een opnamestop afkondigt."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "Testmelding",
+    "code": "dvabtm",
+    "prio": 5,
+    "uitleg": "Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Ambulancezorg",
+    "MC3": "VWS",
+    "code": "dvabvw",
+    "prio": 4,
+    "uitleg": "Voorwaardescheppend"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Afstemverzoek",
+    "code": "dvbwav",
+    "prio": 5,
+    "uitleg": "Verzoek van de alarmcentrale aan contactpersoon van de brandweer in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Bijstand",
+    "code": "dvbwbs",
+    "prio": 4,
+    "uitleg": "Bijstand aanvraag/-inzet van de brandweer voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Dienst aan derden",
+    "code": "dvbwdd",
+    "prio": 4,
+    "uitleg": "Het verlenen van diensten aan derden door de Brandweer"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Geplande actie",
+    "code": "dvbwga",
+    "prio": 5,
+    "uitleg": "Acties van de brandweer die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Herbez./Kazern.",
+    "code": "dvbwhb",
+    "prio": 5,
+    "uitleg": "Acties van de brandweer om een kazerne die zelf geen eenheden meer kan leveren, in verband met de inzet, bij een incident of anderszins bezet te krijgen voor de noodzaakelijk geachte dekking in een bepaald gebied."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Liftopsluiting",
+    "code": "dvbwlo",
+    "prio": 3,
+    "uitleg": "Melding van/inzet voor mensen die vast in een lift zitten waarbij inzet van de brandweer wenselijk geacht wordt in verband met lange wachttijd op de liftmonteur."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Oefening",
+    "code": "dvbwoe",
+    "prio": 5,
+    "uitleg": "Het verwerken van een fictief incident, voor trainingsdoeleinden."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Brandweer",
+    "MC3": "Testmelding",
+    "code": "dvbwtm",
+    "prio": 5,
+    "uitleg": "Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Dieren",
+    "MC3": "Dier in problemen",
+    "code": "dvdipb",
+    "prio": 3,
+    "uitleg": "Hulpverlening aan een dier in problemen, niet specifiek benoemd."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Dieren",
+    "MC3": "In of op ijs",
+    "code": "dvdiij",
+    "prio": 3,
+    "uitleg": "Hulpverlening aan een dier dat door het ijs is gezakt of dreigt te zakken of is vastgevroren en waarvan naar redelijkheid niet verwacht kan worden dat het zelfstandig uit het water/van het ijs kan komen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Dieren",
+    "MC3": "In put/bassin/kelder",
+    "code": "dvdipu",
+    "prio": 3,
+    "uitleg": "Hulpverlening aan een dier dat zich bevindt in een opslagruimte voor vloeistof/mest of andere stof waarin het kan zinken."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Dieren",
+    "MC3": "Op hoogte",
+    "code": "dvdiho",
+    "prio": 3,
+    "uitleg": "Hulpverlening aan een dier dat zich op een plek hoog boven de grond bevindt waarvan redelijkerwijs niet verwacht mag worden dat het dier zelf weer de normale leefomgeving kan bereiken."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Dieren",
+    "MC3": "Te water",
+    "code": "dvdiwa",
+    "prio": 3,
+    "uitleg": "Hulpverlening aan een dier dat te water is geraakt en waarvan naar alle redelijkheid niet verwacht kan worden dat het zelfstandig weer uit het water kan komen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Afstemverzoek",
+    "code": "dvkav",
+    "prio": 5,
+    "uitleg": "Verzoek van de alarmcentrale aan contactpersoon van de KMAR in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Begeleiden",
+    "code": "dvkmbg",
+    "prio": 3,
+    "uitleg": "Inzet van de KMAR bij de begeleiding van personen  en goederen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Beveil. waardetransport",
+    "code": "dvkmwd",
+    "prio": 3,
+    "uitleg": "Inzet van de KMAR bij het beveiligen van een waardetransport."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Bijstand",
+    "code": "dvkmbs",
+    "prio": 3,
+    "uitleg": "Bijstand aanvraag/-inzet van de KMAR."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Dienst aan derden",
+    "code": "dvkmdd",
+    "prio": 3,
+    "uitleg": "Het verlenen van diensten aan derden door de KMAR"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Geplande actie",
+    "code": "dvkmga",
+    "prio": 3,
+    "uitleg": "Acties van de KMAR die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Signalering",
+    "code": "dvkmsn",
+    "prio": 3,
+    "uitleg": "Signalering uit een opsporingssysteem, niet zijnde via sensing."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "KMAR",
+    "MC3": "Testmelding",
+    "code": "dvkmtm",
+    "prio": 5,
+    "uitleg": "Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Multi",
+    "MC3": "Afstemverzoek",
+    "code": "dvmuav",
+    "prio": 5,
+    "uitleg": "Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Multi",
+    "MC3": "Oefening",
+    "code": "dvmuoe",
+    "prio": 5,
+    "uitleg": "Het verwerken van een fictief incident, voor trainingsdoeleinden."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Multi",
+    "MC3": "Overname meldkamer",
+    "code": "dvmuom",
+    "prio": 5,
+    "uitleg": "Het overnemen van een meldkamer door een andere meldkamer."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Multi",
+    "MC3": "Testmelding",
+    "code": "dvmutm",
+    "prio": 5,
+    "uitleg": "Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen"
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Multi",
+    "MC3": "Uitval meldkamer",
+    "code": "dvmumk",
+    "prio": 5,
+    "uitleg": "De melding aan de disciplines dat de meldkamer beperkt of niet functioneert."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Multi",
+    "MC3": "Uitval systeem",
+    "code": "dvmuc2",
+    "prio": 5,
+    "uitleg": "De melding aan de disciplines dat C2000 is uitgevallen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Aan instanties",
+    "code": "dvpoai",
+    "prio": 3,
+    "uitleg": "Het verlenen van hulp en leveren van diensten door de politie aan instanties."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Aantreffen van",
+    "code": "dvpoav",
+    "prio": 3,
+    "uitleg": "De inzet van de politie in het kader van het aantreffen van personen of goederen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Afstemverzoek",
+    "code": "dvplav",
+    "prio": 3,
+    "uitleg": "Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Begeleiden",
+    "code": "dvpobg",
+    "prio": 3,
+    "uitleg": "Inzet van de politie bij de begeleiding van personen  en goederen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Bijstand",
+    "code": "dvpobs",
+    "prio": 3,
+    "uitleg": "Bijstand aanvraag/-inzet van de politie voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Dienst aan derden",
+    "code": "dvpodd",
+    "prio": 3,
+    "uitleg": "Het verlenen van diensten aan derden door de politie."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Geplande actie",
+    "code": "dvpoga",
+    "prio": 5,
+    "uitleg": "Acties van de politie die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Oefening",
+    "code": "dvpooe",
+    "prio": 5,
+    "uitleg": "Het verwerken van een fictief incident, voor trainingsdoeleinden."
+  },
+  {
+    "MC1": "Dienstverlening",
+    "MC2": "Politie",
+    "MC3": "Testmelding",
+    "code": "dvpltm",
+    "prio": 5,
+    "uitleg": "Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen"
+  },
+  {
+    "MC1": "Hulpvraag",
+    "MC2": "Ambulancezorg",
+    "MC3": "Directe inzet",
+    "code": "hvazdi",
+    "prio": 2,
+    "uitleg": "De centralist van de meldkamer ambulancezorg stuurt op basis van een 112-melding zo snel als mogelijk en voor afronding van de triage een ambulance-eenheid in de richting van het incident. Het uitsturen van de ambulance gebeurt met een A2-urgentie. Triage, terwijl de ambulance al onderweg is, kan aanleiding geven de inzetopdracht en/of de urgentie bij te stellen of eventueel zelfs de inzetopdracht af te breken."
+  },
+  {
+    "MC1": "Hulpvraag",
+    "MC2": "Ambulancezorg",
+    "MC3": "Versnelde inzet",
+    "code": "hvazvi",
+    "prio": 2,
+    "uitleg": "De centralist van de meldkamer ambulancezorg stuurt op basis van een 112-melding of melding van een zorg professional vanuit NTS zo snel als mogelijk en voor afronding van de triage een ambulance-eenheid in de richting van het incident. Het uitsturen van de ambulance gebeurt met een A1- of A2-urgentie (keuze vanuit NTS). Triage, terwijl de ambulance al onderweg is, kan aanleiding geven de urgentie bij te stellen."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Conflict",
+    "MC3": "Burenruzie",
+    "code": "lmcfbu",
+    "prio": 2,
+    "uitleg": "Een conflict tussen buren."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Conflict",
+    "MC3": "Conflictbemiddeling",
+    "code": "lmcfbm",
+    "prio": 2,
+    "uitleg": "Een conflict tussen twee (samenwonende) personen."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Conflict",
+    "MC3": "Hulpverlener",
+    "code": "lmcfhv",
+    "prio": 1,
+    "uitleg": "Een conflict tussen een burger en een hulpverlener van een particuliere- of overheidsinstelling."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Dieren",
+    "MC3": "Zieke/Dode dieren",
+    "code": "lmdizd",
+    "prio": 3,
+    "uitleg": "Aantreffen van zieke en/of dode dieren."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Overlast van/door",
+    "MC3": "Dieren",
+    "code": "lmoldi",
+    "prio": 3,
+    "uitleg": "Overlast veroorzaakt door dieren, waaronder blaffende honden en bijenzwermen."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Overlast van/door",
+    "MC3": "Geluid",
+    "code": "lmolgl",
+    "prio": 3,
+    "uitleg": "Overlast veroorzaakt door geluid in de woonomgeving."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Overlast van/door",
+    "MC3": "Jeugd",
+    "code": "lmolje",
+    "prio": 3,
+    "uitleg": "Het veroorzaken van overlast door jeugdige personen, waaronder zogenaamde hangjongeren."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Overlast van/door",
+    "MC3": "Persoon",
+    "code": "lmolps",
+    "prio": 3,
+    "uitleg": "Het veroorzaken van overlast door een individueel persoon."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Overlast van/door",
+    "MC3": "Verkeer",
+    "code": "lmolvk",
+    "prio": 3,
+    "uitleg": "Overlast veroorzaakt door weg-, water-, spoor- en luchtverkeer."
+  },
+  {
+    "MC1": "Leefmilieu",
+    "MC2": "Overlast van/door",
+    "MC3": "Vuurwerk",
+    "code": "lmolvw",
+    "prio": 3,
+    "uitleg": "Overlast ten gevolge van het afsteken van vuurwerk."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Luchtvaart",
+    "MC3": "Crash",
+    "code": "ogluco",
+    "prio": 1,
+    "uitleg": "Een onvoorziene landing of neerstorting of aanrijding met ernstige gevolgen. (Bijv. vliegtuig stort neer tijdens landing, twee vliegtuigen komen op de start-/landingsbaan met elkaar in botsing, een helikopter raakt hoogspanningskabel en stort neer)"
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Luchtvaart",
+    "MC3": "Gevaarlijke stof",
+    "code": "oglugs",
+    "prio": 1,
+    "uitleg": "Een ongeval (incident) met gevaarlijke stoffen (niet zijnde een crash, noodsituatie of voorzorgslanding), vanuit een luchtvaartuig."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Luchtvaart",
+    "MC3": "Noodsituatie",
+    "code": "ogluns",
+    "prio": 1,
+    "uitleg": "Piloot doet May Day Call. Hierbij is sprake van een ernstige situatie waarbij direct levensgevaar voor de aanwezigen is of kan ontstaan en waarbij direct assistentie is vereist. Het luchtvaartuig wil voorrang op alle luchtvaartbewegingen om te landen."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Luchtvaart",
+    "MC3": "Overig LVO",
+    "code": "ogluki",
+    "prio": 1,
+    "uitleg": "Onder de luchtvaart ongevallen vallende overige incidenten met luchtvaartuig, wat de luchthaven in eerste instantie zelf af kan met de luchthavenbrandweer. (Dit zijn geen crashes, runway incursion, voorzorgslandingen, etc.)"
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Luchtvaart",
+    "MC3": "Voorzorg",
+    "code": "ogluvz",
+    "prio": 1,
+    "uitleg": "Een melding uit voorzorg (pan pan call) met als doel vroegtijdig maatregelen te kunnen treffen of hulpverlening op te starten. Er wordt nog geen ernstig incident verwacht en de luchthaven moet het incident in principe met eigen potentieel af kunnen handelen."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Overig",
+    "MC3": "Gevaarlijke stof",
+    "code": "ogovgs",
+    "prio": 1,
+    "uitleg": "Een ongeval (incident) (niet zijnde luchtvaart, spoorvervoer, water of wegvervoer), waarbij gevaarlijke stoffen betrokken zijn en deze stof(fen) het grootste gevaar van het incident zijn voor de hulpverleners en de omgeving.(bijvoorbeeld het vrijkomen van een gevaarlijke stof uit een installatie bij een bedrijf)"
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Spoorvervoer",
+    "MC3": "Gevaarlijke stof",
+    "code": "ogspgs",
+    "prio": 1,
+    "uitleg": "Een ongeval (incident) met gevaarlijke stoffen op het spoor ( bijvoorbeeld een lekkende ketelwagon)"
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Spoorvervoer",
+    "MC3": "Letsel",
+    "code": "ogspls",
+    "prio": 1,
+    "uitleg": "Een ongeval op het spoor met (ander) voertuig of voorwerp waarbij enig menselijk letsel is ontstaan."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Spoorvervoer",
+    "MC3": "Materieel",
+    "code": "ogspmt",
+    "prio": 2,
+    "uitleg": "Een ongeval op het spoor met (ander) voertuig of voorwerp waarbij slechts sprake is van materiele schade."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Gevaarlijke stof",
+    "code": "ogwtgs",
+    "prio": 1,
+    "uitleg": "Een ongeval (incident) met gevaarlijke stoffen op het water ( bijvoorbeeld een lekkende tank/compartiment van een binnenvaartschip)"
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Letsel",
+    "code": "ogwtls",
+    "prio": 1,
+    "uitleg": "Een ongeval te water waarbij enig menselijk letsel is ontstaan."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Materieel",
+    "code": "ogwtmt",
+    "prio": 3,
+    "uitleg": "Een ongeval te water waarbij slechts van materiele schade sprake is."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Noodsignaal",
+    "code": "ogwtns",
+    "prio": 1,
+    "uitleg": "Een (melding) waarneming signaal dat wordt uitgezonden/gegeven om aan te geven dat een vaartuig in nood verkeert en waarbij geen direct mondeling contact is met de opvarende op het vaartuig, en door de waarnemer ook niet vast te stellen is dat er zich daadwerkelijk een vaartuig in nood verkeert."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Persoon in drijfzand",
+    "code": "ogwtpd",
+    "prio": 1,
+    "uitleg": "Een persoon in nood die zich in drijfzand begeeft."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Persoon te water",
+    "code": "ogwtpw",
+    "prio": 1,
+    "uitleg": "Een persoon in nood die te water is geraakt en niet in het bezit is van een drijfmiddel (drenkeling)."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Schip/watersp. in problemen",
+    "code": "ogwtpr",
+    "prio": 2,
+    "uitleg": "Een vaartuig waarover de bemanning de controle heeft verloren of welke in gevaar verkeert. Dit wordt bepaald op basis van direct contact met opvarenden, of door waarneming van de toestand van het vaartuig door derden."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Wegvervoer",
+    "MC3": "Gevaarlijke stof",
+    "code": "ogwegs",
+    "prio": 1,
+    "uitleg": "Een ongeval (incident) met gevaarlijke stoffen op de weg / vanuit een voertuig ( bijvoorbeeld een lekkende tankwagen)"
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Wegvervoer",
+    "MC3": "Letsel",
+    "code": "ogwels",
+    "prio": 1,
+    "uitleg": "Een ongeval waarbij een voertuig (wegvervoer) is betrokken waarbij enig lichamelijk letsel is ontstaan."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Wegvervoer",
+    "MC3": "Materieel",
+    "code": "ogwemt",
+    "prio": 3,
+    "uitleg": "Een ongeval waarbij een voertuig (wegvervoer) is betrokken en waarbij slechts sprake is van materiele schade."
+  },
+  {
+    "MC1": "Ongeval",
+    "MC2": "Wegvervoer",
+    "MC3": "Voertuig te water",
+    "code": "ogwewt",
+    "prio": 1,
+    "uitleg": "Een ongeval waarbij een voertuig (wegvervoer) te water is geraakt."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Demonstratie",
+    "code": "voatdm",
+    "prio": 4,
+    "uitleg": "Een spontane of aangekondigde betoging op de openbare weg door een of meerdere personen."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Evenementen",
+    "code": "voatev",
+    "prio": 4,
+    "uitleg": "Een spontane of aangekondigde gebeurtenis op de openbare weg door eenn of meerdere personen."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Huis/lok. vredebreuk",
+    "code": "voatvb",
+    "prio": 2,
+    "uitleg": "Het wederrechtelijk binnendringen van een woning of lokaliteit."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Onbevoegd betreden",
+    "code": "voatob",
+    "prio": 3,
+    "uitleg": "Zonder toestemming van de eigenaar betreden van een terrein of gebouw."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Overtreding avondklok",
+    "code": "vooak",
+    "prio": 3,
+    "uitleg": "Zonder toestemming zich in de openbaarheid begeven gedurende de periode dat een avondklok van toepassing is"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Samenscholing",
+    "code": "voatsm",
+    "prio": 3,
+    "uitleg": "Samen zijn van een groep personen dat als hinderlijk wordt ervaren."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Aantast. Openb orde",
+    "MC3": "Stalking",
+    "code": "vostk",
+    "prio": 2,
+    "uitleg": "Iemand opzettelijk en structureel lastigvallen, waardoor die persoon zich in zijn of haar vrijheid en veiligheid voelt aangetast."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Beveiliging luchtvaart",
+    "MC3": "Onbeheerde bagage",
+    "code": "vobbbg",
+    "prio": 2,
+    "uitleg": "Aantreffen van bagage zonder dat een eigenaar waarneembaar is."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Beveiliging luchtvaart",
+    "MC3": "Security incident",
+    "code": "vobbsi",
+    "prio": 2,
+    "uitleg": "Incident waarvoor 'security' protocollen gelden."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Beveiliging luchtvaart",
+    "MC3": "Startverbod vliegtuig",
+    "code": "vobbsv",
+    "prio": 1,
+    "uitleg": "Een of meerdere vliegtuigen is verboden op te starten."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Beveiliging luchtvaart",
+    "MC3": "Steekproef security",
+    "code": "vobbss",
+    "prio": 3,
+    "uitleg": "Vanuit beveiligingsoverweging steekproefsgewijs extra controle uitvoeren."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Beveiliging luchtvaart",
+    "MC3": "Vluchtafhandeling",
+    "code": "vobbva",
+    "prio": 3,
+    "uitleg": "Beveiliging incheck, bagage, passagiers, platform etcetera."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Bijzondere Wetten",
+    "MC3": "GB Controle",
+    "code": "vogbc",
+    "prio": 3,
+    "uitleg": "Controle aan de Nederlandse grens"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Bijzondere Wetten",
+    "MC3": "Militaire Zaken",
+    "code": "vomi",
+    "prio": 3,
+    "uitleg": "Meldingen met betrekking tot het militair tucht of strafrecht, welke niet onder een andere MC’s kunnen vallen, of andere zaken met betrekking tot de Nederlandse Krijgsmacht. "
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Bijzondere Wetten",
+    "MC3": "MTV Controle",
+    "code": "vomtv",
+    "prio": 3,
+    "uitleg": "Controle aan de Schengen binnengrens van het Koninkrijk. (NL-DU en NL-BE) "
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Bijzondere Wetten",
+    "MC3": "Veiligheidscontrole WWM",
+    "code": "vovhc",
+    "prio": 2,
+    "uitleg": "Veiligheidscontrole Wet Wapens en Munitie"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Bijzondere Wetten",
+    "MC3": "Vreemdelingenzaak",
+    "code": "vovzk",
+    "prio": 3,
+    "uitleg": "Overige vreemdelingenzaken, niet zijnde GB of MTV"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Drugszaak",
+    "MC3": "Dealen",
+    "code": "vodzdl",
+    "prio": 3,
+    "uitleg": "Het (illegaal) handelen in drugs."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Drugszaak",
+    "MC3": "Drugslab",
+    "code": "vodzlb",
+    "prio": 2,
+    "uitleg": "Het aantreffen van een drugslaboratorium."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Drugszaak",
+    "MC3": "Wietplantage",
+    "code": "vodzwp",
+    "prio": 2,
+    "uitleg": "Het aantreffen van hennep- en wietplantages."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Explosief/Munitie",
+    "MC3": "Aantref. explosieven",
+    "code": "voexat",
+    "prio": 1,
+    "uitleg": "Het aantreffen van explosieven."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Explosief/Munitie",
+    "MC3": "Bommelding",
+    "code": "voexbm",
+    "prio": 1,
+    "uitleg": "Een melding waarbij gedreigd wordt tot het gebruik van een explosief."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Explosief/Munitie",
+    "MC3": "Munitie",
+    "code": "voexmu",
+    "prio": 3,
+    "uitleg": "Het aantreffen van vuurwapens en/of munitie."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Explosief/Munitie",
+    "MC3": "Vuurwerkopslag",
+    "code": "voexvw",
+    "prio": 3,
+    "uitleg": "Het aantreffen van (illegaal) vuurwerk."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Gevangenis",
+    "MC3": "Ontsnapping",
+    "code": "vogvos",
+    "prio": 1,
+    "uitleg": "Het zonder toestemming verlaten van de gevangenis."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Gevangenis",
+    "MC3": "Oproer",
+    "code": "vogvor",
+    "prio": 1,
+    "uitleg": "Een melding van verzet, onrust door meerdere personen in een gevangenis."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Bedreiging",
+    "code": "vogwbd",
+    "prio": 2,
+    "uitleg": "Het verbaal bedreigen van personen met het toebrengen van schade, pijn of letsel zonder dit daadwerkelijk al te hebben uitgevoerd."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "CBRN-e dreiging",
+    "code": "vogwcb",
+    "prio": 1,
+    "uitleg": "De dreiging van chemische, biologische, radioactieve, nucleaire stoffen/wapens waarbij pijn of letsel kan ontstaan."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Gijzeling",
+    "code": "vogwgz",
+    "prio": 1,
+    "uitleg": "Personen met geweld of bedreiging met geweld tegen hun wil vasthouden."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Kaping",
+    "code": "vogwkp",
+    "prio": 1,
+    "uitleg": "Het met geweld of dreiging met geweld het commando overnemen van een voertuig, vaartuig, of luchtvaartuig."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Mishandeling",
+    "code": "vogwmh",
+    "prio": 2,
+    "uitleg": "Het opzettelijk toebrengen van pijn of letsel aan een ander."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Ontvoering",
+    "code": "vogwon",
+    "prio": 1,
+    "uitleg": "Iemand tegen diens wil onttrekken uit zijn/haar vertrouwde omgeving en wederrechtelijk verplaatsen/wegvoeren."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Schietpartij",
+    "code": "vogwsi",
+    "prio": 1,
+    "uitleg": "Een vuurgevecht door middel van vuurwapens tussen of gericht tegen personen."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Steekpartij",
+    "code": "vogwst",
+    "prio": 1,
+    "uitleg": "Het gebruiken van steekwapens gericht tegen personen."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Terrorisme",
+    "code": "vogwte",
+    "prio": 1,
+    "uitleg": "Op de meldkamer geeft de politie aan of een incident als terrorisme geclassificeerd moet worden. Het betreffen acties met oogmerk om de bevolking of een deel van de bevolking van een land vrees aan te jagen, dan wel een overheid of internationale organisatie te dwingen iets te doen, niet te doen of te dulden, dan wel de fundamentele politieke, constitutionele, economische of sociale structuren van een land of een internationale organisatie ernstig te ontwrichten of te vernietigen. (bron: AIVD) Deze definitie die het gevolg is van het Europese standpunt van de Raad van de Europese Unie inzake terrorismebestrijding, zoals deze materieel gelijk is beschreven in de bepaling in de (ontwerp-)WTM, artikel 83a WvSr: wet- en regelgeving Art. 83a WvSr en 140 WvSr hiërarchische verhouding"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Geweld",
+    "MC3": "Vechtpartij",
+    "code": "vogwve",
+    "prio": 1,
+    "uitleg": "Door toepassing van lijfelijk geweld een geschil trachten te slechten."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Verdachte situatie",
+    "MC3": "Gebouw",
+    "code": "vovsgb",
+    "prio": 2,
+    "uitleg": "Een ongewone situatie in en om een gebouw die om nader onderzoek vraagt"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Verdachte situatie",
+    "MC3": "Overleden persoon",
+    "code": "vovsop",
+    "prio": 2,
+    "uitleg": "Het aantreffen van een overleden persoon waarvan de identiteit niet direct kan worden vastgesteld en de doodsoorzaak vraagt om nader onderzoek."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Verdachte situatie",
+    "MC3": "Pakket/Voorwerp",
+    "code": "vovspv",
+    "prio": 2,
+    "uitleg": "Het aantreffen van een verdacht pakket of voorwerp."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Verdachte situatie",
+    "MC3": "Persoon",
+    "code": "vovsps",
+    "prio": 2,
+    "uitleg": "Het aantreffen van een persoon die verdacht is of verdacht gedraagt"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Verdachte situatie",
+    "MC3": "Voertuig/Vaartuig",
+    "code": "vovsvv",
+    "prio": 2,
+    "uitleg": "Het aantreffen van een verdacht voertuig "
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Seksueel delict",
+    "MC3": "Aanstootgevend gedrag",
+    "code": "vosdag",
+    "prio": 2,
+    "uitleg": "Tonen geslachtsdeel (bijv potloodventer), kan ook live via internet"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Seksueel delict",
+    "MC3": "Ontucht minderjarigen",
+    "code": "vozdom",
+    "prio": 2,
+    "uitleg": "Het plegen van ontucht (seksuele handelingen) met een minderjarig persoon. Onder ontucht wordt hier ook verstaan het betasten van intieme delen."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Seksueel delict",
+    "MC3": "Seksueel benaderen kind",
+    "code": "vosdbk",
+    "prio": 2,
+    "uitleg": "Seksuele benadering van een kind, schriftelijk of mondeling (sexchatting of grooming)"
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Seksueel delict",
+    "MC3": "Seksueel misbruik kind",
+    "code": "vosdmk",
+    "prio": 2,
+    "uitleg": "Seksuele handelingen met kind (verkrachting of aanranding kind)."
+  },
+  {
+    "MC1": "Veiligheid en openbare orde",
+    "MC2": "Seksueel delict",
+    "MC3": "Seksuele intimidatie",
+    "code": "vosdsi",
+    "prio": 2,
+    "uitleg": "Seksuele intimidatie in het openbaar (op straat of online). Kan gaan om opmerkingen, geluiden, gebaren of aanrakingen."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Luchtvaart",
+    "MC3": "Laag vliegen",
+    "code": "vklulv",
+    "prio": 2,
+    "uitleg": "Het lager vliegen dan de voorgeschreven minimale hoogte."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Luchtvaart",
+    "MC3": "Onbevoegd vliegen",
+    "code": "vkluov",
+    "prio": 2,
+    "uitleg": "Zonder daarvoor voorafgegane toestemming vliegen met een luchtvaartuig."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Luchtvaart",
+    "MC3": "Onbevoegde landing",
+    "code": "vkluol",
+    "prio": 2,
+    "uitleg": "Zonder daarvoor voorafgegane toestemming op een luchtvaartterrein of ander terrein landen."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Luchtvaart",
+    "MC3": "Onder invloed",
+    "code": "vkluoi",
+    "prio": 2,
+    "uitleg": "Een luchtvaartuig besturen terwijl de gezagvoerder onder invloed van alcoholische drank of drugs verkeert."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Luchtvaart",
+    "MC3": "Runway incursion",
+    "code": "vkluri",
+    "prio": 2,
+    "uitleg": "Er is sprake van een runway incursion wanneer een vliegtuig, een voertuig of een persoon zich ten onrechte op de start- en of landingsbaan bevindt of binnen de beschermende zone daarvan."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "Aanmeerproblemen",
+    "code": "vkshap",
+    "prio": 3,
+    "uitleg": "Er doen zich problemen voor bij het afmeren aan een steiger of kade of bij het ankeren."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "Afgevallen lading",
+    "code": "vkshal",
+    "prio": 3,
+    "uitleg": "Lading dat van een schip is gevallen."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "ASO-vaargedrag",
+    "code": "vkshav",
+    "prio": 3,
+    "uitleg": "Gedrag op het water waar anderen hinder van ondervinden."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "Hinderl. waterbeweging",
+    "code": "vkshhw",
+    "prio": 3,
+    "uitleg": "Een vaartuig veroorzaakt een golfbeweging die hinder of schade veroorzaakt."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "Onbevoegd varen",
+    "code": "vkshov",
+    "prio": 3,
+    "uitleg": "Het besturen van een vaartuig zonder in het bezit te zijn van de vereiste documenten."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "Onder invloed",
+    "code": "vkshoi",
+    "prio": 2,
+    "uitleg": "Een vaartuig onder invloed van alcoholische drank of drugs besturen."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Scheepvaart",
+    "MC3": "Stremming",
+    "code": "vkshsm",
+    "prio": 3,
+    "uitleg": "Gedeeltelijke of gehele stremming van de vaarweg niet zijnde een ongeval"
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Spoorvervoer",
+    "MC3": "Defect meubilair",
+    "code": "vkspdm",
+    "prio": 5,
+    "uitleg": "Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Spoorvervoer",
+    "MC3": "Loslopende dieren",
+    "code": "vkspld",
+    "prio": 2,
+    "uitleg": "Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Spoorvervoer",
+    "MC3": "Negeren rood sein",
+    "code": "vksprs",
+    "prio": 1,
+    "uitleg": "Een treinmachinist geeft geen gevolg aan een rood stopteken."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Spoorvervoer",
+    "MC3": "Onder invloed",
+    "code": "vkspoi",
+    "prio": 2,
+    "uitleg": "Een persoon bevindt zich onbevoegd op het spoor."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Spoorvervoer",
+    "MC3": "Persoon o/b spoor",
+    "code": "vkspps",
+    "prio": 1,
+    "uitleg": "Een persoon bevindt zich onbevoegd op of bij het spoor of spoorbed."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Spoorvervoer",
+    "MC3": "Verstoring treindienst",
+    "code": "vkspvt",
+    "prio": 4,
+    "uitleg": "Trein Incident Management onderscheid 4 gradaties van in toenemende mate ernstiger wordende verstoringen van de treindienst: TIS 1.1 t/m TIS 1.4 Zolang het geen ontsporing zonder slachtoffers, verstoring door slecht weer of door de overheid opgelegde verstoring treindienst is b.v. voor het ruimen van WO2 bom kunnen deze meldingen hieronder geplaatst worden."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Afgevallen lading",
+    "code": "vkweal",
+    "prio": 2,
+    "uitleg": "Lading dat van een voertuig is gevallen."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "ASO-rijgedrag",
+    "code": "vkwear",
+    "prio": 3,
+    "uitleg": "Gedrag op de weg waar anderen hinder van ondervinden."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Bijz. Verk zaken",
+    "code": "vkwebz",
+    "prio": 3,
+    "uitleg": "Bijzondere verkeerszaken bijv. extreem vervoer"
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Defect straatmeubilair",
+    "code": "vkweds",
+    "prio": 4,
+    "uitleg": "Hulpmiddelen langs de weg bijv. verkeersborden, lichtmasten, wegbebording, schrikhekken die defect of beschadigd zijn."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Fietser o/b rijbaan",
+    "code": "vkwefs",
+    "prio": 2,
+    "uitleg": "Een fietser bevindt zich onbevoegd op of bij de rijbaan"
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Gladheid",
+    "code": "vkwegh",
+    "prio": 3,
+    "uitleg": "Wegdek dat door atmosferische invloed glad is geworden of dreigt te worden."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Joyriding",
+    "code": "vkwejr",
+    "prio": 2,
+    "uitleg": "Het zonder toestemming van de eigenaar met een motorvoertuig over de voor het openbaar verkeer openstaande weg rijden."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Loslopende dieren",
+    "code": "vkwedi",
+    "prio": 2,
+    "uitleg": "Dieren die zonder een geleider op of langs de rijbaan van een weg lopen."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Onder invloed",
+    "code": "vkweoi",
+    "prio": 2,
+    "uitleg": "Een voertuig besturen terwijl de bestuurder onder invloed van alcoholische drank of drugs verkeert."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Parkeerprobleem",
+    "code": "vkwepk",
+    "prio": 3,
+    "uitleg": "Er doen zich problemen voor door of met het parkeren van een voertuig."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Persoon o/b rijbaan",
+    "code": "vkweps",
+    "prio": 2,
+    "uitleg": "Een persoon bevindt zich onbevoegd op of bij de rijbaan"
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Spookrijder",
+    "code": "vkwesr",
+    "prio": 1,
+    "uitleg": "Een bestuurder van een motorvoertuig rijdt tegen de rijrichting van het overige verkeer in."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Verkeersgeleiding",
+    "code": "vkwegl",
+    "prio": 4,
+    "uitleg": "Bestuurders krijgen een aanwijzing door middel van matrix- borden om een bepaalde snelheid te rijden of van een bepaalde rijstrook gebruik te maken."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Verkeersstremming",
+    "code": "vkwest",
+    "prio": 3,
+    "uitleg": "De rijbaan is geheel of gedeeltelijk gestremd door een voorwerp of voertuig waardoor het verkeer niet of slechts gedeeltelijk door kan gaan."
+  },
+  {
+    "MC1": "Verkeer",
+    "MC2": "Wegverkeer",
+    "MC3": "Vervuild wegdek",
+    "code": "vkwevw",
+    "prio": 3,
+    "uitleg": "Wegdekvervuiling door gelekte vloeistof, afvallende lading of loslatende modder van banden."
+  }
+]

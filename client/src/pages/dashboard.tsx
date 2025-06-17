@@ -793,29 +793,38 @@ export default function Dashboard() {
     localStorage.setItem("basisteams", JSON.stringify(basisteamsData));
   }
 
-  // Initialize GMS classifications in localStorage
-  if (
-    typeof window !== "undefined" &&
-    !localStorage.getItem("gmsClassifications")
-  ) {
-    localStorage.setItem(
-      "gmsClassifications",
-      JSON.stringify(gmsClassificationsData),
-    );
-  }
-
   const [basisTeams] = useLocalStorage<BasisTeam[]>(
     "basisteams",
     basisteamsData,
   );
 
-  // Use state directly with the full classification data
-  const [gmsClassifications, setGmsClassifications] = useState<GmsClassification[]>(gmsClassificationsData);
+  // Initialize GMS classifications with complete official data
+  const [gmsClassifications, setGmsClassifications] = useState<GmsClassification[]>([]);
 
-  // Store in localStorage for persistence
+  // Load complete official LMC classifications
   useEffect(() => {
-    localStorage.setItem("gmsClassifications", JSON.stringify(gmsClassificationsData));
-    console.log('Loaded GMS classifications:', gmsClassificationsData.length, 'entries');
+    const loadOfficialClassifications = async () => {
+      // Clear existing data to force reload of complete official dataset
+      localStorage.removeItem("gmsClassifications");
+      
+      try {
+        const response = await fetch('/lmc_classifications.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const officialClassifications: GmsClassification[] = await response.json();
+        
+        localStorage.setItem("gmsClassifications", JSON.stringify(officialClassifications));
+        setGmsClassifications(officialClassifications);
+        console.log("Loaded complete official GMS classifications:", officialClassifications.length, "entries");
+      } catch (error) {
+        console.error("Failed to load official classifications:", error);
+        // Fallback to ensure system still works
+        setGmsClassifications([]);
+      }
+    };
+
+    loadOfficialClassifications();
   }, []);
 
   // GMS Classification database helper functions
@@ -3782,7 +3791,7 @@ export default function Dashboard() {
                               className="gms-field"
                             >
                               <option value="">Selecteer...</option>
-                              {getUniqueClassificationsByLevel("mc1").map(
+                              {getUniqueClassificationsByLevel("MC1").map(
                                 (mc1: string) => (
                                   <option key={mc1} value={mc1}>
                                     {mc1}
