@@ -230,6 +230,102 @@ export default function Dashboard() {
   }
 
   // Complete basisteams database for Regionale Eenheid Rotterdam
+  // GMS Classifications database
+  interface GmsClassification {
+    cijfercode: number;
+    code: string;
+    MC1: string;
+    MC2: string;
+    MC3: string;
+  }
+
+  const gmsClassificationsData: GmsClassification[] = [
+    {
+      cijfercode: 1011,
+      code: "-alabab",
+      MC1: "Alarm",
+      MC2: "Autom. brand",
+      MC3: "Autom. brand OMS"
+    },
+    {
+      cijfercode: 2034,
+      code: "-verkeer",
+      MC1: "Verkeer",
+      MC2: "Ongeval",
+      MC3: "Ernstig letsel"
+    },
+    {
+      cijfercode: 3099,
+      code: "-overl",
+      MC1: "Overlast",
+      MC2: "Lawaai",
+      MC3: "Feest in woning"
+    },
+    {
+      cijfercode: 1012,
+      code: "-albrand",
+      MC1: "Alarm",
+      MC2: "Brand",
+      MC3: "Woningbrand"
+    },
+    {
+      cijfercode: 2001,
+      code: "-verkaav",
+      MC1: "Verkeer",
+      MC2: "Aanrijding",
+      MC3: "Auto vs auto"
+    },
+    {
+      cijfercode: 2002,
+      code: "-verkafv",
+      MC1: "Verkeer",
+      MC2: "Aanrijding",
+      MC3: "Auto vs fiets"
+    },
+    {
+      cijfercode: 3001,
+      code: "-overlge",
+      MC1: "Overlast",
+      MC2: "Geluidshinder",
+      MC3: "Bouwwerkzaamheden"
+    },
+    {
+      cijfercode: 4001,
+      code: "-crimdie",
+      MC1: "Criminaliteit",
+      MC2: "Diefstal",
+      MC3: "Winkeldiefstal"
+    },
+    {
+      cijfercode: 4002,
+      code: "-criminb",
+      MC1: "Criminaliteit",
+      MC2: "Inbraak",
+      MC3: "Woninginbraak"
+    },
+    {
+      cijfercode: 5001,
+      code: "-geweld",
+      MC1: "Geweld",
+      MC2: "Mishandeling",
+      MC3: "Openbare weg"
+    },
+    {
+      cijfercode: 5002,
+      code: "-gewhuis",
+      MC1: "Geweld",
+      MC2: "Huiselijk geweld",
+      MC3: "Partnergeweld"
+    },
+    {
+      cijfercode: 6001,
+      code: "-persvm",
+      MC1: "Personen",
+      MC2: "Vermist",
+      MC3: "Vermiste minderjarige"
+    }
+  ];
+
   const basisteamsData: BasisTeam[] = [
     // Rotterdam Stadsregio (A-teams)
     {
@@ -367,10 +463,70 @@ export default function Dashboard() {
     localStorage.setItem("basisteams", JSON.stringify(basisteamsData));
   }
 
+  // Initialize GMS classifications in localStorage
+  if (typeof window !== "undefined" && !localStorage.getItem("gmsClassifications")) {
+    localStorage.setItem("gmsClassifications", JSON.stringify(gmsClassificationsData));
+  }
+
   const [basisTeams] = useLocalStorage<BasisTeam[]>(
     "basisteams",
     basisteamsData,
   );
+
+  const [gmsClassifications] = useLocalStorage<GmsClassification[]>(
+    "gmsClassifications",
+    gmsClassificationsData,
+  );
+
+  // GMS Classification database helper functions
+  const searchGmsClassifications = (query: string): GmsClassification[] => {
+    const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+    if (!query) return storedClassifications;
+    
+    const lowerQuery = query.toLowerCase();
+    return storedClassifications.filter((classification: GmsClassification) => 
+      classification.cijfercode.toString().includes(lowerQuery) ||
+      classification.code.toLowerCase().includes(lowerQuery) ||
+      classification.MC1.toLowerCase().includes(lowerQuery) ||
+      classification.MC2.toLowerCase().includes(lowerQuery) ||
+      classification.MC3.toLowerCase().includes(lowerQuery)
+    );
+  };
+
+  const getClassificationByCijfercode = (cijfercode: number): GmsClassification | undefined => {
+    const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+    return storedClassifications.find((classification: GmsClassification) => 
+      classification.cijfercode === cijfercode
+    );
+  };
+
+  const getClassificationByCode = (code: string): GmsClassification | undefined => {
+    const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+    return storedClassifications.find((classification: GmsClassification) => 
+      classification.code === code
+    );
+  };
+
+  const getUniqueClassificationsByLevel = (level: 'MC1' | 'MC2' | 'MC3', parentValue?: string): string[] => {
+    const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+    let filtered = storedClassifications;
+    
+    // Filter by parent value if provided
+    if (level === 'MC2' && parentValue) {
+      filtered = storedClassifications.filter((c: GmsClassification) => c.MC1 === parentValue);
+    } else if (level === 'MC3' && parentValue) {
+      filtered = storedClassifications.filter((c: GmsClassification) => c.MC2 === parentValue);
+    }
+    
+    const values = filtered.map((c: GmsClassification) => c[level]).filter(Boolean);
+    const uniqueValues: string[] = [];
+    values.forEach(value => {
+      if (value && !uniqueValues.includes(value)) {
+        uniqueValues.push(value);
+      }
+    });
+    return uniqueValues.sort();
+  };
 
   const incidentTypes = [
     "Diefstal",
@@ -2610,23 +2766,15 @@ export default function Dashboard() {
                           <div className="gms-mc-fields">
                             <select id="gmsClassificatie1" className="gms-field">
                               <option value="">Selecteer...</option>
-                              <option value="Verkeer">Verkeer</option>
-                              <option value="Geweld">Geweld</option>
-                              <option value="Diefstal">Diefstal</option>
-                              <option value="Brand">Brand</option>
-                              <option value="Overlast">Overlast</option>
+                              {getUniqueClassificationsByLevel('MC1').map(mc1 => (
+                                <option key={mc1} value={mc1}>{mc1}</option>
+                              ))}
                             </select>
                             <select id="gmsClassificatie2" className="gms-field">
                               <option value="">Selecteer...</option>
-                              <option value="Wegverkeer">Wegverkeer</option>
-                              <option value="Fietsverkeer">Fietsverkeer</option>
-                              <option value="Voetganger">Voetganger</option>
                             </select>
                             <select id="gmsClassificatie3" className="gms-field">
                               <option value="">Selecteer...</option>
-                              <option value="Onder invloed">Onder invloed</option>
-                              <option value="Materiële schade">Materiële schade</option>
-                              <option value="Letselschade">Letselschade</option>
                             </select>
                           </div>
                         </div>
