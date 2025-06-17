@@ -2233,7 +2233,8 @@ export default function Dashboard() {
         const tijdstip = (document.getElementById("gmsTijdstip") as HTMLInputElement)?.value || new Date().toISOString().slice(0, 16);
         const prioriteit = parseInt((document.getElementById("gmsPrioriteit") as HTMLSelectElement)?.value || '3');
         
-        const meldingslogging = document.getElementById("gmsMeldingLogging")?.innerHTML || '';
+        const meldingLoggingElement = document.getElementById("gmsMeldingLogging");
+        const meldingslogging = meldingLoggingElement?.innerHTML || '';
         const notities = document.getElementById("gmsKladblok")?.textContent || '';
         
         // Create comprehensive location string
@@ -4679,7 +4680,12 @@ export default function Dashboard() {
       
       // Restore melding logging with full HTML content
       if (meldingLoggingField && incidentData.meldingslogging) {
+        console.log('Restoring melding logging data:', incidentData.meldingslogging);
         meldingLoggingField.innerHTML = incidentData.meldingslogging;
+        // Scroll to bottom to show latest entries
+        meldingLoggingField.scrollTop = meldingLoggingField.scrollHeight;
+      } else {
+        console.log('No melding logging data to restore or element not found');
       }
       
       // Only clear notepad for new notes, keep existing data
