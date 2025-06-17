@@ -1443,8 +1443,44 @@ export default function Dashboard() {
           prioriteit: parseInt(prioriteit?.value || "3"),
         };
 
-        // Save to localStorage incidenten array
+        // Save to localStorage with incident persistence
         try {
+          // Get current incident data if exists
+          const currentIncidentData = localStorage.getItem('currentGmsIncident');
+          let incidentId = null;
+          
+          if (currentIncidentData) {
+            const parsedIncident = JSON.parse(currentIncidentData);
+            incidentId = parsedIncident.incidentId;
+            
+            // Update the current incident data with form values
+            const updatedIncidentData = {
+              ...parsedIncident,
+              melderNaam: gmsData.meldernaam,
+              melderAdres: gmsData.melderadres,
+              telefoonnummer: gmsData.telefoonnummer,
+              straatnaam: gmsData.straatnaam,
+              huisnummer: gmsData.huisnummer,
+              toevoeging: gmsData.toevoeging,
+              postcode: gmsData.postcode,
+              plaatsnaam: gmsData.plaatsnaam,
+              gemeente: gmsData.gemeente,
+              mc1: gmsData.classificatie1,
+              mc2: gmsData.classificatie2,
+              mc3: gmsData.classificatie3,
+              priority: gmsData.prioriteit,
+              notities: gmsData.opmerkingen,
+              lastUpdated: new Date().toISOString()
+            };
+            
+            // Save updated incident data
+            localStorage.setItem('currentGmsIncident', JSON.stringify(updatedIncidentData));
+            localStorage.setItem(`gmsData_${incidentId}`, JSON.stringify(updatedIncidentData));
+            
+            console.log(`GMS data saved for incident ${incidentId}`);
+          }
+          
+          // Also save to legacy incidenten array for compatibility
           const existingIncidenten = JSON.parse(
             localStorage.getItem("incidenten") || "[]",
           );
@@ -1529,6 +1565,58 @@ export default function Dashboard() {
       if (saveButton) {
         console.log('📌 Save button found, attaching form submit listener');
         saveButton.addEventListener("click", handleGMSFormSubmit);
+      }
+
+      // Handle incident closure buttons
+      const handleIncidentClosure = (actionType: string) => {
+        const currentIncidentData = localStorage.getItem('currentGmsIncident');
+        if (currentIncidentData) {
+          try {
+            const incidentData = JSON.parse(currentIncidentData);
+            const incidentId = incidentData.incidentId;
+            
+            // Close the incident in the main incidents list
+            setIncidents((prev) =>
+              prev.map((inc) =>
+                inc.id === incidentId ? { ...inc, status: "closed" as const } : inc,
+              ),
+            );
+            
+            // Remove GMS data for finalized incident
+            localStorage.removeItem(`gmsData_${incidentId}`);
+            localStorage.removeItem('currentGmsIncident');
+            
+            // Clear the GMS form
+            const form = document.querySelector('.gms-form') as HTMLFormElement;
+            if (form) {
+              form.reset();
+              const kladblok = document.getElementById("gmsKladblok");
+              if (kladblok) kladblok.textContent = '';
+            }
+            
+            showNotificationMessage(`Incident ${incidentId} ${actionType === 'close' ? 'afgesloten' : 'gefinaliseerd'}`);
+            console.log(`Incident ${incidentId} finalized with action: ${actionType}`);
+            
+            // Switch back to incidents overview
+            setActiveSection('incidents');
+          } catch (error) {
+            console.error('Error finalizing incident:', error);
+          }
+        } else {
+          showNotificationMessage('Geen actief incident om af te sluiten');
+        }
+      };
+
+      // Sluit af button
+      const sluitAfButton = document.getElementById("gmsSluitAfButton");
+      if (sluitAfButton) {
+        sluitAfButton.addEventListener("click", () => handleIncidentClosure('close'));
+      }
+
+      // Eindrapport button
+      const eindrapportButton = document.getElementById("gmsEindrapportButton");
+      if (eindrapportButton) {
+        eindrapportButton.addEventListener("click", () => handleIncidentClosure('finalize'));
       }
 
       // Initialize time immediately and then every minute
@@ -1755,6 +1843,12 @@ export default function Dashboard() {
         }
         if (verzendButton) {
           verzendButton.removeEventListener("click", handleNotePadSubmit);
+        }
+        if (sluitAfButton) {
+          sluitAfButton.removeEventListener("click", () => handleIncidentClosure('close'));
+        }
+        if (eindrapportButton) {
+          eindrapportButton.removeEventListener("click", () => handleIncidentClosure('finalize'));
         }
       };
     };
@@ -3366,6 +3460,24 @@ export default function Dashboard() {
         inc.id === id ? { ...inc, status: "closed" as const } : inc,
       ),
     );
+    
+    // Remove GMS data for closed incident
+    localStorage.removeItem(`gmsData_${id}`);
+    
+    // Clear current GMS incident if it matches the closed incident
+    const currentIncident = localStorage.getItem('currentGmsIncident');
+    if (currentIncident) {
+      try {
+        const parsedIncident = JSON.parse(currentIncident);
+        if (parsedIncident.incidentId === id) {
+          localStorage.removeItem('currentGmsIncident');
+          console.log(`Cleared GMS data for closed incident ${id}`);
+        }
+      } catch (error) {
+        console.error('Error clearing GMS data:', error);
+      }
+    }
+    
     showNotificationMessage("Incident gesloten");
   };
 
