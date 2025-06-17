@@ -1813,7 +1813,7 @@ export default function Dashboard() {
         // Populate MC1
         mc1Field.innerHTML = '<option value="">Selecteer...</option>';
         const mc1Options = Array.from(new Set(storedClassifications.map((c: any) => c.MC1).filter(Boolean))).sort();
-        mc1Options.forEach(mc1 => {
+        mc1Options.forEach((mc1: string) => {
           const option = document.createElement('option');
           option.value = mc1;
           option.textContent = mc1;
@@ -1825,7 +1825,7 @@ export default function Dashboard() {
         if (mc1Value && mc2Value) {
           mc2Field.innerHTML = '<option value="">Selecteer...</option>';
           const mc2Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC1 === mc1Value).map((c: any) => c.MC2).filter(Boolean))).sort();
-          mc2Options.forEach(mc2 => {
+          mc2Options.forEach((mc2: string) => {
             const option = document.createElement('option');
             option.value = mc2;
             option.textContent = mc2;
@@ -1837,7 +1837,7 @@ export default function Dashboard() {
           if (mc2Value && mc3Value) {
             mc3Field.innerHTML = '<option value="">Selecteer...</option>';
             const mc3Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC2 === mc2Value).map((c: any) => c.MC3).filter(Boolean))).sort();
-            mc3Options.forEach(mc3 => {
+            mc3Options.forEach((mc3: string) => {
               const option = document.createElement('option');
               option.value = mc3;
               option.textContent = mc3;
@@ -2272,8 +2272,66 @@ export default function Dashboard() {
         }
       };
 
+      // Load current incident data into GMS form if available
+      const loadCurrentIncidentData = () => {
+        if (currentGmsIncident) {
+          console.log('Loading current incident data into GMS form:', currentGmsIncident);
+          
+          // Fill form fields with current incident data
+          const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
+          const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
+          const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
+          const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+          const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
+          const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
+          const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
+          const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+          const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
+          const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
+          const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+          const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+          const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+          const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+          const meldingLoggingField = document.getElementById("gmsMeldingLogging");
+          
+          // Fill meldergegevens
+          if (melderNaamField && currentGmsIncident.melderNaam) melderNaamField.value = currentGmsIncident.melderNaam;
+          if (melderAdresField && currentGmsIncident.melderAdres) melderAdresField.value = currentGmsIncident.melderAdres;
+          if (telefoonnummerField && currentGmsIncident.telefoonnummer) telefoonnummerField.value = currentGmsIncident.telefoonnummer;
+          
+          // Fill locatie
+          if (straatnaamField && currentGmsIncident.straatnaam) straatnaamField.value = currentGmsIncident.straatnaam;
+          if (huisnummerField && currentGmsIncident.huisnummer) huisnummerField.value = currentGmsIncident.huisnummer;
+          if (toevoegingField && currentGmsIncident.toevoeging) toevoegingField.value = currentGmsIncident.toevoeging;
+          if (postcodeField && currentGmsIncident.postcode) postcodeField.value = currentGmsIncident.postcode;
+          if (plaatsnaamField && currentGmsIncident.plaatsnaam) plaatsnaamField.value = currentGmsIncident.plaatsnaam;
+          if (gemeenteField && currentGmsIncident.gemeente) gemeenteField.value = currentGmsIncident.gemeente;
+          
+          // Fill tijdstip en prioriteit
+          if (tijdstipField && currentGmsIncident.tijdstip) tijdstipField.value = currentGmsIncident.tijdstip;
+          if (prioriteitField && currentGmsIncident.prioriteit) prioriteitField.value = currentGmsIncident.prioriteit.toString();
+          
+          // Restore classifications
+          const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+          if (mc1Field && currentGmsIncident.mc1) {
+            populateClassificationDropdowns(mc1Field, mc2Field, mc3Field, currentGmsIncident.mc1, currentGmsIncident.mc2, currentGmsIncident.mc3);
+          }
+          
+          // Restore meldingslogging
+          if (meldingLoggingField && currentGmsIncident.meldingslogging) {
+            meldingLoggingField.innerHTML = currentGmsIncident.meldingslogging;
+          }
+          
+          // Keep notepad empty for new notes
+          const kladblokField = document.getElementById("gmsKladblok");
+          if (kladblokField) kladblokField.textContent = '';
+          
+          console.log('Current incident data loaded into GMS form');
+        }
+      };
+
       // Load incident data after a brief delay to ensure form is ready
-      setTimeout(loadIncidentData, 500);
+      setTimeout(loadCurrentIncidentData, 500);
 
       return () => {
         clearInterval(timeTimer);
@@ -3691,77 +3749,73 @@ export default function Dashboard() {
     showNotificationMessage("Incident verwijderd");
   };
 
+  // Handle new incident creation in GMS
+  const handleNewIncident = () => {
+    console.log('Creating new incident in GMS');
+    setCurrentGmsIncident(null);
+    setActiveSection('gms');
+    showNotificationMessage('Nieuw incident gestart in GMS');
+  };
+
   // Handle incident click - redirect to GMS with pre-filled data
   const handleIncidentClick = (incident: Incident) => {
-    console.log('🚨 Opening incident in GMS:', incident);
+    console.log('Opening incident in GMS:', incident);
     
-    // Parse location into street and house number if possible
-    const locationParts = incident.location.split(' ');
-    let straatnaam = '';
-    let huisnummer = '';
+    // Find the complete incident data in GMS database
+    const gmsIncident = gmsIncidents.find(gmsInc => gmsInc.id === incident.id);
     
-    if (locationParts.length >= 2) {
-      // Last part might be house number
-      const lastPart = locationParts[locationParts.length - 1];
-      if (/^\d+/.test(lastPart)) {
-        huisnummer = lastPart;
-        straatnaam = locationParts.slice(0, -1).join(' ');
+    if (gmsIncident) {
+      console.log('Found complete GMS incident data:', gmsIncident);
+      setCurrentGmsIncident(gmsIncident);
+      setActiveSection('gms');
+      showNotificationMessage(`Incident ${incident.id} geopend in GMS`);
+    } else {
+      console.log('No complete GMS data found, creating basic incident');
+      
+      // Parse location into street and house number if possible
+      const locationParts = incident.location.split(' ');
+      let straatnaam = '';
+      let huisnummer = '';
+      
+      if (locationParts.length >= 2) {
+        const lastPart = locationParts[locationParts.length - 1];
+        if (/^\d+/.test(lastPart)) {
+          huisnummer = lastPart;
+          straatnaam = locationParts.slice(0, -1).join(' ');
+        } else {
+          straatnaam = incident.location;
+        }
       } else {
         straatnaam = incident.location;
       }
-    } else {
-      straatnaam = incident.location;
+      
+      // Create basic incident data
+      const basicIncident = {
+        id: incident.id,
+        straatnaam: straatnaam,
+        huisnummer: huisnummer,
+        plaatsnaam: 'Rotterdam',
+        gemeente: 'Rotterdam',
+        tijdstip: incident.timestamp,
+        prioriteit: incident.priority === 'high' ? 1 : incident.priority === 'medium' ? 2 : 3,
+        status: 'Bestaand',
+        mc1: incident.type || '',
+        mc2: '',
+        mc3: '',
+        melderNaam: '',
+        melderAdres: '',
+        telefoonnummer: '',
+        toevoeging: '',
+        postcode: '',
+        meldingslogging: '',
+        notities: '',
+        aangemaaktOp: new Date().toISOString()
+      };
+      
+      setCurrentGmsIncident(basicIncident);
+      setActiveSection('gms');
+      showNotificationMessage(`Incident ${incident.id} geopend in GMS`);
     }
-    
-    // Store the incident data for GMS to load with basic incident info pre-filled
-    const gmsData = {
-      incidentId: incident.id,
-      type: incident.type,
-      location: incident.location,
-      timestamp: incident.timestamp,
-      priority: incident.priority,
-      status: incident.status,
-      // Map basic incident data to GMS form fields
-      mc1: incident.type || '',
-      mc2: '',
-      mc3: '',
-      melderNaam: '',
-      melderAdres: '',
-      telefoonnummer: '',
-      straatnaam: straatnaam,
-      huisnummer: huisnummer,
-      toevoeging: '',
-      postcode: '',
-      plaatsnaam: 'Rotterdam', // Default for Rotterdam police region
-      gemeente: 'Rotterdam',
-      notities: `Incident ${incident.id} - ${incident.type}\nLocatie: ${incident.location}\nPrioriteit: ${incident.priority}\nStatus: ${incident.status}`
-    };
-    
-    // Try to load existing GMS data for this incident (preserve any previously entered data)
-    const existingGmsData = localStorage.getItem(`gmsData_${incident.id}`);
-    if (existingGmsData) {
-      try {
-        const parsedData = JSON.parse(existingGmsData);
-        // Only override empty fields, keep existing data
-        Object.keys(parsedData).forEach(key => {
-          if (parsedData[key] && parsedData[key] !== '') {
-            (gmsData as any)[key] = parsedData[key];
-          }
-        });
-        console.log('🔄 Merged existing GMS data for incident:', incident.id);
-      } catch (error) {
-        console.error('Failed to parse existing GMS data:', error);
-      }
-    }
-    
-    // Store current incident data for GMS
-    localStorage.setItem('currentGmsIncident', JSON.stringify(gmsData));
-    console.log('💾 Stored incident data for GMS:', gmsData);
-    
-    // Switch to GMS section
-    setActiveSection('gms');
-    
-    showNotificationMessage(`Incident ${incident.id} geopend in GMS`);
   };
 
   const calculateStats = (): Stats => {
