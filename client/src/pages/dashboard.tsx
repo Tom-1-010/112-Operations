@@ -4720,6 +4720,10 @@ export default function Dashboard() {
                   <pre id="gmsOutput" className="gms-output"></pre>
                 </div>
               </div>
+              {/* GMS Timestamp at bottom left */}
+              <div className="gms-timestamp">
+                {formatTime(currentTime)}
+              </div>
             </div>
           </div>
         )}
