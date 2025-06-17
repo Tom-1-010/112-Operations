@@ -1546,23 +1546,7 @@ export default function Dashboard() {
         console.log(`Operator acceptance logged at ${dateStr} ${timeStr}`);
       };
 
-      // Setup auto-logging on field interactions
-      const setupFieldInteractionLogging = () => {
-        const fieldSelectors = [
-          'input[id^="gms"]',
-          'select[id^="gms"]', 
-          'textarea[id^="gms"]',
-          '#gmsKladblok'
-        ];
 
-        fieldSelectors.forEach(selector => {
-          const fields = document.querySelectorAll(selector);
-          fields.forEach(field => {
-            field.addEventListener('focus', logOperatorAcceptance, { once: false });
-            field.addEventListener('click', logOperatorAcceptance, { once: false });
-          });
-        });
-      };
 
       // Update GMS status bar with live Dutch date and time
       const updateGMSStatusDateTime = () => {
@@ -3507,6 +3491,66 @@ export default function Dashboard() {
   // GMS Kladblok functionality
   useEffect(() => {
     const initializeKladblokFeatures = () => {
+      // Track if operator acceptance has been logged for this incident
+      let operatorAcceptanceLogged = false;
+
+      // Auto-log operator acceptance when any field is first clicked
+      const logOperatorAcceptance = () => {
+        if (operatorAcceptanceLogged) return;
+        
+        const meldingLogging = document.getElementById("gmsMeldingLogging");
+        if (!meldingLogging) return;
+
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("nl-NL", {
+          day: "2-digit",
+          month: "2-digit", 
+          year: "numeric"
+        });
+        const timeStr = now.toLocaleTimeString("nl-NL", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        // Determine active discipline (default to Politie)
+        const activeDiscipline = "P--"; // Could be enhanced to detect actual discipline
+
+        const logEntry = document.createElement("div");
+        logEntry.className = "gms-log-entry operator-acceptance";
+        logEntry.innerHTML = `
+          <span class="gms-log-time">${timeStr}</span>
+          <span class="gms-log-message">Oproep aangenomen door discipline ${activeDiscipline} op ${dateStr} ${timeStr}</span>
+        `;
+
+        // Add to top of logging area
+        if (meldingLogging.firstChild) {
+          meldingLogging.insertBefore(logEntry, meldingLogging.firstChild);
+        } else {
+          meldingLogging.appendChild(logEntry);
+        }
+
+        operatorAcceptanceLogged = true;
+        console.log(`Operator acceptance logged at ${dateStr} ${timeStr}`);
+      };
+
+      // Setup auto-logging on field interactions
+      const setupFieldInteractionLogging = () => {
+        const fieldSelectors = [
+          'input[id^="gms"]',
+          'select[id^="gms"]', 
+          'textarea[id^="gms"]',
+          '#gmsKladblok'
+        ];
+
+        fieldSelectors.forEach(selector => {
+          const fields = document.querySelectorAll(selector);
+          fields.forEach(field => {
+            field.addEventListener('focus', logOperatorAcceptance, { once: false });
+            field.addEventListener('click', logOperatorAcceptance, { once: false });
+          });
+        });
+      };
+
       const kladblok = document.getElementById("gmsKladblok");
       const verzendButton = document.getElementById("gmsVerzendButton");
       const alertButton = document.getElementById("gmsAlertButton");
@@ -3886,6 +3930,9 @@ export default function Dashboard() {
 
       // Initialize header with current values
       updateDynamicHeader();
+
+      // Setup auto-logging on field interactions
+      setupFieldInteractionLogging();
 
       // GMS Status Button Handlers
       const collectGMSFormData = () => {
@@ -4310,8 +4357,7 @@ export default function Dashboard() {
         serviceAmbulanceBtn.addEventListener("click", handleServiceButtonClick);
       }
 
-      // Setup auto-logging on field interactions
-      setupFieldInteractionLogging();
+      // Setup auto-logging on field interactions (defined within initializeKladblokFeatures)
 
       return () => {
         verzendButton.removeEventListener("click", handleVerzendClick);
