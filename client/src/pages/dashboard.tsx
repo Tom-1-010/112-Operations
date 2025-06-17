@@ -1028,9 +1028,22 @@ export default function Dashboard() {
           });
 
           if (mc1Select && mc2Select && mc3Select) {
+            console.log('✅ All dropdown elements found, proceeding with classification detection');
             const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
             console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
-            console.log('📝 Input text:', notitieText);
+            console.log('📝 Input text:', `"${notitieText}"`);
+            
+            // Quick test: check if we have any "brgb" codes in our data
+            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
+            console.log('🧪 Test - BRGB codes available:', testBrgb.length, testBrgb.slice(0, 3));
+            
+            // Test specific searches
+            const testOngevall = storedClassifications.filter(c => 
+              c.MC1.toLowerCase().includes('ongeval') || 
+              c.MC2.toLowerCase().includes('wegvervoer') ||
+              c.MC3.toLowerCase().includes('letsel')
+            );
+            console.log('🧪 Test - Ongeval/wegvervoer/letsel matches:', testOngevall.length);
             
             const lines = notitieText.split('\n');
             let matchedClassification = null;
