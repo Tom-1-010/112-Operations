@@ -21,26 +21,40 @@ export default function IncidentTable({
     (inc) => inc.status === 'active' || inc.status === 'accepted'
   );
 
-  const getPriorityLabel = (priority: string | number) => {
+  const getPriorityCircleStyle = (priority: string | number) => {
     const priorityNum = typeof priority === 'string' ? parseInt(priority) : priority;
-    return `Prio ${priorityNum}`;
-  };
-
-  const getPriorityClass = (priority: string | number) => {
-    const priorityNum = typeof priority === 'string' ? parseInt(priority) : priority;
+    const baseStyle = {
+      width: '20px',
+      height: '20px',
+      borderRadius: '50%',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontSize: '12px',
+      fontWeight: 'bold'
+    };
+    
     switch (priorityNum) {
       case 1:
-        return 'priority-1';
+        return { ...baseStyle, backgroundColor: '#dc3545' }; // red
       case 2:
-        return 'priority-2';
+        return { ...baseStyle, backgroundColor: '#fd7e14' }; // orange
       case 3:
-        return 'priority-3';
+        return { ...baseStyle, backgroundColor: '#28a745' }; // green
       case 4:
       case 5:
-        return 'priority-4-5';
+        return { ...baseStyle, backgroundColor: '#6c757d' }; // grey
       default:
-        return 'priority-3';
+        return { ...baseStyle, backgroundColor: '#28a745' }; // green
     }
+  };
+
+  const getRowStyle = (index: number) => {
+    return {
+      backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#e9ecef',
+      cursor: 'pointer'
+    };
   };
 
   return (
@@ -54,11 +68,13 @@ export default function IncidentTable({
       </div>
       <div className="incidents-table">
         <div className="incident-row" style={{ background: '#f8f9fa', fontWeight: 600 }}>
-          <div>Type</div>
-          <div>Locatie</div>
-          <div>Tijd</div>
-          <div>Eenheden</div>
-          <div>Prioriteit</div>
+          <div>Prio</div>
+          <div>MC1 / MC2 / MC3</div>
+          <div>Straatnaam + Huisnummer</div>
+          <div>Plaatsnaam</div>
+          <div>Incident Nummer</div>
+          <div>Toegewezen Eenheden</div>
+          <div>Status</div>
           <div>Acties</div>
         </div>
         <div id="incidentsList">
@@ -67,46 +83,66 @@ export default function IncidentTable({
               Geen actieve incidenten
             </div>
           ) : (
-            activeIncidents.map((incident) => (
-              <div 
-                key={incident.id} 
-                className="incident-row" 
-                style={{ cursor: 'pointer' }}
-                onClick={() => onIncidentClick(incident)}
-              >
-                <div className="incident-type">{incident.type}</div>
-                <div className="incident-location">{incident.location}</div>
-                <div className="incident-time">{incident.timeAgo}</div>
-                <div className="units-assigned">{incident.unitsAssigned}</div>
-                <div>
-                  <span className={`priority-tag ${getPriorityClass(incident.priority)}`}>
-                    {getPriorityLabel(incident.priority)}
-                  </span>
-                </div>
-                <div className="incident-actions" onClick={(e) => e.stopPropagation()}>
-                  {incident.status === 'active' && (
+            activeIncidents.map((incident, index) => {
+              // Parse location data
+              const locationParts = incident.location.split(',');
+              const streetAndNumber = locationParts[0]?.trim() || '';
+              const city = locationParts[1]?.trim() || 'Rotterdam';
+              
+              // Create MC1/MC2/MC3 display (placeholder for now as we need to add this data to incidents)
+              const mcDisplay = incident.type || 'Onbekend';
+              
+              // Get status display
+              const statusDisplay = incident.status === 'active' ? 'Nieuw' : 
+                                  incident.status === 'accepted' ? 'In behandeling' : 
+                                  incident.status === 'closed' ? 'Afgehandeld' : 'Onbekend';
+              
+              // Units display (placeholder as unitsAssigned is currently a number)
+              const unitsDisplay = incident.unitsAssigned > 0 ? `${incident.unitsAssigned} eenheden` : 'Geen';
+              
+              return (
+                <div 
+                  key={incident.id} 
+                  className="incident-row" 
+                  style={getRowStyle(index)}
+                  onClick={() => onIncidentClick(incident)}
+                >
+                  <div>
+                    <div style={getPriorityCircleStyle(incident.priority)}>
+                      {typeof incident.priority === 'string' ? parseInt(incident.priority) : incident.priority}
+                    </div>
+                  </div>
+                  <div>{mcDisplay}</div>
+                  <div>{streetAndNumber}</div>
+                  <div>{city}</div>
+                  <div>{incident.id}</div>
+                  <div>{unitsDisplay}</div>
+                  <div>{statusDisplay}</div>
+                  <div className="incident-actions" onClick={(e) => e.stopPropagation()}>
+                    {incident.status === 'active' && (
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => onAccept(incident.id)}
+                      >
+                        <i className="bi bi-check"></i>
+                      </button>
+                    )}
                     <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => onAccept(incident.id)}
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => onClose(incident.id)}
                     >
-                      <i className="bi bi-check"></i>
+                      <i className="bi bi-x"></i>
                     </button>
-                  )}
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => onClose(incident.id)}
-                  >
-                    <i className="bi bi-x"></i>
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => onRemove(incident.id)}
-                  >
-                    <i className="bi bi-trash"></i>
-                  </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => onRemove(incident.id)}
+                    >
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
