@@ -1403,51 +1403,57 @@ export default function Dashboard() {
         showNotificationMessage("GMS melding opgeslagen");
       };
 
-      // Add event listeners for both button click and Enter key
-      const verzendButton = document.getElementById("gmsVerzendButton");
-      const kladblokElement = document.getElementById("gmsKladblok");
-      
-      if (verzendButton) {
-        console.log('📌 Verzend button found, attaching notepad submit listener');
+      // Setup event listeners with a delay to ensure DOM is ready
+      const setupGMSEventListeners = () => {
+        console.log('🔧 Setting up GMS event listeners...');
         
-        // Test function to verify classification data is available
-        const testClassificationData = () => {
-          const testData = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-          console.log('🧪 Classification test - data available:', testData.length);
-          const brgbTest = testData.filter(c => c.code.toLowerCase().includes('brgb'));
-          console.log('🧪 BRGB codes found:', brgbTest.length, brgbTest.slice(0, 2));
-        };
-        testClassificationData();
+        const verzendButton = document.getElementById("gmsVerzendButton");
+        const kladblokElement = document.getElementById("gmsKladblok");
         
-        // Add manual test function for debugging
-        (window as any).testClassification = () => {
-          console.log('🧪 Manual test triggered');
-          const kladblok = document.getElementById("gmsKladblok");
-          if (kladblok) {
-            kladblok.textContent = "-brgb";
-            handleNotePadSubmit();
-          }
-        };
-        
-        verzendButton.addEventListener("click", () => {
-          console.log('🖱️ Verzend button clicked - triggering classification detection');
-          handleNotePadSubmit();
+        console.log('🔍 Element check:', {
+          verzendButton: !!verzendButton,
+          kladblokElement: !!kladblokElement
         });
-      } else {
-        console.error('❌ Verzend button not found!');
-      }
-      
-      // Add Enter key support for kladblok
-      if (kladblokElement) {
-        console.log('📌 Kladblok found, attaching Enter key listener');
-        kladblokElement.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+        
+        if (verzendButton) {
+          console.log('📌 Verzend button found, attaching event listener');
+          
+          // Remove any existing listeners first
+          verzendButton.removeEventListener("click", handleNotePadSubmit);
+          
+          verzendButton.addEventListener("click", (e) => {
             e.preventDefault();
-            console.log('⌨️ Enter key pressed in kladblok!');
+            console.log('🖱️ Verzend button clicked!');
             handleNotePadSubmit();
-          }
-        });
-      }
+          });
+          
+          // Test function
+          (window as any).testClassification = () => {
+            console.log('🧪 Manual test triggered');
+            const kladblok = document.getElementById("gmsKladblok");
+            if (kladblok) {
+              kladblok.textContent = "-brgb";
+              handleNotePadSubmit();
+            }
+          };
+        } else {
+          console.error('❌ Verzend button not found!');
+        }
+        
+        if (kladblokElement) {
+          console.log('📌 Kladblok found, attaching Enter key listener');
+          kladblokElement.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              console.log('⌨️ Enter key pressed!');
+              handleNotePadSubmit();
+            }
+          });
+        }
+      };
+      
+      // Setup listeners after a brief delay to ensure DOM is ready
+      setTimeout(setupGMSEventListeners, 100);
       
       // Form save button (for full form submission)
       const saveButton = document.getElementById("gmsSaveButton");
