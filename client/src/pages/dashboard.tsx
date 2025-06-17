@@ -852,7 +852,7 @@ export default function Dashboard() {
 
             if (selectedMC1) {
               const mc2Options = getUniqueClassificationsByLevel(
-                "MC2",
+                "mc2",
                 selectedMC1,
               );
               mc2Options.forEach((mc2) => {
@@ -873,7 +873,7 @@ export default function Dashboard() {
 
             if (selectedMC2) {
               const mc3Options = getUniqueClassificationsByLevel(
-                "MC3",
+                "mc3",
                 selectedMC2,
               );
               mc3Options.forEach((mc3) => {
@@ -3251,7 +3251,7 @@ export default function Dashboard() {
                               className="gms-field"
                             >
                               <option value="">Selecteer...</option>
-                              {getUniqueClassificationsByLevel("MC1").map(
+                              {getUniqueClassificationsByLevel("mc1").map(
                                 (mc1) => (
                                   <option key={mc1} value={mc1}>
                                     {mc1}
