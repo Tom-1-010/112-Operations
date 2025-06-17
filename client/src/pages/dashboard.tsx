@@ -2033,7 +2033,7 @@ export default function Dashboard() {
             const statusClass = `legacy-status-${status.toLowerCase()}`;
 
             return `
-            <div class="legacy-incident-row" data-incident-id="${incident.id || index}" onclick="selectIncidentRow(this)">
+            <div class="legacy-incident-row" data-incident-id="${incident.id || index}" onclick="redirectToGMS(${incident.id || index})">
               <div class="legacy-col-id">${incidentNumber}</div>
               <div class="legacy-col-tijd">${formattedTime}</div>
               <div class="legacy-col-mc">${mc}</div>
@@ -2048,283 +2048,34 @@ export default function Dashboard() {
           })
           .join("");
 
-        // Modal functionality
-        const openIncidentModal = (incident: any, incidentId: string) => {
-          const modal = document.getElementById("incidentModal");
-          if (!modal) return;
-
-          // Populate modal with incident data
-          const incidentNumber = `I${String(incident.id || incidentId).padStart(6, "0")}`;
-          const formattedDateTime = new Date(incident.timestamp).toLocaleString(
-            "nl-NL",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            },
-          );
-
-          document.getElementById("incidentModalTitle")!.textContent =
-            `${incidentNumber} - Details`;
-          document.getElementById("modalIncidentNumber")!.textContent =
-            incidentNumber;
-          document.getElementById("modalIncidentTime")!.textContent =
-            formattedDateTime;
-          document.getElementById("modalMC1")!.textContent =
-            incident.classificatie1 || "-";
-          document.getElementById("modalMC2")!.textContent =
-            incident.classificatie2 || "-";
-          document.getElementById("modalMC3")!.textContent =
-            incident.classificatie3 || "-";
-
-          const locatie =
-            incident.straatnaam && incident.huisnummer
-              ? `${incident.straatnaam} ${incident.huisnummer}`
-              : incident.meldingsadres || "-";
-          document.getElementById("modalLocation")!.textContent = locatie;
-          document.getElementById("modalPlace")!.textContent =
-            incident.plaatsnaam || incident.gemeente || "-";
-          document.getElementById("modalMunicipality")!.textContent =
-            incident.gemeente || "-";
-
-          // Priority with colored box
-          const prioriteitNummer = incident.prioriteit || 3;
-          const priorityElement = document.getElementById("modalPriority")!;
-          priorityElement.innerHTML = `<span class="modal-priority-box priority-box-${prioriteitNummer}">${prioriteitNummer}</span>`;
-
-          // Status
-          let status = "Nieuw";
-          if (incident.status === "Uitgegeven") status = "Openstaand";
-          if (incident.status === "Openstaand") status = "Openstaand";
-          if (incident.status === "In wacht") status = "Nieuw";
-          if (incident.status === "Afgesloten") status = "Afgesloten";
-          document.getElementById("modalStatus")!.textContent = status;
-
-          // Load existing logging
-          loadIncidentLogging(incidentId);
-
-          // Reset form fields
-          (
-            document.getElementById("incidentNoteInput") as HTMLTextAreaElement
-          ).value = "";
-          (
-            document.getElementById("unitAssignmentSelect") as HTMLSelectElement
-          ).value = "";
-          document.getElementById("assignedUnitDisplay")!.style.display =
-            "none";
-
-          // Show modal
-          modal.style.display = "flex";
-
-          // Store current incident ID for notes and unit assignment
-          (window as any).currentIncidentId = incidentId;
-        };
-
-        const loadIncidentLogging = (incidentId: string) => {
-          const loggingArea = document.getElementById("incidentLoggingArea");
-          if (!loggingArea) return;
-
-          // Get stored logging for this incident
-          const incidentLogs = JSON.parse(
-            localStorage.getItem(`incident_logs_${incidentId}`) || "[]",
-          );
-
-          if (incidentLogs.length === 0) {
-            loggingArea.innerHTML =
-              '<div style="color: #6c757d; font-style: italic;">Geen logging beschikbaar</div>';
+        // Direct GMS redirection functionality
+        const redirectToGMS = (incidentId: number) => {
+          const incident = sortedIncidenten.find((inc: any) => inc.id === incidentId);
+          if (!incident) {
+            console.error('Incident not found:', incidentId);
             return;
           }
 
-          loggingArea.innerHTML = incidentLogs
-            .map(
-              (log: any) => `
-            <div class="logging-entry">
-              <div class="logging-timestamp">[${log.timestamp}]</div>
-              <div>${log.message}</div>
-            </div>
-          `,
-            )
-            .join("");
+          console.log('Redirecting incident to GMS:', incidentId);
+          
+          // Create incident object in the expected format
+          const incidentForGMS = {
+            id: incident.id,
+            type: incident.classificatie1 || 'Onbekend',
+            location: incident.straatnaam && incident.huisnummer 
+              ? `${incident.straatnaam} ${incident.huisnummer}` 
+              : incident.meldingsadres || 'Onbekend',
+            timestamp: incident.timestamp,
+            priority: incident.prioriteit === 1 ? 'high' : incident.prioriteit === 2 ? 'medium' : 'low',
+            status: 'active'
+          };
+          
+          // Use the existing handleIncidentClick function
+          handleIncidentClick(incidentForGMS);
         };
 
-        // Modal close functionality
-        const setupModalEventListeners = () => {
-          const modal = document.getElementById("incidentModal");
-          const closeBtn = document.getElementById("incidentModalClose");
-          const closeFooterBtn = document.getElementById(
-            "incidentModalCloseBtn",
-          );
-          const addNoteBtn = document.getElementById("addIncidentNote");
-          const assignUnitBtn = document.getElementById("assignUnit");
-
-          if (closeBtn) {
-            closeBtn.onclick = () => {
-              if (modal) modal.style.display = "none";
-            };
-          }
-
-          if (closeFooterBtn) {
-            closeFooterBtn.onclick = () => {
-              if (modal) modal.style.display = "none";
-            };
-          }
-
-          // Close modal when clicking outside
-          if (modal) {
-            modal.onclick = (e) => {
-              if (e.target === modal) {
-                modal.style.display = "none";
-              }
-            };
-          }
-
-          // Add note functionality
-          if (addNoteBtn) {
-            addNoteBtn.onclick = () => {
-              const noteInput = document.getElementById(
-                "incidentNoteInput",
-              ) as HTMLTextAreaElement;
-              const note = noteInput.value.trim();
-
-              if (note && (window as any).currentIncidentId) {
-                addIncidentNote((window as any).currentIncidentId, note);
-                noteInput.value = "";
-              }
-            };
-          }
-
-          // Assign unit functionality
-          if (assignUnitBtn) {
-            assignUnitBtn.onclick = () => {
-              const unitSelect = document.getElementById(
-                "unitAssignmentSelect",
-              ) as HTMLSelectElement;
-              const selectedUnit = unitSelect.value;
-
-              if (selectedUnit && (window as any).currentIncidentId) {
-                assignUnitToIncident(
-                  (window as any).currentIncidentId,
-                  selectedUnit,
-                );
-              }
-            };
-          }
-        };
-
-        const addIncidentNote = (incidentId: string, note: string) => {
-          const timestamp = new Date().toLocaleString("nl-NL", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          });
-
-          // Get existing logs
-          const existingLogs = JSON.parse(
-            localStorage.getItem(`incident_logs_${incidentId}`) || "[]",
-          );
-
-          // Add new log entry
-          existingLogs.push({
-            timestamp: timestamp,
-            message: `NOTITIE: ${note}`,
-            type: "note",
-          });
-
-          // Save updated logs
-          localStorage.setItem(
-            `incident_logs_${incidentId}`,
-            JSON.stringify(existingLogs),
-          );
-
-          // Refresh logging display
-          loadIncidentLogging(incidentId);
-        };
-
-        const assignUnitToIncident = (
-          incidentId: string,
-          unitNumber: string,
-        ) => {
-          const timestamp = new Date().toLocaleString("nl-NL", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          });
-
-          // Get existing logs
-          const existingLogs = JSON.parse(
-            localStorage.getItem(`incident_logs_${incidentId}`) || "[]",
-          );
-
-          // Add unit assignment log entry
-          existingLogs.push({
-            timestamp: timestamp,
-            message: `EENHEID GEKOPPELD: ${unitNumber}`,
-            type: "unit_assignment",
-          });
-
-          // Save updated logs
-          localStorage.setItem(
-            `incident_logs_${incidentId}`,
-            JSON.stringify(existingLogs),
-          );
-
-          // Show assigned unit display
-          const assignedUnitDisplay = document.getElementById(
-            "assignedUnitDisplay",
-          );
-          const assignedUnitNumber =
-            document.getElementById("assignedUnitNumber");
-
-          if (assignedUnitDisplay && assignedUnitNumber) {
-            assignedUnitNumber.textContent = unitNumber;
-            assignedUnitDisplay.style.display = "block";
-          }
-
-          // Refresh logging display
-          loadIncidentLogging(incidentId);
-
-          // Reset select
-          const unitSelect = document.getElementById(
-            "unitAssignmentSelect",
-          ) as HTMLSelectElement;
-          if (unitSelect) unitSelect.value = "";
-        };
-
-        // Add row selection functionality and modal opening
-        (window as any).selectIncidentRow = function (row: HTMLElement) {
-          // Remove previous selection
-          const previousSelected = incidentsList.querySelector(".selected");
-          if (previousSelected) {
-            previousSelected.classList.remove("selected");
-          }
-
-          // Add selection to clicked row
-          row.classList.add("selected");
-
-          // Get incident data and open modal
-          const incidentId = row.getAttribute("data-incident-id");
-          if (incidentId) {
-            const incident = sortedIncidenten.find(
-              (inc: any) =>
-                String(inc.id || sortedIncidenten.indexOf(inc)) === incidentId,
-            );
-
-            if (incident) {
-              openIncidentModal(incident, incidentId);
-            }
-          }
-        };
-
-        // Initialize modal event listeners
-        setupModalEventListeners();
+        // Make redirectToGMS globally available
+        (window as any).redirectToGMS = redirectToGMS;
       } catch (error) {
         console.error("Error loading incidents:", error);
         incidentsList.innerHTML = `
@@ -3651,140 +3402,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Incident Details Modal */}
-              <div
-                id="incidentModal"
-                className="incident-modal-overlay"
-                style={{ display: "none" }}
-              >
-                <div className="incident-modal-content">
-                  <div className="incident-modal-header">
-                    <h3 id="incidentModalTitle">Incident Details</h3>
-                    <button
-                      className="incident-modal-close"
-                      id="incidentModalClose"
-                    >
-                      ×
-                    </button>
-                  </div>
 
-                  <div className="incident-modal-body">
-                    {/* Incident Details Section */}
-                    <div className="incident-details-section">
-                      <h4>Incident Gegevens</h4>
-                      <div className="incident-details-grid">
-                        <div className="incident-detail-item">
-                          <label>Incidentnummer:</label>
-                          <span id="modalIncidentNumber"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>Tijdstip:</label>
-                          <span id="modalIncidentTime"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>MC1:</label>
-                          <span id="modalMC1"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>MC2:</label>
-                          <span id="modalMC2"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>MC3:</label>
-                          <span id="modalMC3"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>Locatie:</label>
-                          <span id="modalLocation"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>Plaats:</label>
-                          <span id="modalPlace"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>Gemeente:</label>
-                          <span id="modalMunicipality"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>Prioriteit:</label>
-                          <span id="modalPriority"></span>
-                        </div>
-                        <div className="incident-detail-item">
-                          <label>Status:</label>
-                          <span id="modalStatus"></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Logging Section */}
-                    <div className="incident-logging-section">
-                      <h4>Logging Historie</h4>
-                      <div
-                        className="incident-logging-area"
-                        id="incidentLoggingArea"
-                      >
-                        {/* Logging entries will be added here */}
-                      </div>
-                    </div>
-
-                    {/* Add Note Section */}
-                    <div className="incident-note-section">
-                      <h4>Nieuwe Notitie</h4>
-                      <textarea
-                        id="incidentNoteInput"
-                        className="incident-note-input"
-                        placeholder="Voer notitie in..."
-                        rows={3}
-                      ></textarea>
-                      <button
-                        id="addIncidentNote"
-                        className="incident-note-btn"
-                      >
-                        Toevoegen
-                      </button>
-                    </div>
-
-                    {/* Unit Assignment Section */}
-                    <div className="incident-unit-section">
-                      <h4>Eenheid Koppelen</h4>
-                      <select
-                        id="unitAssignmentSelect"
-                        className="incident-unit-select"
-                      >
-                        <option value="">Selecteer eenheid...</option>
-                        <option value="5901">5901</option>
-                        <option value="4502">4502</option>
-                        <option value="7801">7801</option>
-                        <option value="3204">3204</option>
-                        <option value="6105">6105</option>
-                        <option value="2907">2907</option>
-                      </select>
-                      <button id="assignUnit" className="incident-unit-btn">
-                        Koppelen
-                      </button>
-                      <div
-                        id="assignedUnitDisplay"
-                        className="assigned-unit-display"
-                        style={{ display: "none" }}
-                      >
-                        <span>
-                          Gekoppelde eenheid:{" "}
-                          <strong id="assignedUnitNumber"></strong>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="incident-modal-footer">
-                    <button
-                      className="incident-modal-close-btn"
-                      id="incidentModalCloseBtn"
-                    >
-                      Sluiten
-                    </button>
-                  </div>
-                </div>
-              </div>
 
               {/* Delete Confirmation Modal */}
               {showDeleteConfirmModal && (
