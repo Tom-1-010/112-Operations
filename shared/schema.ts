@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -55,6 +55,19 @@ export const gmsIncidents = pgTable("gms_incidents", {
   afgesloten: timestamp("afgesloten"),
 });
 
+export const phoneNumbers = pgTable("phone_numbers", {
+  id: serial("id").primaryKey(),
+  functie: text("functie").notNull(),
+  omschrijving: text("omschrijving").notNull(),
+  telefoonnummer: text("telefoonnummer").notNull(),
+  beginDienst: text("begin_dienst"),
+  eindeDienst: text("einde_dienst"),
+  bereikbaar24u: boolean("bereikbaar_24u").default(false),
+  opmerkingen: text("opmerkingen"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertIncidentSchema = createInsertSchema(incidents).omit({
   id: true,
   timestamp: true,
@@ -68,9 +81,17 @@ export const insertGmsIncidentSchema = createInsertSchema(gmsIncidents).omit({
   afgesloten: true,
 });
 
+export const insertPhoneNumberSchema = createInsertSchema(phoneNumbers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
 export type InsertUnit = z.infer<typeof insertUnitSchema>;
 export type Unit = typeof units.$inferSelect;
 export type InsertGmsIncident = z.infer<typeof insertGmsIncidentSchema>;
 export type GmsIncident = typeof gmsIncidents.$inferSelect;
+export type InsertPhoneNumber = z.infer<typeof insertPhoneNumberSchema>;
+export type PhoneNumber = typeof phoneNumbers.$inferSelect;
