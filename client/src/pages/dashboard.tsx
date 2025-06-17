@@ -1409,8 +1409,28 @@ export default function Dashboard() {
       
       if (verzendButton) {
         console.log('📌 Verzend button found, attaching notepad submit listener');
+        
+        // Test function to verify classification data is available
+        const testClassificationData = () => {
+          const testData = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+          console.log('🧪 Classification test - data available:', testData.length);
+          const brgbTest = testData.filter(c => c.code.toLowerCase().includes('brgb'));
+          console.log('🧪 BRGB codes found:', brgbTest.length, brgbTest.slice(0, 2));
+        };
+        testClassificationData();
+        
+        // Add manual test function for debugging
+        (window as any).testClassification = () => {
+          console.log('🧪 Manual test triggered');
+          const kladblok = document.getElementById("gmsKladblok");
+          if (kladblok) {
+            kladblok.textContent = "-brgb";
+            handleNotePadSubmit();
+          }
+        };
+        
         verzendButton.addEventListener("click", () => {
-          console.log('🖱️ Verzend button clicked!');
+          console.log('🖱️ Verzend button clicked - triggering classification detection');
           handleNotePadSubmit();
         });
       } else {
