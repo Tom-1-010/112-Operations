@@ -1074,6 +1074,45 @@ export default function Dashboard() {
               const trimmedLine = line.trim();
               console.log('🔍 Processing line:', trimmedLine);
               
+              // Check for Meldergegevens format (m/phone/name)
+              if (trimmedLine.startsWith('m/') && trimmedLine.length > 2) {
+                const melderData = trimmedLine.substring(2); // Remove 'm/' prefix
+                const parts = melderData.split('/');
+                
+                if (parts.length >= 2) {
+                  const phoneNumber = parts[0].trim();
+                  const melderName = parts.slice(1).join('/').trim(); // Join remaining parts for name
+                  
+                  console.log('📞 Processing Meldergegevens:', { phoneNumber, melderName });
+                  
+                  // Fill in the Meldergegevens fields
+                  const phoneField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
+                  const nameField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
+                  
+                  if (phoneField) {
+                    phoneField.value = phoneNumber;
+                    console.log('✅ Phone number set to:', phoneNumber);
+                  } else {
+                    console.error('❌ Phone field not found');
+                  }
+                  
+                  if (nameField) {
+                    nameField.value = melderName;
+                    console.log('✅ Melder name set to:', melderName);
+                  } else {
+                    console.error('❌ Name field not found');
+                  }
+                  
+                  // Log the automatic fill
+                  const timestamp = new Date().toLocaleTimeString('nl-NL');
+                  console.log(`${timestamp} ✅ Meldergegevens automatisch ingevuld: ${melderName} - ${phoneNumber}`);
+                } else {
+                  console.log('⚠️ Invalid Meldergegevens format. Expected: m/phone/name');
+                }
+                
+                continue; // Skip to next line
+              }
+              
               // Check for hyphen-based codes (-brgb, -wvoi, etc.)
               if (trimmedLine.startsWith('-') && trimmedLine.length > 1) {
                 const searchQuery = trimmedLine.substring(1).trim();
