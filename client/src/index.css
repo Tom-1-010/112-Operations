@@ -356,9 +356,15 @@ body {
   font-size: 14px;
 }
 
-/* Specific grid for incidents page */
+/* Incidents page specific styling */
+.incidents-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .incidents-content .incident-row {
-  grid-template-columns: 150px 1fr 1fr 100px 80px;
+  grid-template-columns: 1fr 1fr 1fr 80px 100px 140px;
 }
 
 /* Legacy Incidents Table */

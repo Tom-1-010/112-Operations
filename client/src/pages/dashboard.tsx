@@ -3972,14 +3972,15 @@ export default function Dashboard() {
           <div className="content-section active">
             <StatsGrid stats={calculateStats()} />
             <div className="content-grid">
-              <IncidentTable
-                incidents={incidents}
-                onAccept={acceptIncident}
-                onClose={closeIncident}
-                onRemove={removeIncident}
-                onSimulateNew={simulateNewIncident}
-                onIncidentClick={handleIncidentClick}
-              />
+              <div className="section">
+                <div className="section-header">
+                  <h3 className="section-title">Dashboard Overzicht</h3>
+                </div>
+                <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                  <p>Welkom bij het Meldkamer Dashboard</p>
+                  <p>Gebruik de navigatie om naar specifieke secties te gaan</p>
+                </div>
+              </div>
               <UnitsPanel units={units} />
             </div>
           </div>
