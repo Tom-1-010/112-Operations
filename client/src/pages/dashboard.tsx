@@ -576,20 +576,25 @@ Water\tVaartuig in nood\tZinken\twavnzi\t1\tZinkend vaartuig`;
     basisteamsData,
   );
 
-  const [gmsClassifications] = useLocalStorage<GmsClassification[]>(
+  const [gmsClassifications, setGmsClassifications] = useLocalStorage<GmsClassification[]>(
     "gmsClassifications",
     gmsClassificationsData,
   );
 
+  // Ensure classifications are loaded and available
+  useEffect(() => {
+    if (gmsClassifications.length === 0) {
+      console.log('Loading GMS classifications...', gmsClassificationsData.length, 'entries');
+      setGmsClassifications(gmsClassificationsData);
+    }
+  }, [gmsClassifications.length, setGmsClassifications]);
+
   // GMS Classification database helper functions
   const searchGmsClassifications = (query: string): GmsClassification[] => {
-    const storedClassifications = JSON.parse(
-      localStorage.getItem("gmsClassifications") || "[]",
-    );
-    if (!query) return storedClassifications;
+    if (!query) return gmsClassifications;
 
     const lowerQuery = query.toLowerCase();
-    return storedClassifications.filter(
+    return gmsClassifications.filter(
       (classification: GmsClassification) =>
         classification.code.toLowerCase().includes(lowerQuery) ||
         classification.mc1.toLowerCase().includes(lowerQuery) ||
@@ -602,10 +607,7 @@ Water\tVaartuig in nood\tZinken\twavnzi\t1\tZinkend vaartuig`;
   const getClassificationByCode = (
     code: string,
   ): GmsClassification | undefined => {
-    const storedClassifications = JSON.parse(
-      localStorage.getItem("gmsClassifications") || "[]",
-    );
-    return storedClassifications.find(
+    return gmsClassifications.find(
       (classification: GmsClassification) => classification.code === code,
     );
   };
@@ -614,18 +616,16 @@ Water\tVaartuig in nood\tZinken\twavnzi\t1\tZinkend vaartuig`;
     level: "mc1" | "mc2" | "mc3",
     parentValue?: string,
   ): string[] => {
-    const storedClassifications = JSON.parse(
-      localStorage.getItem("gmsClassifications") || "[]",
-    ) as GmsClassification[];
-    let filtered = storedClassifications;
+    // Use React state instead of localStorage for real-time updates
+    let filtered = gmsClassifications;
 
     // Filter by parent value if provided
     if (level === "mc2" && parentValue) {
-      filtered = storedClassifications.filter(
+      filtered = gmsClassifications.filter(
         (c: GmsClassification) => c.mc1 === parentValue,
       );
     } else if (level === "mc3" && parentValue) {
-      filtered = storedClassifications.filter(
+      filtered = gmsClassifications.filter(
         (c: GmsClassification) => c.mc2 === parentValue,
       );
     }
