@@ -1362,132 +1362,50 @@ export default function Dashboard() {
 
         // Enhanced shortcode detection for both Notitieveld and Melding Logging
         const setupShortcodeDetection = (element: HTMLElement, elementName: string) => {
-          if (!element) {
-            console.log(`Element not found for ${elementName}`);
-            return;
-          }
+          if (!element) return;
           
-          console.log(`Setting up shortcode detection for ${elementName}`, element);
-          
-          element.addEventListener("input", () => {
-            let text = '';
-            if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
-              text = (element as HTMLTextAreaElement | HTMLInputElement).value;
-            } else {
-              text = element.textContent || '';
-            }
-            
-            console.log(`Input detected in ${elementName}: "${text}"`);
-            
+          const handleInput = () => {
+            const text = element.textContent || '';
             const lines = text.split('\n');
             const lastLine = lines[lines.length - 1].trim();
             
-            console.log(`Last line: "${lastLine}"`);
-            
-            // Enhanced shortcode detection with multiple formats
-            let searchQuery = null;
-            let isHyphenFormat = false;
-            
-            // Format: -alabab or -al or -bz or -onder invloed (hyphen-based detection)
+            // Only process hyphen-based input
             if (lastLine.startsWith('-') && lastLine.length > 1) {
-              searchQuery = lastLine.substring(1).trim();
-              isHyphenFormat = true;
-              console.log(`Hyphen format detected: "${searchQuery}"`);
-            }
-            
-            // Format: alabab (without dash, legacy support)
-            else if (lastLine.length >= 2 && /^[a-z]+$/.test(lastLine)) {
-              searchQuery = lastLine;
-              isHyphenFormat = false;
-              console.log(`Legacy format detected: "${searchQuery}"`);
-            }
-            
-            if (searchQuery && isHyphenFormat) {
+              const searchQuery = lastLine.substring(1).trim();
               const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
-              let matchedClassification = null;
               
-              console.log(`Searching for: "${searchQuery}" in ${storedClassifications.length} classifications`);
-              
-              // 1. Try exact code match first (e.g., -alabab)
-              matchedClassification = storedClassifications.find(c => 
-                c.code.toLowerCase() === searchQuery.toLowerCase()
+              // Find matching classification
+              let matchedClassification = storedClassifications.find(c => 
+                c.code.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC3.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC2.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC1.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
               );
               
-              // 2. Try exact MC3 text match (e.g., -onder invloed)
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC3.toLowerCase() === searchQuery.toLowerCase()
-                );
-              }
-              
-              // 3. Try exact MC2 text match
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC2.toLowerCase() === searchQuery.toLowerCase()
-                );
-              }
-              
-              // 4. Try exact MC1 text match
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC1.toLowerCase() === searchQuery.toLowerCase()
-                );
-              }
-              
-              // 5. Try partial matches for MC3 (e.g., -invloed matches "Onder invloed")
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  searchQuery.toLowerCase().includes(c.MC3.toLowerCase())
-                );
-              }
-              
-              // 6. Try partial matches for MC2
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  searchQuery.toLowerCase().includes(c.MC2.toLowerCase())
-                );
-              }
-              
-              // 7. Try partial matches for MC1
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC1.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  searchQuery.toLowerCase().includes(c.MC1.toLowerCase())
-                );
-              }
-              
-              // 8. Try partial code matches (e.g., -al matches alabab)
-              if (!matchedClassification) {
-                matchedClassification = storedClassifications.find(c => 
-                  c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
-                );
-              }
-              
-              if (matchedClassification) {
-                if (selectClassificationByCode(matchedClassification.code)) {
-                  // Auto-set priority based on classification
-                  if (prioriteitSelect) {
-                    prioriteitSelect.value = matchedClassification.prio.toString();
-                  }
-                  
-                  // Log the automatic classification selection
-                  if (loggingPanel) {
-                    const timestamp = new Date().toLocaleTimeString('nl-NL');
-                    const logEntry = document.createElement('div');
-                    logEntry.className = 'log-entry classification-auto';
-                    logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Auto-classificatie via ${elementName}: "${searchQuery}" → ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
-                    loggingPanel.appendChild(logEntry);
-                    loggingPanel.scrollTop = loggingPanel.scrollHeight;
-                  }
-                  
-                  // Keep the processed code/text in the input for reference
-                  // Don't remove the text to allow users to see what triggered the classification
+              if (matchedClassification && selectClassificationByCode(matchedClassification.code)) {
+                // Set priority
+                if (prioriteitSelect) {
+                  prioriteitSelect.value = matchedClassification.prio.toString();
+                }
+                
+                // Log the action
+                if (loggingPanel) {
+                  const timestamp = new Date().toLocaleTimeString('nl-NL');
+                  const logEntry = document.createElement('div');
+                  logEntry.className = 'log-entry classification-auto';
+                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Auto-classificatie: "${searchQuery}" → ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
+                  loggingPanel.appendChild(logEntry);
+                  loggingPanel.scrollTop = loggingPanel.scrollHeight;
                 }
               }
             }
-          });
+          };
+          
+          element.addEventListener("input", handleInput);
+          element.addEventListener("keyup", handleInput);
         };
         
         // Setup shortcode detection for Notitieveld
