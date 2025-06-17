@@ -3196,3 +3196,45 @@ body {
   color: #1e3f73;
   text-decoration: none;
 }
+
+/* Caller Information Fields in Intake */
+.caller-info-section {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+}
+
+.caller-info-field {
+  margin-bottom: 12px;
+}
+
+.caller-info-field:last-child {
+  margin-bottom: 0;
+}
+
+.caller-info-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2c5aa0;
+  margin-bottom: 6px;
+}
+
+.caller-info-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 11px;
+  background: #f8f9fa;
+  color: #666;
+  font-family: inherit;
+}
+
+.caller-info-input:focus {
+  outline: none;
+  border-color: #2c5aa0;
+  background: #fff;
+}

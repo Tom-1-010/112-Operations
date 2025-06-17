@@ -4666,6 +4666,30 @@ export default function Dashboard() {
                         Verzend
                       </button>
                     </div>
+                    
+                    {/* Caller Information Fields */}
+                    <div className="caller-info-section">
+                      <div className="caller-info-field">
+                        <label className="caller-info-label">Telefoonnummer melder</label>
+                        <input 
+                          type="text" 
+                          className="caller-info-input" 
+                          id="intakeTelefoonnummerMelder"
+                          readOnly
+                          placeholder="Automatisch ingevuld"
+                        />
+                      </div>
+                      <div className="caller-info-field">
+                        <label className="caller-info-label">AML locatie melder</label>
+                        <input 
+                          type="text" 
+                          className="caller-info-input" 
+                          id="intakeAmlLocatie"
+                          readOnly
+                          placeholder="AML locatie wanneer beschikbaar"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -5252,42 +5276,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                         
-                        {/* Caller Information Fields */}
-                        <div className="gms-caller-info-section">
-                          <div className="gms-block-title">Melder Gegevens</div>
-                          <div className="gms-form-row">
-                            <div className="gms-field-group">
-                              <label>Telefoonnummer Melder</label>
-                              <input
-                                type="text"
-                                id="gmsTelefoonnummerMelder"
-                                className="gms-field"
-                                placeholder="06-12345678"
-                              />
-                            </div>
-                            <div className="gms-field-group">
-                              <label>Naam Melder</label>
-                              <input
-                                type="text"
-                                id="gmsNaamMelder"
-                                className="gms-field"
-                                placeholder="Voor- en achternaam"
-                              />
-                            </div>
-                          </div>
-                          <div className="gms-form-row">
-                            <div className="gms-field-group gms-field-wide">
-                              <label>AML Locatie Melder</label>
-                              <input
-                                type="text"
-                                id="gmsAmlLocatie"
-                                className="gms-field"
-                                placeholder="Automatisch via AML wanneer beschikbaar"
-                                readOnly
-                              />
-                            </div>
-                          </div>
-                        </div>
+
                       </div>
                     </div>
                   </div>
