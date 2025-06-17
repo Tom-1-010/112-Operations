@@ -5184,6 +5184,123 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+        {activeSection === "telefoonnummers" && (
+          <div className="content-section active">
+            <div className="section">
+              <div className="section-header">
+                <h3 className="section-title">Telefoonnummers Beheer</h3>
+                <button
+                  className="btn btn-primary"
+                  id="addNewPhoneNumberBtn"
+                >
+                  <i className="bi bi-plus-lg"></i>
+                  Nieuw Telefoonnummer
+                </button>
+              </div>
+              <div className="telefoonnummers-content">
+                {/* Phone Number Form */}
+                <div className="gms-form-container">
+                  <div className="gms-form-section">
+                    <h4 className="gms-section-title">Nieuw Telefoonnummer Toevoegen</h4>
+                    <div className="gms-form-grid">
+                      <div className="gms-field-group">
+                        <label className="gms-label">Naam</label>
+                        <input
+                          type="text"
+                          id="phoneNaam"
+                          className="gms-field"
+                          placeholder="Voor- en achternaam"
+                        />
+                      </div>
+                      <div className="gms-field-group">
+                        <label className="gms-label">Telefoonnummer</label>
+                        <input
+                          type="text"
+                          id="phoneTelefoonnummer"
+                          className="gms-field"
+                          placeholder="06-12345678"
+                        />
+                      </div>
+                      <div className="gms-field-group">
+                        <label className="gms-label">Categorie</label>
+                        <select id="phoneCategorie" className="gms-field">
+                          <option value="">Selecteer categorie</option>
+                          <option value="Collega">Collega</option>
+                          <option value="Externe partner">Externe partner</option>
+                        </select>
+                      </div>
+                      <div className="gms-field-group">
+                        <label className="gms-label">Functie</label>
+                        <input
+                          type="text"
+                          id="phoneFunctie"
+                          className="gms-field"
+                          placeholder="Functieomschrijving"
+                        />
+                      </div>
+                      <div className="gms-field-group gms-field-wide">
+                        <label className="gms-label">Diensten / Bereikbaarheid</label>
+                        <input
+                          type="text"
+                          id="phoneDiensten"
+                          className="gms-field"
+                          placeholder="Tijden en beschikbaarheid"
+                        />
+                      </div>
+                      <div className="gms-field-group gms-field-wide">
+                        <label className="gms-label">Opmerkingen</label>
+                        <textarea
+                          id="phoneOpmerkingen"
+                          className="gms-field gms-textarea"
+                          rows={3}
+                          placeholder="Aanvullende informatie"
+                        ></textarea>
+                      </div>
+                    </div>
+                    <div className="gms-form-actions">
+                      <button
+                        type="button"
+                        id="savePhoneNumberBtn"
+                        className="gms-save-btn"
+                      >
+                        Opslaan
+                      </button>
+                      <button
+                        type="button"
+                        id="resetPhoneFormBtn"
+                        className="gms-reset-btn"
+                      >
+                        Wissen
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone Numbers List */}
+                <div className="telefoonnummers-list-section">
+                  <h4 className="gms-section-title">Opgeslagen Telefoonnummers</h4>
+                  <div className="telefoonnummers-table-container">
+                    <table className="telefoonnummers-table">
+                      <thead>
+                        <tr>
+                          <th>Naam</th>
+                          <th>Telefoonnummer</th>
+                          <th>Categorie</th>
+                          <th>Functie</th>
+                          <th>Diensten</th>
+                          <th>Acties</th>
+                        </tr>
+                      </thead>
+                      <tbody id="telefoonnummersTableBody">
+                        {/* Phone numbers will be loaded here dynamically */}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <div className={`notification ${showNotification ? "show" : ""}`}>
