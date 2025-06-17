@@ -1813,10 +1813,10 @@ export default function Dashboard() {
         // Populate MC1
         mc1Field.innerHTML = '<option value="">Selecteer...</option>';
         const mc1Options = Array.from(new Set(storedClassifications.map((c: any) => c.MC1).filter(Boolean))).sort();
-        mc1Options.forEach((mc1: string) => {
+        mc1Options.forEach((mc1, index) => {
           const option = document.createElement('option');
-          option.value = mc1;
-          option.textContent = mc1;
+          option.value = String(mc1);
+          option.textContent = String(mc1);
           mc1Field.appendChild(option);
         });
         mc1Field.value = mc1Value;
@@ -1825,10 +1825,10 @@ export default function Dashboard() {
         if (mc1Value && mc2Value) {
           mc2Field.innerHTML = '<option value="">Selecteer...</option>';
           const mc2Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC1 === mc1Value).map((c: any) => c.MC2).filter(Boolean))).sort();
-          mc2Options.forEach((mc2: string) => {
+          mc2Options.forEach((mc2, index) => {
             const option = document.createElement('option');
-            option.value = mc2;
-            option.textContent = mc2;
+            option.value = String(mc2);
+            option.textContent = String(mc2);
             mc2Field.appendChild(option);
           });
           mc2Field.value = mc2Value;
@@ -1837,10 +1837,10 @@ export default function Dashboard() {
           if (mc2Value && mc3Value) {
             mc3Field.innerHTML = '<option value="">Selecteer...</option>';
             const mc3Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC2 === mc2Value).map((c: any) => c.MC3).filter(Boolean))).sort();
-            mc3Options.forEach((mc3: string) => {
+            mc3Options.forEach((mc3, index) => {
               const option = document.createElement('option');
-              option.value = mc3;
-              option.textContent = mc3;
+              option.value = String(mc3);
+              option.textContent = String(mc3);
               mc3Field.appendChild(option);
             });
             mc3Field.value = mc3Value;
@@ -4010,8 +4010,8 @@ export default function Dashboard() {
 
                   <div className="intake-quick-actions">
                     <h4>Snelle Acties</h4>
-                    <button className="intake-action-btn primary">
-                      📞 Nieuwe Melding Ontvangen
+                    <button className="intake-action-btn primary" onClick={handleNewIncident}>
+                      📞 Nieuw Incident Starten
                     </button>
                     <button className="intake-action-btn secondary">
                       📋 Doorsturen naar GMS
