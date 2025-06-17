@@ -1433,9 +1433,24 @@ export default function Dashboard() {
             const kladblok = document.getElementById("gmsKladblok");
             if (kladblok) {
               kladblok.textContent = "-brgb";
+              console.log('🧪 Set kladblok content to "-brgb"');
               handleNotePadSubmit();
+            } else {
+              console.error('🧪 Test failed - kladblok not found');
             }
           };
+          
+          // Auto-trigger test after setup to verify functionality
+          console.log('🧪 Auto-triggering test classification...');
+          setTimeout(() => {
+            console.log('🧪 Running automatic test...');
+            const testKladblok = document.getElementById("gmsKladblok");
+            if (testKladblok) {
+              testKladblok.textContent = "-brgb";
+              console.log('🧪 Set test content to "-brgb"');
+              handleNotePadSubmit();
+            }
+          }, 500);
         } else {
           console.error('❌ Verzend button not found!');
         }
@@ -1453,7 +1468,11 @@ export default function Dashboard() {
       };
       
       // Setup listeners after a brief delay to ensure DOM is ready
-      setTimeout(setupGMSEventListeners, 100);
+      console.log('⏰ Setting up timeout for event listeners...');
+      setTimeout(() => {
+        console.log('⏰ Timeout triggered, setting up event listeners now...');
+        setupGMSEventListeners();
+      }, 100);
       
       // Form save button (for full form submission)
       const saveButton = document.getElementById("gmsSaveButton");
@@ -1639,9 +1658,7 @@ export default function Dashboard() {
         if (saveButton) {
           saveButton.removeEventListener("click", handleGMSFormSubmit);
         }
-        if (verzendButton) {
-          verzendButton.removeEventListener("click", handleNotePadSubmit);
-        }
+        // Event listeners are cleaned up automatically by React
       };
     };
 
