@@ -6,6 +6,7 @@ interface IncidentTableProps {
   onClose: (id: number) => void;
   onRemove: (id: number) => void;
   onSimulateNew: () => void;
+  onIncidentClick: (incident: Incident) => void;
 }
 
 export default function IncidentTable({
@@ -14,6 +15,7 @@ export default function IncidentTable({
   onClose,
   onRemove,
   onSimulateNew,
+  onIncidentClick,
 }: IncidentTableProps) {
   const activeIncidents = incidents.filter(
     (inc) => inc.status === 'active' || inc.status === 'accepted'
@@ -66,7 +68,12 @@ export default function IncidentTable({
             </div>
           ) : (
             activeIncidents.map((incident) => (
-              <div key={incident.id} className="incident-row">
+              <div 
+                key={incident.id} 
+                className="incident-row" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => onIncidentClick(incident)}
+              >
                 <div className="incident-type">{incident.type}</div>
                 <div className="incident-location">{incident.location}</div>
                 <div className="incident-time">{incident.timeAgo}</div>
@@ -76,7 +83,7 @@ export default function IncidentTable({
                     {getPriorityLabel(incident.priority)}
                   </span>
                 </div>
-                <div className="incident-actions">
+                <div className="incident-actions" onClick={(e) => e.stopPropagation()}>
                   {incident.status === 'active' && (
                     <button
                       className="btn btn-success btn-sm"

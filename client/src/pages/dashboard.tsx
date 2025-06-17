@@ -1690,6 +1690,63 @@ export default function Dashboard() {
 
       setupClassificationDropdowns();
 
+      // Load incident data if available
+      const loadIncidentData = () => {
+        const currentIncidentData = localStorage.getItem('currentGmsIncident');
+        if (currentIncidentData) {
+          try {
+            const incidentData = JSON.parse(currentIncidentData);
+            console.log('Loading incident data into GMS:', incidentData.incidentId);
+            
+            // Pre-fill form fields with incident data
+            const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
+            const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
+            const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
+            const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+            const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
+            const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
+            const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
+            const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+            const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
+            const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
+            const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+            const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+            const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+            const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+            const kladblokField = document.getElementById("gmsKladblok") as HTMLElement;
+            
+            // Fill in the fields with stored data
+            if (melderNaamField && incidentData.melderNaam) melderNaamField.value = incidentData.melderNaam;
+            if (melderAdresField && incidentData.melderAdres) melderAdresField.value = incidentData.melderAdres;
+            if (telefoonnummerField && incidentData.telefoonnummer) telefoonnummerField.value = incidentData.telefoonnummer;
+            if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
+            if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
+            if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
+            if (postcodeField && incidentData.postcode) postcodeField.value = incidentData.postcode;
+            if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
+            if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
+            if (tijdstipField && incidentData.timestamp) tijdstipField.value = incidentData.timestamp;
+            if (prioriteitField && incidentData.priority) prioriteitField.value = incidentData.priority.toString();
+            if (mc1Field && incidentData.mc1) mc1Field.value = incidentData.mc1;
+            if (mc2Field && incidentData.mc2) mc2Field.value = incidentData.mc2;
+            if (mc3Field && incidentData.mc3) mc3Field.value = incidentData.mc3;
+            if (kladblokField && incidentData.notities) kladblokField.textContent = incidentData.notities;
+            
+            // If no specific location data, use the incident location
+            if (straatnaamField && !incidentData.straatnaam && incidentData.location) {
+              straatnaamField.value = incidentData.location;
+            }
+            
+            console.log('GMS form pre-filled with incident data');
+          } catch (error) {
+            console.error('Failed to load incident data:', error);
+          }
+        }
+      };
+
+      // Load incident data after a brief delay to ensure form is ready
+      setTimeout(loadIncidentData, 500);
+
       return () => {
         clearInterval(timeTimer);
         clearInterval(statusDateTimeTimer);
@@ -3314,7 +3371,58 @@ export default function Dashboard() {
 
   const removeIncident = (id: number) => {
     setIncidents((prev) => prev.filter((inc) => inc.id !== id));
+    // Remove GMS data for this incident when it's deleted
+    localStorage.removeItem(`gmsData_${id}`);
     showNotificationMessage("Incident verwijderd");
+  };
+
+  // Handle incident click - redirect to GMS with pre-filled data
+  const handleIncidentClick = (incident: Incident) => {
+    console.log('Opening incident in GMS:', incident.id);
+    
+    // Store the incident data for GMS to load
+    const gmsData = {
+      incidentId: incident.id,
+      type: incident.type,
+      location: incident.location,
+      timestamp: incident.timestamp,
+      priority: incident.priority,
+      status: incident.status,
+      // Additional fields that might be stored
+      mc1: '',
+      mc2: '',
+      mc3: '',
+      melderNaam: '',
+      melderAdres: '',
+      telefoonnummer: '',
+      straatnaam: '',
+      huisnummer: '',
+      toevoeging: '',
+      postcode: '',
+      plaatsnaam: '',
+      gemeente: '',
+      notities: ''
+    };
+    
+    // Try to load existing GMS data for this incident
+    const existingGmsData = localStorage.getItem(`gmsData_${incident.id}`);
+    if (existingGmsData) {
+      try {
+        const parsedData = JSON.parse(existingGmsData);
+        Object.assign(gmsData, parsedData);
+        console.log('Loading existing GMS data for incident:', incident.id);
+      } catch (error) {
+        console.error('Failed to parse existing GMS data:', error);
+      }
+    }
+    
+    // Store current incident data for GMS
+    localStorage.setItem('currentGmsIncident', JSON.stringify(gmsData));
+    
+    // Switch to GMS section
+    setActiveSection('gms');
+    
+    showNotificationMessage(`Incident ${incident.id} geopend in GMS`);
   };
 
   const calculateStats = (): Stats => {
@@ -3392,6 +3500,7 @@ export default function Dashboard() {
                 onClose={closeIncident}
                 onRemove={removeIncident}
                 onSimulateNew={simulateNewIncident}
+                onIncidentClick={handleIncidentClick}
               />
               <UnitsPanel units={units} />
             </div>
