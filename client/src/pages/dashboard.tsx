@@ -842,20 +842,20 @@ export default function Dashboard() {
   };
 
   const getUniqueClassificationsByLevel = (
-    level: "mc1" | "mc2" | "mc3",
+    level: "MC1" | "MC2" | "MC3",
     parentValue?: string,
   ): string[] => {
     // Use React state instead of localStorage for real-time updates
     let filtered = gmsClassifications;
 
     // Filter by parent value if provided
-    if (level === "mc2" && parentValue) {
+    if (level === "MC2" && parentValue) {
       filtered = gmsClassifications.filter(
-        (c: GmsClassification) => c.mc1 === parentValue,
+        (c: GmsClassification) => c.MC1 === parentValue,
       );
-    } else if (level === "mc3" && parentValue) {
+    } else if (level === "MC3" && parentValue) {
       filtered = gmsClassifications.filter(
-        (c: GmsClassification) => c.mc2 === parentValue,
+        (c: GmsClassification) => c.MC2 === parentValue,
       );
     }
 
@@ -1164,15 +1164,15 @@ export default function Dashboard() {
             let matchingClassification;
             if (selectedMC3) {
               matchingClassification = storedClassifications.find(c => 
-                c.mc1 === selectedMC1 && c.mc2 === selectedMC2 && c.mc3 === selectedMC3
+                c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
               );
             } else if (selectedMC2) {
               matchingClassification = storedClassifications.find(c => 
-                c.mc1 === selectedMC1 && c.mc2 === selectedMC2 && !c.mc3
+                c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && !c.MC3
               );
             } else {
               matchingClassification = storedClassifications.find(c => 
-                c.mc1 === selectedMC1 && !c.mc2 && !c.mc3
+                c.MC1 === selectedMC1 && !c.MC2 && !c.MC3
               );
             }
 
@@ -1304,23 +1304,23 @@ export default function Dashboard() {
               const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
               
               // Find the classification that matches this MC3 value
-              const matchingClassification = storedClassifications.find(c => c.mc3 === selectedMC3);
+              const matchingClassification = storedClassifications.find(c => c.MC3 === selectedMC3);
               
               if (matchingClassification) {
                 // Auto-fill MC1 and MC2
-                mc1Select.value = matchingClassification.mc1;
+                mc1Select.value = matchingClassification.MC1;
                 
-                if (matchingClassification.mc2) {
+                if (matchingClassification.MC2) {
                   // Populate MC2 dropdown first
                   mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-                  const mc2Options = getUniqueClassificationsByLevel("mc2", matchingClassification.mc1);
+                  const mc2Options = getUniqueClassificationsByLevel("MC2", matchingClassification.MC1);
                   mc2Options.forEach(mc2 => {
                     const option = document.createElement('option');
                     option.value = mc2;
                     option.textContent = mc2;
                     mc2Select.appendChild(option);
                   });
-                  mc2Select.value = matchingClassification.mc2;
+                  mc2Select.value = matchingClassification.MC2;
                 }
                 
                 // Log the auto-fill action
