@@ -5238,7 +5238,14 @@ export default function Dashboard() {
                                 createdAt: new Date().toISOString()
                               };
 
-                              setPhoneNumbers(prev => [...prev, savedPhoneNumber]);
+                              console.log('Saving phone number:', savedPhoneNumber);
+                              console.log('Current phoneNumbers before save:', phoneNumbers);
+                              
+                              setPhoneNumbers(prev => {
+                                const updated = [...prev, savedPhoneNumber];
+                                console.log('Updated phoneNumbers:', updated);
+                                return updated;
+                              });
                               setNewPhoneNumber({
                                 functie: "", omschrijving: "", telefoonnummer: "",
                                 beginDienst: "", eindeDienst: "", bereikbaar24u: false, opmerkingen: ""
@@ -5276,7 +5283,7 @@ export default function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {Array.isArray(phoneNumbers) && phoneNumbers.map((phone) => (
+                        {phoneNumbers.map((phone) => (
                           <tr key={phone.id} className="telefoon-row">
                             <td className="telefoon-functie"><strong>{phone.functie}</strong></td>
                             <td className="telefoon-omschrijving">{phone.omschrijving}</td>
