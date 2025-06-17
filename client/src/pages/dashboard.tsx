@@ -447,6 +447,30 @@ export default function Dashboard() {
         }
       };
 
+      // Update GMS status bar with live Dutch date and time
+      const updateGMSStatusDateTime = () => {
+        const statusElement = document.getElementById("gmsStatusDateTime");
+        if (statusElement) {
+          const now = new Date();
+          
+          // Dutch day names
+          const dayNames = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+          const monthNames = ["januari", "februari", "maart", "april", "mei", "juni", 
+                             "juli", "augustus", "september", "oktober", "november", "december"];
+          
+          const dayName = dayNames[now.getDay()];
+          const day = now.getDate();
+          const month = monthNames[now.getMonth()];
+          const year = now.getFullYear();
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+          
+          const formattedDateTime = `${dayName} ${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
+          statusElement.textContent = formattedDateTime;
+        }
+      };
+
       // Handle GMS form submission
       const handleGMSSubmit = () => {
         const kladblok = document.getElementById("gmsKladblok");
@@ -562,8 +586,13 @@ export default function Dashboard() {
       updateGMSTime();
       const timeTimer = setInterval(updateGMSTime, 60000);
 
+      // Initialize GMS status date/time immediately and then every second
+      updateGMSStatusDateTime();
+      const statusDateTimeTimer = setInterval(updateGMSStatusDateTime, 1000);
+
       return () => {
         clearInterval(timeTimer);
+        clearInterval(statusDateTimeTimer);
         if (saveButton) {
           saveButton.removeEventListener("click", handleGMSSubmit);
         }
@@ -2734,7 +2763,7 @@ export default function Dashboard() {
                   {/* Bottom Status Bar */}
                   <div className="gms-status-bar">
                     <div className="gms-status-left">
-                      <span>Woensdag 18 november 2015, 08:27:38</span>
+                      <span id="gmsStatusDateTime">Woensdag 18 november 2015, 08:27:38</span>
                     </div>
                     <div className="gms-status-right">
                       <button className="gms-status-btn" id="gmsEindrapportButton">Eindrapport</button>
