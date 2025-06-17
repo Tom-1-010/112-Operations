@@ -1608,7 +1608,8 @@ body {
 .gms-field-group {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 0 0 auto;
+  width: auto;
 }
 
 .gms-field-group.gms-field-wide {
@@ -1624,31 +1625,33 @@ body {
 }
 
 .gms-field-street {
-  flex: 3;
+  width: 120px;
+  max-width: 120px;
 }
 
 .gms-field-number {
-  flex: 1;
-  max-width: 60px;
+  width: 40px;
+  max-width: 40px;
 }
 
 .gms-field-extension {
-  flex: 1;
-  max-width: 50px;
+  width: 30px;
+  max-width: 30px;
 }
 
 .gms-field-postal {
-  flex: 1;
-  max-width: 80px;
+  width: 60px;
+  max-width: 60px;
 }
 
 .gms-field-city {
-  flex: 2;
+  width: 80px;
+  max-width: 80px;
 }
 
 .gms-field-full {
-  flex: 1;
-  width: 100%;
+  width: 150px;
+  max-width: 150px;
 }
 
 .gms-field-group label {
@@ -1663,6 +1666,14 @@ body {
   padding: 2px 4px;
   font-size: 11px;
   font-family: inherit;
+  width: 100px;
+  max-width: 100px;
+}
+
+/* Dropdown specific styling for even more compact appearance */
+select.gms-field {
+  width: 120px;
+  max-width: 120px;
 }
 
 .gms-field-small {
@@ -1801,9 +1812,11 @@ body {
   padding: 4px;
   font-size: 11px;
   font-family: 'Courier New', monospace;
-  flex: 1;
+  width: 180px;
+  max-width: 180px;
   overflow-y: auto;
   min-height: 150px;
+  resize: none;
 }
 
 .gms-text-area-compact {
