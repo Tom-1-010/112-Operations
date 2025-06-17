@@ -32,6 +32,9 @@ export default function Dashboard() {
   
   // Phone numbers management with localStorage fallback
   const [phoneNumbers, setPhoneNumbers] = useLocalStorage<any[]>("telefoonlijst", []);
+  
+  // Ensure phoneNumbers is always an array
+  const phoneNumbersArray = Array.isArray(phoneNumbers) ? phoneNumbers : [];
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState({
     functie: "",
@@ -5239,7 +5242,7 @@ export default function Dashboard() {
                               };
 
                               console.log('Saving phone number:', savedPhoneNumber);
-                              console.log('Current phoneNumbers before save:', phoneNumbers);
+                              console.log('Current phoneNumbers before save:', phoneNumbersArray);
                               
                               setPhoneNumbers(prev => {
                                 const prevArray = Array.isArray(prev) ? prev : [];
@@ -5284,7 +5287,7 @@ export default function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {(phoneNumbers || []).map((phone) => (
+                        {phoneNumbersArray.map((phone) => (
                           <tr key={phone.id} className="telefoon-row">
                             <td className="telefoon-functie"><strong>{phone.functie}</strong></td>
                             <td className="telefoon-omschrijving">{phone.omschrijving}</td>
@@ -5313,7 +5316,7 @@ export default function Dashboard() {
                             </td>
                           </tr>
                         ))}
-                        {(!phoneNumbers || phoneNumbers.length === 0) && (
+                        {phoneNumbersArray.length === 0 && (
                           <tr>
                             <td colSpan={6} className="no-data">
                               Geen telefoonnummers gevonden. Klik op "Telefoonnummer toevoegen" om een nummer toe te voegen.
