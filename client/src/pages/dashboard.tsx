@@ -1123,6 +1123,71 @@ export default function Dashboard() {
                 continue; // Skip to next line
               }
               
+              // Check for location commands starting with =
+              if (trimmedLine.startsWith('=') && trimmedLine.length > 1) {
+                const locationData = trimmedLine.substring(1); // Remove the =
+                console.log('📍 Processing location command:', locationData);
+                
+                // Parse location data
+                let plaatsnaam = '';
+                let straatnaam = '';
+                let huisnummer = '';
+                
+                // Handle format: =Rotterdam+ (plus sign is optional and ignored)
+                if (locationData.endsWith('+')) {
+                  plaatsnaam = locationData.slice(0, -1).trim();
+                }
+                // Handle format: =Rotterdam/Laan op zuid 12
+                else if (locationData.includes('/')) {
+                  const [city, streetAndNumber] = locationData.split('/');
+                  plaatsnaam = city.trim();
+                  
+                  // Parse street and number
+                  const streetParts = streetAndNumber.trim().split(' ');
+                  const lastPart = streetParts[streetParts.length - 1];
+                  
+                  // Check if last part is a number
+                  const isNumber = /^\d+[a-zA-Z]*$/.test(lastPart);
+                  
+                  if (isNumber) {
+                    huisnummer = lastPart;
+                    straatnaam = streetParts.slice(0, -1).join(' ');
+                  } else {
+                    straatnaam = streetAndNumber.trim();
+                  }
+                }
+                // Handle format: =Rotterdam
+                else {
+                  plaatsnaam = locationData.trim();
+                }
+                
+                // Fill in the location fields
+                const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+                const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+                const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
+                
+                if (plaatsnaamField && plaatsnaam) {
+                  plaatsnaamField.value = plaatsnaam;
+                  console.log('✅ Plaatsnaam set to:', plaatsnaam);
+                }
+                
+                if (straatnaamField && straatnaam) {
+                  straatnaamField.value = straatnaam;
+                  console.log('✅ Straatnaam set to:', straatnaam);
+                }
+                
+                if (huisnummerField && huisnummer) {
+                  huisnummerField.value = huisnummer;
+                  console.log('✅ Huisnummer set to:', huisnummer);
+                }
+                
+                // Log the automatic fill
+                const timestamp = new Date().toLocaleTimeString('nl-NL');
+                console.log(`${timestamp} ✅ Locatie automatisch ingevuld: ${plaatsnaam}${straatnaam ? ' / ' + straatnaam : ''}${huisnummer ? ' ' + huisnummer : ''}`);
+                
+                continue; // Skip to next line
+              }
+              
               // Check for hyphen-based codes (-brgb, -wvoi, etc.)
               if (trimmedLine.startsWith('-') && trimmedLine.length > 1) {
                 const searchQuery = trimmedLine.substring(1).trim();
@@ -1349,9 +1414,16 @@ export default function Dashboard() {
             }
           }
           
-          // Add the note to the logging section
+          // Filter out command lines (= and m/) from the logging display
+          const filteredText = notitieText
+            .split('\n')
+            .filter(line => !line.trim().startsWith('=') && !line.trim().startsWith('m/'))
+            .join('\n')
+            .trim();
+          
+          // Add the filtered note to the logging section
           const meldingLogging = document.getElementById("gmsMeldingLogging");
-          if (meldingLogging && notitieText.trim()) {
+          if (meldingLogging && filteredText.trim()) {
             const timestamp = new Date().toLocaleString('nl-NL', {
               hour: '2-digit',
               minute: '2-digit',
@@ -1363,7 +1435,7 @@ export default function Dashboard() {
             logEntry.className = 'gms-log-entry';
             logEntry.innerHTML = `
               <span class="gms-log-timestamp">[${timestamp}]</span>
-              <span class="gms-log-content">${notitieText}</span>
+              <span class="gms-log-content">${filteredText}</span>
             `;
             
             // Insert at the top of the logging area
@@ -1374,7 +1446,7 @@ export default function Dashboard() {
             }
             
             // Also log to console
-            console.log(`${timestamp} Note: ${notitieText}`);
+            console.log(`${timestamp} Note: ${filteredText}`);
           }
           
           // Clear the notepad after sending
