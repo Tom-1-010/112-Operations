@@ -4315,19 +4315,19 @@ export default function Dashboard() {
             <div className="telefoon-dashboard">
               {/* Header */}
               <div className="telefoon-header">
-                <h2 className="telefoon-title">📞 Telefoon Dashboard - Meldkamer Rotterdam</h2>
+                <h2 className="telefoon-title">Telefoon Dashboard - Meldkamer Rotterdam</h2>
                 <div className="telefoon-header-buttons">
                   <button 
                     className="telefoon-header-btn gms-btn"
                     onClick={() => setActiveSection('gms')}
                   >
-                    🚨 Naar GMS
+                    Naar GMS
                   </button>
                   <button 
                     className="telefoon-header-btn new-tab-btn"
                     onClick={() => window.open(window.location.href, '_blank')}
                   >
-                    🗗 Nieuw Tabblad
+                    Nieuw Tabblad
                   </button>
                 </div>
               </div>
@@ -4339,13 +4339,13 @@ export default function Dashboard() {
                 <div className="telefoon-chat-section">
                   <div className="chat-tabs">
                     <button className="chat-tab active" data-chat="burgers">
-                      👥 Burgers
+                      Burgers
                     </button>
                     <button className="chat-tab" data-chat="collega">
-                      🏢 Collega's
+                      Collega's
                     </button>
                     <button className="chat-tab" data-chat="partners">
-                      🚑 Ketenpartners
+                      Ketenpartners
                     </button>
                   </div>
 
@@ -4371,7 +4371,7 @@ export default function Dashboard() {
                         id="chatInput"
                       />
                       <button className="chat-send-btn" id="chatSendBtn">
-                        ➤ Verzend
+                        Verzend
                       </button>
                     </div>
                   </div>
@@ -4380,70 +4380,64 @@ export default function Dashboard() {
                 {/* Right Column - Contact Panels */}
                 <div className="telefoon-contact-section">
                   
-                  {/* Emergency Services */}
-                  <div className="contact-panel emergency-panel">
-                    <h3 className="panel-title">🚨 Hulpdiensten</h3>
-                    <div className="contact-grid">
-                      <button className="contact-btn emergency" data-service="politie">
-                        🚔 Politie Dispatch
-                        <span className="contact-number">088-1692000</span>
-                      </button>
-                      <button className="contact-btn emergency" data-service="brandweer">
-                        🚒 Brandweer Rotterdam
-                        <span className="contact-number">088-1692100</span>
-                      </button>
-                      <button className="contact-btn emergency" data-service="ambulance">
-                        🚑 Ambulance RAV
-                        <span className="contact-number">088-1692200</span>
-                      </button>
-                      <button className="contact-btn emergency" data-service="boa">
-                        👮 BOA Coördinator
-                        <span className="contact-number">010-4417000</span>
-                      </button>
+                  {/* AI Telephone Conversations - Placeholder */}
+                  <div className="contact-panel ai-conversations-panel">
+                    <h3 className="panel-title">AI Telefoonconversaties</h3>
+                    <div className="ai-placeholder-content">
+                      <div className="placeholder-message">
+                        <strong>Toekomstige functionaliteit:</strong>
+                        <p>Hier komen dynamische AI-gestuurde telefoongesprekken met noodmelders via 112 en andere emergency services.</p>
+                      </div>
+                      <div className="placeholder-features">
+                        <div className="feature-item">• Realtime conversatie simulatie</div>
+                        <div className="feature-item">• Intelligente respons generatie</div>
+                        <div className="feature-item">• Automatische incident classificatie</div>
+                        <div className="feature-item">• Geïntegreerde GMS koppeling</div>
+                      </div>
                     </div>
                   </div>
 
                   {/* Colleagues */}
                   <div className="contact-panel colleague-panel">
-                    <h3 className="panel-title">👥 Collega's</h3>
+                    <h3 className="panel-title">Collega's</h3>
                     <div className="contact-grid">
                       <button className="contact-btn colleague" data-colleague="supervisor">
-                        👔 Dienstchef
-                        <span className="contact-status online">● Online</span>
+                        Dienstchef
+                        <span className="contact-status online">Online</span>
                       </button>
                       <button className="contact-btn colleague" data-colleague="coordinator">
-                        📋 Coördinator
-                        <span className="contact-status online">● Online</span>
+                        Coördinator
+                        <span className="contact-status online">Online</span>
                       </button>
                       <button className="contact-btn colleague" data-colleague="teamleader">
-                        🎯 Teamleider
-                        <span className="contact-status away">● Afwezig</span>
+                        Teamleider
+                        <span className="contact-status away">Afwezig</span>
                       </button>
                       <button className="contact-btn colleague" data-colleague="backup">
-                        🔄 Back-up Centralist
-                        <span className="contact-status online">● Online</span>
+                        Back-up Centralist
+                        <span className="contact-status online">Online</span>
                       </button>
                     </div>
                   </div>
 
                   {/* External Partners */}
                   <div className="contact-panel partner-panel">
-                    <h3 className="panel-title">🤝 Externe Partners</h3>
+                    <h3 className="panel-title">Externe Partners</h3>
                     <div className="contact-grid">
                       <button className="contact-btn partner" data-partner="rijkswaterstaat">
-                        🛣️ Rijkswaterstaat
+                        Rijkswaterstaat
                         <span className="contact-number">0800-8002</span>
                       </button>
                       <button className="contact-btn partner" data-partner="gemeente">
-                        🏛️ Gemeente Rotterdam
+                        Gemeente Rotterdam
                         <span className="contact-number">14010</span>
                       </button>
                       <button className="contact-btn partner" data-partner="ov">
-                        🚌 OV Controle
+                        OV Controle
                         <span className="contact-number">0900-9292</span>
                       </button>
                       <button className="contact-btn partner" data-partner="defensie">
-                        ⚔️ Koninklijke Marechaussee
+                        Koninklijke Marechaussee
                         <span className="contact-number">0900-0141</span>
                       </button>
                     </div>
@@ -4454,9 +4448,9 @@ export default function Dashboard() {
               {/* Bottom Status Bar */}
               <div className="telefoon-status-bar">
                 <div className="status-left">
-                  <span className="call-status">📞 Lijn 1: Beschikbaar</span>
-                  <span className="call-status">📞 Lijn 2: In gesprek</span>
-                  <span className="call-status">📞 Lijn 3: Beschikbaar</span>
+                  <span className="call-status">Lijn 1: Beschikbaar</span>
+                  <span className="call-status">Lijn 2: In gesprek</span>
+                  <span className="call-status">Lijn 3: Beschikbaar</span>
                 </div>
                 <div className="status-right">
                   <span className="active-calls">Actieve gesprekken: 2</span>
