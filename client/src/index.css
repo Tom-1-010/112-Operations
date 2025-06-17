@@ -896,7 +896,345 @@ body {
   background: #c82333;
 }
 
-/* Intake Page Styling - Cleared for new design */
+/* Telefoon Dashboard Styling */
+.telefoon-dashboard {
+  background: #f0f0f0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+}
+
+.telefoon-header {
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.telefoon-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.telefoon-header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.telefoon-header-btn {
+  background: #e0e0e0;
+  border: 1px outset #c0c0c0;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+}
+
+.telefoon-header-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.gms-btn {
+  background: #ff6b6b;
+  color: white;
+}
+
+.gms-btn:hover {
+  background: #ff5252;
+}
+
+.new-tab-btn {
+  background: #4dabf7;
+  color: white;
+}
+
+.new-tab-btn:hover {
+  background: #339af0;
+}
+
+.telefoon-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Chat Section */
+.telefoon-chat-section {
+  background: white;
+  border: 2px inset #c0c0c0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-tabs {
+  display: flex;
+  background: #c0c0c0;
+}
+
+.chat-tab {
+  flex: 1;
+  background: #e0e0e0;
+  border: 1px outset #c0c0c0;
+  border-bottom: none;
+  padding: 6px 8px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+}
+
+.chat-tab.active {
+  background: white;
+  border: 1px inset #c0c0c0;
+  border-bottom: 1px solid white;
+}
+
+.chat-tab:not(.active):hover {
+  background: #f0f0f0;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+  background: white;
+  border: 1px inset #c0c0c0;
+  margin: 4px;
+  max-height: 400px;
+}
+
+.chat-message {
+  margin-bottom: 12px;
+  padding: 6px;
+  border: 1px solid #d0d0d0;
+  background: #f8f8f8;
+}
+
+.chat-message.incoming {
+  background: #e3f2fd;
+  border-left: 3px solid #2196f3;
+}
+
+.chat-message.outgoing {
+  background: #f3e5f5;
+  border-left: 3px solid #9c27b0;
+  margin-left: 20px;
+}
+
+.message-sender {
+  font-weight: bold;
+  font-size: 10px;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.message-content {
+  font-size: 11px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.message-time {
+  font-size: 9px;
+  color: #666;
+  text-align: right;
+}
+
+.chat-input-section {
+  display: flex;
+  padding: 8px;
+  background: #f0f0f0;
+  border-top: 1px inset #c0c0c0;
+}
+
+.chat-input {
+  flex: 1;
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+.chat-send-btn {
+  background: #28a745;
+  color: white;
+  border: 1px outset #c0c0c0;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.chat-send-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.chat-send-btn:hover {
+  background: #218838;
+}
+
+/* Contact Section */
+.telefoon-contact-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-panel {
+  background: white;
+  border: 2px inset #c0c0c0;
+  padding: 8px;
+  flex: 1;
+}
+
+.panel-title {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  background: #e0e0e0;
+  padding: 4px 6px;
+  border: 1px outset #c0c0c0;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.contact-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #f0f0f0;
+  border: 1px outset #c0c0c0;
+  padding: 6px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Courier New', monospace;
+  min-height: 40px;
+}
+
+.contact-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.contact-btn.emergency {
+  background: #ffebee;
+  border-color: #f44336;
+}
+
+.contact-btn.emergency:hover {
+  background: #ffcdd2;
+}
+
+.contact-btn.colleague {
+  background: #e8f5e8;
+  border-color: #4caf50;
+}
+
+.contact-btn.colleague:hover {
+  background: #c8e6c9;
+}
+
+.contact-btn.partner {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+.contact-btn.partner:hover {
+  background: #ffe0b2;
+}
+
+.contact-number {
+  font-size: 9px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.contact-status {
+  font-size: 9px;
+  margin-top: 2px;
+}
+
+.contact-status.online {
+  color: #4caf50;
+}
+
+.contact-status.away {
+  color: #ff9800;
+}
+
+/* Status Bar */
+.telefoon-status-bar {
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+}
+
+.status-left, .status-right {
+  display: flex;
+  gap: 16px;
+}
+
+.call-status, .active-calls, .queue-count {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .telefoon-main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .telefoon-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  
+  .telefoon-header-buttons {
+    justify-content: center;
+  }
+  
+  .status-left, .status-right {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
 
 
 

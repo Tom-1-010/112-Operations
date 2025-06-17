@@ -1829,6 +1829,186 @@ export default function Dashboard() {
         console.log('Incident dispatched and saved to database');
       };
 
+      // Telefoon Dashboard Interactive Functionality
+      const initializeTelefoonDashboard = () => {
+        // Chat functionality
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const chatInput = document.getElementById('chatInput') as HTMLInputElement;
+        const chatMessages = document.getElementById('chatMessages');
+        
+        const sendChatMessage = () => {
+          if (!chatInput || !chatMessages) return;
+          
+          const messageText = chatInput.value.trim();
+          if (!messageText) return;
+          
+          const timestamp = new Date().toLocaleTimeString('nl-NL', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          // Create outgoing message
+          const messageDiv = document.createElement('div');
+          messageDiv.className = 'chat-message outgoing';
+          messageDiv.innerHTML = `
+            <div class="message-sender">Meldkamer</div>
+            <div class="message-content">${messageText}</div>
+            <div class="message-time">${timestamp}</div>
+          `;
+          
+          chatMessages.appendChild(messageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          
+          // Clear input
+          chatInput.value = '';
+          
+          // Simulate response after 2-3 seconds
+          setTimeout(() => {
+            const responseDiv = document.createElement('div');
+            responseDiv.className = 'chat-message incoming';
+            const responses = [
+              'Bedankt voor de snelle reactie.',
+              'Ik begrijp het. Hulpdiensten zijn onderweg.',
+              'Kunt u op een veilige plek blijven?',
+              'We houden contact voor updates.',
+              'De eenheden zijn ter plaatse aangekomen.'
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            responseDiv.innerHTML = `
+              <div class="message-sender">Melder - 06-12345678</div>
+              <div class="message-content">${randomResponse}</div>
+              <div class="message-time">${new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}</div>
+            `;
+            
+            chatMessages.appendChild(responseDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }, 2000 + Math.random() * 1000);
+        };
+        
+        if (chatSendBtn) {
+          chatSendBtn.addEventListener('click', sendChatMessage);
+        }
+        
+        if (chatInput) {
+          chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              sendChatMessage();
+            }
+          });
+        }
+        
+        // Chat tab switching
+        const chatTabs = document.querySelectorAll('.chat-tab');
+        chatTabs.forEach(tab => {
+          tab.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const chatType = target.dataset.chat;
+            
+            // Remove active class from all tabs
+            chatTabs.forEach(t => t.classList.remove('active'));
+            target.classList.add('active');
+            
+            // Update chat messages based on chat type
+            if (chatMessages) {
+              let newContent = '';
+              const timestamp = new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+              
+              switch (chatType) {
+                case 'burgers':
+                  newContent = `
+                    <div class="chat-message incoming">
+                      <div class="message-sender">Melder - 06-12345678</div>
+                      <div class="message-content">Er is een verkeersongeval op de A20 richting Den Haag, ter hoogte van afslag Vlaardingen.</div>
+                      <div class="message-time">14:23</div>
+                    </div>
+                    <div class="chat-message outgoing">
+                      <div class="message-sender">Meldkamer</div>
+                      <div class="message-content">Dank u voor de melding. Zijn er gewonden? En kunt u de exacte locatie bevestigen?</div>
+                      <div class="message-time">14:24</div>
+                    </div>
+                  `;
+                  break;
+                case 'collega':
+                  newContent = `
+                    <div class="chat-message incoming">
+                      <div class="message-sender">Dienstchef</div>
+                      <div class="message-content">Status update: alle eenheden zijn operationeel. Nieuwe richtlijnen voor avonddienst zijn beschikbaar.</div>
+                      <div class="message-time">${timestamp}</div>
+                    </div>
+                    <div class="chat-message outgoing">
+                      <div class="message-sender">Centralist</div>
+                      <div class="message-content">Begrepen. Ik heb de nieuwe richtlijnen gelezen en geïmplementeerd.</div>
+                      <div class="message-time">${timestamp}</div>
+                    </div>
+                  `;
+                  break;
+                case 'partners':
+                  newContent = `
+                    <div class="chat-message incoming">
+                      <div class="message-sender">Brandweer Rotterdam</div>
+                      <div class="message-content">Incident A20 onder controle. Geen extra assistentie nodig. Verwachte afhandeltijd: 30 minuten.</div>
+                      <div class="message-time">${timestamp}</div>
+                    </div>
+                    <div class="chat-message outgoing">
+                      <div class="message-sender">Meldkamer</div>
+                      <div class="message-content">Ontvangen. Houden jullie ons op de hoogte van ontwikkelingen.</div>
+                      <div class="message-time">${timestamp}</div>
+                    </div>
+                  `;
+                  break;
+              }
+              
+              chatMessages.innerHTML = newContent;
+            }
+          });
+        });
+        
+        // Contact button functionality
+        const contactButtons = document.querySelectorAll('.contact-btn');
+        contactButtons.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const service = target.dataset.service || target.dataset.colleague || target.dataset.partner;
+            const buttonText = target.textContent?.trim() || '';
+            
+            // Visual feedback
+            target.style.background = '#ffeb3b';
+            setTimeout(() => {
+              target.style.background = '';
+            }, 200);
+            
+            // Simulate call initiation
+            const statusBar = document.querySelector('.telefoon-status-bar .status-left');
+            if (statusBar) {
+              const callStatus = document.createElement('span');
+              callStatus.className = 'call-status';
+              callStatus.textContent = `📞 Verbinding maken met ${buttonText.split('\n')[0]}...`;
+              callStatus.style.color = '#ff9800';
+              
+              statusBar.appendChild(callStatus);
+              
+              setTimeout(() => {
+                callStatus.textContent = `📞 Verbonden met ${buttonText.split('\n')[0]}`;
+                callStatus.style.color = '#4caf50';
+                
+                setTimeout(() => {
+                  callStatus.remove();
+                }, 5000);
+              }, 2000);
+            }
+            
+            console.log(`📞 Calling ${service}: ${buttonText}`);
+          });
+        });
+      };
+      
+      // Initialize telefoon dashboard if on intake page
+      if (activeSection === 'intake') {
+        setTimeout(initializeTelefoonDashboard, 100);
+      }
+
       // Add event listeners for both button click and Enter key
       const verzendButton = document.getElementById("gmsVerzendButton");
       const uitgifteButton = document.getElementById("gmsUitgifteButton");
@@ -4132,7 +4312,158 @@ export default function Dashboard() {
         )}
         {activeSection === "intake" && (
           <div className="content-section active">
-            {/* Empty intake page - ready for new custom layout */}
+            <div className="telefoon-dashboard">
+              {/* Header */}
+              <div className="telefoon-header">
+                <h2 className="telefoon-title">📞 Telefoon Dashboard - Meldkamer Rotterdam</h2>
+                <div className="telefoon-header-buttons">
+                  <button 
+                    className="telefoon-header-btn gms-btn"
+                    onClick={() => setActiveSection('gms')}
+                  >
+                    🚨 Naar GMS
+                  </button>
+                  <button 
+                    className="telefoon-header-btn new-tab-btn"
+                    onClick={() => window.open(window.location.href, '_blank')}
+                  >
+                    🗗 Nieuw Tabblad
+                  </button>
+                </div>
+              </div>
+
+              {/* Main Content Grid */}
+              <div className="telefoon-main-grid">
+                
+                {/* Left Column - Chat Section */}
+                <div className="telefoon-chat-section">
+                  <div className="chat-tabs">
+                    <button className="chat-tab active" data-chat="burgers">
+                      👥 Burgers
+                    </button>
+                    <button className="chat-tab" data-chat="collega">
+                      🏢 Collega's
+                    </button>
+                    <button className="chat-tab" data-chat="partners">
+                      🚑 Ketenpartners
+                    </button>
+                  </div>
+
+                  <div className="chat-container">
+                    <div className="chat-messages" id="chatMessages">
+                      <div className="chat-message incoming">
+                        <div className="message-sender">Melder - 06-12345678</div>
+                        <div className="message-content">Er is een verkeersongeval op de A20 richting Den Haag, ter hoogte van afslag Vlaardingen.</div>
+                        <div className="message-time">14:23</div>
+                      </div>
+                      <div className="chat-message outgoing">
+                        <div className="message-sender">Meldkamer</div>
+                        <div className="message-content">Dank u voor de melding. Zijn er gewonden? En kunt u de exacte locatie bevestigen?</div>
+                        <div className="message-time">14:24</div>
+                      </div>
+                    </div>
+                    
+                    <div className="chat-input-section">
+                      <input 
+                        type="text" 
+                        className="chat-input" 
+                        placeholder="Typ uw bericht..."
+                        id="chatInput"
+                      />
+                      <button className="chat-send-btn" id="chatSendBtn">
+                        ➤ Verzend
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Contact Panels */}
+                <div className="telefoon-contact-section">
+                  
+                  {/* Emergency Services */}
+                  <div className="contact-panel emergency-panel">
+                    <h3 className="panel-title">🚨 Hulpdiensten</h3>
+                    <div className="contact-grid">
+                      <button className="contact-btn emergency" data-service="politie">
+                        🚔 Politie Dispatch
+                        <span className="contact-number">088-1692000</span>
+                      </button>
+                      <button className="contact-btn emergency" data-service="brandweer">
+                        🚒 Brandweer Rotterdam
+                        <span className="contact-number">088-1692100</span>
+                      </button>
+                      <button className="contact-btn emergency" data-service="ambulance">
+                        🚑 Ambulance RAV
+                        <span className="contact-number">088-1692200</span>
+                      </button>
+                      <button className="contact-btn emergency" data-service="boa">
+                        👮 BOA Coördinator
+                        <span className="contact-number">010-4417000</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Colleagues */}
+                  <div className="contact-panel colleague-panel">
+                    <h3 className="panel-title">👥 Collega's</h3>
+                    <div className="contact-grid">
+                      <button className="contact-btn colleague" data-colleague="supervisor">
+                        👔 Dienstchef
+                        <span className="contact-status online">● Online</span>
+                      </button>
+                      <button className="contact-btn colleague" data-colleague="coordinator">
+                        📋 Coördinator
+                        <span className="contact-status online">● Online</span>
+                      </button>
+                      <button className="contact-btn colleague" data-colleague="teamleader">
+                        🎯 Teamleider
+                        <span className="contact-status away">● Afwezig</span>
+                      </button>
+                      <button className="contact-btn colleague" data-colleague="backup">
+                        🔄 Back-up Centralist
+                        <span className="contact-status online">● Online</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* External Partners */}
+                  <div className="contact-panel partner-panel">
+                    <h3 className="panel-title">🤝 Externe Partners</h3>
+                    <div className="contact-grid">
+                      <button className="contact-btn partner" data-partner="rijkswaterstaat">
+                        🛣️ Rijkswaterstaat
+                        <span className="contact-number">0800-8002</span>
+                      </button>
+                      <button className="contact-btn partner" data-partner="gemeente">
+                        🏛️ Gemeente Rotterdam
+                        <span className="contact-number">14010</span>
+                      </button>
+                      <button className="contact-btn partner" data-partner="ov">
+                        🚌 OV Controle
+                        <span className="contact-number">0900-9292</span>
+                      </button>
+                      <button className="contact-btn partner" data-partner="defensie">
+                        ⚔️ Koninklijke Marechaussee
+                        <span className="contact-number">0900-0141</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Status Bar */}
+              <div className="telefoon-status-bar">
+                <div className="status-left">
+                  <span className="call-status">📞 Lijn 1: Beschikbaar</span>
+                  <span className="call-status">📞 Lijn 2: In gesprek</span>
+                  <span className="call-status">📞 Lijn 3: Beschikbaar</span>
+                </div>
+                <div className="status-right">
+                  <span className="active-calls">Actieve gesprekken: 2</span>
+                  <span className="queue-count">Wachtrij: 0</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {activeSection === "units" && (
