@@ -1074,11 +1074,12 @@ export default function Dashboard() {
                 
                 // 3. Special mappings for common abbreviations
                 if (!matchedClassification) {
-                  const specialMappings = {
+                  const specialMappings: Record<string, string> = {
                     'wegverkeer onder invloed': 'vkweoi',
                     'onder invloed': 'vkweoi',
                     'bz': 'bzdsap', // Default to first bz code
-                    'brgb': 'brgb01' // Default to first brgb code
+                    'brgb': 'brgb01', // Default to first brgb code
+                    'vkwebz': 'vkwebz' // Direct mapping for vkwebz
                   };
                   
                   const mappedCode = specialMappings[searchQuery.toLowerCase()];
@@ -1087,6 +1088,8 @@ export default function Dashboard() {
                       c.code.toLowerCase() === mappedCode.toLowerCase()
                     );
                     console.log('🔍 3. Special mapping result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  } else {
+                    console.log('🔍 3. No special mapping found for:', searchQuery.toLowerCase());
                   }
                 }
                 
@@ -1432,49 +1435,41 @@ export default function Dashboard() {
           handleNotePadSubmit();
         });
         
-        // Test classification system immediately with sample data
-        const testClassification = () => {
-          const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-          console.log('🧪 IMMEDIATE TEST - Classifications loaded:', storedClassifications.length);
+        // Add manual test button for debugging
+        const addTestButton = () => {
+          const existingButton = document.getElementById('testClassificationBtn');
+          if (existingButton) return;
           
-          if (storedClassifications.length > 0) {
-            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
-            console.log('🧪 BRGB test results:', testBrgb.length, testBrgb.slice(0, 2));
-            
-            // Test the actual classification detection function with multiple codes
-            console.log('🧪 Testing handleNotePadSubmit with various codes...');
+          const testButton = document.createElement('button');
+          testButton.id = 'testClassificationBtn';
+          testButton.textContent = 'Test Classification Detection';
+          testButton.style.cssText = 'margin: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;';
+          
+          testButton.addEventListener('click', () => {
             const kladblok = document.getElementById("gmsKladblok");
             if (kladblok) {
-              const originalContent = kladblok.textContent;
-              const testCodes = ['-bz', '-wegverkeer onder invloed', '-brgb'];
-              
-              let testIndex = 0;
-              const runNextTest = () => {
-                if (testIndex < testCodes.length) {
-                  const testCode = testCodes[testIndex];
-                  kladblok.textContent = testCode;
-                  console.log(`🧪 Test ${testIndex + 1}: Set content to "${testCode}"`);
-                  
-                  setTimeout(() => {
-                    console.log(`🧪 Running test ${testIndex + 1}...`);
-                    handleNotePadSubmit();
-                    testIndex++;
-                    setTimeout(runNextTest, 1000);
-                  }, 500);
-                } else {
-                  // Restore original content after all tests
-                  kladblok.textContent = originalContent;
-                  console.log('🧪 All tests completed, content restored');
-                }
-              };
-              
-              setTimeout(runNextTest, 1000);
+              const testCodes = ['-vkwebz', '-bz', '-wegverkeer onder invloed'];
+              testCodes.forEach((code, index) => {
+                setTimeout(() => {
+                  console.log(`Testing code: ${code}`);
+                  kladblok.textContent = code;
+                  handleNotePadSubmit();
+                }, index * 2000);
+              });
             }
+          });
+          
+          const gmsSection = document.querySelector('.gms-notepad-section');
+          if (gmsSection) {
+            gmsSection.appendChild(testButton);
           }
         };
         
-        // Run test after a brief delay to ensure DOM is ready
-        setTimeout(testClassification, 500);
+        setTimeout(addTestButton, 1000);
+        
+        // Basic classification system verification
+        const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+        console.log('📊 Classifications loaded:', storedClassifications.length, 'entries available');
       } else {
         console.error('❌ Verzend button not found! Available buttons:', 
           Array.from(document.querySelectorAll('button')).map(b => b.id).filter(id => id));
