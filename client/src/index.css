@@ -2211,6 +2211,24 @@ body {
   color: #ff8c00;
 }
 
+.gms-log-entry {
+  display: flex;
+  margin: 2px 0;
+  padding: 2px 4px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.gms-log-entry.operator-acceptance {
+  background-color: #e8f5e8;
+  border: 1px solid #28a745;
+  border-radius: 3px;
+  font-weight: bold;
+  color: #155724;
+  margin: 4px 0;
+}
+
 .gms-logging-area-tall {
   height: 130px; /* 30% taller than the original 100px */
 }
