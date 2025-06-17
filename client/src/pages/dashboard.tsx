@@ -2376,11 +2376,34 @@ export default function Dashboard() {
           }
         });
         
+        // Save to localStorage for persistence (using both naming conventions)
+        const storageIncident = {
+          ...completeIncident,
+          // Support legacy field names for compatibility
+          meldernaam: formData.melderNaam,
+          melderadres: formData.melderAdres,
+          classificatie1: formData.mc1,
+          classificatie2: formData.mc2,
+          classificatie3: formData.mc3,
+          timestamp: formData.tijdstip
+        };
+        
+        const existingIncidenten = JSON.parse(localStorage.getItem("incidenten") || "[]");
+        const existingIndex = existingIncidenten.findIndex((inc: any) => (inc.id || inc.incidentId) === incidentId);
+        
+        if (existingIndex >= 0) {
+          existingIncidenten[existingIndex] = storageIncident;
+        } else {
+          existingIncidenten.push(storageIncident);
+        }
+        
+        localStorage.setItem("incidenten", JSON.stringify(existingIncidenten));
+        
         // Update current incident state but stay on GMS
         setCurrentGmsIncident(completeIncident);
         
         showNotificationMessage("Incident uitgegeven en toegevoegd aan overzicht");
-        console.log('Incident dispatched and saved to database');
+        console.log('Incident dispatched and saved to database and localStorage');
       };
 
       // Telefoon Dashboard Interactive Functionality
@@ -3379,40 +3402,29 @@ export default function Dashboard() {
           })
           .join("");
 
-        // Direct GMS redirection functionality
-        const redirectToGMS = (incidentId: number) => {
-          const incident = sortedIncidenten.find((inc: any) => inc.id === incidentId);
+        // Make redirectToGMS globally accessible
+        (window as any).redirectToGMS = (incidentId: number) => {
+          console.log('Redirecting incident to GMS:', incidentId);
+          
+          // Get fresh incident data from localStorage
+          const storedIncidenten = JSON.parse(localStorage.getItem("incidenten") || "[]");
+          const incident = storedIncidenten.find((inc: any) => (inc.id || inc.incidentId) === incidentId);
+          
           if (!incident) {
-            console.error('Incident not found:', incidentId);
+            console.error('Incident not found in storage:', incidentId);
             return;
           }
 
-          console.log('Redirecting incident to GMS:', incidentId);
+          console.log('Found incident data:', incident);
           
-          // Create incident object in the expected format
-          let priority: 'low' | 'medium' | 'high' = 'low';
-          if (incident.prioriteit === 1) priority = 'high';
-          else if (incident.prioriteit === 2) priority = 'medium';
+          // Switch to GMS tab first
+          setActiveSection('gms');
           
-          const incidentForGMS: Incident = {
-            id: incident.id,
-            type: incident.classificatie1 || 'Onbekend',
-            location: incident.straatnaam && incident.huisnummer 
-              ? `${incident.straatnaam} ${incident.huisnummer}` 
-              : incident.meldingsadres || 'Onbekend',
-            timestamp: incident.timestamp,
-            timeAgo: '', // Will be calculated automatically
-            unitsAssigned: 0, // Default value
-            priority: priority,
-            status: 'active'
-          };
-          
-          // Use the existing handleIncidentClick function
-          handleIncidentClick(incidentForGMS);
+          // Load the complete incident data into GMS form
+          setTimeout(() => {
+            loadIncidentIntoGMS(incident);
+          }, 100);
         };
-
-        // Make redirectToGMS globally available
-        (window as any).redirectToGMS = redirectToGMS;
       } catch (error) {
         console.error("Error loading incidents:", error);
         const incidentsList = document.getElementById("allIncidentsLegacyList");
@@ -4065,48 +4077,7 @@ export default function Dashboard() {
         }
       };
 
-      const handleUitgifte = () => {
-        const formData = collectGMSFormData();
-        const now = new Date();
 
-        // Use existing incident ID if available, otherwise create new
-        const incidentId = currentGmsIncident?.id || Date.now();
-        
-        const incidentData = {
-          ...formData,
-          id: incidentId,
-          timestamp: currentGmsIncident?.timestamp || now.toISOString(),
-          status: "Openstaand",
-        };
-
-        // Save to incidents tab and GMS database
-        saveIncidentToStorage(incidentData);
-        
-        // Also save to GMS incidents for persistence
-        setGmsIncidents(prev => {
-          const existing = prev.find(inc => inc.id === incidentId);
-          if (existing) {
-            return prev.map(inc => inc.id === incidentId ? { ...inc, ...incidentData } : inc);
-          } else {
-            return [...prev, incidentData];
-          }
-        });
-        
-        // Set as current incident to maintain form state
-        setCurrentGmsIncident(incidentData);
-
-        // Show notification
-        showNotificationMessage(
-          "Incident uitgegeven en naar Incidenten verzonden",
-        );
-
-        // DO NOT reset form - preserve data for continued editing
-        // Only clear the notepad for new notes
-        const kladblok = document.getElementById("gmsKladblok");
-        if (kladblok) {
-          kladblok.textContent = "";
-        }
-      };
 
       const handleSluitAf = () => {
         resetGMSForm();
