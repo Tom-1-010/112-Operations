@@ -804,8 +804,7 @@ export default function Dashboard() {
   // Load complete official LMC classifications
   useEffect(() => {
     const loadOfficialClassifications = async () => {
-      // Clear existing data to force reload of complete official dataset
-      localStorage.removeItem("gmsClassifications");
+      // Don't clear existing data - preserve it for reliability
       
       try {
         const response = await fetch('/lmc_classifications.json');
@@ -818,9 +817,23 @@ export default function Dashboard() {
         setGmsClassifications(officialClassifications);
         console.log("Loaded complete official GMS classifications:", officialClassifications.length, "entries");
       } catch (error) {
-        console.error("Failed to load official classifications:", error);
-        // Fallback to ensure system still works
-        setGmsClassifications([]);
+        console.warn("Could not load from server, checking localStorage...");
+        
+        // Try to load from localStorage if server fails
+        const storedClassifications = localStorage.getItem("gmsClassifications");
+        if (storedClassifications) {
+          try {
+            const parsedClassifications = JSON.parse(storedClassifications);
+            setGmsClassifications(parsedClassifications);
+            console.log("Loaded GMS classifications from localStorage:", parsedClassifications.length, "entries");
+          } catch (parseError) {
+            console.error("Failed to parse stored classifications");
+            setGmsClassifications([]);
+          }
+        } else {
+          console.error("No classifications available in localStorage");
+          setGmsClassifications([]);
+        }
       }
     };
 
