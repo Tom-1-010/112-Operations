@@ -1600,8 +1600,8 @@ body {
 /* Form Elements */
 .gms-form-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 4px;
+  margin-bottom: 4px;
   align-items: flex-end;
 }
 
@@ -1619,39 +1619,39 @@ body {
 /* Address Layout Specific */
 .gms-address-row {
   display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 3px;
+  margin-bottom: 4px;
   align-items: flex-end;
 }
 
 .gms-field-street {
-  width: 120px;
-  max-width: 120px;
+  width: 100px;
+  max-width: 100px;
 }
 
 .gms-field-number {
-  width: 40px;
-  max-width: 40px;
-}
-
-.gms-field-extension {
   width: 30px;
   max-width: 30px;
 }
 
+.gms-field-extension {
+  width: 25px;
+  max-width: 25px;
+}
+
 .gms-field-postal {
-  width: 60px;
-  max-width: 60px;
+  width: 50px;
+  max-width: 50px;
 }
 
 .gms-field-city {
-  width: 80px;
-  max-width: 80px;
+  width: 70px;
+  max-width: 70px;
 }
 
 .gms-field-full {
-  width: 150px;
-  max-width: 150px;
+  width: 120px;
+  max-width: 120px;
 }
 
 .gms-field-group label {
@@ -1666,14 +1666,14 @@ body {
   padding: 2px 4px;
   font-size: 11px;
   font-family: inherit;
-  width: 100px;
-  max-width: 100px;
+  width: 80px;
+  max-width: 80px;
 }
 
 /* Dropdown specific styling for even more compact appearance */
 select.gms-field {
-  width: 120px;
-  max-width: 120px;
+  width: 100px;
+  max-width: 100px;
 }
 
 .gms-field-small {
@@ -1812,10 +1812,10 @@ select.gms-field {
   padding: 4px;
   font-size: 11px;
   font-family: 'Courier New', monospace;
-  width: 180px;
-  max-width: 180px;
+  width: 140px;
+  max-width: 140px;
   overflow-y: auto;
-  min-height: 150px;
+  min-height: 120px;
   resize: none;
 }
 
