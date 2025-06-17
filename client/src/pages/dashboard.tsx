@@ -26,6 +26,22 @@ export default function Dashboard() {
   
   // Current active incident in GMS
   const [currentGmsIncident, setCurrentGmsIncident] = useState<any>(null);
+  
+  // Settings subtab state
+  const [activeSettingsTab, setActiveSettingsTab] = useState("basisteams");
+  
+  // Phone numbers management
+  const [phoneNumbers, setPhoneNumbers] = useState<any[]>([]);
+  const [showPhoneForm, setShowPhoneForm] = useState(false);
+  const [newPhoneNumber, setNewPhoneNumber] = useState({
+    functie: "",
+    omschrijving: "",
+    telefoonnummer: "",
+    beginDienst: "",
+    eindeDienst: "",
+    bereikbaar24u: false,
+    opmerkingen: "",
+  });
   interface PoliceUnit {
     id: string;
     roepnaam: string;
@@ -5034,57 +5050,297 @@ export default function Dashboard() {
           <div className="content-section active">
             <div className="section">
               <div className="section-header">
-                <h3 className="section-title">Basisteams Eenheid Rotterdam</h3>
+                <h3 className="section-title">Instellingen</h3>
               </div>
-              <div className="basisteams-content">
-                <div className="basisteams-filter-section">
-                  <label htmlFor="basisteamsFilter" className="filter-label">
-                    🔍 Filter basisteams
-                  </label>
-                  <input
-                    type="text"
-                    id="basisteamsFilter"
-                    className="filter-input"
-                    placeholder="Zoek op teamcode, naam of gemeente..."
-                  />
-                </div>
+              
+              {/* Settings Subtabs */}
+              <div className="gms-subtabs">
+                <button 
+                  className={`gms-subtab ${activeSettingsTab === "basisteams" ? "active" : ""}`}
+                  onClick={() => setActiveSettingsTab("basisteams")}
+                >
+                  Basisteams
+                </button>
+                <button 
+                  className={`gms-subtab ${activeSettingsTab === "telefoonlijst" ? "active" : ""}`}
+                  onClick={() => setActiveSettingsTab("telefoonlijst")}
+                >
+                  Telefoonlijst
+                </button>
+              </div>
 
-                <div className="basisteams-table-container">
-                  <table className="basisteams-table">
-                    <thead>
-                      <tr>
-                        <th>Teamcode</th>
-                        <th>Teamnaam</th>
-                        <th>Regio</th>
-                        <th>Gemeenten</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {basisTeams.map((team) => (
-                        <tr
-                          key={team.code}
-                          className="basisteam-row"
-                          data-team={JSON.stringify(team)}
-                        >
-                          <td className="team-code">
-                            <strong>{team.code}</strong>
-                          </td>
-                          <td className="team-naam">{team.naam}</td>
-                          <td className="team-regio">{team.regio}</td>
-                          <td className="team-gemeenten">
-                            {team.gemeenten.map((gemeente, index) => (
-                              <span key={gemeente} className="gemeente-tag">
-                                {gemeente}
-                                {index < team.gemeenten.length - 1 && ", "}
-                              </span>
-                            ))}
-                          </td>
+              {/* Basisteams Tab Content */}
+              {activeSettingsTab === "basisteams" && (
+                <div className="basisteams-content">
+                  <div className="basisteams-filter-section">
+                    <label htmlFor="basisteamsFilter" className="filter-label">
+                      Filter basisteams
+                    </label>
+                    <input
+                      type="text"
+                      id="basisteamsFilter"
+                      className="filter-input"
+                      placeholder="Zoek op teamcode, naam of gemeente..."
+                    />
+                  </div>
+
+                  <div className="basisteams-table-container">
+                    <table className="basisteams-table">
+                      <thead>
+                        <tr>
+                          <th>Teamcode</th>
+                          <th>Teamnaam</th>
+                          <th>Regio</th>
+                          <th>Gemeenten</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {basisTeams.map((team) => (
+                          <tr
+                            key={team.code}
+                            className="basisteam-row"
+                            data-team={JSON.stringify(team)}
+                          >
+                            <td className="team-code">
+                              <strong>{team.code}</strong>
+                            </td>
+                            <td className="team-naam">{team.naam}</td>
+                            <td className="team-regio">{team.regio}</td>
+                            <td className="team-gemeenten">
+                              {team.gemeenten.map((gemeente, index) => (
+                                <span key={gemeente} className="gemeente-tag">
+                                  {gemeente}
+                                  {index < team.gemeenten.length - 1 && ", "}
+                                </span>
+                              ))}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Telefoonlijst Tab Content */}
+              {activeSettingsTab === "telefoonlijst" && (
+                <div className="telefoonlijst-content">
+                  <div className="telefoonlijst-header">
+                    <h4 className="telefoonlijst-title">Telefoonlijst Beheer</h4>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        setShowPhoneForm(!showPhoneForm);
+                        if (!phoneNumbers.length) {
+                          fetch('/api/phone-numbers')
+                            .then(res => res.json())
+                            .then(data => setPhoneNumbers(data))
+                            .catch(err => console.error('Failed to load phone numbers:', err));
+                        }
+                      }}
+                    >
+                      Telefoonnummer toevoegen
+                    </button>
+                  </div>
+
+                  {/* Phone Number Form */}
+                  {showPhoneForm && (
+                    <div className="telefoon-form-container">
+                      <div className="telefoon-form">
+                        <h5>Nieuw Telefoonnummer Toevoegen</h5>
+                        
+                        <div className="gms-form-row">
+                          <div className="gms-field-group">
+                            <label>Functie *</label>
+                            <input
+                              type="text"
+                              className="gms-field"
+                              value={newPhoneNumber.functie}
+                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, functie: e.target.value}))}
+                              placeholder="Bijv. Dienstchef, Teamleider"
+                            />
+                          </div>
+                          <div className="gms-field-group">
+                            <label>Omschrijving *</label>
+                            <input
+                              type="text"
+                              className="gms-field"
+                              value={newPhoneNumber.omschrijving}
+                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, omschrijving: e.target.value}))}
+                              placeholder="Korte beschrijving van de functie"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="gms-form-row">
+                          <div className="gms-field-group">
+                            <label>Telefoonnummer *</label>
+                            <input
+                              type="tel"
+                              className="gms-field"
+                              value={newPhoneNumber.telefoonnummer}
+                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, telefoonnummer: e.target.value}))}
+                              placeholder="06-12345678"
+                            />
+                          </div>
+                          <div className="gms-field-group">
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={newPhoneNumber.bereikbaar24u}
+                                onChange={(e) => setNewPhoneNumber(prev => ({...prev, bereikbaar24u: e.target.checked}))}
+                              />
+                              24 uur bereikbaar
+                            </label>
+                          </div>
+                        </div>
+
+                        {!newPhoneNumber.bereikbaar24u && (
+                          <div className="gms-form-row">
+                            <div className="gms-field-group">
+                              <label>Tijdstip begin dienst</label>
+                              <input
+                                type="time"
+                                className="gms-field"
+                                value={newPhoneNumber.beginDienst}
+                                onChange={(e) => setNewPhoneNumber(prev => ({...prev, beginDienst: e.target.value}))}
+                              />
+                            </div>
+                            <div className="gms-field-group">
+                              <label>Tijdstip einde dienst</label>
+                              <input
+                                type="time"
+                                className="gms-field"
+                                value={newPhoneNumber.eindeDienst}
+                                onChange={(e) => setNewPhoneNumber(prev => ({...prev, eindeDienst: e.target.value}))}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="gms-form-row">
+                          <div className="gms-field-group gms-field-full">
+                            <label>Opmerkingen</label>
+                            <textarea
+                              className="gms-field"
+                              rows={3}
+                              value={newPhoneNumber.opmerkingen}
+                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, opmerkingen: e.target.value}))}
+                              placeholder="Extra informatie of opmerkingen..."
+                            />
+                          </div>
+                        </div>
+
+                        <div className="telefoon-form-buttons">
+                          <button
+                            className="btn btn-primary"
+                            onClick={async () => {
+                              if (!newPhoneNumber.functie || !newPhoneNumber.omschrijving || !newPhoneNumber.telefoonnummer) {
+                                alert("Vul alle verplichte velden in");
+                                return;
+                              }
+
+                              try {
+                                const response = await fetch('/api/phone-numbers', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify(newPhoneNumber),
+                                });
+
+                                if (response.ok) {
+                                  const savedPhoneNumber = await response.json();
+                                  setPhoneNumbers(prev => [...prev, savedPhoneNumber]);
+                                  setNewPhoneNumber({
+                                    functie: "", omschrijving: "", telefoonnummer: "",
+                                    beginDienst: "", eindeDienst: "", bereikbaar24u: false, opmerkingen: ""
+                                  });
+                                  setShowPhoneForm(false);
+                                  setNotification("Telefoonnummer succesvol toegevoegd");
+                                  setShowNotification(true);
+                                  setTimeout(() => setShowNotification(false), 3000);
+                                }
+                              } catch (error) {
+                                console.error('Failed to save phone number:', error);
+                                setNotification("Fout bij opslaan telefoonnummer");
+                                setShowNotification(true);
+                                setTimeout(() => setShowNotification(false), 3000);
+                              }
+                            }}
+                          >
+                            Opslaan
+                          </button>
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() => setShowPhoneForm(false)}
+                          >
+                            Annuleren
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Phone Numbers List */}
+                  <div className="telefoonlijst-table-container">
+                    <table className="telefoonlijst-table">
+                      <thead>
+                        <tr>
+                          <th>Functie</th>
+                          <th>Omschrijving</th>
+                          <th>Telefoonnummer</th>
+                          <th>Diensttijden</th>
+                          <th>Opmerkingen</th>
+                          <th>Acties</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {phoneNumbers.map((phone) => (
+                          <tr key={phone.id} className="telefoon-row">
+                            <td className="telefoon-functie"><strong>{phone.functie}</strong></td>
+                            <td className="telefoon-omschrijving">{phone.omschrijving}</td>
+                            <td className="telefoon-nummer">{phone.telefoonnummer}</td>
+                            <td className="telefoon-dienst">
+                              {phone.bereikbaar24u ? "24/7" : `${phone.beginDienst || "?"} - ${phone.eindeDienst || "?"}`}
+                            </td>
+                            <td className="telefoon-opmerkingen">{phone.opmerkingen || "-"}</td>
+                            <td className="telefoon-acties">
+                              <button
+                                className="btn btn-danger btn-small"
+                                onClick={async () => {
+                                  if (confirm("Weet u zeker dat u dit telefoonnummer wilt verwijderen?")) {
+                                    try {
+                                      const response = await fetch(`/api/phone-numbers/${phone.id}`, {
+                                        method: 'DELETE',
+                                      });
+                                      if (response.ok) {
+                                        setPhoneNumbers(prev => prev.filter(p => p.id !== phone.id));
+                                        setNotification("Telefoonnummer verwijderd");
+                                        setShowNotification(true);
+                                        setTimeout(() => setShowNotification(false), 3000);
+                                      }
+                                    } catch (error) {
+                                      console.error('Failed to delete phone number:', error);
+                                    }
+                                  }
+                                }}
+                              >
+                                Verwijder
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {phoneNumbers.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="no-data">
+                              Geen telefoonnummers gevonden. Klik op "Telefoonnummer toevoegen" om een nummer toe te voegen.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

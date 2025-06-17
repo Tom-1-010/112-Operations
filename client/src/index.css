@@ -1289,6 +1289,185 @@ body {
   }
 }
 
+/* Settings Subtabs Styling */
+.gms-subtabs {
+  display: flex;
+  border-bottom: 2px solid #c0c0c0;
+  margin-bottom: 20px;
+}
+
+.gms-subtab {
+  background: #e0e0e0;
+  border: 1px outset #c0c0c0;
+  border-bottom: none;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  margin-right: 2px;
+}
+
+.gms-subtab.active {
+  background: white;
+  border: 1px inset #c0c0c0;
+  border-bottom: 2px solid white;
+  margin-bottom: -2px;
+}
+
+.gms-subtab:not(.active):hover {
+  background: #f0f0f0;
+}
+
+/* Telefoonlijst Styling */
+.telefoonlijst-content {
+  padding: 20px 0;
+}
+
+.telefoonlijst-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.telefoonlijst-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.telefoon-form-container {
+  background: #f8f9fa;
+  border: 2px inset #c0c0c0;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.telefoon-form h5 {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.telefoon-form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.telefoonlijst-table-container {
+  background: white;
+  border: 2px inset #c0c0c0;
+  overflow-x: auto;
+}
+
+.telefoonlijst-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.telefoonlijst-table th {
+  background: #e0e0e0;
+  border: 1px outset #c0c0c0;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.telefoonlijst-table td {
+  border: 1px solid #d0d0d0;
+  padding: 8px 12px;
+  vertical-align: top;
+}
+
+.telefoon-row:hover {
+  background: #f5f5f5;
+}
+
+.telefoon-functie {
+  font-weight: bold;
+  color: #333;
+}
+
+.telefoon-nummer {
+  font-family: monospace;
+  color: #0066cc;
+}
+
+.telefoon-dienst {
+  font-size: 10px;
+  color: #666;
+}
+
+.telefoon-acties {
+  text-align: center;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: 1px outset #c0c0c0;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.btn-danger:active {
+  border: 1px inset #c0c0c0;
+}
+
+.no-data {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  padding: 20px;
+}
+
+/* Form field styling for telefoonlijst */
+.gms-field-full {
+  grid-column: 1 / -1;
+}
+
+.telefoon-form .gms-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.telefoon-form .gms-field-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+  font-size: 11px;
+  color: #333;
+}
+
+.telefoon-form .gms-field {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px inset #c0c0c0;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.telefoon-form textarea.gms-field {
+  resize: vertical;
+  min-height: 60px;
+}
+
 
 
 
