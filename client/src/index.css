@@ -1625,55 +1625,64 @@ body {
 }
 
 .gms-field-street {
-  width: 80px;
-  max-width: 80px;
+  width: 70px;
+  max-width: 70px;
+  height: 18px;
 }
 
 .gms-field-number {
-  width: 25px;
-  max-width: 25px;
+  width: 20px;
+  max-width: 20px;
+  height: 18px;
 }
 
 .gms-field-extension {
-  width: 20px;
-  max-width: 20px;
+  width: 18px;
+  max-width: 18px;
+  height: 18px;
 }
 
 .gms-field-postal {
-  width: 40px;
-  max-width: 40px;
+  width: 35px;
+  max-width: 35px;
+  height: 18px;
 }
 
 .gms-field-city {
-  width: 60px;
-  max-width: 60px;
+  width: 55px;
+  max-width: 55px;
+  height: 18px;
 }
 
 .gms-field-full {
-  width: 100px;
-  max-width: 100px;
+  width: 90px;
+  max-width: 90px;
+  height: 18px;
 }
 
 .gms-field-group label {
-  font-size: 10px;
-  margin-bottom: 2px;
+  font-size: 9px;
+  margin-bottom: 1px;
   color: #333;
+  font-family: 'MS Sans Serif', sans-serif;
 }
 
 .gms-field {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 2px 4px;
-  font-size: 11px;
-  font-family: inherit;
-  width: 70px;
-  max-width: 70px;
+  padding: 1px 3px;
+  font-size: 10px;
+  font-family: 'MS Sans Serif', sans-serif;
+  width: 60px;
+  max-width: 60px;
+  height: 18px;
 }
 
 /* Dropdown specific styling for even more compact appearance */
 select.gms-field {
-  width: 85px;
-  max-width: 85px;
+  width: 75px;
+  max-width: 75px;
+  height: 20px;
 }
 
 .gms-field-small {
@@ -1689,13 +1698,15 @@ select.gms-field {
 
 /* Specific styles for priority and time fields */
 .gms-priority-field {
-  width: 40px;
-  max-width: 40px;
+  width: 35px;
+  max-width: 35px;
+  height: 18px;
 }
 
 .gms-time-field {
-  width: 75px;
-  max-width: 75px;
+  width: 65px;
+  max-width: 65px;
+  height: 18px;
 }
 
 .gms-field:focus {
@@ -1823,13 +1834,13 @@ select.gms-field {
 .gms-text-area {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 4px;
-  font-size: 11px;
-  font-family: 'Courier New', monospace;
-  width: 120px;
-  max-width: 120px;
+  padding: 2px;
+  font-size: 10px;
+  font-family: 'MS Sans Serif', sans-serif;
+  width: 100px;
+  max-width: 100px;
   overflow-y: auto;
-  min-height: 100px;
+  min-height: 80px;
   resize: none;
 }
 
