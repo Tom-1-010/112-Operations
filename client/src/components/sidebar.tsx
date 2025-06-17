@@ -22,14 +22,13 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   const settingsSubItems = [
     { id: 'settings', icon: 'table', label: 'Basisteams' },
     { id: 'classificaties', icon: 'tags', label: 'Classificaties' },
-    { id: 'telefoonnummers', icon: 'telephone', label: 'Telefoonnummers' },
   ];
 
   const handleSettingsClick = () => {
     setSettingsExpanded(!settingsExpanded);
   };
 
-  const isSettingsActive = activeSection === 'settings' || activeSection === 'classificaties' || activeSection === 'telefoonnummers';
+  const isSettingsActive = activeSection === 'settings' || activeSection === 'classificaties';
 
   return (
     <nav className="sidebar">

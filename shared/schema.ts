@@ -2,12 +2,6 @@ import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
-
 export const incidents = pgTable("incidents", {
   id: serial("id").primaryKey(),
   type: text("type").notNull(),
@@ -61,17 +55,6 @@ export const gmsIncidents = pgTable("gms_incidents", {
   afgesloten: timestamp("afgesloten"),
 });
 
-export const phoneNumbers = pgTable("phone_numbers", {
-  id: serial("id").primaryKey(),
-  naam: text("naam").notNull(),
-  telefoonnummer: text("telefoonnummer").notNull(),
-  categorie: text("categorie").notNull(), // "Collega" or "Externe partner"
-  functie: text("functie"),
-  diensten: text("diensten"),
-  opmerkingen: text("opmerkingen"),
-  aangemaaktOp: timestamp("aangemaakt_op").notNull().defaultNow(),
-});
-
 export const insertIncidentSchema = createInsertSchema(incidents).omit({
   id: true,
   timestamp: true,
@@ -85,22 +68,9 @@ export const insertGmsIncidentSchema = createInsertSchema(gmsIncidents).omit({
   afgesloten: true,
 });
 
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-});
-
-export const insertPhoneNumberSchema = createInsertSchema(phoneNumbers).omit({
-  id: true,
-  aangemaaktOp: true,
-});
-
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
 export type InsertUnit = z.infer<typeof insertUnitSchema>;
 export type Unit = typeof units.$inferSelect;
 export type InsertGmsIncident = z.infer<typeof insertGmsIncidentSchema>;
 export type GmsIncident = typeof gmsIncidents.$inferSelect;
-export type InsertPhoneNumber = z.infer<typeof insertPhoneNumberSchema>;
-export type PhoneNumber = typeof phoneNumbers.$inferSelect;
