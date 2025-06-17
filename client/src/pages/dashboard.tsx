@@ -1093,12 +1093,20 @@ export default function Dashboard() {
                 );
                 console.log('🔍 1. Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 
-                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
+                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.) - this is the key fix
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
                   );
                   console.log('🔍 2. Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                }
+                
+                // 3. If still no match, try searching within the code (e.g., brgb within brgb01)
+                if (!matchedClassification) {
+                  matchedClassification = storedClassifications.find(c => 
+                    c.code.toLowerCase().includes(searchQuery.toLowerCase())
+                  );
+                  console.log('🔍 2.5. Code contains match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
                 // 3. Try text matches for full classification strings (e.g., "ongeval wegvervoer letsel")
@@ -1467,6 +1475,29 @@ export default function Dashboard() {
               handleNotePadSubmit();
             } else {
               console.error('🧪 Test failed - kladblok not found');
+            }
+          };
+          
+          // Simple direct test function to verify classification data
+          (window as any).directTest = () => {
+            const classifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+            const brgbMatch = classifications.find(c => c.code.toLowerCase().startsWith('brgb'));
+            console.log('Direct test result:', brgbMatch);
+            
+            if (brgbMatch) {
+              const mc1 = document.getElementById("gmsClassificatie1");
+              const mc2 = document.getElementById("gmsClassificatie2"); 
+              const mc3 = document.getElementById("gmsClassificatie3");
+              
+              console.log('Setting dropdowns directly:', {
+                MC1: brgbMatch.MC1,
+                MC2: brgbMatch.MC2,
+                MC3: brgbMatch.MC3
+              });
+              
+              if (mc1) mc1.value = brgbMatch.MC1;
+              if (mc2) mc2.value = brgbMatch.MC2;
+              if (mc3) mc3.value = brgbMatch.MC3;
             }
           };
           
