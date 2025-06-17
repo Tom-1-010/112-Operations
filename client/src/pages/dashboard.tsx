@@ -1009,13 +1009,22 @@ export default function Dashboard() {
         const kladblok = document.getElementById("gmsKladblok");
         const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
         
-        if (!kladblok || !loggingPanel) return;
+        if (!kladblok) {
+          console.error('❌ Kladblok element not found');
+          return;
+        }
+        if (!loggingPanel) {
+          console.error('❌ Logging panel not found');
+          return;
+        }
         
         const notitieText = kladblok.textContent || '';
         console.log('📝 Note content:', notitieText);
         
         // Only process classification detection, don't save full form
+        console.log('🔍 Checking if text is available for processing...');
         if (notitieText.trim()) {
+          console.log('✅ Text found, proceeding with classification detection');
           // Process classification codes
           const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
           const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
@@ -1440,17 +1449,7 @@ export default function Dashboard() {
             }
           };
           
-          // Auto-trigger test after setup to verify functionality
-          console.log('🧪 Auto-triggering test classification...');
-          setTimeout(() => {
-            console.log('🧪 Running automatic test...');
-            const testKladblok = document.getElementById("gmsKladblok");
-            if (testKladblok) {
-              testKladblok.textContent = "-brgb";
-              console.log('🧪 Set test content to "-brgb"');
-              handleNotePadSubmit();
-            }
-          }, 500);
+          // Classification detection is ready
         } else {
           console.error('❌ Verzend button not found!');
         }
