@@ -1004,65 +1004,128 @@ export default function Dashboard() {
       // Handle notepad note submission (Verzend button in notepad)
       const handleNotePadSubmit = () => {
         console.log('📝 NOTEPAD SUBMIT - Processing note from kladblok');
-        console.log('🚀 handleNotePadSubmit function triggered');
         
         const kladblok = document.getElementById("gmsKladblok");
-        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
-        
         if (!kladblok) {
           console.error('❌ Kladblok element not found');
           return;
         }
-        if (!loggingPanel) {
-          console.error('❌ Logging panel not found');
+        
+        const notitieText = kladblok.textContent || '';
+        console.log('📝 Note content:', `"${notitieText}"`);
+        
+        if (!notitieText.trim()) {
+          console.log('⚠️ No text to process');
           return;
         }
         
-        const notitieText = kladblok.textContent || '';
-        console.log('📝 Note content:', notitieText);
+        // Get classification data
+        const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+        console.log('📚 Classifications loaded:', storedClassifications.length);
         
-        // Only process classification detection, don't save full form
-        console.log('🔍 Checking if text is available for processing...');
-        if (notitieText.trim()) {
-          console.log('✅ Text found, proceeding with classification detection');
-          // Process classification codes
+        if (storedClassifications.length === 0) {
+          console.error('❌ No classification data available');
+          return;
+        }
+        
+        // Simple direct matching for codes starting with hyphen
+        let matchedClassification = null;
+        
+        if (notitieText.startsWith('-')) {
+          const searchCode = notitieText.substring(1).trim().toLowerCase();
+          console.log('🔍 Searching for code:', searchCode);
+          
+          // Find first match that starts with the search code
+          matchedClassification = storedClassifications.find((c: any) => 
+            c.code.toLowerCase().startsWith(searchCode)
+          );
+        }
+        
+        console.log('🎯 Match result:', matchedClassification ? matchedClassification.code : 'No match');
+        
+        if (matchedClassification) {
+          // Get dropdown elements
           const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
           const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
           const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-          const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
           
-          console.log('🔧 Dropdown elements found:', {
-            mc1Select: !!mc1Select,
-            mc2Select: !!mc2Select,
-            mc3Select: !!mc3Select,
-            prioriteitSelect: !!prioriteitSelect
-          });
-          
-          // Add critical error check
-          if (!mc1Select || !mc2Select || !mc3Select) {
-            console.error('❌ Critical: One or more dropdown elements missing!');
-            return;
-          }
-
           if (mc1Select && mc2Select && mc3Select) {
-            console.log('✅ All dropdown elements found, proceeding with classification detection');
-            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
-            console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
-            console.log('📝 Input text:', `"${notitieText}"`);
+            console.log('✅ Setting classifications:', {
+              MC1: matchedClassification.MC1,
+              MC2: matchedClassification.MC2,
+              MC3: matchedClassification.MC3
+            });
             
-            // Quick test: check if we have any "brgb" codes in our data
-            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
-            console.log('🧪 Test - BRGB codes available:', testBrgb.length, testBrgb.slice(0, 3));
+            // Reset and populate dropdowns
+            setupClassificationDropdowns();
             
-            // Direct test for "-brgb" input
-            if (notitieText.includes('-brgb')) {
-              console.log('🎯 DIRECT TEST: Searching for BRGB classification...');
-              const directBrgbMatch = storedClassifications.find(c => 
-                c.code.toLowerCase().includes('brgb') || 
-                c.code.toLowerCase().startsWith('brgb')
-              );
-              console.log('🎯 DIRECT MATCH RESULT:', directBrgbMatch);
-            }
+            // Set values after short delay to ensure dropdowns are populated
+            setTimeout(() => {
+              mc1Select.value = matchedClassification.MC1;
+              mc2Select.value = matchedClassification.MC2;
+              mc3Select.value = matchedClassification.MC3;
+              
+              console.log('✅ Dropdowns set successfully');
+            }, 100);
+          } else {
+            console.error('❌ Dropdown elements not found');
+          }
+        }
+      };
+
+      // Handle form submission
+      const handleGMSFormSubmit = () => {
+        console.log('💾 GMS Form submission');
+        
+        const voertuig = document.getElementById("gmsVoertuig") as HTMLInputElement;
+        const naam = document.getElementById("gmsNaam") as HTMLInputElement;
+        const adres = document.getElementById("gmsAdres") as HTMLInputElement;
+        const contact = document.getElementById("gmsContact") as HTMLSelectElement;
+        const postcode = document.getElementById("gmsPostcode") as HTMLInputElement;
+        const plaats = document.getElementById("gmsPlaats") as HTMLInputElement;
+        const gemeente = document.getElementById("gmsGemeente") as HTMLInputElement;
+        const melding = document.getElementById("gmsMelding") as HTMLTextAreaElement;
+        const mc1 = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+        const mc2 = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+        const mc3 = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+        const prioriteit = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+        const karakteristiek = document.getElementById("gmsKarakteristiek") as HTMLTextAreaElement;
+        
+        // Create new incident
+        const newIncident = {
+          id: Date.now(),
+          type: `${mc1?.value || 'Onbekend'} - ${mc2?.value || ''} - ${mc3?.value || ''}`.replace(/ - $/, ''),
+          location: `${adres?.value || ''} ${plaats?.value || ''}`.trim() || 'Onbekende locatie',
+          timestamp: new Date().toISOString(),
+          timeAgo: 'Nu',
+          unitsAssigned: 0,
+          priority: prioriteit?.value === '1' ? 'high' as const : 
+                  prioriteit?.value === '2' ? 'medium' as const : 'low' as const,
+          status: 'active' as const
+        };
+
+        // Add incident to the main incident list
+        const existingIncidents = JSON.parse(localStorage.getItem('policeIncidents') || '[]');
+        existingIncidents.unshift(newIncident);
+        localStorage.setItem('policeIncidents', JSON.stringify(existingIncidents));
+
+        // Clear form
+        if (voertuig) voertuig.value = "";
+        if (naam) naam.value = "";
+        if (adres) adres.value = "";
+        if (contact) contact.value = "";
+        if (postcode) postcode.value = "";
+        if (plaats) plaats.value = "";
+        if (gemeente) gemeente.value = "";
+        if (melding) melding.value = "";
+        if (mc1) mc1.value = "";
+        if (mc2) mc2.value = "";
+        if (mc3) mc3.value = "";
+        if (karakteristiek) karakteristiek.value = "";
+        if (prioriteit) prioriteit.value = "3";
+
+        console.log('GMS melding opgeslagen');
+      };
             
             // Test specific searches
             const testOngevall = storedClassifications.filter(c => 
