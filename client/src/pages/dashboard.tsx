@@ -5034,8 +5034,10 @@ export default function Dashboard() {
       <main className="main-content">
         {activeSection !== "gms" && (
           <div className="header">
-            <h1>Meldkamer Dashboard</h1>
-            <div className="header-time">{formatTime(currentTime)}</div>
+            <div className="header-datetime">
+              <div className="header-time">{formatTime(currentTime)}</div>
+              <div className="header-title">Politie Meldkamer</div>
+            </div>
           </div>
         )}
 

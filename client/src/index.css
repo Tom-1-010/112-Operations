@@ -232,8 +232,8 @@ body {
 
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   margin-bottom: 32px;
   background: white;
   padding: 20px 24px;
@@ -241,15 +241,23 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.header h1 {
-  color: hsl(208, 79%, 51%);
-  font-size: 24px;
-  font-weight: 600;
+.header-datetime {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .header-time {
   color: hsl(220, 9%, 40%);
   font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.header-title {
+  color: hsl(208, 79%, 51%);
+  font-size: 18px;
+  font-weight: 600;
 }
 
 /* Dashboard Stats */
