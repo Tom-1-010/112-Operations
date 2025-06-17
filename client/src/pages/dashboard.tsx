@@ -4924,9 +4924,18 @@ export default function Dashboard() {
 
         {activeSection === "incidents" && (
           <div className="content-section active">
+            <IncidentTable
+              incidents={incidents}
+              onAccept={acceptIncident}
+              onClose={closeIncident}
+              onRemove={removeIncident}
+              onSimulateNew={simulateNewIncident}
+              onIncidentClick={handleIncidentClick}
+            />
+            
             <div className="section">
               <div className="section-header">
-                <h3 className="section-title">Alle Incidenten</h3>
+                <h3 className="section-title">Alle Incidenten (Legacy)</h3>
                 <button
                   className="delete-all-incidents-btn"
                   onClick={() => setShowDeleteConfirmModal(true)}
