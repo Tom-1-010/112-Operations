@@ -1599,6 +1599,9 @@ export default function Dashboard() {
         updateGMSTime();
 
         showNotificationMessage("GMS melding opgeslagen en toegevoegd aan incidenten");
+        
+        // Do NOT redirect to incidents tab - stay on GMS page
+        console.log('✅ Form saved successfully, staying on GMS page');
       };
 
       // Handle "Uitgifte" button - saves incident and redirects to Incidents tab
@@ -2018,9 +2021,11 @@ export default function Dashboard() {
             // Restore classifications after a brief delay to ensure dropdown setup is complete
             setTimeout(restoreClassifications, 100);
             
-            if (kladblokField && incidentData.notities) {
-              kladblokField.textContent = incidentData.notities;
-              console.log('✅ Set kladblok:', incidentData.notities);
+            // Note: Do NOT prefill the kladblok when reopening incidents
+            // The notepad should always start empty for new notes
+            if (kladblokField) {
+              kladblokField.textContent = '';
+              console.log('✅ Kladblok kept empty for new notes');
             }
             
             // If no specific location data, use the incident location
