@@ -1,0 +1,2280 @@
+MC1	MC2	MC3	Code	PRIO	DEFINITIE
+Alarm			al		Alle soorten alarmen van detectiesystemen die rechtstreeks op de meldkamer binnenkomen, en meldingen door derden over het afgaan van alarmen van detectiesystemen.
+Alarm	Autom. brand		alab	2	Alarmen van aangesloten OMS die direct op de meldkamer binnenkomen en automatische brandmeldingen door PAC aan de meldkamer doorgegeven.
+Alarm	Autom. brand	Autom. brand OMS	alabab	2	Melding via OMS van inwerkingtreding van een automatische brandmelder
+Alarm	Autom. brand	Br beheerssysteem	alabbb	2	Melding via OMS van inwerkingtreding van een automatische blusinstallatie
+Alarm	Autom. brand	Brandmelding PAC	alabbm	2	Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen.
+Alarm	Autom. brand	Drukknopmelding OMS	alabdk	2	Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding.
+Alarm	Autom. brand	Handmelder OMS	alabhm	2	Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven.
+Alarm	Autom. Gev stof		algs	2	Automatische meldingen van ontsnapping van een gevaarlijke stof via direct op de meldkamer aangesloten OMS en door PAC aan de meldkamer doorgegeven.
+Alarm	Autom. Gev stof	Gev. stof OMS	algsom	2	Melding via OMS van detectie van een gevaarlijke stof.
+Alarm	Autom. Gev stof	Gev. stof PAC	algspa	2	Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen.
+Alarm	Autom. systeemmelding		alas	4	Alle binnenkomende meldingen via de OMS waarvoor, op basis van de aard van de melding, geen repressieve brandweer inzet nodig is. Het betreft in hoofdzaak storings-, onderhouds-, test en buiten werking stelling meldingen van OMS systemen.
+Alarm	Hoog water alarm		alhw	4	Alarmen/waarschuwingen afgegeven door Rijkswaterstaat/waterschappen i.v.m. dreigend bijzonder hoogwater.
+Alarm	Luid/optisch alarm		allo	3	Melding door een persoon aan de meldkamer dat ergens een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas alarm) hoor- of zichtbaar is, en waarop door de beheerder /gebruiker van het betreffende object niet gereageerd lijkt te worden.
+Alarm	Luid/optisch alarm	CO-melder	alloco	3	
+Alarm	Luid/optisch alarm	Gebouw	allogb	3	Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.
+Alarm	Luid/optisch alarm	Rookmelder	allorm	3	Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.
+Alarm	Luid/optisch alarm	Voertuig/Vaartuig	allovv	3	Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.
+Alarm	PAC alarm		alpa	2	Alarmmeldingen die via de PAC op de meldkamer binnenkomen.
+Alarm	PAC alarm	Inbraakalarm	alpaib	2	Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen.
+Alarm	PAC alarm	Overvalalarm	alpaov	2	(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding.
+Alarm	PAC alarm	Persoonsalarm	alpaps	1	Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is.
+Alarm	RAC alarm		alra	1	Inbraakmeldingen die via de RAC binnenkomen.
+Alarm	RAC alarm	Inbraakalarm	alraib	1	Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen.
+Alarm	RAC alarm	Overvalalarm	alraov	1	(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding.
+Alarm	RAC alarm	Persoonsalarm	alraps	1	Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel.
+Alarm	Sensing		alse	2	
+Alarm	Sensing	Alert	alseal	2	Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen. 
+Alarm	Sensing	ANPR-hit	alseah	2	
+Alarm	Sensing	Opsporingsmiddel	alseom	2	
+Alarm	Sensing	Toezichtsalarm	alsetz	1	Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP.
+Alarm	Tunnelalarm		altu	2	Automatische alarmmelding via vanuit tunnel zonder indicatie dat het een brandmelding betreft.
+Alarm	Weeralarm		alma	4	Alarmen/waarschuwingen afgegeven door meteorologische diensten i.v.m. dreigend gevaarlijk/extreem weer.
+Bezitsaantasting			bz		Aantasting van andermans bezit of een poging daartoe.
+Bezitsaantasting	Diefstal		bzds	3	Het wegnemen of toe-eigenen van enig goed dat geheel of gedeeltelijk aan een ander toebehoort.
+Bezitsaantasting	Diefstal	Afpersing	bzdsap	3	Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging.
+Bezitsaantasting	Diefstal	Beroving	bzdsbr	1	Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport.
+Bezitsaantasting	Diefstal	Dier	bzdsdi	3	Diefstal van een dier.
+Bezitsaantasting	Diefstal	Fraude	bzdsfd	3	Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen.
+Bezitsaantasting	Diefstal	Goederen	bzdsgd	3	Diefstal van goederen.
+Bezitsaantasting	Diefstal	Heling	bzdshl	3	Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft.
+Bezitsaantasting	Diefstal	Luchtvaartuig	bzdslu	3	Diefstal van een luchtvaartuig.
+Bezitsaantasting	Diefstal	Oplichting	bzdsol	3	Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen.
+Bezitsaantasting	Diefstal	Vaartuig	bzdsva	3	Zie diefstal.
+Bezitsaantasting	Diefstal	Verduistering	bzdsvd	3	Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft.
+Bezitsaantasting	Diefstal	Voertuig	bzdsvo	3	Diefstal van een voertuig
+Bezitsaantasting	Diefstal	Winkeldiefstal	bzdswk	2	Diefstal uit een winkel
+Bezitsaantasting	Diefstal	Zakkenrollerij	bzdszk	3	Diefstal door een zakkenroller
+Bezitsaantasting	Inbraak		bzib	3	Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Bedrijf/Instelling	bzibbi	2	Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Bijgebouw	bzibbg	2	Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Luchtvaartuig	bziblu	2	Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Spoorvervoer	bzibsp	2	Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Vaartuig	bzibva	2	Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Voertuig	bzibvo	2	Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Inbraak	Woning	bzibwn	2	Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen.
+Bezitsaantasting	Overval		bzov	1	Het dwingen tot afgifte van enig goed door middel van geweld of het dreigen met geweld met voorbedachte rade.
+Bezitsaantasting	Overval	Bedrijf/Instelling	bzovbi	1	Een geplande overval op een bedrijf of instelling
+Bezitsaantasting	Overval	Luchtvaartuig	bzovlu	1	Een geplande overval op of in luchtvaartuig niet zijnde een kaping.
+Bezitsaantasting	Overval	Voertuig/Vaartuig	bzovvv	1	Een geplande overval op een voer- of vaartuig.
+Bezitsaantasting	Overval	Waardetransport	bzovwd	1	Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe.
+Bezitsaantasting	Overval	Woning	bzovwn	1	Een geplande overval op een particulier persoon vaak binnenshuis
+Bezitsaantasting	Stroperij		bzsp	2	Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten, dieren etc. wegnemen met het oogmerk van toe-eigening.
+Bezitsaantasting	Stroperij	Dier	bzspdi	2	Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening.
+Bezitsaantasting	Stroperij	Goederen	bzspgd	2	Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening.
+Bezitsaantasting	Vernieling		bzvn	3	Het opzettelijk en wederrechtelijk vernielen, beschadigen, onbruikbaar of wegmaken van enig goed dat aan een ander toebehoort.
+Bezitsaantasting	Vernieling	Gebouw	bzvngb	3	Zie vernieling.
+Bezitsaantasting	Vernieling	Goederen	bzvngd	3	Zie vernieling.
+Bezitsaantasting	Vernieling	Graffiti	bzvngf	3	Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan.
+Bezitsaantasting	Vernieling	Luchtvaartuig	bzvnlu	3	Zie vernieling.
+Bezitsaantasting	Vernieling	Spoorvervoer	bzvnsp	3	Zie vernieling.
+Bezitsaantasting	Vernieling	Vaartuig	bzvnva	3	Zie vernieling.
+Bezitsaantasting	Vernieling	Voertuig	bzvnvo	3	Zie vernieling.
+Brand			br		Incident waarbij het primair om brand gaat/ging of waarbij een explosie heeft plaatsgevonden met brand als overheersend effect tot gevolg.
+Brand	Bijgebouw		brbg	1	De BAG definieert als een bijgebouw: Een bijgebouw is een al dan niet vrijstaand pand dat dienstbaar is aan een hoofdgebouw en bevat geen verblijfsobjecten. Een pand zonder verblijfsobjecten heeft geen adres.
+Brand	Buiten		brbt	2	Alle buiten brandmeldingen, maar geen industrie/natuur/vervoer/scenario of gebouwen.
+Brand	Buiten	Afval/Rommel	brbtar	2	Brandmelding van afval/rommel. Geen grote als industrieel aangemerkte objecten met opslag van afval. Rommel betreft die goederen die geen of weinig waarde hebben, buiten staande/opgeslagen gebruiksgoederen. 
+Brand	Buiten	Berm/Ruigte/Bosschage	brbtbb	2	Brandmelding van begroeiing op een terrein dat op gebruiks-/natuurkaart en of in GMS NIET als bos heide veen of riet gebied aan te merken is.
+Brand	Buiten	Container	brbtct	2	Brandmelding van, in principe alleen voor opslag van afval of goederen bedoelde, containers/bakken. De containers zijn bedoeld om menselijke activiteiten daarin te laten plaatsvinden (toilet-, douche-, schaftcontainers en dergelijke), en vallen onder gebouwen of kleine opstal.
+Brand	Buiten	Industrie	brbtid	2	Brandmelding van industrieel aangemerkt terrein.
+Brand	Gebouw		brgb	1	Brandmeldingen van/in gebouwen die niet vallen onder industriegebouwen of speciale scenario's. Een gebouw is elk vast of verplaatsbare, maar niet mobiel overdekte constructie, waarbinnen zich bij normaal gebruik of onderhoud mensen kunnen bevinden.
+Brand	Gebouw	01 Woning/Woongebouw	brgb01	1	Gebruiksfunctie voor het wonen. Woongebouw: gebouw of gedeelte van gebouw waarin twee of meer woonfuncties zijn ondergebracht, die zijn aangewezen op een of meer gemeenschappelijke verkeersroutes.
+Brand	Gebouw	02 Bijeenkomst	brgb02	1	Gebruiksfunctie voor het samenkomen van mensen voor kunst, cultuur, godsdienst, communicatie, kinderopvang, verstrekken van consumpties voor het gebruik ter plaatse en aanschouwen sport
+Brand	Gebouw	03 Cel	brgb03	1	Gebruiksfunctie voor dwangverblijf van mensen. Cellengebouw: gebouw of gedeelte van gebouw waarin twee of meer celfuncties liggen, die zijn aangewezen op een of meer gemeenschappelijke verkeersroutes
+Brand	Gebouw	04 Gezondheidszorg	brgb04	1	Gebruiksfunctie voor medisch onderzoek, verpleging, verzorging of behandeling
+Brand	Gebouw	05 Agrarisch	brgb05	1	Gebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goeden, of voor agrarische doeleinden.
+Brand	Gebouw	05 Industrie	brgb05	1	
+Brand	Gebouw	06 Kantoor	brgb06	1	Gebruiksfunctie voor administratie
+Brand	Gebouw	07 Logies	brgb07	1	Gebruiksfunctie voor het bieden van recreatief verblijf of tijdelijk onderdak aan mensen Bij de voorbeelden staan ook: vakantiehuisje, een trekkershut en stacaravan! Deze voorbeelden hebben wel logiesfunctie maar zijn geen logiesgebouw. De WOZ vertaal tabel plaatst ze bij de woningen.
+Brand	Gebouw	08 Onderwijs	brgb08	1	Gebruiksfunctie voor het geven van onderwijs
+Brand	Gebouw	09 Sport	brgb09	1	Gebruiksfunctie voor het beoefenen van sport (Dus niet die voor het aanschouwen van sport. Die vallen onder bijeenkomst gebouw)
+Brand	Gebouw	10 Winkel	brgb10	1	Gebruiksfunctie voor het verhandelen van materialen, goederen of diensten. Bij de voorbeelden staan ook: benzinestation, (auto)showroom, kaartverkoopkantoor, praktijkruimte dierenarts, kapsalon/pedicure, zonnestudie en bordeel.
+Brand	Gebouw	11 Overige	brgb11	1	Gebruiksfunctie van een deel van een gebouw, voor activiteiten waarbij het verblijven van mensen een ondergeschikte rol speelt en die niet valt onder de eerste tien meer specifiek benoemde gebruiksfuncties Met de subgroepen: voor personenvervoer, stallen motorvoertuigen, opslaan afval. Bij de voorbeelden staan: Parkeergarage, bergruimte of garage bij woning, wachtlokaal passagiers op station, telefooncel, transformatorgebouw, sanitairgebouw op camping, observatiehut in bos.
+Brand	Luchtvaart		brlu	1	Brand in een op de grond staand luchtvaartuig, waarbij geen passagiers zijn betrokken / aanwezig zijn. (Bijv. een op een platform staand vliegtuig dat in de brand vliegt tijdens beladen of tanken)
+Brand	Natuur		brnt	2	Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als natuur/bos/duin/heide/veen of riet gebied wordt aangemerkt.
+Brand	Natuur	Akker/Weide	brntak	2	Brand van op akker/weide perceel aanwezige landbouwgewassen ook gras. Al dan niet gemaaid of op wiers liggend maar geen hooi/stro bulten of ander landbouwgewas (tussen) opslag op het veld waar het geoogst is.
+Brand	Natuur	Bos	brntbo	2	Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als bosgebied wordt aangemerkt.
+Brand	Natuur	Duin	brntdu	2	Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als duingebied wordt aangemerkt.
+Brand	Natuur	Heide	brnthe	2	Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als heidegebied wordt aangemerkt.
+Brand	Natuur	Riet	brntri	2	Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als rietvelden wordt aangemerkt. Het gaat hier om grotere oppervlaktes en dus niet om een strook riet langs een sloot of waterweg. In die laatste gevallen gaat het om een buitenbrand berm/ruigte of bosschage.
+Brand	Natuur	Veen	brntve	2	Brandmelding van begroeiing en of veenbodem in gebied dat op gebruiksdoeleinden-/ natuur kaart/ in GMS als veengebied wordt aangemerkt.
+Brand	Scheepvaart		brsh	2	Brandmelding van/in vaartuig met uitzondering van drijvende objecten die in verband met de primaire functie zelden verplaatst worden zoals een woonboot, gevangenisboot, hotelschip en dergelijke.
+Brand	Specifiek		brsf	3	Classificatie voor brandmeldingen waarbij naar verwachting geen, of geen omvangrijke, brandweerinzet (meer) nodig is. En het type object, in principe, niet bepalend is voor de inzet.
+Brand	Specifiek	Brandgerucht	brsfbg	3	Meldingen waarbij het zeer twijfelachtig is of er een te blussen brand is. Dit omdat de melder alleen een brandlucht waarneemt of alleen rook of vuurverschijnselen op afstand meldt, waarbij de melder niet kan aangeven wat er dan mogelijk in brand staat.
+Brand	Specifiek	Nablussen	brsfnb	3	Meldingen dat er op locatie waar, niet al te lang daarvoor een brand is geblust, het opnieuw begint te branden. Dit is echter niet zodanig dat een inzet met spoed nodig geacht wordt.
+Brand	Specifiek	Nacontrole	brsfnc	3	Melding van mensen die zelf een brandje geblust hebben maar er niet 100 procent zeker van zijn dat het uit is, of die na blikseminslag zonder direct waarneembare brandverschijnselen aangeven er niet zeker van te zijn of die echt geen brand veroorzaakt heeft en de brandweer verzoeken een nacontrole te doen, of er echt geen brand meer is.
+Brand	Spoorvervoer		brsp	2	Brandmelding van/in spoorvervoermiddel maar niet in een tunnel of in een station. Indien vervoermiddel in tunnel en/of onderstations overkapping dan wel direct tegen stationsgebouw, dan gebouwbrand betreffende tunnel en/of stationsobject.
+Brand	Wegvervoer		brwe	2	Brandmelding van/in wegvervoermiddel en (land/wegen)bouwmachine op de weg of in het vrije veld. Indien de brand in de tunnel/onder viaduct of in/direct tegen gebouw is, dan voor gebouwbrand, en zo mogelijk betreffend object(type) kiezen.
+Dienstverlening			dv		Het verlenen van hulp en diensten aan derden en aan de eigen dienst. Niet betreffende de directe inzet voor een incident of besteld vervoer tenzij het grootschalige bijstand buiten de regio/ werkingsgebied meldkamer betreft.
+Dienstverlening	Ambulancezorg		dvab	5	Het verlenen van hulp en leveren van diensten door de ambulancedienst aan derden en de eigen dienst. Niet zijnde directe inzet tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft.
+Dienstverlening	Ambulancezorg	Afgebroken inzet	dvabai	5	Een gestartte versnelde inzet waarbij na triage duidelijk is dat er geen inzet benodigd is.
+Dienstverlening	Ambulancezorg	Afstemverzoek	dvabav	5	Verzoek van de alarmcentrale aan contactpersoon van de ambulancedienst in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+Dienstverlening	Ambulancezorg	Bijstand	dvabbs	5	Bijstand aanvraag/-inzet van de ambulancedienst voor (grootschalige) inzet buiten het werkgebied van de meldkamer
+Dienstverlening	Ambulancezorg	Dienst aan derden	dvabdd	5	Het verlenen van diensten aan derden door de ambulancedienst
+Dienstverlening	Ambulancezorg	Geplande actie	dvabga	5	
+Dienstverlening	Ambulancezorg	Oefening	dvaboe	5	Het verwerken van een fictief incident, voor trainingsdoeleinden.
+Dienstverlening	Ambulancezorg	Opnamestop	dvabos	5	Indien een ziekenhuis een opnamestop afkondigt.
+Dienstverlening	Ambulancezorg	Testmelding	dvabtm	5	Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+Dienstverlening	Ambulancezorg	VWS	dvabvw	4	Voorwaardescheppend
+Dienstverlening	Brandweer		dvbw	5	Het verlenen van hulp en leveren van diensten door de brandweer aan derden en de eigen dienst. Niet zijnde directe inzet voor een incident tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft.
+Dienstverlening	Brandweer	Afstemverzoek	dvbwav	5	Verzoek van de alarmcentrale aan contactpersoon van de brandweer in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+Dienstverlening	Brandweer	Bijstand	dvbwbs	4	Bijstand aanvraag/-inzet van de brandweer voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale.
+Dienstverlening	Brandweer	Dienst aan derden	dvbwdd	4	Het verlenen van diensten aan derden door de Brandweer
+Dienstverlening	Brandweer	Geplande actie	dvbwga	5	Acties van de brandweer die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen.
+Dienstverlening	Brandweer	Herbez./Kazern.	dvbwhb	5	Acties van de brandweer om een kazerne die zelf geen eenheden meer kan leveren, in verband met de inzet, bij een incident of anderszins bezet te krijgen voor de noodzaakelijk geachte dekking in een bepaald gebied.
+Dienstverlening	Brandweer	Liftopsluiting	dvbwlo	3	Melding van/inzet voor mensen die vast in een lift zitten waarbij inzet van de brandweer wenselijk geacht wordt in verband met lange wachttijd op de liftmonteur.
+Dienstverlening	Brandweer	Oefening	dvbwoe	5	Het verwerken van een fictief incident, voor trainingsdoeleinden.
+Dienstverlening	Brandweer	Testmelding	dvbwtm	5	Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+Dienstverlening	Dienst door derden		dvdd	5	Het gaat hier om een bij de MK binnen gekomen hulpvraag waarvan geconcludeerd wordt dat het niet nodig is 1 van de disciplines te betrekken (anders dan de centralist waarbij die binnen gekomen is) en die niet onder 1 van de andere MC’s te plaatsen is en die beter door een andere niet direct aan de OOV diensten gelieerde partij af te handelen is.
+Dienstverlening	Dieren		dvdi	3	Hulpverlening in verband met dieren.
+Dienstverlening	Dieren	Dier in problemen	dvdipb	3	Hulpverlening aan een dier in problemen, niet specifiek benoemd.
+Dienstverlening	Dieren	In of op ijs	dvdiij	3	Hulpverlening aan een dier dat door het ijs is gezakt of dreigt te zakken of is vastgevroren en waarvan naar redelijkheid niet verwacht kan worden dat het zelfstandig uit het water/van het ijs kan komen.
+Dienstverlening	Dieren	In put/bassin/kelder	dvdipu	3	Hulpverlening aan een dier dat zich bevindt in een opslagruimte voor vloeistof/mest of andere stof waarin het kan zinken.
+Dienstverlening	Dieren	Op hoogte	dvdiho	3	Hulpverlening aan een dier dat zich op een plek hoog boven de grond bevindt waarvan redelijkerwijs niet verwacht mag worden dat het dier zelf weer de normale leefomgeving kan bereiken.
+Dienstverlening	Dieren	Te water	dvdiwa	3	Hulpverlening aan een dier dat te water is geraakt en waarvan naar alle redelijkheid niet verwacht kan worden dat het zelfstandig weer uit het water kan komen.
+Dienstverlening	KMAR		dvkm	3	Inzet van de KMAR.
+Dienstverlening	KMAR	Afstemverzoek	dvkav	5	Verzoek van de alarmcentrale aan contactpersoon van de KMAR in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+Dienstverlening	KMAR	Begeleiden	dvkmbg	3	Inzet van de KMAR bij de begeleiding van personen  en goederen.
+Dienstverlening	KMAR	Beveil. waardetransport	dvkmwd	3	Inzet van de KMAR bij het beveiligen van een waardetransport.
+Dienstverlening	KMAR	Bijstand	dvkmbs	3	Bijstand aanvraag/-inzet van de KMAR.
+Dienstverlening	KMAR	Dienst aan derden	dvkmdd	3	Het verlenen van diensten aan derden door de KMAR
+Dienstverlening	KMAR	Geplande actie	dvkmga	3	Acties van de KMAR die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen.
+Dienstverlening	KMAR	Signalering	dvkmsn	3	Signalering uit een opsporingssysteem, niet zijnde via sensing.
+Dienstverlening	KMAR	Testmelding	dvkmtm	5	Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+Dienstverlening	Multi		dvmu	5	Het verlenen van hulp en leveren van diensten door meerdere disciplines aan derden en de eigen dienst.
+Dienstverlening	Multi	Afstemverzoek	dvmuav	5	Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+Dienstverlening	Multi	Buitensluiting	dvmubt	5	
+Dienstverlening	Multi	Geplande actie	dvmuga	4	
+Dienstverlening	Multi	Oefening	dvmuoe	5	Het verwerken van een fictief incident, voor trainingsdoeleinden.
+Dienstverlening	Multi	Overname meldkamer	dvmuom	5	Het overnemen van een meldkamer door een andere meldkamer.
+Dienstverlening	Multi	Testmelding	dvmutm	5	Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+Dienstverlening	Multi	Uitval meldkamer	dvmumk	5	De melding aan de disciplines dat de meldkamer beperkt of niet functioneert.
+Dienstverlening	Multi	Uitval systeem	dvmuc2	5	De melding aan de disciplines dat C2000 is uitgevallen.
+Dienstverlening	Politie		dvpo	5	Het verlenen van hulp en leveren van diensten door de politie aan derden en de eigen dienst. Niet zijnde directe inzet voor een incident tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft.
+Dienstverlening	Politie	Aan instanties	dvpoai	3	Het verlenen van hulp en leveren van diensten door de politie aan instanties.
+Dienstverlening	Politie	Aantreffen van	dvpoav	3	De inzet van de politie in het kader van het aantreffen van personen of goederen.
+Dienstverlening	Politie	Afstemverzoek	dvplav	3	Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+Dienstverlening	Politie	Begeleiden	dvpobg	3	Inzet van de politie bij de begeleiding van personen  en goederen.
+Dienstverlening	Politie	Bijstand	dvpobs	3	Bijstand aanvraag/-inzet van de politie voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale.
+Dienstverlening	Politie	Controle Wet ID	dvpoci	3	
+Dienstverlening	Politie	Dienst aan derden	dvpodd	3	Het verlenen van diensten aan derden door de politie.
+Dienstverlening	Politie	Eigen initiatief	dvpoei	3	
+Dienstverlening	Politie	Geplande actie	dvpoga	5	Acties van de politie die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen.
+Dienstverlening	Politie	Oefening	dvpooe	5	Het verwerken van een fictief incident, voor trainingsdoeleinden.
+Dienstverlening	Politie	Overbrengen	dvpoob	3	
+Dienstverlening	Politie	Testmelding	dvpltm	5	Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+Dienstverlening	Politie	Vermissing	dvpovm	2	
+Gezondheid			gz		Gezondheidsproblemen die niet gerelateerd zijn aan brand of een ongeval (of andere MC).
+Gezondheid	Onwel/Ziekte		gzoz	1	
+Gezondheid	Poging zelfdoding		gzpz	1	Er is een melding voor een van de disciplines van poging tot zelfdoding.
+Gezondheid	Reanimatie		gzra	1	
+Gezondheid	Suicidaal persoon		gzsp	2	
+Hulpvraag			hvr		Hulpaanvragen die bij de meldkamer binnenkomen
+Hulpvraag	Ambulancezorg		hvaz	2	Hulpaanvragen die bij de ambulanzezorg binnenkomen
+Hulpvraag	Ambulancezorg	Directe inzet	hvazdi	2	De centralist van de meldkamer ambulancezorg stuurt op basis van een 112-melding zo snel als mogelijk en voor afronding van de triage een ambulance-eenheid in de richting van het incident. Het uitsturen van de ambulance gebeurt met een A2-urgentie. Triage, terwijl de ambulance al onderweg is, kan aanleiding geven de inzetopdracht en/of de urgentie bij te stellen of eventueel zelfs de inzetopdracht af te breken.
+Hulpvraag	Ambulancezorg	Versnelde inzet	hvazvi	2	De centralist van de meldkamer ambulancezorg stuurt op basis van een 112-melding of melding van een zorg professional vanuit NTS zo snel als mogelijk en voor afronding van de triage een ambulance-eenheid in de richting van het incident. Het uitsturen van de ambulance gebeurt met een A1- of A2-urgentie (keuze vanuit NTS). Triage, terwijl de ambulance al onderweg is, kan aanleiding geven de urgentie bij te stellen.
+Leefmilieu			lm		Aantasting van de leefomgeving (hinder) of dreiging daartoe, zonder directe of indirecte invloed op de gezondheid van mensen.
+Leefmilieu	Aardschok		lmas	2	
+Leefmilieu	Conflict		lmcf	2	Een situatie waarin twee of meer mensen tegengestelde opvattingen hebben.
+Leefmilieu	Conflict	Burenruzie	lmcfbu	2	Een conflict tussen buren.
+Leefmilieu	Conflict	Conflictbemiddeling	lmcfbm	2	Een conflict tussen twee (samenwonende) personen.
+Leefmilieu	Conflict	Hulpverlener	lmcfhv	1	Een conflict tussen een burger en een hulpverlener van een particuliere- of overheidsinstelling.
+Leefmilieu	Dieren		lmdi	3	
+Leefmilieu	Dieren	Agressieve dieren	lmdiag	2	
+Leefmilieu	Dieren	Dierenkwelling	lmdikw	2	
+Leefmilieu	Dieren	Zieke/Dode dieren	lmdizd	3	Aantreffen van zieke en/of dode dieren.
+Leefmilieu	Overlast van/door		lmol	3	
+Leefmilieu	Overlast van/door	Dieren	lmoldi	3	Overlast veroorzaakt door dieren, waaronder blaffende honden en bijenzwermen.
+Leefmilieu	Overlast van/door	Geluid	lmolgl	3	Overlast veroorzaakt door geluid in de woonomgeving.
+Leefmilieu	Overlast van/door	Jeugd	lmolje	3	Het veroorzaken van overlast door jeugdige personen, waaronder zogenaamde hangjongeren.
+Leefmilieu	Overlast van/door	Persoon	lmolps	3	Het veroorzaken van overlast door een individueel persoon.
+Leefmilieu	Overlast van/door	Verkeer	lmolvk	3	Overlast veroorzaakt door weg-, water-, spoor- en luchtverkeer.
+Leefmilieu	Overlast van/door	Vuurwerk	lmolvw	3	Overlast ten gevolge van het afsteken van vuurwerk.
+Leefmilieu	Stank/Hinder. Lucht		lmst	3	Overlast van stinkende stoffen, bijvoorbeeld door chemisch stoffen of het uitrijden van mest.
+Leefmilieu	Uitval nutsvoorziening		lmun	5	
+Leefmilieu	Verontreiniging		lmvo	3	
+Leefmilieu	Verontreiniging	Bodem	lmvobd	3	
+Leefmilieu	Verontreiniging	Lucht	lmvolu	3	
+Leefmilieu	Verontreiniging	Object	lmvoob	3	
+Leefmilieu	Verontreiniging	Oppervlaktewater	lmvoow	3	
+Leefmilieu	Water/weer problemen		lmww	3	
+Leefmilieu	Water/weer problemen	Gladheid/Sneeuw	lmwwgl	4	
+Leefmilieu	Water/weer problemen	Hoogwater	lmwwhw	4	
+Leefmilieu	Water/weer problemen	Overstroming/Dijkdoorbraak	lmwwos	1	
+Leefmilieu	Water/weer problemen	Stormschade	lmwwst	3	
+Leefmilieu	Water/weer problemen	Warmte/Droogte	lmwwwd	5	
+Leefmilieu	Water/weer problemen	Wateroverlast	lmwwol	3	
+Ongeval			og		Een onvoorziene gebeurtenis met urgentie waarbij op enige wijze schade is veroorzaakt (ontstaan) aan mensen of goederen waarbij het niet primair om brand of een explosie gaat. Alleen onder luchtvaartongevallen worden ook alle branden van luchtvaartuigen gerekend.
+Ongeval	Luchtvaart		oglu	2	Een onvoorziene gebeurtenis waarbij een vliegtuig is betrokken.
+Ongeval	Luchtvaart	Crash	ogluco	1	Een onvoorziene landing of neerstorting of aanrijding met ernstige gevolgen. (Bijv. vliegtuig stort neer tijdens landing, twee vliegtuigen komen op de start-/landingsbaan met elkaar in botsing, een helikopter raakt hoogspanningskabel en stort neer)
+Ongeval	Luchtvaart	Gevaarlijke stof	oglugs	1	Een ongeval (incident) met gevaarlijke stoffen (niet zijnde een crash, noodsituatie of voorzorgslanding), vanuit een luchtvaartuig.
+Ongeval	Luchtvaart	Noodsituatie	ogluns	1	Piloot doet May Day Call. Hierbij is sprake van een ernstige situatie waarbij direct levensgevaar voor de aanwezigen is of kan ontstaan en waarbij direct assistentie is vereist. Het luchtvaartuig wil voorrang op alle luchtvaartbewegingen om te landen.
+Ongeval	Luchtvaart	Overig LVO	ogluki	1	Onder de luchtvaart ongevallen vallende overige incidenten met luchtvaartuig, wat de luchthaven in eerste instantie zelf af kan met de luchthavenbrandweer. (Dit zijn geen crashes, runway incursion, voorzorgslandingen, etc.)
+Ongeval	Luchtvaart	Voorzorg	ogluvz	1	Een melding uit voorzorg (pan pan call) met als doel vroegtijdig maatregelen te kunnen treffen of hulpverlening op te starten. Er wordt nog geen ernstig incident verwacht en de luchthaven moet het incident in principe met eigen potentieel af kunnen handelen.
+Ongeval	Overig		ogov	2	
+Ongeval	Overig	Gevaarlijke stof	ogovgs	1	Een ongeval (incident) (niet zijnde luchtvaart, spoorvervoer, water of wegvervoer), waarbij gevaarlijke stoffen betrokken zijn en deze stof(fen) het grootste gevaar van het incident zijn voor de hulpverleners en de omgeving.(bijvoorbeeld het vrijkomen van een gevaarlijke stof uit een installatie bij een bedrijf)
+Ongeval	Overig	Letsel	ogovls	1	
+Ongeval	Overig	Materieel	ogovmt	2	
+Ongeval	Spoorvervoer		ogsp	2	Een ongeval op het spoor.
+Ongeval	Spoorvervoer	Gevaarlijke stof	ogspgs	1	Een ongeval (incident) met gevaarlijke stoffen op het spoor ( bijvoorbeeld een lekkende ketelwagon)
+Ongeval	Spoorvervoer	Letsel	ogspls	1	Een ongeval op het spoor met (ander) voertuig of voorwerp waarbij enig menselijk letsel is ontstaan.
+Ongeval	Spoorvervoer	Materieel	ogspmt	2	Een ongeval op het spoor met (ander) voertuig of voorwerp waarbij slechts sprake is van materiele schade.
+Ongeval	Water		ogwt	2	Een ongeval te water.
+Ongeval	Water	Gevaarlijke stof	ogwtgs	1	Een ongeval (incident) met gevaarlijke stoffen op het water ( bijvoorbeeld een lekkende tank/compartiment van een binnenvaartschip)
+Ongeval	Water	Lek/zinken woonboot	ogwtzi	2	
+Ongeval	Water	Letsel	ogwtls	1	Een ongeval te water waarbij enig menselijk letsel is ontstaan.
+Ongeval	Water	Materieel	ogwtmt	3	Een ongeval te water waarbij slechts van materiele schade sprake is.
+Ongeval	Water	Noodsignaal	ogwtns	1	Een (melding) waarneming signaal dat wordt uitgezonden/gegeven om aan te geven dat een vaartuig in nood verkeert en waarbij geen direct mondeling contact is met de opvarende op het vaartuig, en door de waarnemer ook niet vast te stellen is dat er zich daadwerkelijk een vaartuig in nood verkeert.
+Ongeval	Water	Persoon in drijfzand	ogwtpd	1	Een persoon in nood die zich in drijfzand begeeft.
+Ongeval	Water	Persoon te water	ogwtpw	1	Een persoon in nood die te water is geraakt en niet in het bezit is van een drijfmiddel (drenkeling).
+Ongeval	Water	Schip/watersp. in problemen	ogwtpr	2	Een vaartuig waarover de bemanning de controle heeft verloren of welke in gevaar verkeert. Dit wordt bepaald op basis van direct contact met opvarenden, of door waarneming van de toestand van het vaartuig door derden.
+Ongeval	Wegvervoer		ogwe	2	Een ongeval op de weg.
+Ongeval	Wegvervoer	Gevaarlijke stof	ogwegs	1	Een ongeval (incident) met gevaarlijke stoffen op de weg / vanuit een voertuig ( bijvoorbeeld een lekkende tankwagen)
+Ongeval	Wegvervoer	Letsel	ogwels	1	Een ongeval waarbij een voertuig (wegvervoer) is betrokken waarbij enig lichamelijk letsel is ontstaan.
+Ongeval	Wegvervoer	Materieel	ogwemt	3	Een ongeval waarbij een voertuig (wegvervoer) is betrokken en waarbij slechts sprake is van materiele schade.
+Ongeval	Wegvervoer	Voertuig te water	ogwewt	1	Een ongeval waarbij een voertuig (wegvervoer) te water is geraakt.
+Veiligheid en openbare orde			vo		Aantasting van de lichamelijke integriteit van persoon of dreiging met maatschappelijke gevolgen.
+Veiligheid en openbare orde	Aantast. Openb orde		voat	3	Verstoring van de openbare orde
+Veiligheid en openbare orde	Aantast. Openb orde	Demonstratie	voatdm	4	Een spontane of aangekondigde betoging op de openbare weg door een of meerdere personen.
+Veiligheid en openbare orde	Aantast. Openb orde	Evenementen	voatev	4	Een spontane of aangekondigde gebeurtenis op de openbare weg door eenn of meerdere personen.
+Veiligheid en openbare orde	Aantast. Openb orde	Huis/lok. vredebreuk	voatvb	2	Het wederrechtelijk binnendringen van een woning of lokaliteit.
+Veiligheid en openbare orde	Aantast. Openb orde	Onbevoegd betreden	voatob	3	Zonder toestemming van de eigenaar betreden van een terrein of gebouw.
+Veiligheid en openbare orde	Aantast. Openb orde	Overtreding avondklok	vooak	3	Zonder toestemming zich in de openbaarheid begeven gedurende de periode dat een avondklok van toepassing is
+Veiligheid en openbare orde	Aantast. Openb orde	Samenscholing	voatsm	3	Samen zijn van een groep personen dat als hinderlijk wordt ervaren.
+Veiligheid en openbare orde	Aantast. Openb orde	Stalking	vostk	2	Iemand opzettelijk en structureel lastigvallen, waardoor die persoon zich in zijn of haar vrijheid en veiligheid voelt aangetast.
+Veiligheid en openbare orde	Beveiliging		vobev	3	Beveiligingswerkzaamheden uitgevoerd door 1 of meerdere eenheden van de politie en/of KMAR.
+Veiligheid en openbare orde	Beveiliging luchtvaart		vobb	3	Incidenten met betrekking tot vliegvelden en vliegtuigen van de burgerluchtvaart.
+Veiligheid en openbare orde	Beveiliging luchtvaart	Onbeheerde bagage	vobbbg	2	Aantreffen van bagage zonder dat een eigenaar waarneembaar is.
+Veiligheid en openbare orde	Beveiliging luchtvaart	Security incident	vobbsi	2	Incident waarvoor 'security' protocollen gelden.
+Veiligheid en openbare orde	Beveiliging luchtvaart	Startverbod vliegtuig	vobbsv	1	Een of meerdere vliegtuigen is verboden op te starten.
+Veiligheid en openbare orde	Beveiliging luchtvaart	Steekproef security	vobbss	3	Vanuit beveiligingsoverweging steekproefsgewijs extra controle uitvoeren.
+Veiligheid en openbare orde	Beveiliging luchtvaart	Vluchtafhandeling	vobbva	3	Beveiliging incheck, bagage, passagiers, platform etcetera.
+Veiligheid en openbare orde	Bijzondere Wetten		vobzw	3	
+Veiligheid en openbare orde	Bijzondere Wetten	GB Controle	vogbc	3	Controle aan de Nederlandse grens
+Veiligheid en openbare orde	Bijzondere Wetten	Militaire Zaken	vomi	3	Meldingen met betrekking tot het militair tucht of strafrecht, welke niet onder een andere MC’s kunnen vallen, of andere zaken met betrekking tot de Nederlandse Krijgsmacht. 
+Veiligheid en openbare orde	Bijzondere Wetten	MTV Controle	vomtv	3	Controle aan de Schengen binnengrens van het Koninkrijk. (NL-DU en NL-BE) 
+Veiligheid en openbare orde	Bijzondere Wetten	Veiligheidscontrole WWM	vovhc	2	Veiligheidscontrole Wet Wapens en Munitie
+Veiligheid en openbare orde	Bijzondere Wetten	Vreemdelingenzaak	vovzk	3	Overige vreemdelingenzaken, niet zijnde GB of MTV
+Veiligheid en openbare orde	Digitaal		vodg	3	
+Veiligheid en openbare orde	Digitaal	Cybercrime	vodgcc	3	
+Veiligheid en openbare orde	Digitaal	Digitale criminaliteit	vodgdc	3	
+Veiligheid en openbare orde	Drugszaak		vodz	3	Alle meldingen met betrekking tot het bezit en gebruik van drugs.
+Veiligheid en openbare orde	Drugszaak	Dealen	vodzdl	3	Het (illegaal) handelen in drugs.
+Veiligheid en openbare orde	Drugszaak	Drugslab	vodzlb	2	Het aantreffen van een drugslaboratorium.
+Veiligheid en openbare orde	Drugszaak	Wietplantage	vodzwp	2	Het aantreffen van hennep- en wietplantages.
+Veiligheid en openbare orde	Explosief/Munitie		voex	2	Het aantreffen van een explosief of munitie, niet zijnde het gebruik hiervan.
+Veiligheid en openbare orde	Explosief/Munitie	Aantref. explosieven	voexat	1	Het aantreffen van explosieven.
+Veiligheid en openbare orde	Explosief/Munitie	Bommelding	voexbm	1	Een melding waarbij gedreigd wordt tot het gebruik van een explosief.
+Veiligheid en openbare orde	Explosief/Munitie	Explosie	voexex	1	
+Veiligheid en openbare orde	Explosief/Munitie	Munitie	voexmu	3	Het aantreffen van vuurwapens en/of munitie.
+Veiligheid en openbare orde	Explosief/Munitie	Vuurwerkopslag	voexvw	3	Het aantreffen van (illegaal) vuurwerk.
+Veiligheid en openbare orde	Gevangenis		vogv	2	Een gebouw om gedetineerden in bewaring te stellen of in hechtenis te nemen.
+Veiligheid en openbare orde	Gevangenis	Ontsnapping	vogvos	1	Het zonder toestemming verlaten van de gevangenis.
+Veiligheid en openbare orde	Gevangenis	Oproer	vogvor	1	Een melding van verzet, onrust door meerdere personen in een gevangenis.
+Veiligheid en openbare orde	Geweld		vogw	2	Het opzettelijk, door middel van het toepassen van geweld, toebrengen van pijn of letsel aan personen.
+Veiligheid en openbare orde	Geweld	Bedreiging	vogwbd	2	Het verbaal bedreigen van personen met het toebrengen van schade, pijn of letsel zonder dit daadwerkelijk al te hebben uitgevoerd.
+Veiligheid en openbare orde	Geweld	CBRN-e dreiging	vogwcb	1	De dreiging van chemische, biologische, radioactieve, nucleaire stoffen/wapens waarbij pijn of letsel kan ontstaan.
+Veiligheid en openbare orde	Geweld	Gijzeling	vogwgz	1	Personen met geweld of bedreiging met geweld tegen hun wil vasthouden.
+Veiligheid en openbare orde	Geweld	Kaping	vogwkp	1	Het met geweld of dreiging met geweld het commando overnemen van een voertuig, vaartuig, of luchtvaartuig.
+Veiligheid en openbare orde	Geweld	Mishandeling	vogwmh	2	Het opzettelijk toebrengen van pijn of letsel aan een ander.
+Veiligheid en openbare orde	Geweld	Ontvoering	vogwon	1	Iemand tegen diens wil onttrekken uit zijn/haar vertrouwde omgeving en wederrechtelijk verplaatsen/wegvoeren.
+Veiligheid en openbare orde	Geweld	Schietpartij	vogwsi	1	Een vuurgevecht door middel van vuurwapens tussen of gericht tegen personen.
+Veiligheid en openbare orde	Geweld	Steekpartij	vogwst	1	Het gebruiken van steekwapens gericht tegen personen.
+Veiligheid en openbare orde	Geweld	Terrorisme	vogwte	1	Op de meldkamer geeft de politie aan of een incident als terrorisme geclassificeerd moet worden. Het betreffen acties met oogmerk om de bevolking of een deel van de bevolking van een land vrees aan te jagen, dan wel een overheid of internationale organisatie te dwingen iets te doen, niet te doen of te dulden, dan wel de fundamentele politieke, constitutionele, economische of sociale structuren van een land of een internationale organisatie ernstig te ontwrichten of te vernietigen. (bron: AIVD) Deze definitie die het gevolg is van het Europese standpunt van de Raad van de Europese Unie inzake terrorismebestrijding, zoals deze materieel gelijk is beschreven in de bepaling in de (ontwerp-)WTM, artikel 83a WvSr: wet- en regelgeving Art. 83a WvSr en 140 WvSr hiërarchische verhouding
+Veiligheid en openbare orde	Geweld	Vechtpartij	vogwve	1	Door toepassing van lijfelijk geweld een geschil trachten te slechten.
+Veiligheid en openbare orde	Noodoproep		vono	1	
+Veiligheid en openbare orde	Verdachte situatie		vovs	2	Een ongewone situatie die om nader onderzoek vraagt
+Veiligheid en openbare orde	Verdachte situatie	Gebouw	vovsgb	2	Een ongewone situatie in en om een gebouw die om nader onderzoek vraagt
+Veiligheid en openbare orde	Verdachte situatie	Overleden persoon	vovsop	2	Het aantreffen van een overleden persoon waarvan de identiteit niet direct kan worden vastgesteld en de doodsoorzaak vraagt om nader onderzoek.
+Veiligheid en openbare orde	Verdachte situatie	Pakket/Voorwerp	vovspv	2	Het aantreffen van een verdacht pakket of voorwerp.
+Veiligheid en openbare orde	Verdachte situatie	Persoon	vovsps	2	Het aantreffen van een persoon die verdacht is of verdacht gedraagt
+Veiligheid en openbare orde	Verdachte situatie	Voertuig/Vaartuig	vovsvv	2	Het aantreffen van een verdacht voertuig 
+Veiligheid en openbare orde	Seksueel delict		vosd	2	Een melding van een incident waarbij sprake is van een seksueel misdrijf
+Veiligheid en openbare orde	Seksueel delict	Aanranding	vosdar	2	
+Veiligheid en openbare orde	Seksueel delict	Aanstootgevend gedrag	vosdag	2	Tonen geslachtsdeel (bijv potloodventer), kan ook live via internet
+Veiligheid en openbare orde	Seksueel delict	Kinderpornografie	vosdkp	2	
+Veiligheid en openbare orde	Seksueel delict	Ontucht minderjarigen	vozdom	2	Het plegen van ontucht (seksuele handelingen) met een minderjarig persoon. Onder ontucht wordt hier ook verstaan het betasten van intieme delen.
+Veiligheid en openbare orde	Seksueel delict	Prostitutie	vosdpt	2	
+Veiligheid en openbare orde	Seksueel delict	Seksueel benaderen kind	vosdbk	2	Seksuele benadering van een kind, schriftelijk of mondeling (sexchatting of grooming)
+Veiligheid en openbare orde	Seksueel delict	Seksueel misbruik kind	vosdmk	2	Seksuele handelingen met kind (verkrachting of aanranding kind).
+Veiligheid en openbare orde	Seksueel delict	Seksuele intimidatie	vosdsi	2	Seksuele intimidatie in het openbaar (op straat of online). Kan gaan om opmerkingen, geluiden, gebaren of aanrakingen.
+Veiligheid en openbare orde	Seksueel delict	Verkrachting	vosdvk	1	
+Verkeer			vk		Een verkeersgebeurtenis niet zijnde een ongeval.
+Verkeer	Luchtvaart		vklu	3	Betreft alle luchtvaartvervoermiddelen.
+Verkeer	Luchtvaart	Laag vliegen	vklulv	2	Het lager vliegen dan de voorgeschreven minimale hoogte.
+Verkeer	Luchtvaart	Onbevoegd vliegen	vkluov	2	Zonder daarvoor voorafgegane toestemming vliegen met een luchtvaartuig.
+Verkeer	Luchtvaart	Onbevoegde landing	vkluol	2	Zonder daarvoor voorafgegane toestemming op een luchtvaartterrein of ander terrein landen.
+Verkeer	Luchtvaart	Onder invloed	vkluoi	2	Een luchtvaartuig besturen terwijl de gezagvoerder onder invloed van alcoholische drank of drugs verkeert.
+Verkeer	Luchtvaart	Runway incursion	vkluri	2	Er is sprake van een runway incursion wanneer een vliegtuig, een voertuig of een persoon zich ten onrechte op de start- en of landingsbaan bevindt of binnen de beschermende zone daarvan.
+Verkeer	Scheepvaart		vksh	3	Incidenten die het vervoer op het water aangaan.
+Verkeer	Scheepvaart	Aanmeerproblemen	vkshap	3	Er doen zich problemen voor bij het afmeren aan een steiger of kade of bij het ankeren.
+Verkeer	Scheepvaart	Afgevallen lading	vkshal	3	Lading dat van een schip is gevallen.
+Verkeer	Scheepvaart	ASO-vaargedrag	vkshav	3	Gedrag op het water waar anderen hinder van ondervinden.
+Verkeer	Scheepvaart	Hinderl. waterbeweging	vkshhw	3	Een vaartuig veroorzaakt een golfbeweging die hinder of schade veroorzaakt.
+Verkeer	Scheepvaart	Onbevoegd varen	vkshov	3	Het besturen van een vaartuig zonder in het bezit te zijn van de vereiste documenten.
+Verkeer	Scheepvaart	Onder invloed	vkshoi	2	Een vaartuig onder invloed van alcoholische drank of drugs besturen.
+Verkeer	Scheepvaart	Stremming	vkshsm	3	Gedeeltelijke of gehele stremming van de vaarweg niet zijnde een ongeval
+Verkeer	Spoorvervoer		vksp	3	Incidenten die het vervoer op of om het spoor aangaan.
+Verkeer	Spoorvervoer	Defect meubilair	vkspdm	5	Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn.
+Verkeer	Spoorvervoer	Loslopende dieren	vkspld	2	Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn.
+Verkeer	Spoorvervoer	Negeren rood sein	vksprs	1	Een treinmachinist geeft geen gevolg aan een rood stopteken.
+Verkeer	Spoorvervoer	Onder invloed	vkspoi	2	Een persoon bevindt zich onbevoegd op het spoor.
+Verkeer	Spoorvervoer	Persoon o/b spoor	vkspps	1	Een persoon bevindt zich onbevoegd op of bij het spoor of spoorbed.
+Verkeer	Spoorvervoer	Stremming	vkspss	3	
+Verkeer	Spoorvervoer	Verstoring treindienst	vkspvt	4	Trein Incident Management onderscheid 4 gradaties van in toenemende mate ernstiger wordende verstoringen van de treindienst: TIS 1.1 t/m TIS 1.4 Zolang het geen ontsporing zonder slachtoffers, verstoring door slecht weer of door de overheid opgelegde verstoring treindienst is b.v. voor het ruimen van WO2 bom kunnen deze meldingen hieronder geplaatst worden.
+Verkeer	Wegverkeer		vkwe	3	Betreft alle wegvervoermiddelen.
+Verkeer	Wegverkeer	Achtervolging	vkweav	1	
+Verkeer	Wegverkeer	Afgevallen lading	vkweal	2	Lading dat van een voertuig is gevallen.
+Verkeer	Wegverkeer	ASO-rijgedrag	vkwear	3	Gedrag op de weg waar anderen hinder van ondervinden.
+Verkeer	Wegverkeer	Bijz. Verk zaken	vkwebz	3	Bijzondere verkeerszaken bijv. extreem vervoer
+Verkeer	Wegverkeer	Defect straatmeubilair	vkweds	4	Hulpmiddelen langs de weg bijv. verkeersborden, lichtmasten, wegbebording, schrikhekken die defect of beschadigd zijn.
+Verkeer	Wegverkeer	Fietser o/b rijbaan	vkwefs	2	Een fietser bevindt zich onbevoegd op of bij de rijbaan
+Verkeer	Wegverkeer	Gladheid	vkwegh	3	Wegdek dat door atmosferische invloed glad is geworden of dreigt te worden.
+Verkeer	Wegverkeer	Joyriding	vkwejr	2	Het zonder toestemming van de eigenaar met een motorvoertuig over de voor het openbaar verkeer openstaande weg rijden.
+Verkeer	Wegverkeer	Loslopende dieren	vkwedi	2	Dieren die zonder een geleider op of langs de rijbaan van een weg lopen.
+Verkeer	Wegverkeer	Onder invloed	vkweoi	2	Een voertuig besturen terwijl de bestuurder onder invloed van alcoholische drank of drugs verkeert.
+Verkeer	Wegverkeer	Parkeerprobleem	vkwepk	3	Er doen zich problemen voor door of met het parkeren van een voertuig.
+Verkeer	Wegverkeer	Persoon o/b rijbaan	vkweps	2	Een persoon bevindt zich onbevoegd op of bij de rijbaan
+Verkeer	Wegverkeer	Spookrijder	vkwesr	1	Een bestuurder van een motorvoertuig rijdt tegen de rijrichting van het overige verkeer in.
+Verkeer	Wegverkeer	Verkeersgeleiding	vkwegl	4	Bestuurders krijgen een aanwijzing door middel van matrix- borden om een bepaalde snelheid te rijden of van een bepaalde rijstrook gebruik te maken.
+Verkeer	Wegverkeer	Verkeersstremming	vkwest	3	De rijbaan is geheel of gedeeltelijk gestremd door een voorwerp of voertuig waardoor het verkeer niet of slechts gedeeltelijk door kan gaan.
+Verkeer	Wegverkeer	Vervuild wegdek	vkwevw	3	Wegdekvervuiling door gelekte vloeistof, afvallende lading of loslatende modder van banden.
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
