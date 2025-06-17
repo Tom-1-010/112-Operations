@@ -1261,6 +1261,52 @@ body {
   border-bottom: none;
 }
 
+/* Search functionality styling */
+.search-container {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.contact-search {
+  width: 100%;
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-family: inherit;
+  border-radius: 2px;
+}
+
+.contact-search:focus {
+  outline: none;
+  background: #ffffcc;
+  border-color: #999;
+}
+
+/* GMS Caller Information Styling */
+.gms-caller-info-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d0d0d0;
+}
+
+.gms-caller-info-section .gms-block-title {
+  background: #e8f4f8;
+  color: #2c5aa0;
+  font-weight: bold;
+  font-size: 11px;
+  padding: 4px 8px;
+  margin: -4px -4px 8px -4px;
+  border: 1px solid #b8d4ea;
+}
+
+.gms-field-wide {
+  flex: 2;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .telefoon-main-grid {

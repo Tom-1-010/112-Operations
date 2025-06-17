@@ -1984,13 +1984,13 @@ export default function Dashboard() {
             if (statusBar) {
               const callStatus = document.createElement('span');
               callStatus.className = 'call-status';
-              callStatus.textContent = `📞 Verbinding maken met ${buttonText.split('\n')[0]}...`;
+              callStatus.textContent = `Verbinding maken met ${buttonText.split('\n')[0]}...`;
               callStatus.style.color = '#ff9800';
               
               statusBar.appendChild(callStatus);
               
               setTimeout(() => {
-                callStatus.textContent = `📞 Verbonden met ${buttonText.split('\n')[0]}`;
+                callStatus.textContent = `Verbonden met ${buttonText.split('\n')[0]}`;
                 callStatus.style.color = '#4caf50';
                 
                 setTimeout(() => {
@@ -1999,9 +1999,53 @@ export default function Dashboard() {
               }, 2000);
             }
             
-            console.log(`📞 Calling ${service}: ${buttonText}`);
+            console.log(`Calling ${service}: ${buttonText}`);
           });
         });
+        
+        // Search functionality for colleagues
+        const colleagueSearch = document.getElementById('colleagueSearch') as HTMLInputElement;
+        const colleagueGrid = document.getElementById('colleagueGrid');
+        
+        if (colleagueSearch && colleagueGrid) {
+          colleagueSearch.addEventListener('input', (e) => {
+            const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+            const buttons = colleagueGrid.querySelectorAll('.contact-btn');
+            
+            buttons.forEach(btn => {
+              const searchData = btn.getAttribute('data-search')?.toLowerCase() || '';
+              const buttonText = btn.textContent?.toLowerCase() || '';
+              
+              if (searchData.includes(searchTerm) || buttonText.includes(searchTerm)) {
+                (btn as HTMLElement).style.display = 'flex';
+              } else {
+                (btn as HTMLElement).style.display = 'none';
+              }
+            });
+          });
+        }
+        
+        // Search functionality for external partners
+        const partnerSearch = document.getElementById('partnerSearch') as HTMLInputElement;
+        const partnerGrid = document.getElementById('partnerGrid');
+        
+        if (partnerSearch && partnerGrid) {
+          partnerSearch.addEventListener('input', (e) => {
+            const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+            const buttons = partnerGrid.querySelectorAll('.contact-btn');
+            
+            buttons.forEach(btn => {
+              const searchData = btn.getAttribute('data-search')?.toLowerCase() || '';
+              const buttonText = btn.textContent?.toLowerCase() || '';
+              
+              if (searchData.includes(searchTerm) || buttonText.includes(searchTerm)) {
+                (btn as HTMLElement).style.display = 'flex';
+              } else {
+                (btn as HTMLElement).style.display = 'none';
+              }
+            });
+          });
+        }
       };
       
       // Initialize telefoon dashboard if on intake page
@@ -4400,20 +4444,28 @@ export default function Dashboard() {
                   {/* Colleagues */}
                   <div className="contact-panel colleague-panel">
                     <h3 className="panel-title">Collega's</h3>
-                    <div className="contact-grid">
-                      <button className="contact-btn colleague" data-colleague="supervisor">
+                    <div className="search-container">
+                      <input 
+                        type="text" 
+                        className="contact-search" 
+                        placeholder="Zoek collega's..."
+                        id="colleagueSearch"
+                      />
+                    </div>
+                    <div className="contact-grid" id="colleagueGrid">
+                      <button className="contact-btn colleague" data-colleague="supervisor" data-search="dienstchef supervisor">
                         Dienstchef
                         <span className="contact-status online">Online</span>
                       </button>
-                      <button className="contact-btn colleague" data-colleague="coordinator">
+                      <button className="contact-btn colleague" data-colleague="coordinator" data-search="coördinator coordinator">
                         Coördinator
                         <span className="contact-status online">Online</span>
                       </button>
-                      <button className="contact-btn colleague" data-colleague="teamleader">
+                      <button className="contact-btn colleague" data-colleague="teamleader" data-search="teamleider team leader">
                         Teamleider
                         <span className="contact-status away">Afwezig</span>
                       </button>
-                      <button className="contact-btn colleague" data-colleague="backup">
+                      <button className="contact-btn colleague" data-colleague="backup" data-search="back-up centralist backup">
                         Back-up Centralist
                         <span className="contact-status online">Online</span>
                       </button>
@@ -4423,20 +4475,28 @@ export default function Dashboard() {
                   {/* External Partners */}
                   <div className="contact-panel partner-panel">
                     <h3 className="panel-title">Externe Partners</h3>
-                    <div className="contact-grid">
-                      <button className="contact-btn partner" data-partner="rijkswaterstaat">
+                    <div className="search-container">
+                      <input 
+                        type="text" 
+                        className="contact-search" 
+                        placeholder="Zoek externe partners..."
+                        id="partnerSearch"
+                      />
+                    </div>
+                    <div className="contact-grid" id="partnerGrid">
+                      <button className="contact-btn partner" data-partner="rijkswaterstaat" data-search="rijkswaterstaat 0800-8002">
                         Rijkswaterstaat
                         <span className="contact-number">0800-8002</span>
                       </button>
-                      <button className="contact-btn partner" data-partner="gemeente">
+                      <button className="contact-btn partner" data-partner="gemeente" data-search="gemeente rotterdam 14010">
                         Gemeente Rotterdam
                         <span className="contact-number">14010</span>
                       </button>
-                      <button className="contact-btn partner" data-partner="ov">
+                      <button className="contact-btn partner" data-partner="ov" data-search="ov controle 0900-9292">
                         OV Controle
                         <span className="contact-number">0900-9292</span>
                       </button>
-                      <button className="contact-btn partner" data-partner="defensie">
+                      <button className="contact-btn partner" data-partner="defensie" data-search="koninklijke marechaussee 0900-0141">
                         Koninklijke Marechaussee
                         <span className="contact-number">0900-0141</span>
                       </button>
@@ -4942,7 +5002,43 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-
+                        </div>
+                        
+                        {/* Caller Information Fields */}
+                        <div className="gms-caller-info-section">
+                          <div className="gms-block-title">Melder Gegevens</div>
+                          <div className="gms-form-row">
+                            <div className="gms-field-group">
+                              <label>Telefoonnummer Melder</label>
+                              <input
+                                type="text"
+                                id="gmsTelefoonnummerMelder"
+                                className="gms-field"
+                                placeholder="06-12345678"
+                              />
+                            </div>
+                            <div className="gms-field-group">
+                              <label>Naam Melder</label>
+                              <input
+                                type="text"
+                                id="gmsNaamMelder"
+                                className="gms-field"
+                                placeholder="Voor- en achternaam"
+                              />
+                            </div>
+                          </div>
+                          <div className="gms-form-row">
+                            <div className="gms-field-group gms-field-wide">
+                              <label>AML Locatie Melder</label>
+                              <input
+                                type="text"
+                                id="gmsAmlLocatie"
+                                className="gms-field"
+                                placeholder="Automatisch via AML wanneer beschikbaar"
+                                readOnly
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
