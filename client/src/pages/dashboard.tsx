@@ -1071,7 +1071,9 @@ export default function Dashboard() {
 
             // Apply the matched classification
             if (matchedClassification) {
-              // Set MC1
+              console.log('Matched classification:', matchedClassification);
+              
+              // Populate MC1 dropdown
               mc1Select.innerHTML = '<option value="">Selecteer...</option>';
               const mc1Options = getUniqueClassificationsByLevel("MC1");
               mc1Options.forEach(mc1 => {
@@ -1082,7 +1084,7 @@ export default function Dashboard() {
               });
               mc1Select.value = matchedClassification.MC1;
               
-              // Set MC2 if exists
+              // Populate MC2 dropdown if MC2 exists
               if (matchedClassification.MC2) {
                 mc2Select.innerHTML = '<option value="">Selecteer...</option>';
                 const mc2Options = getUniqueClassificationsByLevel("MC2", matchedClassification.MC1);
@@ -1094,7 +1096,7 @@ export default function Dashboard() {
                 });
                 mc2Select.value = matchedClassification.MC2;
                 
-                // Set MC3 if exists
+                // Populate MC3 dropdown if MC3 exists
                 if (matchedClassification.MC3) {
                   mc3Select.innerHTML = '<option value="">Selecteer...</option>';
                   const mc3Options = getUniqueClassificationsByLevel("MC3", matchedClassification.MC2);
@@ -1112,6 +1114,13 @@ export default function Dashboard() {
               if (prioriteitSelect) {
                 prioriteitSelect.value = matchedClassification.prio.toString();
               }
+              
+              console.log('Final dropdown values:', {
+                MC1: mc1Select.value,
+                MC2: mc2Select.value,
+                MC3: mc3Select.value,
+                Priority: prioriteitSelect.value
+              });
               
               // Log the automatic classification
               if (loggingPanel) {
@@ -1345,58 +1354,7 @@ export default function Dashboard() {
           }
         };
 
-        // Function to select classification by code
-        const selectClassificationByCode = (code: string) => {
-          const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
-          const classification = storedClassifications.find(c => c.code.toLowerCase() === code.toLowerCase());
-          
-          if (classification) {
-            // Set MC1
-            mc1Select.value = classification.MC1;
-            
-            // Populate and set MC2 if exists
-            if (classification.MC2) {
-              mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-              const mc2Options = getUniqueClassificationsByLevel("MC2", classification.MC1);
-              mc2Options.forEach(mc2 => {
-                const option = document.createElement('option');
-                option.value = mc2;
-                option.textContent = mc2;
-                mc2Select.appendChild(option);
-              });
-              mc2Select.value = classification.MC2;
-              
-              // Populate and set MC3 if exists
-              if (classification.MC3) {
-                mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-                const mc3Options = getUniqueClassificationsByLevel("MC3", classification.MC2);
-                mc3Options.forEach(mc3 => {
-                  const option = document.createElement('option');
-                  option.value = mc3;
-                  option.textContent = mc3;
-                  mc3Select.appendChild(option);
-                });
-                mc3Select.value = classification.MC3;
-              }
-            }
-            
-            // Update priority
-            updatePriorityFromClassification();
-            
-            // Log the automatic selection
-            if (loggingPanel) {
-              const timestamp = new Date().toLocaleTimeString('nl-NL');
-              const logEntry = document.createElement('div');
-              logEntry.className = 'log-entry classification-auto';
-              logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Classificatie automatisch geselecteerd: ${classification.MC1}${classification.MC2 ? ' > ' + classification.MC2 : ''}${classification.MC3 ? ' > ' + classification.MC3 : ''} (Code: ${classification.code})`;
-              loggingPanel.appendChild(logEntry);
-              loggingPanel.scrollTop = loggingPanel.scrollHeight;
-            }
-            
-            return true;
-          }
-          return false;
-        };
+
 
         if (mc1Select && mc2Select && mc3Select) {
           // Handle MC1 change
