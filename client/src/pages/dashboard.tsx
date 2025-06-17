@@ -4095,6 +4095,55 @@ export default function Dashboard() {
       const sluitAfBtn = document.getElementById("gmsSluitAfButton");
       const sluitBtn = document.getElementById("gmsSluitButton");
 
+      // Uitgifte handler function
+      const handleUitgifte = () => {
+        const formData = collectGMSFormData();
+        if (!formData) return;
+        
+        const now = new Date();
+        const incidentId = currentGmsIncident?.id || Date.now();
+        
+        const incidentData = {
+          ...formData,
+          id: incidentId,
+          timestamp: currentGmsIncident?.timestamp || now.toISOString(),
+          status: "Uitgegeven",
+        };
+
+        // Save to localStorage for persistence
+        const existingIncidenten = JSON.parse(localStorage.getItem("incidenten") || "[]");
+        const existingIndex = existingIncidenten.findIndex((inc: any) => (inc.id || inc.incidentId) === incidentId);
+        
+        if (existingIndex >= 0) {
+          existingIncidenten[existingIndex] = incidentData;
+        } else {
+          existingIncidenten.push(incidentData);
+        }
+        
+        localStorage.setItem("incidenten", JSON.stringify(existingIncidenten));
+
+        // Update GMS incidents database
+        setGmsIncidents(prev => {
+          const existing = prev.find(inc => inc.id === incidentId);
+          if (existing) {
+            return prev.map(inc => inc.id === incidentId ? { ...inc, ...incidentData } : inc);
+          } else {
+            return [...prev, incidentData];
+          }
+        });
+
+        // Set as current incident to maintain form state
+        setCurrentGmsIncident(incidentData);
+
+        showNotificationMessage("Incident uitgegeven en naar Incidenten verzonden");
+
+        // Clear the notepad for new notes
+        const kladblok = document.getElementById("gmsKladblok");
+        if (kladblok) {
+          kladblok.textContent = "";
+        }
+      };
+
       // Sharing button functionality
       const handleSharingButtonClick = (event: Event) => {
         const button = event.target as HTMLButtonElement;
@@ -4231,9 +4280,6 @@ export default function Dashboard() {
         // Remove status button event listeners
         if (eindrapportBtn) {
           eindrapportBtn.removeEventListener("click", handleEindrapport);
-        }
-        if (uitgifteBtn) {
-          uitgifteBtn.removeEventListener("click", handleUitgifte);
         }
         if (sluitAfBtn) {
           sluitAfBtn.removeEventListener("click", handleSluitAf);
