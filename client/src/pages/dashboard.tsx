@@ -1004,128 +1004,40 @@ export default function Dashboard() {
       // Handle notepad note submission (Verzend button in notepad)
       const handleNotePadSubmit = () => {
         console.log('📝 NOTEPAD SUBMIT - Processing note from kladblok');
+        console.log('🚀 handleNotePadSubmit function triggered');
         
         const kladblok = document.getElementById("gmsKladblok");
-        if (!kladblok) {
-          console.error('❌ Kladblok element not found');
-          return;
-        }
+        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
+        
+        if (!kladblok || !loggingPanel) return;
         
         const notitieText = kladblok.textContent || '';
-        console.log('📝 Note content:', `"${notitieText}"`);
+        console.log('📝 Note content:', notitieText);
         
-        if (!notitieText.trim()) {
-          console.log('⚠️ No text to process');
-          return;
-        }
-        
-        // Get classification data
-        const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-        console.log('📚 Classifications loaded:', storedClassifications.length);
-        
-        if (storedClassifications.length === 0) {
-          console.error('❌ No classification data available');
-          return;
-        }
-        
-        // Simple direct matching for codes starting with hyphen
-        let matchedClassification = null;
-        
-        if (notitieText.startsWith('-')) {
-          const searchCode = notitieText.substring(1).trim().toLowerCase();
-          console.log('🔍 Searching for code:', searchCode);
-          
-          // Find first match that starts with the search code
-          matchedClassification = storedClassifications.find((c: any) => 
-            c.code.toLowerCase().startsWith(searchCode)
-          );
-        }
-        
-        console.log('🎯 Match result:', matchedClassification ? matchedClassification.code : 'No match');
-        
-        if (matchedClassification) {
-          // Get dropdown elements
+        // Only process classification detection, don't save full form
+        if (notitieText.trim()) {
+          // Process classification codes
           const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
           const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
           const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+          const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
           
+          console.log('🔧 Dropdown elements found:', {
+            mc1Select: !!mc1Select,
+            mc2Select: !!mc2Select,
+            mc3Select: !!mc3Select,
+            prioriteitSelect: !!prioriteitSelect
+          });
+
           if (mc1Select && mc2Select && mc3Select) {
-            console.log('✅ Setting classifications:', {
-              MC1: matchedClassification.MC1,
-              MC2: matchedClassification.MC2,
-              MC3: matchedClassification.MC3
-            });
+            console.log('✅ All dropdown elements found, proceeding with classification detection');
+            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
+            console.log('📝 Input text:', `"${notitieText}"`);
             
-            // Reset and populate dropdowns
-            setupClassificationDropdowns();
-            
-            // Set values after short delay to ensure dropdowns are populated
-            setTimeout(() => {
-              mc1Select.value = matchedClassification.MC1;
-              mc2Select.value = matchedClassification.MC2;
-              mc3Select.value = matchedClassification.MC3;
-              
-              console.log('✅ Dropdowns set successfully');
-            }, 100);
-          } else {
-            console.error('❌ Dropdown elements not found');
-          }
-        }
-      };
-
-      // Handle form submission
-      const handleGMSFormSubmit = () => {
-        console.log('💾 GMS Form submission');
-        
-        const voertuig = document.getElementById("gmsVoertuig") as HTMLInputElement;
-        const naam = document.getElementById("gmsNaam") as HTMLInputElement;
-        const adres = document.getElementById("gmsAdres") as HTMLInputElement;
-        const contact = document.getElementById("gmsContact") as HTMLSelectElement;
-        const postcode = document.getElementById("gmsPostcode") as HTMLInputElement;
-        const plaats = document.getElementById("gmsPlaats") as HTMLInputElement;
-        const gemeente = document.getElementById("gmsGemeente") as HTMLInputElement;
-        const melding = document.getElementById("gmsMelding") as HTMLTextAreaElement;
-        const mc1 = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-        const mc2 = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-        const mc3 = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-        const prioriteit = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-        const karakteristiek = document.getElementById("gmsKarakteristiek") as HTMLTextAreaElement;
-        
-        // Create new incident
-        const newIncident = {
-          id: Date.now(),
-          type: `${mc1?.value || 'Onbekend'} - ${mc2?.value || ''} - ${mc3?.value || ''}`.replace(/ - $/, ''),
-          location: `${adres?.value || ''} ${plaats?.value || ''}`.trim() || 'Onbekende locatie',
-          timestamp: new Date().toISOString(),
-          timeAgo: 'Nu',
-          unitsAssigned: 0,
-          priority: prioriteit?.value === '1' ? 'high' as const : 
-                  prioriteit?.value === '2' ? 'medium' as const : 'low' as const,
-          status: 'active' as const
-        };
-
-        // Add incident to the main incident list
-        const existingIncidents = JSON.parse(localStorage.getItem('policeIncidents') || '[]');
-        existingIncidents.unshift(newIncident);
-        localStorage.setItem('policeIncidents', JSON.stringify(existingIncidents));
-
-        // Clear form
-        if (voertuig) voertuig.value = "";
-        if (naam) naam.value = "";
-        if (adres) adres.value = "";
-        if (contact) contact.value = "";
-        if (postcode) postcode.value = "";
-        if (plaats) plaats.value = "";
-        if (gemeente) gemeente.value = "";
-        if (melding) melding.value = "";
-        if (mc1) mc1.value = "";
-        if (mc2) mc2.value = "";
-        if (mc3) mc3.value = "";
-        if (karakteristiek) karakteristiek.value = "";
-        if (prioriteit) prioriteit.value = "3";
-
-        console.log('GMS melding opgeslagen');
-      };
+            // Quick test: check if we have any "brgb" codes in our data
+            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
+            console.log('🧪 Test - BRGB codes available:', testBrgb.length, testBrgb.slice(0, 3));
             
             // Test specific searches
             const testOngevall = storedClassifications.filter(c => 
@@ -1137,9 +1049,6 @@ export default function Dashboard() {
             
             const lines = notitieText.split('\n');
             let matchedClassification = null;
-            
-            console.log('🔄 Starting line-by-line processing...');
-            console.log('📝 Lines to process:', lines);
 
             for (const line of lines) {
               const trimmedLine = line.trim();
@@ -1156,20 +1065,12 @@ export default function Dashboard() {
                 );
                 console.log('🔍 1. Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 
-                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.) - this is the key fix
+                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
                   );
                   console.log('🔍 2. Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                }
-                
-                // 3. If still no match, try searching within the code (e.g., brgb within brgb01)
-                if (!matchedClassification) {
-                  matchedClassification = storedClassifications.find(c => 
-                    c.code.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                  console.log('🔍 2.5. Code contains match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
                 // 3. Try text matches for full classification strings (e.g., "ongeval wegvervoer letsel")
@@ -1245,8 +1146,6 @@ export default function Dashboard() {
               }
             }
 
-            console.log('🏁 Classification search completed. Result:', matchedClassification ? 'FOUND' : 'NOT FOUND');
-            
             // Apply the matched classification
             if (matchedClassification) {
               console.log('🎯 MATCHED CLASSIFICATION:', matchedClassification);
@@ -1504,89 +1403,51 @@ export default function Dashboard() {
         showNotificationMessage("GMS melding opgeslagen");
       };
 
-      // Setup event listeners with a delay to ensure DOM is ready
-      const setupGMSEventListeners = () => {
-        console.log('🔧 Setting up GMS event listeners...');
-        
-        const verzendButton = document.getElementById("gmsVerzendButton");
-        const kladblokElement = document.getElementById("gmsKladblok");
-        
-        console.log('🔍 Element check:', {
-          verzendButton: !!verzendButton,
-          kladblokElement: !!kladblokElement
-        });
-        
-        if (verzendButton) {
-          console.log('📌 Verzend button found, attaching event listener');
-          
-          // Remove any existing listeners first
-          verzendButton.removeEventListener("click", handleNotePadSubmit);
-          
-          verzendButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            console.log('🖱️ Verzend button clicked!');
-            handleNotePadSubmit();
-          });
-          
-          // Test function
-          (window as any).testClassification = () => {
-            console.log('🧪 Manual test triggered');
-            const kladblok = document.getElementById("gmsKladblok");
-            if (kladblok) {
-              kladblok.textContent = "-brgb";
-              console.log('🧪 Set kladblok content to "-brgb"');
-              handleNotePadSubmit();
-            } else {
-              console.error('🧪 Test failed - kladblok not found');
-            }
-          };
-          
-          // Simple direct test function to verify classification data
-          (window as any).directTest = () => {
-            const classifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-            const brgbMatch = classifications.find(c => c.code.toLowerCase().startsWith('brgb'));
-            console.log('Direct test result:', brgbMatch);
-            
-            if (brgbMatch) {
-              const mc1 = document.getElementById("gmsClassificatie1");
-              const mc2 = document.getElementById("gmsClassificatie2"); 
-              const mc3 = document.getElementById("gmsClassificatie3");
-              
-              console.log('Setting dropdowns directly:', {
-                MC1: brgbMatch.MC1,
-                MC2: brgbMatch.MC2,
-                MC3: brgbMatch.MC3
-              });
-              
-              if (mc1) mc1.value = brgbMatch.MC1;
-              if (mc2) mc2.value = brgbMatch.MC2;
-              if (mc3) mc3.value = brgbMatch.MC3;
-            }
-          };
-          
-          // Classification detection is ready
-        } else {
-          console.error('❌ Verzend button not found!');
-        }
-        
-        if (kladblokElement) {
-          console.log('📌 Kladblok found, attaching Enter key listener');
-          kladblokElement.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              console.log('⌨️ Enter key pressed!');
-              handleNotePadSubmit();
-            }
-          });
-        }
-      };
+      // Add event listeners for both button click and Enter key
+      const verzendButton = document.getElementById("gmsVerzendButton");
+      const kladblokElement = document.getElementById("gmsKladblok");
       
-      // Setup listeners after a brief delay to ensure DOM is ready
-      console.log('⏰ Setting up timeout for event listeners...');
-      setTimeout(() => {
-        console.log('⏰ Timeout triggered, setting up event listeners now...');
-        setupGMSEventListeners();
-      }, 100);
+      if (verzendButton) {
+        console.log('📌 Verzend button found, attaching notepad submit listener');
+        
+        // Test function to verify classification data is available
+        const testClassificationData = () => {
+          const testData = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+          console.log('🧪 Classification test - data available:', testData.length);
+          const brgbTest = testData.filter(c => c.code.toLowerCase().includes('brgb'));
+          console.log('🧪 BRGB codes found:', brgbTest.length, brgbTest.slice(0, 2));
+        };
+        testClassificationData();
+        
+        // Add manual test function for debugging
+        (window as any).testClassification = () => {
+          console.log('🧪 Manual test triggered');
+          const kladblok = document.getElementById("gmsKladblok");
+          if (kladblok) {
+            kladblok.textContent = "-brgb";
+            handleNotePadSubmit();
+          }
+        };
+        
+        verzendButton.addEventListener("click", () => {
+          console.log('🖱️ Verzend button clicked - triggering classification detection');
+          handleNotePadSubmit();
+        });
+      } else {
+        console.error('❌ Verzend button not found!');
+      }
+      
+      // Add Enter key support for kladblok
+      if (kladblokElement) {
+        console.log('📌 Kladblok found, attaching Enter key listener');
+        kladblokElement.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            console.log('⌨️ Enter key pressed in kladblok!');
+            handleNotePadSubmit();
+          }
+        });
+      }
       
       // Form save button (for full form submission)
       const saveButton = document.getElementById("gmsSaveButton");
@@ -1772,7 +1633,9 @@ export default function Dashboard() {
         if (saveButton) {
           saveButton.removeEventListener("click", handleGMSFormSubmit);
         }
-        // Event listeners are cleaned up automatically by React
+        if (verzendButton) {
+          verzendButton.removeEventListener("click", handleNotePadSubmit);
+        }
       };
     };
 
