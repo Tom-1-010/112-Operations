@@ -1413,6 +1413,18 @@ export default function Dashboard() {
           console.log('🔥 VERZEND BUTTON CLICKED - Event triggered');
           handleNotePadSubmit();
         });
+        
+        // Test classification system immediately with sample data
+        const testClassification = () => {
+          const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+          console.log('🧪 IMMEDIATE TEST - Classifications loaded:', storedClassifications.length);
+          
+          if (storedClassifications.length > 0) {
+            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
+            console.log('🧪 BRGB test results:', testBrgb.length, testBrgb.slice(0, 2));
+          }
+        };
+        testClassification();
       } else {
         console.error('❌ Verzend button not found! Available buttons:', 
           Array.from(document.querySelectorAll('button')).map(b => b.id).filter(id => id));
