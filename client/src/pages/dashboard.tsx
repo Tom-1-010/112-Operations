@@ -1208,31 +1208,31 @@ export default function Dashboard() {
           
           if (classification) {
             // Set MC1
-            mc1Select.value = classification.mc1;
+            mc1Select.value = classification.MC1;
             
             // Populate and set MC2 if exists
-            if (classification.mc2) {
+            if (classification.MC2) {
               mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-              const mc2Options = getUniqueClassificationsByLevel("mc2", classification.mc1);
+              const mc2Options = getUniqueClassificationsByLevel("MC2", classification.MC1);
               mc2Options.forEach(mc2 => {
                 const option = document.createElement('option');
                 option.value = mc2;
                 option.textContent = mc2;
                 mc2Select.appendChild(option);
               });
-              mc2Select.value = classification.mc2;
+              mc2Select.value = classification.MC2;
               
               // Populate and set MC3 if exists
-              if (classification.mc3) {
+              if (classification.MC3) {
                 mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-                const mc3Options = getUniqueClassificationsByLevel("mc3", classification.mc2);
+                const mc3Options = getUniqueClassificationsByLevel("MC3", classification.MC2);
                 mc3Options.forEach(mc3 => {
                   const option = document.createElement('option');
                   option.value = mc3;
                   option.textContent = mc3;
                   mc3Select.appendChild(option);
                 });
-                mc3Select.value = classification.mc3;
+                mc3Select.value = classification.MC3;
               }
             }
             
@@ -1244,7 +1244,7 @@ export default function Dashboard() {
               const timestamp = new Date().toLocaleTimeString('nl-NL');
               const logEntry = document.createElement('div');
               logEntry.className = 'log-entry classification-auto';
-              logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Classificatie automatisch geselecteerd: ${classification.mc1}${classification.mc2 ? ' > ' + classification.mc2 : ''}${classification.mc3 ? ' > ' + classification.mc3 : ''} (Code: ${classification.code})`;
+              logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Classificatie automatisch geselecteerd: ${classification.MC1}${classification.MC2 ? ' > ' + classification.MC2 : ''}${classification.MC3 ? ' > ' + classification.MC3 : ''} (Code: ${classification.code})`;
               loggingPanel.appendChild(logEntry);
               loggingPanel.scrollTop = loggingPanel.scrollHeight;
             }
@@ -1328,7 +1328,7 @@ export default function Dashboard() {
                   const timestamp = new Date().toLocaleTimeString('nl-NL');
                   const logEntry = document.createElement('div');
                   logEntry.className = 'log-entry classification-auto';
-                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.mc1} / ${matchingClassification.mc2 || 'n.v.t.'} / ${matchingClassification.mc3}`;
+                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.MC1} / ${matchingClassification.MC2 || 'n.v.t.'} / ${matchingClassification.MC3}`;
                   loggingPanel.appendChild(logEntry);
                   loggingPanel.scrollTop = loggingPanel.scrollHeight;
                 }
@@ -1376,7 +1376,7 @@ export default function Dashboard() {
               // Try partial match for fallback behavior (e.g., "alarm" matches "al")
               if (!matchedClassification) {
                 matchedClassification = storedClassifications.find(c => 
-                  c.mc1.toLowerCase().startsWith(codeMatch.toLowerCase()) ||
+                  c.MC1.toLowerCase().startsWith(codeMatch.toLowerCase()) ||
                   c.code.toLowerCase().startsWith(codeMatch.toLowerCase())
                 );
               }
@@ -1388,7 +1388,7 @@ export default function Dashboard() {
                     const timestamp = new Date().toLocaleTimeString('nl-NL');
                     const logEntry = document.createElement('div');
                     logEntry.className = 'log-entry classification-auto';
-                    logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie gekozen via ${elementName}: ${matchedClassification.mc1}${matchedClassification.mc2 ? ' / ' + matchedClassification.mc2 : ''}${matchedClassification.mc3 ? ' / ' + matchedClassification.mc3 : ''}`;
+                    logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie gekozen via ${elementName}: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''}`;
                     loggingPanel.appendChild(logEntry);
                     loggingPanel.scrollTop = loggingPanel.scrollHeight;
                   }
