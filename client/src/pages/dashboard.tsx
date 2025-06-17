@@ -30,8 +30,8 @@ export default function Dashboard() {
   // Settings subtab state
   const [activeSettingsTab, setActiveSettingsTab] = useState("basisteams");
   
-  // Phone numbers management
-  const [phoneNumbers, setPhoneNumbers] = useState<any[]>([]);
+  // Phone numbers management with localStorage fallback
+  const [phoneNumbers, setPhoneNumbers] = useLocalStorage<any[]>("telefoonlijst", []);
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState({
     functie: "",
@@ -5129,15 +5129,7 @@ export default function Dashboard() {
                     <h4 className="telefoonlijst-title">Telefoonlijst Beheer</h4>
                     <button
                       className="btn btn-primary"
-                      onClick={() => {
-                        setShowPhoneForm(!showPhoneForm);
-                        if (!phoneNumbers.length) {
-                          fetch('/api/phone-numbers')
-                            .then(res => res.json())
-                            .then(data => setPhoneNumbers(data))
-                            .catch(err => console.error('Failed to load phone numbers:', err));
-                        }
-                      }}
+                      onClick={() => setShowPhoneForm(!showPhoneForm)}
                     >
                       Telefoonnummer toevoegen
                     </button>
@@ -5234,37 +5226,27 @@ export default function Dashboard() {
                         <div className="telefoon-form-buttons">
                           <button
                             className="btn btn-primary"
-                            onClick={async () => {
+                            onClick={() => {
                               if (!newPhoneNumber.functie || !newPhoneNumber.omschrijving || !newPhoneNumber.telefoonnummer) {
                                 alert("Vul alle verplichte velden in");
                                 return;
                               }
 
-                              try {
-                                const response = await fetch('/api/phone-numbers', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify(newPhoneNumber),
-                                });
+                              const savedPhoneNumber = {
+                                ...newPhoneNumber,
+                                id: Date.now() + Math.random(), // Generate unique ID
+                                createdAt: new Date().toISOString()
+                              };
 
-                                if (response.ok) {
-                                  const savedPhoneNumber = await response.json();
-                                  setPhoneNumbers(prev => [...prev, savedPhoneNumber]);
-                                  setNewPhoneNumber({
-                                    functie: "", omschrijving: "", telefoonnummer: "",
-                                    beginDienst: "", eindeDienst: "", bereikbaar24u: false, opmerkingen: ""
-                                  });
-                                  setShowPhoneForm(false);
-                                  setNotification("Telefoonnummer succesvol toegevoegd");
-                                  setShowNotification(true);
-                                  setTimeout(() => setShowNotification(false), 3000);
-                                }
-                              } catch (error) {
-                                console.error('Failed to save phone number:', error);
-                                setNotification("Fout bij opslaan telefoonnummer");
-                                setShowNotification(true);
-                                setTimeout(() => setShowNotification(false), 3000);
-                              }
+                              setPhoneNumbers(prev => [...prev, savedPhoneNumber]);
+                              setNewPhoneNumber({
+                                functie: "", omschrijving: "", telefoonnummer: "",
+                                beginDienst: "", eindeDienst: "", bereikbaar24u: false, opmerkingen: ""
+                              });
+                              setShowPhoneForm(false);
+                              setNotification("Telefoonnummer succesvol toegevoegd");
+                              setShowNotification(true);
+                              setTimeout(() => setShowNotification(false), 3000);
                             }}
                           >
                             Opslaan
@@ -5294,7 +5276,7 @@ export default function Dashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {phoneNumbers.map((phone) => (
+                        {Array.isArray(phoneNumbers) && phoneNumbers.map((phone) => (
                           <tr key={phone.id} className="telefoon-row">
                             <td className="telefoon-functie"><strong>{phone.functie}</strong></td>
                             <td className="telefoon-omschrijving">{phone.omschrijving}</td>
@@ -5306,21 +5288,12 @@ export default function Dashboard() {
                             <td className="telefoon-acties">
                               <button
                                 className="btn btn-danger btn-small"
-                                onClick={async () => {
+                                onClick={() => {
                                   if (confirm("Weet u zeker dat u dit telefoonnummer wilt verwijderen?")) {
-                                    try {
-                                      const response = await fetch(`/api/phone-numbers/${phone.id}`, {
-                                        method: 'DELETE',
-                                      });
-                                      if (response.ok) {
-                                        setPhoneNumbers(prev => prev.filter(p => p.id !== phone.id));
-                                        setNotification("Telefoonnummer verwijderd");
-                                        setShowNotification(true);
-                                        setTimeout(() => setShowNotification(false), 3000);
-                                      }
-                                    } catch (error) {
-                                      console.error('Failed to delete phone number:', error);
-                                    }
+                                    setPhoneNumbers(prev => prev.filter(p => p.id !== phone.id));
+                                    setNotification("Telefoonnummer verwijderd");
+                                    setShowNotification(true);
+                                    setTimeout(() => setShowNotification(false), 3000);
                                   }
                                 }}
                               >
