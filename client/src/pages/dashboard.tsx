@@ -1422,9 +1422,29 @@ export default function Dashboard() {
           if (storedClassifications.length > 0) {
             const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
             console.log('🧪 BRGB test results:', testBrgb.length, testBrgb.slice(0, 2));
+            
+            // Test the actual classification detection function
+            console.log('🧪 Testing handleNotePadSubmit with mock data...');
+            const kladblok = document.getElementById("gmsKladblok");
+            if (kladblok) {
+              // Temporarily set test content
+              const originalContent = kladblok.textContent;
+              kladblok.textContent = '-brgb';
+              console.log('🧪 Set test content to "-brgb"');
+              
+              // Test the function
+              setTimeout(() => {
+                console.log('🧪 Running classification test...');
+                handleNotePadSubmit();
+                // Restore original content
+                kladblok.textContent = originalContent;
+              }, 1000);
+            }
           }
         };
-        testClassification();
+        
+        // Run test after a brief delay to ensure DOM is ready
+        setTimeout(testClassification, 500);
       } else {
         console.error('❌ Verzend button not found! Available buttons:', 
           Array.from(document.querySelectorAll('button')).map(b => b.id).filter(id => id));
