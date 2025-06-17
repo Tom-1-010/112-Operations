@@ -41,81 +41,270 @@ export default function Dashboard() {
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
 
-  // AI Conversation Engine for Emergency Services
+  // Enhanced AI Conversation Engine for Emergency Services
   const generateColleagueResponse = (contact: any, userMessage: string, conversationHistory: any[] = []) => {
-    const responses = {
-      "Dienstchef": [
-        "Ik bekijk de situatie. Wat is de prioriteit?",
-        "We hebben extra eenheden beschikbaar. Zal ik ze inzetten?",
-        "Coördineer met de teamleiders. Ik regel de ondersteuning.",
-        "De situatie vereist mijn directe aandacht. Ik kom eraan.",
-        "Heb je contact gehad met de gemeentelijke diensten?",
-        "We moeten de pers informeren als dit escaliert."
-      ],
-      "Teamleider": [
-        "Mijn team staat klaar. Geef me de details.",
-        "Ik stuur twee eenheden naar de locatie. ETA 8 minuten.",
-        "We hebben de situatie onder controle hier.",
-        "Kan je de back-up oproepen? We hebben versterking nodig.",
-        "De eenheden zijn ter plaatse. Situatie wordt geëvalueerd.",
-        "Ik regel de afsluiting van het gebied."
-      ],
-      "Coördinator": [
-        "Ik update het operationele overzicht nu.",
-        "Alle eenheden zijn geïnformeerd via de portofoon.",
-        "De ambulance is onderweg, ETA 6 minuten.",
-        "Ik coördineer met de brandweer voor ondersteuning.",
-        "Het verkeer wordt omgeleid via route B.",
-        "Situatierapport wordt doorgestuurd naar het hoofdbureau."
-      ],
-      "Centralist": [
-        "Ik neem de oproepen over terwijl jij dit afhandelt.",
-        "Er komen meer meldingen binnen over hetzelfde incident.",
-        "Ik log alle details in het systeem.",
-        "De familie is geïnformeerd door onze liaison.",
-        "112 doorverbinding geactiveerd voor dit gebied.",
-        "Alle communicatie wordt opgenomen voor het dossier."
-      ]
+    const message = userMessage.toLowerCase();
+    
+    // Analyze user message for context
+    const isUrgent = /urgent|spoed|direct|nu|emergency|prio|meteen/.test(message);
+    const isLocation = /waar|locatie|adres|plaats|richting/.test(message);
+    const isStatus = /status|situatie|stand|update/.test(message);
+    const isRequest = /kun je|kan je|wil je|zou je|help|stuur|regel/.test(message);
+    const isQuestion = /\?/.test(userMessage) || /wat|wie|waar|wanneer|waarom|hoe/.test(message);
+    
+    // Role-specific personality and knowledge base
+    const roleProfiles = {
+      "Dienstchef": {
+        tone: "autoritair en beslissend",
+        expertise: ["operationeel overzicht", "resource management", "perscontacten", "escalatieprocedures"],
+        responses: {
+          urgent: [
+            "Urgent genoteerd. Ik schakel direct over naar code geel. Welke eenheden heb je nodig?",
+            "Dit krijgt mijn onmiddellijke aandacht. Ik mobiliseer extra mankracht.",
+            "Prioriteit 1 - ik neem persoonlijk de leiding over deze operatie."
+          ],
+          location: [
+            "Ik ken dat gebied goed. Laat me de beste aanrijroute voor je regelen.",
+            "Die locatie valt onder district Zuid. Ik stuur de dichtstbijzijnde eenheden.",
+            "Complexe locatie - ik regel coördinatie met verkeersdienst voor toegang."
+          ],
+          status: [
+            "Operationeel overzicht: 12 eenheden actief, 3 in reserve. Alles onder controle.",
+            "Situatie is stabiel. Ik houd alle partijen geïnformeerd via het commandocentrum.",
+            "Status groen op alle fronten. Pers is nog niet geïnformeerd."
+          ],
+          request: [
+            "Akkoord, ik regel dat direct via mijn kanalen.",
+            "Geen probleem, ik heb de autoriteit om dat goed te keuren.",
+            "Dat valt onder mijn verantwoordelijkheid - wordt onmiddellijk geregeld."
+          ],
+          default: [
+            "Spreek je met urgentie? Dan neem ik direct actie.",
+            "Ik heb volledige operationele autoriteit hier. Wat heb je nodig?",
+            "Als dienstchef kan ik alle resources inzetten. Geef me de details."
+          ]
+        }
+      },
+      "Teamleider": {
+        tone: "praktisch en operationeel",
+        expertise: ["tactische operaties", "team coördinatie", "terreinkennis", "veiligheidsprocedures"],
+        responses: {
+          urgent: [
+            "Team alpha staat gereed! Geef me coördinaten en we rukken uit.",
+            "Spoedmelding - ik stuur direct twee surveillanceauto's jouw kant op.",
+            "Mijn team is al onderweg. ETA 4 minuten ter plaatse."
+          ],
+          location: [
+            "Die straat ken ik goed - smalle toegang, let op geparkeerde auto's.",
+            "Wijk Rotterdam-Zuid, sector 7. Mijn eenheden patrouilleren daar nu.",
+            "Moeilijk bereikbaar gebied. Ik stuur een motor vooruit voor verkenning."
+          ],
+          status: [
+            "Team operationeel: 6 man actief, 2 in voertuigen, alles 100% beschikbaar.",
+            "Situatie ter plaatse onder controle. Verdachte aangehouden, geen incidenten.",
+            "Gebied afgezet, forensisch onderzoek loopt. Verwachte afronding over 2 uur."
+          ],
+          request: [
+            "Roger dat. Mijn team pakt het op - wordt direct uitgevoerd.",
+            "Komt voor elkaar. Ik delegeer naar surveillant De Jong, hij kent het protocol.",
+            "Geen probleem, ik regel versterking en kom persoonlijk kijken."
+          ],
+          default: [
+            "Teamleider hier - mijn jongens staan paraat voor elke klus.",
+            "Operationeel team beschikbaar. Wat moet er gebeuren?",
+            "Direct inzetbaar met volledig team. Geef instructies door."
+          ]
+        }
+      },
+      "Coördinator": {
+        tone: "systematisch en ondersteunend",
+        expertise: ["communicatie", "logistiek", "planning", "multi-agency coördinatie"],
+        responses: {
+          urgent: [
+            "Urgentie geregistreerd. Ik activeer het crisisteam en informeer alle betrokken diensten.",
+            "Code rood procedures in werking. Ambulance, brandweer en bijzondere bijstand worden geactiveerd.",
+            "Spoedsysteem actief - alle communicatie loopt nu via prioriteitskanaal."
+          ],
+          location: [
+            "Locatie geplot in het systeem. Ik coördineer toegangsroutes met verkeerscentrale.",
+            "GPS coördinaten doorgestuurd naar alle eenheden. Kaartmateriaal beschikbaar.",
+            "Gebied gemarkeerd als operationeel. Ik regel perimeter en verkeersomleidingen."
+          ],
+          status: [
+            "Realtime overview: 15 actieve incidenten, 23 eenheden ingezet, capaciteit 78%.",
+            "Communicatie verloopt vlot. Alle diensten zijn sync en rapporteren volgens schema.",
+            "Operationele status optimaal. Back-up systemen functioneren, geen verstoringen."
+          ],
+          request: [
+            "Verzoek genoteerd en doorgegeven. Ik monitor de voortgang en rapporteer terug.",
+            "Coördinatie gestart. Ik breng alle partijen bij elkaar en regel de uitvoering.",
+            "Opdracht in het systeem gezet. Ik zorg voor follow-up en statusupdates."
+          ],
+          default: [
+            "Coördinatiecentrum hier. Ik zorg voor de verbindingen tussen alle diensten.",
+            "Alles loopt via mij - communicatie, planning en logistieke ondersteuning.",
+            "Operationele coördinatie actief. Hoe kan ik de operatie ondersteunen?"
+          ]
+        }
+      },
+      "Centralist": {
+        tone: "alert en ondersteunend",
+        expertise: ["meldingen", "communicatie", "protocollen", "administratie"],
+        responses: {
+          urgent: [
+            "Spoedmelding - ik schakel direct door naar de eerstvolgende beschikbare eenheid.",
+            "112 lijn vrijgehouden. Alle nieuwe meldingen route ik om naar collega's.",
+            "Prioriteit omhoog gezet. Ik monitor alle kanalen voor gerelateerde meldingen."
+          ],
+          location: [
+            "Adresgegevens geverifieerd in het systeem. Bewoners en bijzonderheden bekend.",
+            "Locatie gekoppeld aan eerdere meldingen. Zie historiek in het dossier.",
+            "Postcode gebied bekende probleemlocatie. Extra aandachtspunten genoteerd."
+          ],
+          status: [
+            "Meldkamer status: 23 open calls, gemiddelde wachttijd 45 seconden.",
+            "Communicatielijn helder. Alle eenheden bereikbaar, systemen operationeel.",
+            "Administratie bijgewerkt. Alle rapporten ingevoerd, dossier compleet."
+          ],
+          request: [
+            "Ik regel dat direct via het systeem. Koppeling naar de juiste dienstverlening.",
+            "Verzoek gelogd en doorgestuurd. Ik houd de status bij en inform je over updates.",
+            "Direct opgepakt. Ik neem contact op met de betreffende dienst namens jou."
+          ],
+          default: [
+            "Meldkamer centraal - ik houd alle lijnen open en ondersteun waar nodig.",
+            "Communicatie hub actief. Wat kan ik voor je betekenen in de operatie?",
+            "Alle systemen online. Ik sta klaar voor ondersteuning en coördinatie."
+          ]
+        }
+      }
     };
 
-    // Default responses for custom roles
-    const defaultResponses = [
-      "Ik begrijp de situatie. Hoe kan ik helpen?",
-      "Op dit moment ben ik beschikbaar voor ondersteuning.",
-      "Laat me weten wat je nodig hebt.",
-      "Ik ga dit direct oppakken.",
-      "De informatie is genoteerd. Ik neem actie.",
-      "We werken samen aan een oplossing."
-    ];
-
-    let roleResponses = responses[contact.functie as keyof typeof responses] || defaultResponses;
+    // Get role profile or create custom one based on function and notes
+    let profile = roleProfiles[contact.functie as keyof typeof roleProfiles];
     
-    // Add context-aware responses based on notes
+    if (!profile) {
+      // Create custom profile based on function name and notes
+      profile = {
+        tone: "professioneel en behulpzaam",
+        expertise: ["algemene ondersteuning", "hulpverlening"],
+        responses: {
+          urgent: [`Als ${contact.functie} spring ik direct bij voor deze urgentie.`],
+          location: [`Ik ken het gebied redelijk goed in mijn rol als ${contact.functie}.`],
+          status: [`Vanuit mijn positie als ${contact.functie} kan ik bevestigen dat alles loopt.`],
+          request: [`Natuurlijk, als ${contact.functie} kan ik dat voor je regelen.`],
+          default: [`${contact.functie} hier, hoe kan ik je helpen?`]
+        }
+      };
+    }
+
+    // Enhance responses based on notes/comments
     if (contact.opmerkingen) {
-      if (contact.opmerkingen.toLowerCase().includes('specialist')) {
-        roleResponses = [...roleResponses, "Als specialist kan ik hier specifieke expertise bieden.", "Mijn ervaring met dit type situaties komt goed van pas."];
+      const notes = contact.opmerkingen.toLowerCase();
+      
+      if (notes.includes('specialist')) {
+        profile.expertise.push("gespecialiseerde kennis");
+        profile.responses.default.push(`Met mijn specialistische achtergrond kan ik hier specifiek advies over geven.`);
       }
-      if (contact.opmerkingen.toLowerCase().includes('ervaren')) {
-        roleResponses = [...roleResponses, "Gebaseerd op mijn ervaring raad ik aan om...", "Ik heb dit eerder meegemaakt."];
+      
+      if (notes.includes('ervaren')) {
+        profile.responses.default.push(`Door mijn jarenlange ervaring herken ik dit soort situaties direct.`);
       }
-      if (contact.opmerkingen.toLowerCase().includes('nacht')) {
-        roleResponses = [...roleResponses, "Ik ben de hele nacht bereikbaar.", "Ook buiten kantooruren sta ik klaar."];
+      
+      if (notes.includes('verkeer')) {
+        profile.expertise.push("verkeersmanagement");
+        profile.responses.location.push(`Verkeerssituatie is mijn expertise - ik regel optimale routes.`);
+      }
+      
+      if (notes.includes('nacht')) {
+        profile.responses.default.push(`Nachtdienst is mijn specialiteit, 24/7 beschikbaar.`);
+      }
+      
+      if (notes.includes('crisis')) {
+        profile.responses.urgent.push(`Crisismanagement is precies waar ik voor opgeleid ben.`);
       }
     }
 
-    // Select response based on conversation context
-    const randomIndex = Math.floor(Math.random() * roleResponses.length);
-    return roleResponses[randomIndex];
+    // Select appropriate response category
+    let selectedResponses;
+    if (isUrgent) {
+      selectedResponses = profile.responses.urgent;
+    } else if (isLocation) {
+      selectedResponses = profile.responses.location;
+    } else if (isStatus) {
+      selectedResponses = profile.responses.status;
+    } else if (isRequest) {
+      selectedResponses = profile.responses.request;
+    } else {
+      selectedResponses = profile.responses.default;
+    }
+
+    // Add conversational context
+    if (conversationHistory.length > 2) {
+      const contextual = [
+        `Zoals we eerder bespraken...`,
+        `In aanvulling op mijn vorige bericht...`,
+        `Update: de situatie ontwikkelt zich verder...`
+      ];
+      if (Math.random() > 0.7) {
+        selectedResponses = [...selectedResponses, ...contextual];
+      }
+    }
+
+    // Return contextual response
+    const randomIndex = Math.floor(Math.random() * selectedResponses.length);
+    return selectedResponses[randomIndex];
   };
 
   const startConversationWithContact = (contact: any) => {
     setActiveChatTab("collega");
     setCurrentConversation(contact);
     
+    // Generate role-specific greeting
+    const greetings = {
+      "Dienstchef": [
+        "Dienstchef hier. Ik hoop dat het geen spoedgeval is?",
+        "Je spreekt met de dienstchef. Wat vereist mijn aandacht?",
+        "Dienstcommando beschikbaar. Geef me een situatieschets."
+      ],
+      "Teamleider": [
+        "Teamleider operationeel. Mijn jongens staan klaar - wat is er aan de hand?",
+        "Team alpha leader hier. Hebben we een operationele situatie?",
+        "Teamcommando beschikbaar. Welke ondersteuning heb je nodig?"
+      ],
+      "Coördinator": [
+        "Coördinatiecentrum. Alle systemen zijn online - hoe kan ik helpen?",
+        "Operationele coördinatie hier. Welke verbindingen moet ik leggen?",
+        "Communicatiecentrale beschikbaar. Wat moet gecoördineerd worden?"
+      ],
+      "Centralist": [
+        "Meldkamer hier. Ik zie je oproep binnenkomen - wat is de situatie?",
+        "Communicatie centraal. Alle lijnen zijn helder - ga je gang.",
+        "112 centralist beschikbaar. Hoe kan ik je ondersteunen?"
+      ]
+    };
+    
+    let greeting = `Hallo, je spreekt met ${contact.functie}. Wat kan ik voor je doen?`;
+    
+    const roleGreetings = greetings[contact.functie as keyof typeof greetings];
+    if (roleGreetings) {
+      greeting = roleGreetings[Math.floor(Math.random() * roleGreetings.length)];
+    }
+    
+    // Add context from notes if available
+    if (contact.opmerkingen) {
+      if (contact.opmerkingen.toLowerCase().includes('specialist')) {
+        greeting += " Mijn specialistische kennis staat tot je beschikking.";
+      }
+      if (contact.opmerkingen.toLowerCase().includes('nacht')) {
+        greeting += " Nachtdienst operationeel.";
+      }
+    }
+    
     const initialMessage = {
       id: Date.now(),
       sender: contact.functie,
-      content: `Hallo, je spreekt met ${contact.functie}. Wat kan ik voor je doen?`,
+      content: greeting,
       timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
       type: 'incoming'
     };
