@@ -1504,6 +1504,62 @@ body {
   line-height: 1.3;
 }
 
+/* AI Conversation Interface Styling */
+.conversation-header {
+  background: #e3f2fd;
+  border: 2px inset #c0c0c0;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conversation-header strong {
+  color: #1976d2;
+}
+
+.conversation-phone {
+  font-family: monospace;
+  color: #666;
+  font-size: 10px;
+}
+
+.no-conversation {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.no-conversation p {
+  margin: 0;
+  font-size: 12px;
+}
+
+/* Enhanced chat message styling for colleagues */
+.chat-tab.active {
+  background: white;
+  border-bottom: 2px solid white;
+  font-weight: bold;
+}
+
+.chat-message.incoming .message-sender,
+.chat-message.outgoing .message-sender {
+  font-weight: bold;
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.chat-message.incoming .message-sender {
+  color: #1976d2;
+}
+
+.chat-message.outgoing .message-sender {
+  color: #2e7d32;
+}
+
 
 
 

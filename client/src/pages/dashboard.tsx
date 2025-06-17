@@ -35,6 +35,120 @@ export default function Dashboard() {
   
   // Ensure phoneNumbers is always an array
   const phoneNumbersArray = Array.isArray(phoneNumbers) ? phoneNumbers : [];
+  
+  // Chat state management
+  const [activeChatTab, setActiveChatTab] = useState("burgers");
+  const [currentConversation, setCurrentConversation] = useState<any>(null);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+
+  // AI Conversation Engine for Emergency Services
+  const generateColleagueResponse = (contact: any, userMessage: string, conversationHistory: any[] = []) => {
+    const responses = {
+      "Dienstchef": [
+        "Ik bekijk de situatie. Wat is de prioriteit?",
+        "We hebben extra eenheden beschikbaar. Zal ik ze inzetten?",
+        "Coördineer met de teamleiders. Ik regel de ondersteuning.",
+        "De situatie vereist mijn directe aandacht. Ik kom eraan.",
+        "Heb je contact gehad met de gemeentelijke diensten?",
+        "We moeten de pers informeren als dit escaliert."
+      ],
+      "Teamleider": [
+        "Mijn team staat klaar. Geef me de details.",
+        "Ik stuur twee eenheden naar de locatie. ETA 8 minuten.",
+        "We hebben de situatie onder controle hier.",
+        "Kan je de back-up oproepen? We hebben versterking nodig.",
+        "De eenheden zijn ter plaatse. Situatie wordt geëvalueerd.",
+        "Ik regel de afsluiting van het gebied."
+      ],
+      "Coördinator": [
+        "Ik update het operationele overzicht nu.",
+        "Alle eenheden zijn geïnformeerd via de portofoon.",
+        "De ambulance is onderweg, ETA 6 minuten.",
+        "Ik coördineer met de brandweer voor ondersteuning.",
+        "Het verkeer wordt omgeleid via route B.",
+        "Situatierapport wordt doorgestuurd naar het hoofdbureau."
+      ],
+      "Centralist": [
+        "Ik neem de oproepen over terwijl jij dit afhandelt.",
+        "Er komen meer meldingen binnen over hetzelfde incident.",
+        "Ik log alle details in het systeem.",
+        "De familie is geïnformeerd door onze liaison.",
+        "112 doorverbinding geactiveerd voor dit gebied.",
+        "Alle communicatie wordt opgenomen voor het dossier."
+      ]
+    };
+
+    // Default responses for custom roles
+    const defaultResponses = [
+      "Ik begrijp de situatie. Hoe kan ik helpen?",
+      "Op dit moment ben ik beschikbaar voor ondersteuning.",
+      "Laat me weten wat je nodig hebt.",
+      "Ik ga dit direct oppakken.",
+      "De informatie is genoteerd. Ik neem actie.",
+      "We werken samen aan een oplossing."
+    ];
+
+    let roleResponses = responses[contact.functie as keyof typeof responses] || defaultResponses;
+    
+    // Add context-aware responses based on notes
+    if (contact.opmerkingen) {
+      if (contact.opmerkingen.toLowerCase().includes('specialist')) {
+        roleResponses = [...roleResponses, "Als specialist kan ik hier specifieke expertise bieden.", "Mijn ervaring met dit type situaties komt goed van pas."];
+      }
+      if (contact.opmerkingen.toLowerCase().includes('ervaren')) {
+        roleResponses = [...roleResponses, "Gebaseerd op mijn ervaring raad ik aan om...", "Ik heb dit eerder meegemaakt."];
+      }
+      if (contact.opmerkingen.toLowerCase().includes('nacht')) {
+        roleResponses = [...roleResponses, "Ik ben de hele nacht bereikbaar.", "Ook buiten kantooruren sta ik klaar."];
+      }
+    }
+
+    // Select response based on conversation context
+    const randomIndex = Math.floor(Math.random() * roleResponses.length);
+    return roleResponses[randomIndex];
+  };
+
+  const startConversationWithContact = (contact: any) => {
+    setActiveChatTab("collega");
+    setCurrentConversation(contact);
+    
+    const initialMessage = {
+      id: Date.now(),
+      sender: contact.functie,
+      content: `Hallo, je spreekt met ${contact.functie}. Wat kan ik voor je doen?`,
+      timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      type: 'incoming'
+    };
+    
+    setChatMessages([initialMessage]);
+  };
+
+  const sendMessageToColleague = (message: string) => {
+    if (!currentConversation || !message.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      sender: 'Meldkamer',
+      content: message,
+      timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      type: 'outgoing'
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+
+    // Generate AI response after a short delay
+    setTimeout(() => {
+      const aiResponse = generateColleagueResponse(currentConversation, message, chatMessages);
+      const responseMessage = {
+        id: Date.now() + 1,
+        sender: currentConversation.functie,
+        content: aiResponse,
+        timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+        type: 'incoming'
+      };
+      setChatMessages(prev => [...prev, responseMessage]);
+    }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+  };
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState({
     functie: "",
@@ -4357,39 +4471,108 @@ export default function Dashboard() {
                 {/* Left Column - Chat Section */}
                 <div className="telefoon-chat-section">
                   <div className="chat-tabs">
-                    <button className="chat-tab active" data-chat="burgers">
+                    <button 
+                      className={`chat-tab ${activeChatTab === "burgers" ? "active" : ""}`} 
+                      onClick={() => setActiveChatTab("burgers")}
+                    >
                       Burgers
                     </button>
-                    <button className="chat-tab" data-chat="collega">
+                    <button 
+                      className={`chat-tab ${activeChatTab === "collega" ? "active" : ""}`} 
+                      onClick={() => setActiveChatTab("collega")}
+                    >
                       Collega's
                     </button>
-                    <button className="chat-tab" data-chat="partners">
+                    <button 
+                      className={`chat-tab ${activeChatTab === "partners" ? "active" : ""}`} 
+                      onClick={() => setActiveChatTab("partners")}
+                    >
                       Ketenpartners
                     </button>
                   </div>
 
                   <div className="chat-container">
                     <div className="chat-messages" id="chatMessages">
-                      <div className="chat-message incoming">
-                        <div className="message-sender">Melder - 06-12345678</div>
-                        <div className="message-content">Er is een verkeersongeval op de A20 richting Den Haag, ter hoogte van afslag Vlaardingen.</div>
-                        <div className="message-time">14:23</div>
-                      </div>
-                      <div className="chat-message outgoing">
-                        <div className="message-sender">Meldkamer</div>
-                        <div className="message-content">Dank u voor de melding. Zijn er gewonden? En kunt u de exacte locatie bevestigen?</div>
-                        <div className="message-time">14:24</div>
-                      </div>
+                      {activeChatTab === "burgers" && (
+                        <>
+                          <div className="chat-message incoming">
+                            <div className="message-sender">Melder - 06-12345678</div>
+                            <div className="message-content">Er is een verkeersongeval op de A20 richting Den Haag, ter hoogte van afslag Vlaardingen.</div>
+                            <div className="message-time">14:23</div>
+                          </div>
+                          <div className="chat-message outgoing">
+                            <div className="message-sender">Meldkamer</div>
+                            <div className="message-content">Dank u voor de melding. Zijn er gewonden? En kunt u de exacte locatie bevestigen?</div>
+                            <div className="message-time">14:24</div>
+                          </div>
+                        </>
+                      )}
+                      
+                      {activeChatTab === "collega" && (
+                        <>
+                          {currentConversation && (
+                            <div className="conversation-header">
+                              <strong>Gesprek met: {currentConversation.functie}</strong>
+                              <span className="conversation-phone">{currentConversation.telefoonnummer}</span>
+                            </div>
+                          )}
+                          
+                          {chatMessages.length === 0 && !currentConversation && (
+                            <div className="no-conversation">
+                              <p>Geen actief gesprek. Klik op een collega rechts om een gesprek te starten.</p>
+                            </div>
+                          )}
+                          
+                          {chatMessages.map((message) => (
+                            <div key={message.id} className={`chat-message ${message.type}`}>
+                              <div className="message-sender">{message.sender}</div>
+                              <div className="message-content">{message.content}</div>
+                              <div className="message-time">{message.timestamp}</div>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                      
+                      {activeChatTab === "partners" && (
+                        <div className="chat-message incoming">
+                          <div className="message-sender">Rijkswaterstaat - 0800-8002</div>
+                          <div className="message-content">We hebben het incident ontvangen. Wegbeheer is onderweg naar de locatie.</div>
+                          <div className="message-time">14:26</div>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="chat-input-section">
                       <input 
                         type="text" 
                         className="chat-input" 
-                        placeholder="Typ uw bericht..."
+                        placeholder={
+                          activeChatTab === "collega" && currentConversation 
+                            ? `Bericht naar ${currentConversation.functie}...`
+                            : "Typ uw bericht..."
+                        }
                         id="chatInput"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            const input = e.target as HTMLInputElement;
+                            if (activeChatTab === "collega" && input.value.trim()) {
+                              sendMessageToColleague(input.value);
+                              input.value = '';
+                            }
+                          }
+                        }}
                       />
-                      <button className="chat-send-btn" id="chatSendBtn">
+                      <button 
+                        className="chat-send-btn" 
+                        id="chatSendBtn"
+                        onClick={() => {
+                          const input = document.getElementById('chatInput') as HTMLInputElement;
+                          if (activeChatTab === "collega" && input?.value.trim()) {
+                            sendMessageToColleague(input.value);
+                            input.value = '';
+                          }
+                        }}
+                      >
                         Verzend
                       </button>
                     </div>
@@ -4445,6 +4628,7 @@ export default function Dashboard() {
                           data-colleague={phone.functie}
                           data-phone={phone.telefoonnummer}
                           title={`${phone.omschrijving} - ${phone.telefoonnummer}`}
+                          onClick={() => startConversationWithContact(phone)}
                         >
                           {phone.functie}
                           <span className="contact-number">{phone.telefoonnummer}</span>
