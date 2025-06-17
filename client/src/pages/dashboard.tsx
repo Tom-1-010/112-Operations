@@ -999,274 +999,8 @@ export default function Dashboard() {
         }
       };
 
-
-
-      // Handle notepad note submission (Verzend button in notepad)
-      const handleNotePadSubmit = () => {
-        console.log('📝 NOTEPAD SUBMIT - Processing note from kladblok');
-        console.log('🚀 handleNotePadSubmit function triggered');
-        
-        const kladblok = document.getElementById("gmsKladblok");
-        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
-        
-        if (!kladblok || !loggingPanel) return;
-        
-        const notitieText = kladblok.textContent || '';
-        console.log('📝 Note content:', notitieText);
-        
-        // Only process classification detection, don't save full form
-        if (notitieText.trim()) {
-          // Process classification codes
-          const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-          const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-          const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-          const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-          
-          console.log('🔧 Dropdown elements found:', {
-            mc1Select: !!mc1Select,
-            mc2Select: !!mc2Select,
-            mc3Select: !!mc3Select,
-            prioriteitSelect: !!prioriteitSelect
-          });
-
-          if (mc1Select && mc2Select && mc3Select) {
-            console.log('✅ All dropdown elements found, proceeding with classification detection');
-            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
-            console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
-            console.log('📝 Input text:', `"${notitieText}"`);
-            
-            // Quick test: check if we have any "brgb" codes in our data
-            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
-            console.log('🧪 Test - BRGB codes available:', testBrgb.length, testBrgb.slice(0, 3));
-            
-            // Test specific searches
-            const testOngevall = storedClassifications.filter(c => 
-              c.MC1.toLowerCase().includes('ongeval') || 
-              c.MC2.toLowerCase().includes('wegvervoer') ||
-              c.MC3.toLowerCase().includes('letsel')
-            );
-            console.log('🧪 Test - Ongeval/wegvervoer/letsel matches:', testOngevall.length);
-            
-            const lines = notitieText.split('\n');
-            let matchedClassification = null;
-
-            for (const line of lines) {
-              const trimmedLine = line.trim();
-              console.log('🔍 Processing line:', trimmedLine);
-              
-              // Check for hyphen-based codes (-brgb, -wvoi, etc.)
-              if (trimmedLine.startsWith('-') && trimmedLine.length > 1) {
-                const searchQuery = trimmedLine.substring(1).trim();
-                console.log('🎯 Searching for hyphen-based code:', searchQuery);
-                
-                // 1. Try exact code match first
-                matchedClassification = storedClassifications.find(c => 
-                  c.code.toLowerCase() === searchQuery.toLowerCase()
-                );
-                console.log('🔍 1. Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                
-                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
-                if (!matchedClassification) {
-                  matchedClassification = storedClassifications.find(c => 
-                    c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
-                  );
-                  console.log('🔍 2. Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                }
-                
-                // 3. Try text matches for full classification strings (e.g., "ongeval wegvervoer letsel")
-                if (!matchedClassification) {
-                  const searchWords = searchQuery.toLowerCase().split(' ').filter(word => word.length > 2);
-                  console.log('🔍 3. Searching for words:', searchWords);
-                  
-                  matchedClassification = storedClassifications.find(c => {
-                    const fullClassification = `${c.MC1} ${c.MC2} ${c.MC3}`.toLowerCase();
-                    const uitleg = c.uitleg.toLowerCase();
-                    
-                    // Check if all search words are present in the classification or explanation
-                    return searchWords.every(word => 
-                      fullClassification.includes(word) || 
-                      uitleg.includes(word) ||
-                      c.MC1.toLowerCase().includes(word) ||
-                      c.MC2.toLowerCase().includes(word) ||
-                      c.MC3.toLowerCase().includes(word)
-                    );
-                  });
-                  console.log('🔍 3. Multi-word match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                }
-                
-                // 4. Try individual text matches for MC1, MC2, MC3
-                if (!matchedClassification) {
-                  matchedClassification = storedClassifications.find(c => 
-                    c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                  console.log('🔍 4. Individual text match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                }
-                
-                // 5. Try fuzzy matching for partial matches
-                if (!matchedClassification && searchQuery.length > 3) {
-                  matchedClassification = storedClassifications.find(c => {
-                    const searchLower = searchQuery.toLowerCase();
-                    return c.MC1.toLowerCase().includes(searchLower) ||
-                           c.MC2.toLowerCase().includes(searchLower) ||
-                           c.MC3.toLowerCase().includes(searchLower) ||
-                           c.uitleg.toLowerCase().includes(searchLower) ||
-                           searchLower.includes(c.MC1.toLowerCase()) ||
-                           searchLower.includes(c.MC2.toLowerCase()) ||
-                           searchLower.includes(c.MC3.toLowerCase());
-                  });
-                  console.log('🔍 5. Fuzzy match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                }
-                
-                if (matchedClassification) {
-                  console.log('✅ Match found for hyphen code:', matchedClassification);
-                  break;
-                }
-              }
-              
-              // Check for text-based classifications without hyphen
-              else if (trimmedLine.length > 2) {
-                const searchQuery = trimmedLine.toLowerCase();
-                console.log('🎯 Searching for text-based classification:', searchQuery);
-                
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC3.toLowerCase().includes(searchQuery) ||
-                  c.MC2.toLowerCase().includes(searchQuery) ||
-                  c.MC1.toLowerCase().includes(searchQuery) ||
-                  searchQuery.includes(c.MC3.toLowerCase()) ||
-                  searchQuery.includes(c.MC2.toLowerCase()) ||
-                  searchQuery.includes(c.MC1.toLowerCase())
-                );
-                
-                if (matchedClassification) {
-                  console.log('✅ Match found for text:', matchedClassification);
-                  break;
-                }
-              }
-            }
-
-            // Apply the matched classification
-            if (matchedClassification) {
-              console.log('🎯 MATCHED CLASSIFICATION:', matchedClassification);
-              console.log('🔧 Starting dropdown population...');
-              
-              // Debug current dropdown state
-              console.log('📋 Current dropdown elements:', {
-                mc1Select: mc1Select?.id,
-                mc2Select: mc2Select?.id, 
-                mc3Select: mc3Select?.id,
-                prioriteitSelect: prioriteitSelect?.id
-              });
-              
-              // Step 1: Populate MC1 dropdown and set value
-              console.log('📋 Populating MC1...');
-              mc1Select.innerHTML = '<option value="">Selecteer...</option>';
-              const mc1Options = getUniqueClassificationsByLevel("MC1");
-              console.log('📋 MC1 options available:', mc1Options.length, mc1Options);
-              
-              mc1Options.forEach(mc1 => {
-                const option = document.createElement('option');
-                option.value = mc1;
-                option.textContent = mc1;
-                mc1Select.appendChild(option);
-              });
-              mc1Select.value = matchedClassification.MC1;
-              console.log('✅ MC1 set to:', mc1Select.value);
-              
-              // Step 2: Populate MC2 dropdown if MC2 exists
-              if (matchedClassification.MC2 && matchedClassification.MC2.trim() !== '') {
-                console.log('📋 Populating MC2...');
-                mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-                const mc2Options = getUniqueClassificationsByLevel("MC2", matchedClassification.MC1);
-                console.log('📋 MC2 options for', matchedClassification.MC1, ':', mc2Options.length, mc2Options);
-                
-                mc2Options.forEach(mc2 => {
-                  const option = document.createElement('option');
-                  option.value = mc2;
-                  option.textContent = mc2;
-                  mc2Select.appendChild(option);
-                });
-                mc2Select.value = matchedClassification.MC2;
-                console.log('✅ MC2 set to:', mc2Select.value);
-                
-                // Step 3: Populate MC3 dropdown if MC3 exists
-                if (matchedClassification.MC3 && matchedClassification.MC3.trim() !== '') {
-                  console.log('📋 Populating MC3...');
-                  mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-                  const mc3Options = getUniqueClassificationsByLevel("MC3", matchedClassification.MC2);
-                  console.log('📋 MC3 options for', matchedClassification.MC2, ':', mc3Options.length, mc3Options);
-                  
-                  mc3Options.forEach(mc3 => {
-                    const option = document.createElement('option');
-                    option.value = mc3;
-                    option.textContent = mc3;
-                    mc3Select.appendChild(option);
-                  });
-                  mc3Select.value = matchedClassification.MC3;
-                  console.log('✅ MC3 set to:', mc3Select.value);
-                } else {
-                  console.log('⚠️ No MC3 in matched classification');
-                  mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-                }
-              } else {
-                console.log('⚠️ No MC2 in matched classification');
-                mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-                mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-              }
-              
-              // Step 4: Set priority
-              if (prioriteitSelect && matchedClassification.prio) {
-                prioriteitSelect.value = matchedClassification.prio.toString();
-                console.log('✅ Priority set to:', prioriteitSelect.value);
-              }
-              
-              // Final verification
-              const finalValues = {
-                MC1: mc1Select.value,
-                MC2: mc2Select.value,
-                MC3: mc3Select.value,
-                Priority: prioriteitSelect?.value || 'not set'
-              };
-              console.log('🎯 FINAL DROPDOWN VALUES:', finalValues);
-              
-              // Log the automatic classification
-              if (loggingPanel) {
-                const timestamp = new Date().toLocaleTimeString('nl-NL');
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry classification-auto';
-                logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
-                loggingPanel.appendChild(logEntry);
-                loggingPanel.scrollTop = loggingPanel.scrollHeight;
-              }
-            } else {
-              console.log('❌ No classification matched for input');
-              console.log('💡 Available classification samples:', storedClassifications.slice(0, 5).map(c => ({
-                code: c.code,
-                MC1: c.MC1,
-                MC2: c.MC2,
-                MC3: c.MC3
-              })));
-            }
-          }
-          
-          // Log the note to the logging panel
-          const timestamp = new Date().toLocaleTimeString('nl-NL');
-          const logEntry = document.createElement('div');
-          logEntry.className = 'log-entry';
-          logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ${notitieText}`;
-          loggingPanel.appendChild(logEntry);
-          loggingPanel.scrollTop = loggingPanel.scrollHeight;
-          
-          // Clear the notepad after sending
-          kladblok.textContent = '';
-        }
-      };
-
-      // Handle full GMS form submission (separate function for actual form saving)
-      const handleGMSFormSubmit = () => {
-        console.log('💾 FORM SUBMIT - Saving full GMS form');
-        
+      // Handle GMS form submission
+      const handleGMSSubmit = () => {
         const kladblok = document.getElementById("gmsKladblok");
 
         // Melder informatie
@@ -1403,57 +1137,10 @@ export default function Dashboard() {
         showNotificationMessage("GMS melding opgeslagen");
       };
 
-      // Add event listeners for both button click and Enter key
-      const verzendButton = document.getElementById("gmsVerzendButton");
-      const kladblokElement = document.getElementById("gmsKladblok");
-      
-      if (verzendButton) {
-        console.log('📌 Verzend button found, attaching notepad submit listener');
-        
-        // Test function to verify classification data is available
-        const testClassificationData = () => {
-          const testData = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-          console.log('🧪 Classification test - data available:', testData.length);
-          const brgbTest = testData.filter(c => c.code.toLowerCase().includes('brgb'));
-          console.log('🧪 BRGB codes found:', brgbTest.length, brgbTest.slice(0, 2));
-        };
-        testClassificationData();
-        
-        // Add manual test function for debugging
-        (window as any).testClassification = () => {
-          console.log('🧪 Manual test triggered');
-          const kladblok = document.getElementById("gmsKladblok");
-          if (kladblok) {
-            kladblok.textContent = "-brgb";
-            handleNotePadSubmit();
-          }
-        };
-        
-        verzendButton.addEventListener("click", () => {
-          console.log('🖱️ Verzend button clicked - triggering classification detection');
-          handleNotePadSubmit();
-        });
-      } else {
-        console.error('❌ Verzend button not found!');
-      }
-      
-      // Add Enter key support for kladblok
-      if (kladblokElement) {
-        console.log('📌 Kladblok found, attaching Enter key listener');
-        kladblokElement.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            console.log('⌨️ Enter key pressed in kladblok!');
-            handleNotePadSubmit();
-          }
-        });
-      }
-      
-      // Form save button (for full form submission)
+      // Add event listeners
       const saveButton = document.getElementById("gmsSaveButton");
       if (saveButton) {
-        console.log('📌 Save button found, attaching form submit listener');
-        saveButton.addEventListener("click", handleGMSFormSubmit);
+        saveButton.addEventListener("click", handleGMSSubmit);
       }
 
       // Initialize time immediately and then every minute
@@ -1535,7 +1222,58 @@ export default function Dashboard() {
           }
         };
 
-
+        // Function to select classification by code
+        const selectClassificationByCode = (code: string) => {
+          const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+          const classification = storedClassifications.find(c => c.code.toLowerCase() === code.toLowerCase());
+          
+          if (classification) {
+            // Set MC1
+            mc1Select.value = classification.MC1;
+            
+            // Populate and set MC2 if exists
+            if (classification.MC2) {
+              mc2Select.innerHTML = '<option value="">Selecteer...</option>';
+              const mc2Options = getUniqueClassificationsByLevel("MC2", classification.MC1);
+              mc2Options.forEach(mc2 => {
+                const option = document.createElement('option');
+                option.value = mc2;
+                option.textContent = mc2;
+                mc2Select.appendChild(option);
+              });
+              mc2Select.value = classification.MC2;
+              
+              // Populate and set MC3 if exists
+              if (classification.MC3) {
+                mc3Select.innerHTML = '<option value="">Selecteer...</option>';
+                const mc3Options = getUniqueClassificationsByLevel("MC3", classification.MC2);
+                mc3Options.forEach(mc3 => {
+                  const option = document.createElement('option');
+                  option.value = mc3;
+                  option.textContent = mc3;
+                  mc3Select.appendChild(option);
+                });
+                mc3Select.value = classification.MC3;
+              }
+            }
+            
+            // Update priority
+            updatePriorityFromClassification();
+            
+            // Log the automatic selection
+            if (loggingPanel) {
+              const timestamp = new Date().toLocaleTimeString('nl-NL');
+              const logEntry = document.createElement('div');
+              logEntry.className = 'log-entry classification-auto';
+              logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Classificatie automatisch geselecteerd: ${classification.MC1}${classification.MC2 ? ' > ' + classification.MC2 : ''}${classification.MC3 ? ' > ' + classification.MC3 : ''} (Code: ${classification.code})`;
+              loggingPanel.appendChild(logEntry);
+              loggingPanel.scrollTop = loggingPanel.scrollHeight;
+            }
+            
+            return true;
+          }
+          return false;
+        };
 
         if (mc1Select && mc2Select && mc3Select) {
           // Handle MC1 change
@@ -1622,7 +1360,66 @@ export default function Dashboard() {
           });
         }
 
-        // Note: Real-time classification detection disabled - only processes on "Verzend" button click
+        // Enhanced shortcode detection for both Notitieveld and Melding Logging
+        const setupShortcodeDetection = (element: HTMLElement, elementName: string) => {
+          if (!element) return;
+          
+          const handleInput = () => {
+            const text = element.textContent || '';
+            const lines = text.split('\n');
+            const lastLine = lines[lines.length - 1].trim();
+            
+            // Only process hyphen-based input
+            if (lastLine.startsWith('-') && lastLine.length > 1) {
+              const searchQuery = lastLine.substring(1).trim();
+              const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+              
+              // Find matching classification
+              let matchedClassification = storedClassifications.find(c => 
+                c.code.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC3.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC2.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC1.toLowerCase() === searchQuery.toLowerCase() ||
+                c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
+              );
+              
+              if (matchedClassification && selectClassificationByCode(matchedClassification.code)) {
+                // Set priority
+                if (prioriteitSelect) {
+                  prioriteitSelect.value = matchedClassification.prio.toString();
+                }
+                
+                // Log the action
+                if (loggingPanel) {
+                  const timestamp = new Date().toLocaleTimeString('nl-NL');
+                  const logEntry = document.createElement('div');
+                  logEntry.className = 'log-entry classification-auto';
+                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Auto-classificatie: "${searchQuery}" → ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
+                  loggingPanel.appendChild(logEntry);
+                  loggingPanel.scrollTop = loggingPanel.scrollHeight;
+                }
+              }
+            }
+          };
+          
+          element.addEventListener("input", handleInput);
+          element.addEventListener("keyup", handleInput);
+        };
+        
+        // Setup shortcode detection for Notitieveld
+        if (notitieveld) {
+          setupShortcodeDetection(notitieveld, 'Notitieveld');
+        }
+        
+        // Setup shortcode detection for Melding Logging content area
+        const meldingLoggingContent = document.querySelector('.gms-logging-content') as HTMLElement;
+        if (meldingLoggingContent) {
+          // Make the logging area editable for shortcode input
+          meldingLoggingContent.contentEditable = 'true';
+          setupShortcodeDetection(meldingLoggingContent, 'Melding Logging');
+        }
       };
 
       setupClassificationDropdowns();
@@ -1631,10 +1428,7 @@ export default function Dashboard() {
         clearInterval(timeTimer);
         clearInterval(statusDateTimeTimer);
         if (saveButton) {
-          saveButton.removeEventListener("click", handleGMSFormSubmit);
-        }
-        if (verzendButton) {
-          verzendButton.removeEventListener("click", handleNotePadSubmit);
+          saveButton.removeEventListener("click", handleGMSSubmit);
         }
       };
     };
