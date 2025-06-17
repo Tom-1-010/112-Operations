@@ -1625,33 +1625,33 @@ body {
 }
 
 .gms-field-street {
-  width: 100px;
-  max-width: 100px;
+  width: 80px;
+  max-width: 80px;
 }
 
 .gms-field-number {
-  width: 30px;
-  max-width: 30px;
-}
-
-.gms-field-extension {
   width: 25px;
   max-width: 25px;
 }
 
+.gms-field-extension {
+  width: 20px;
+  max-width: 20px;
+}
+
 .gms-field-postal {
-  width: 50px;
-  max-width: 50px;
+  width: 40px;
+  max-width: 40px;
 }
 
 .gms-field-city {
-  width: 70px;
-  max-width: 70px;
+  width: 60px;
+  max-width: 60px;
 }
 
 .gms-field-full {
-  width: 120px;
-  max-width: 120px;
+  width: 100px;
+  max-width: 100px;
 }
 
 .gms-field-group label {
@@ -1666,14 +1666,14 @@ body {
   padding: 2px 4px;
   font-size: 11px;
   font-family: inherit;
-  width: 90px;
-  max-width: 90px;
+  width: 70px;
+  max-width: 70px;
 }
 
 /* Dropdown specific styling for even more compact appearance */
 select.gms-field {
-  width: 100px;
-  max-width: 100px;
+  width: 85px;
+  max-width: 85px;
 }
 
 .gms-field-small {
@@ -1689,14 +1689,13 @@ select.gms-field {
 
 /* Specific styles for priority and time fields */
 .gms-priority-field {
-  width: 50px;
-  max-width: 50px;
+  width: 40px;
+  max-width: 40px;
 }
 
 .gms-time-field {
-  width: 90px;
-  max-width: 90px;
-  min-width: 90px;
+  width: 75px;
+  max-width: 75px;
 }
 
 .gms-field:focus {
@@ -1827,10 +1826,10 @@ select.gms-field {
   padding: 4px;
   font-size: 11px;
   font-family: 'Courier New', monospace;
-  width: 140px;
-  max-width: 140px;
+  width: 120px;
+  max-width: 120px;
   overflow-y: auto;
-  min-height: 120px;
+  min-height: 100px;
   resize: none;
 }
 
