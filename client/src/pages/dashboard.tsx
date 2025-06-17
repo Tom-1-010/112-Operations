@@ -1364,45 +1364,100 @@ export default function Dashboard() {
             const lastLine = lines[lines.length - 1].trim();
             
             // Enhanced shortcode detection with multiple formats
-            let codeMatch = null;
+            let searchQuery = null;
+            let isHyphenFormat = false;
             
-            // Format: -alabab or -al or -bz
+            // Format: -alabab or -al or -bz or -onder invloed (hyphen-based detection)
             if (lastLine.startsWith('-') && lastLine.length > 1) {
-              codeMatch = lastLine.substring(1);
+              searchQuery = lastLine.substring(1).trim();
+              isHyphenFormat = true;
             }
             
-            // Format: alabab (without dash)
+            // Format: alabab (without dash, legacy support)
             else if (lastLine.length >= 2 && /^[a-z]+$/.test(lastLine)) {
-              codeMatch = lastLine;
+              searchQuery = lastLine;
+              isHyphenFormat = false;
             }
             
-            if (codeMatch) {
+            if (searchQuery && isHyphenFormat) {
               const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+              let matchedClassification = null;
               
-              // Try exact match first
-              let matchedClassification = storedClassifications.find(c => c.code.toLowerCase() === codeMatch.toLowerCase());
+              // 1. Try exact code match first (e.g., -alabab)
+              matchedClassification = storedClassifications.find(c => 
+                c.code.toLowerCase() === searchQuery.toLowerCase()
+              );
               
-              // Try partial match for fallback behavior (e.g., "alarm" matches "al")
+              // 2. Try exact MC3 text match (e.g., -onder invloed)
               if (!matchedClassification) {
                 matchedClassification = storedClassifications.find(c => 
-                  c.MC1.toLowerCase().startsWith(codeMatch.toLowerCase()) ||
-                  c.code.toLowerCase().startsWith(codeMatch.toLowerCase())
+                  c.MC3.toLowerCase() === searchQuery.toLowerCase()
+                );
+              }
+              
+              // 3. Try exact MC2 text match
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.MC2.toLowerCase() === searchQuery.toLowerCase()
+                );
+              }
+              
+              // 4. Try exact MC1 text match
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.MC1.toLowerCase() === searchQuery.toLowerCase()
+                );
+              }
+              
+              // 5. Try partial matches for MC3 (e.g., -invloed matches "Onder invloed")
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  searchQuery.toLowerCase().includes(c.MC3.toLowerCase())
+                );
+              }
+              
+              // 6. Try partial matches for MC2
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  searchQuery.toLowerCase().includes(c.MC2.toLowerCase())
+                );
+              }
+              
+              // 7. Try partial matches for MC1
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.MC1.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  searchQuery.toLowerCase().includes(c.MC1.toLowerCase())
+                );
+              }
+              
+              // 8. Try partial code matches (e.g., -al matches alabab)
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
                 );
               }
               
               if (matchedClassification) {
                 if (selectClassificationByCode(matchedClassification.code)) {
-                  // Log the shortcode usage
+                  // Auto-set priority based on classification
+                  if (prioriteitSelect) {
+                    prioriteitSelect.value = matchedClassification.prio.toString();
+                  }
+                  
+                  // Log the automatic classification selection
                   if (loggingPanel) {
                     const timestamp = new Date().toLocaleTimeString('nl-NL');
                     const logEntry = document.createElement('div');
                     logEntry.className = 'log-entry classification-auto';
-                    logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie gekozen via ${elementName}: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''}`;
+                    logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Auto-classificatie via ${elementName}: "${searchQuery}" → ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
                     loggingPanel.appendChild(logEntry);
                     loggingPanel.scrollTop = loggingPanel.scrollHeight;
                   }
                   
-                  // Remove the processed code from the input
+                  // Remove the processed code/text from the input
                   if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
                     const newText = text.replace(lastLine, '').trim();
                     (element as HTMLTextAreaElement | HTMLInputElement).value = newText;
