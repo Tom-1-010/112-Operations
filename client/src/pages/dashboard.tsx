@@ -240,104 +240,188 @@ export default function Dashboard() {
     definitie: string;
   }
 
-  // Comprehensive GMS Classification Database from official Dutch police data
-  const gmsClassificationsData: GmsClassification[] = [
-    // Alarm classifications
-    { code: "al", mc1: "Alarm", mc2: "", mc3: "", prio: 5, definitie: "Alle soorten alarmen van detectiesystemen die rechtstreeks op de meldkamer binnenkomen" },
-    { code: "alab", mc1: "Alarm", mc2: "Autom. brand", mc3: "", prio: 2, definitie: "Alarmen van aangesloten OMS die direct op de meldkamer binnenkomen" },
-    { code: "alabab", mc1: "Alarm", mc2: "Autom. brand", mc3: "Autom. brand OMS", prio: 2, definitie: "Melding via OMS van inwerkingtreding van een automatische brandmelder" },
-    { code: "alabbb", mc1: "Alarm", mc2: "Autom. brand", mc3: "Br beheerssysteem", prio: 2, definitie: "Melding via OMS van inwerkingtreding van een automatische blusinstallatie" },
-    { code: "alabbm", mc1: "Alarm", mc2: "Autom. brand", mc3: "Brandmelding PAC", prio: 2, definitie: "Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen" },
-    { code: "alabdk", mc1: "Alarm", mc2: "Autom. brand", mc3: "Drukknopmelding OMS", prio: 2, definitie: "Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes" },
-    { code: "alabhm", mc1: "Alarm", mc2: "Autom. brand", mc3: "Handmelder OMS", prio: 2, definitie: "Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS" },
-    { code: "algs", mc1: "Alarm", mc2: "Autom. Gev stof", mc3: "", prio: 2, definitie: "Automatische meldingen van ontsnapping van een gevaarlijke stof via OMS" },
-    { code: "algsom", mc1: "Alarm", mc2: "Autom. Gev stof", mc3: "Gev. stof OMS", prio: 2, definitie: "Melding via OMS van detectie van een gevaarlijke stof" },
-    { code: "algspa", mc1: "Alarm", mc2: "Autom. Gev stof", mc3: "Gev. stof PAC", prio: 2, definitie: "Binnenkomende meldingen via PAC van gevaarlijke stof detectiesystemen" },
-    { code: "alas", mc1: "Alarm", mc2: "Autom. systeemmelding", mc3: "", prio: 4, definitie: "Binnenkomende meldingen via OMS waarvoor geen repressieve brandweer inzet nodig is" },
-    { code: "alhw", mc1: "Alarm", mc2: "Hoog water alarm", mc3: "", prio: 4, definitie: "Alarmen/waarschuwingen afgegeven door Rijkswaterstaat/waterschappen" },
-    { code: "allo", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "", prio: 3, definitie: "Melding dat ergens een luid/optisch alarm hoor- of zichtbaar is" },
-    { code: "alloco", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "CO-melder", prio: 3, definitie: "CO-melder alarm" },
-    { code: "allogb", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "Gebouw", prio: 3, definitie: "Luid/optisch alarm uit/in of aan een gebouw" },
-    { code: "allorm", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "Rookmelder", prio: 3, definitie: "Rookmelder hoorbaar in object zonder brandindiciaties" },
-    { code: "allovv", mc1: "Alarm", mc2: "Luid/optisch alarm", mc3: "Voertuig/Vaartuig", prio: 3, definitie: "Luid/optisch alarm uit/in of aan voer-/vaartuig" },
-    { code: "alpa", mc1: "Alarm", mc2: "PAC alarm", mc3: "", prio: 2, definitie: "Alarmmeldingen die via de PAC op de meldkamer binnenkomen" },
-    { code: "alpaib", mc1: "Alarm", mc2: "PAC alarm", mc3: "Inbraakalarm", prio: 2, definitie: "Inbraakmeldingen via PAC van aangesloten inbraakdetectiesystemen" },
-    { code: "alpaov", mc1: "Alarm", mc2: "PAC alarm", mc3: "Overvalalarm", prio: 2, definitie: "Drukknop overvalmeldingen via de PAC aan de meldkamer doorgegeven" },
-    { code: "alpaps", mc1: "Alarm", mc2: "PAC alarm", mc3: "Persoonsalarm", prio: 1, definitie: "Melding via PAC van persoonsgebonden noodoproepsysteem" },
-    { code: "alra", mc1: "Alarm", mc2: "RAC alarm", mc3: "", prio: 1, definitie: "Inbraakmeldingen die via de RAC binnenkomen" },
-    { code: "alraib", mc1: "Alarm", mc2: "RAC alarm", mc3: "Inbraakalarm", prio: 1, definitie: "Inbraakmeldingen via RAC van aangesloten inbraakdetectiesystemen" },
-    { code: "alraov", mc1: "Alarm", mc2: "RAC alarm", mc3: "Overvalalarm", prio: 1, definitie: "Drukknop overvalmeldingen via RAC aan de meldkamer doorgegeven" },
-    { code: "alraps", mc1: "Alarm", mc2: "RAC alarm", mc3: "Persoonsalarm", prio: 1, definitie: "Rechtstreekse melding van persoonsgebonden noodoproepsysteem" },
-    { code: "alse", mc1: "Alarm", mc2: "Sensing", mc3: "", prio: 2, definitie: "Sensing systeem alarm" },
-    { code: "alseal", mc1: "Alarm", mc2: "Sensing", mc3: "Alert", prio: 2, definitie: "Hit vanuit sensing systemen ten behoeve van grensbewaking" },
-    { code: "alseah", mc1: "Alarm", mc2: "Sensing", mc3: "ANPR-hit", prio: 2, definitie: "ANPR detectie hit" },
-    { code: "alseom", mc1: "Alarm", mc2: "Sensing", mc3: "Opsporingsmiddel", prio: 2, definitie: "Opsporingsmiddel detectie" },
-    { code: "alsetz", mc1: "Alarm", mc2: "Sensing", mc3: "Toezichtsalarm", prio: 1, definitie: "GPS-alarm van gedetineerde of TBS'er die voorwaarden niet opvolgt" },
-    { code: "altu", mc1: "Alarm", mc2: "Tunnelalarm", mc3: "", prio: 2, definitie: "Automatische alarmmelding vanuit tunnel zonder brandmelding indicatie" },
-    { code: "alma", mc1: "Alarm", mc2: "Weeralarm", mc3: "", prio: 4, definitie: "Alarmen/waarschuwingen afgegeven door meteorologische diensten" },
-    
-    // Bezitsaantasting classifications
-    { code: "bz", mc1: "Bezitsaantasting", mc2: "", mc3: "", prio: 5, definitie: "Aantasting van andermans bezit of een poging daartoe" },
-    { code: "bzds", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "", prio: 3, definitie: "Het wegnemen of toe-eigenen van enig goed dat aan een ander toebehoort" },
-    { code: "bzdsap", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Afpersing", prio: 3, definitie: "Wederrechtelijk bevoordelen door dwingen door geweld/smaad/laster" },
-    { code: "bzdsbr", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Beroving", prio: 1, definitie: "Met geweld of dreiging persoon of goederen beroven in openbare ruimte" },
-    { code: "bzdsdi", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Dier", prio: 3, definitie: "Diefstal van een dier" },
-    { code: "bzdsfd", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Fraude", prio: 3, definitie: "Misleiden of bedriegen met als doel oneerlijk voordeel te verkrijgen" },
-    { code: "bzdsgd", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Goederen", prio: 3, definitie: "Diefstal van goederen" },
-    { code: "bzdshl", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Heling", prio: 3, definitie: "Afnemen, verkopen of verhandelen van gestolen goederen" },
-    { code: "bzdslu", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Luchtvaartuig", prio: 3, definitie: "Diefstal van een luchtvaartuig" },
-    { code: "bzdsol", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Oplichting", prio: 3, definitie: "Bewegen tot afgifte van goed door bedrieglijke middelen" },
-    { code: "bzdsva", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Vaartuig", prio: 3, definitie: "Diefstal van een vaartuig" },
-    { code: "bzdsvd", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Verduistering", prio: 3, definitie: "Opzettelijk en wederrechtelijk toe-eigenen van goed anders verkregen" },
-    { code: "bzdsvo", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Voertuig", prio: 3, definitie: "Diefstal van een voertuig" },
-    { code: "bzdswk", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Winkeldiefstal", prio: 2, definitie: "Diefstal uit een winkel" },
-    { code: "bzdszk", mc1: "Bezitsaantasting", mc2: "Diefstal", mc3: "Zakkenrollerij", prio: 3, definitie: "Diefstal door een zakkenroller" },
-    { code: "bzib", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "", prio: 3, definitie: "Door braak zich wederrechtelijk toegang verschaffen met oogmerk diefstal" },
-    { code: "bzibbi", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Bedrijf/Instelling", prio: 2, definitie: "Inbraak in bedrijf of instelling met oogmerk diefstal" },
-    { code: "bzibbg", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Bijgebouw", prio: 2, definitie: "Inbraak in bijgebouw met oogmerk diefstal" },
-    { code: "bziblu", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Luchtvaartuig", prio: 2, definitie: "Inbraak in luchtvaartuig met oogmerk diefstal" },
-    { code: "bzibsp", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Spoorvervoer", prio: 2, definitie: "Inbraak in railvoertuig met oogmerk diefstal" },
-    { code: "bzibva", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Vaartuig", prio: 2, definitie: "Inbraak in vaartuig met oogmerk diefstal" },
-    { code: "bzibvo", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Voertuig", prio: 2, definitie: "Inbraak in voertuig met oogmerk diefstal" },
-    { code: "bzibwn", mc1: "Bezitsaantasting", mc2: "Inbraak", mc3: "Woning", prio: 2, definitie: "Inbraak in woning met oogmerk diefstal" },
-    { code: "bzov", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "", prio: 1, definitie: "Dwingen tot afgifte van goed door geweld met voorbedachte rade" },
-    { code: "bzovbi", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Bedrijf/Instelling", prio: 1, definitie: "Geplande overval op bedrijf of instelling" },
-    { code: "bzovlu", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Luchtvaartuig", prio: 1, definitie: "Geplande overval op of in luchtvaartuig niet zijnde kaping" },
-    { code: "bzovvv", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Voertuig/Vaartuig", prio: 1, definitie: "Geplande overval op voer- of vaartuig" },
-    { code: "bzovwd", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Waardetransport", prio: 1, definitie: "Met geweld wegnemen van goed van waardetransport" },
-    { code: "bzovwn", mc1: "Bezitsaantasting", mc2: "Overval", mc3: "Woning", prio: 1, definitie: "Geplande overval op particulier persoon vaak binnenshuis" },
-    { code: "bzsp", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "", prio: 2, definitie: "Zonder geweld wegnemen van veldvruchten, dieren met oogmerk toe-eigening" },
-    { code: "bzspdi", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "Dier", prio: 2, definitie: "Zonder geweld wegnemen van dieren met oogmerk toe-eigening" },
-    { code: "bzspgd", mc1: "Bezitsaantasting", mc2: "Stroperij", mc3: "Goederen", prio: 2, definitie: "Zonder geweld wegnemen van klei, bagger, veldvruchten" },
-    { code: "bzvn", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "", prio: 3, definitie: "Opzettelijk en wederrechtelijk vernielen van goed dat aan ander toebehoort" },
-    { code: "bzvngb", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Gebouw", prio: 3, definitie: "Vernieling van gebouw" },
-    { code: "bzvngd", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Goederen", prio: 3, definitie: "Vernieling van goederen" },
-    { code: "bzvngf", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Graffiti", prio: 3, definitie: "Vernieling door graffiti" },
-    { code: "bzvnlu", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Luchtvaartuig", prio: 3, definitie: "Vernieling van luchtvaartuig" },
-    { code: "bzvnsp", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Spoorvervoer", prio: 3, definitie: "Vernieling van spoorvervoer" },
-    { code: "bzvnva", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Vaartuig", prio: 3, definitie: "Vernieling van vaartuig" },
-    { code: "bzvnvo", mc1: "Bezitsaantasting", mc2: "Vernieling", mc3: "Voertuig", prio: 3, definitie: "Vernieling van voertuig" },
-    
-    // Brand classifications
-    { code: "br", mc1: "Brand", mc2: "", mc3: "", prio: 5, definitie: "Incident waarbij het primair om brand gaat of explosie met brand als effect" },
-    { code: "brbg", mc1: "Brand", mc2: "Bijgebouw", mc3: "", prio: 1, definitie: "Brand in bijgebouw dat dienstbaar is aan hoofdgebouw" },
-    { code: "brbt", mc1: "Brand", mc2: "Buiten", mc3: "", prio: 2, definitie: "Alle buitenbrandmeldingen, geen industrie/natuur/vervoer/scenario" },
-    { code: "brbtar", mc1: "Brand", mc2: "Buiten", mc3: "Afval/Rommel", prio: 2, definitie: "Brandmelding van afval/rommel buiten industriële objecten" },
-    { code: "brbtbb", mc1: "Brand", mc2: "Buiten", mc3: "Berm/Ruigte/Bosschage", prio: 2, definitie: "Brandmelding van begroeiing niet zijnde bos/heide/veen/riet" },
-    { code: "brbtct", mc1: "Brand", mc2: "Buiten", mc3: "Container", prio: 2, definitie: "Brandmelding van containers/bakken voor opslag afval" },
-    { code: "brbtid", mc1: "Brand", mc2: "Buiten", mc3: "Industrie", prio: 2, definitie: "Brandmelding van industrieel aangemerkt terrein" },
-    { code: "brgb", mc1: "Brand", mc2: "Gebouw", mc3: "", prio: 1, definitie: "Brandmeldingen van/in gebouwen niet zijnde industrie of speciale scenario's" },
-    { code: "brgb01", mc1: "Brand", mc2: "Gebouw", mc3: "01 Woning/Woongebouw", prio: 1, definitie: "Brand in woning of woongebouw" },
-    { code: "brgb02", mc1: "Brand", mc2: "Gebouw", mc3: "02 Bijeenkomst", prio: 1, definitie: "Brand in bijeenkomstgebouw" },
-    { code: "brgb03", mc1: "Brand", mc2: "Gebouw", mc3: "03 Cel", prio: 1, definitie: "Brand in cellengebouw" },
-    { code: "brgb04", mc1: "Brand", mc2: "Gebouw", mc3: "04 Gezondheidszorg", prio: 1, definitie: "Brand in gezondheidsgebouw" },
-    { code: "brgb05", mc1: "Brand", mc2: "Gebouw", mc3: "05 Agrarisch", prio: 1, definitie: "Brand in agrarisch gebouw" },
-    { code: "brgb06", mc1: "Brand", mc2: "Gebouw", mc3: "06 Kantoor", prio: 1, definitie: "Brand in kantoorgebouw" },
-    { code: "brgb07", mc1: "Brand", mc2: "Gebouw", mc3: "07 Logies", prio: 1, definitie: "Brand in logiesgebouw" },
-    { code: "brgb08", mc1: "Brand", mc2: "Gebouw", mc3: "08 Onderwijs", prio: 1, definitie: "Brand in onderwijsgebouw" },
-    { code: "brgb09", mc1: "Brand", mc2: "Gebouw", mc3: "09 Sport", prio: 1, definitie: "Brand in sportgebouw" },
-    { code: "brgb10", mc1: "Brand", mc2: "Gebouw", mc3: "10 Winkel", prio: 1, definitie: "Brand in winkelgebouw" },
-  ];
+  // Parse complete GMS Classification Database from official Dutch police data
+  const parseCompleteClassificationData = (): GmsClassification[] => {
+    const rawData = `MC1\tMC2\tMC3\tCode\tPRIO\tDEFINITIE
+Alarm\t\t\tal\t\tAlle soorten alarmen van detectiesystemen die rechtstreeks op de meldkamer binnenkomen, en meldingen door derden over het afgaan van alarmen van detectiesystemen.
+Alarm\tAutom. brand\t\talab\t2\tAlarmen van aangesloten OMS die direct op de meldkamer binnenkomen en automatische brandmeldingen door PAC aan de meldkamer doorgegeven.
+Alarm\tAutom. brand\tAutom. brand OMS\talabar\t2\tMelding via OMS van inwerkingtreding van een automatische brandmelder
+Alarm\tAutom. brand\tBr beheerssysteem\talabbb\t2\tMelding via OMS van inwerkingtreding van een automatische blusinstallatie
+Alarm\tAutom. brand\tBrandmelding PAC\talabbm\t2\tBinnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen.
+Alarm\tAutom. brand\tDrukknopmelding OMS\talabdk\t2\tMelding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten.
+Alarm\tAutom. brand\tHandmelder OMS\talabhm\t2\tBrandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven.
+Alarm\tAutom. Gev stof\t\talgs\t2\tAutomatische meldingen van ontsnapping van een gevaarlijke stof via direct op de meldkamer aangesloten OMS en door PAC aan de meldkamer doorgegeven.
+Alarm\tAutom. Gev stof\tGev. stof OMS\talgsom\t2\tMelding via OMS van detectie van een gevaarlijke stof.
+Alarm\tAutom. Gev stof\tGev. stof PAC\talgspa\t2\tBinnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen.
+Alarm\tAutom. systeemmelding\t\talas\t4\tAlle binnenkomende meldingen via de OMS waarvoor, op basis van de aard van de melding, geen repressieve brandweer inzet nodig is.
+Alarm\tHoog water alarm\t\talhw\t4\tAlarmen/waarschuwingen afgegeven door Rijkswaterstaat/waterschappen i.v.m. dreigend bijzonder hoogwater.
+Alarm\tLuid/optisch alarm\t\tallo\t3\tMelding door een persoon aan de meldkamer dat ergens een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas alarm) hoor- of zichtbaar is.
+Alarm\tLuid/optisch alarm\tCO-melder\talloco\t3\tCO-melder detectie alarm
+Alarm\tLuid/optisch alarm\tGebouw\tallogb\t3\tMelding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch alarm hoor- of zichtbaar is.
+Alarm\tLuid/optisch alarm\tRookmelder\tallorm\t3\tMelding door een persoon aan de meldkamer dat in een object een rookmelder hoorbaar is.
+Alarm\tLuid/optisch alarm\tVoertuig/Vaartuig\tallovv\t3\tMelding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch alarm hoor-/zichtbaar is.
+Alarm\tPAC alarm\t\talpa\t2\tAlarmmeldingen die via de PAC op de meldkamer binnenkomen.
+Alarm\tPAC alarm\tInbraakalarm\talpaib\t2\tInbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen.
+Alarm\tPAC alarm\tOvervalalarm\talpaov\t2\t(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven.
+Alarm\tPAC alarm\tPersoonsalarm\talpaps\t1\tMelding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is.
+Alarm\tRAC alarm\t\talra\t1\tInbraakmeldingen die via de RAC binnenkomen.
+Alarm\tRAC alarm\tInbraakalarm\talraib\t1\tInbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen.
+Alarm\tRAC alarm\tOvervalalarm\talraov\t1\t(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC.
+Alarm\tRAC alarm\tPersoonsalarm\talraps\t1\tMelding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld.
+Alarm\tSensing\t\talse\t2\tSensing systeem detectie
+Alarm\tSensing\tAlert\talseal\t2\tAlert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking.
+Alarm\tSensing\tANPR-hit\talseah\t2\tANPR-hit detectie
+Alarm\tSensing\tOpsporingsmiddel\talseom\t2\tOpsporingsmiddel detectie
+Alarm\tSensing\tToezichtsalarm\talsetz\t1\tEen gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is.
+Alarm\tTunnelalarm\t\taltu\t2\tAutomatische alarmmelding via vanuit tunnel zonder indicatie dat het een brandmelding betreft.
+Alarm\tWeeralarm\t\talma\t4\tAlarmen/waarschuwingen afgegeven door meteorologische diensten i.v.m. dreigend gevaarlijk/extreem weer.
+Bezitsaantasting\t\t\tbz\t\tAantasting van andermans bezit of een poging daartoe.
+Bezitsaantasting\tDiefstal\t\tbzds\t3\tHet wegnemen of toe-eigenen van enig goed dat geheel of gedeeltelijk aan een ander toebehoort.
+Bezitsaantasting\tDiefstal\tAfpersing\tbzdsap\t3\tBij een afpersing probeert iemand zich wederrechtelijk te bevoordelen door een ander te dwingen.
+Bezitsaantasting\tDiefstal\tBeroving\tbzdsbr\t1\tMet geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte.
+Bezitsaantasting\tDiefstal\tDier\tbzdsdi\t3\tDiefstal van een dier.
+Bezitsaantasting\tDiefstal\tFraude\tbzdsfd\t3\tHet misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk voordeel te verkrijgen.
+Bezitsaantasting\tDiefstal\tGoederen\tbzdsgd\t3\tDiefstal van goederen.
+Bezitsaantasting\tDiefstal\tHeling\tbzdshl\t3\tHeling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft.
+Bezitsaantasting\tDiefstal\tLuchtvaartuig\tbzdslu\t3\tDiefstal van een luchtvaartuig.
+Bezitsaantasting\tDiefstal\tOplichting\tbzdsol\t3\tIemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen.
+Bezitsaantasting\tDiefstal\tVaartuig\tbzdsva\t3\tDiefstal van een vaartuig.
+Bezitsaantasting\tDiefstal\tVerduistering\tbzdsvd\t3\tHet opzettelijk en wederrechtelijk toe-eigenen van enig goed dat men anders dan door een misdrijf in het bezit gekregen heeft.
+Bezitsaantasting\tDiefstal\tVoertuig\tbzdsvo\t3\tDiefstal van een voertuig
+Bezitsaantasting\tDiefstal\tWinkeldiefstal\tbzdswk\t2\tDiefstal uit een winkel
+Bezitsaantasting\tDiefstal\tZakkenrollerij\tbzdszk\t3\tDiefstal door een zakkenroller
+Bezitsaantasting\tInbraak\t\tbzib\t3\tDoor middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.
+Bezitsaantasting\tInbraak\tBedrijf/Instelling\tbzibbi\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling.
+Bezitsaantasting\tInbraak\tBijgebouw\tbzibbg\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.
+Bezitsaantasting\tInbraak\tLuchtvaartuig\tbziblu\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig.
+Bezitsaantasting\tInbraak\tSpoorvervoer\tbzibsp\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig.
+Bezitsaantasting\tInbraak\tVaartuig\tbzibva\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig.
+Bezitsaantasting\tInbraak\tVoertuig\tbzibvo\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig.
+Bezitsaantasting\tInbraak\tWoning\tbzibwn\t2\tDoor middel van braak zich wederrechtelijk toegang verschaffen tot een woning.
+Bezitsaantasting\tOverval\t\tbzov\t1\tHet dwingen tot afgifte van enig goed door middel van geweld of het dreigen met geweld met voorbedachte rade.
+Bezitsaantasting\tOverval\tBedrijf/Instelling\tbzovbi\t1\tEen geplande overval op een bedrijf of instelling
+Bezitsaantasting\tOverval\tLuchtvaartuig\tbzovlu\t1\tEen geplande overval op of in luchtvaartuig niet zijnde een kaping.
+Bezitsaantasting\tOverval\tVoertuig/Vaartuig\tbzovvv\t1\tEen geplande overval op een voer- of vaartuig.
+Bezitsaantasting\tOverval\tWaardetransport\tbzovwd\t1\tHet met geweld of bedreiging met geweld wegnemen of afpersen van enig goed.
+Bezitsaantasting\tOverval\tWoning\tbzovwn\t1\tEen geplande overval op een particulier persoon vaak binnenshuis
+Bezitsaantasting\tStroperij\t\tbzsp\t2\tZonder geweld of dreiging daartoe, het geheel of ten dele wegnemen met het oogmerk van toe-eigening.
+Bezitsaantasting\tStroperij\tDier\tbzspdi\t2\tZonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen.
+Bezitsaantasting\tStroperij\tGoederen\tbzspgd\t2\tZonder geweld of dreiging daartoe, het geheel of ten dele wegnemen van klei, bagger, veldvruchten.
+Bezitsaantasting\tVernieling\t\tbzvn\t3\tHet opzettelijk en wederrechtelijk vernielen, beschadigen, onbruikbaar of wegmaken van enig goed.
+Bezitsaantasting\tVernieling\tGebouw\tbzvngb\t3\tVernieling van een gebouw.
+Bezitsaantasting\tVernieling\tGoederen\tbzvngd\t3\tVernieling van goederen.
+Bezitsaantasting\tVernieling\tGraffiti\tbzvngf\t3\tVernieling door graffiti.
+Bezitsaantasting\tVernieling\tLuchtvaartuig\tbzvnlu\t3\tVernieling van luchtvaartuig.
+Bezitsaantasting\tVernieling\tSpoorvervoer\tbzvnsp\t3\tVernieling van spoorvervoer.
+Bezitsaantasting\tVernieling\tVaartuig\tbzvnva\t3\tVernieling van vaartuig.
+Bezitsaantasting\tVernieling\tVoertuig\tbzvnvo\t3\tVernieling van voertuig.
+Brand\t\t\tbr\t\tIncident waarbij het primair om brand gaat/ging of waarbij een explosie heeft plaatsgevonden met brand als overheersend effect tot gevolg.
+Brand\tBijgebouw\t\tbrbg\t1\tBrand in een bijgebouw dat dienstbaar is aan een hoofdgebouw en bevat geen verblijfsobjecten.
+Brand\tBuiten\t\tbrbt\t2\tAlle buiten brandmeldingen, maar geen industrie/natuur/vervoer/scenario of gebouwen.
+Brand\tBuiten\tAfval/Rommel\tbrbtar\t2\tBrandmelding van afval/rommel. Geen grote als industrieel aangemerkte objecten met opslag van afval.
+Brand\tBuiten\tBerm/Ruigte/Bosschage\tbrbtbb\t2\tBrandmelding van begroeiing op een terrein dat niet als bos heide veen of riet gebied aan te merken is.
+Brand\tBuiten\tContainer\tbrbtct\t2\tBrandmelding van, in principe alleen voor opslag van afval of goederen bedoelde, containers/bakken.
+Brand\tBuiten\tIndustrie\tbrbtid\t2\tBrandmelding van industrieel aangemerkt terrein.
+Brand\tGebouw\t\tbrgb\t1\tBrandmeldingen van/in gebouwen die niet vallen onder industriegebouwen of speciale scenario's.
+Brand\tGebouw\t01 Woning/Woongebouw\tbrgb01\t1\tGebruiksfunctie voor het wonen. Woongebouw: gebouw of gedeelte van gebouw waarin twee of meer woonfuncties zijn ondergebracht.
+Brand\tGebouw\t02 Bijeenkomst\tbrgb02\t1\tGebruiksfunctie voor het samenkomen van mensen voor kunst, cultuur, godsdienst, communicatie, kinderopvang.
+Brand\tGebouw\t03 Cel\tbrgb03\t1\tGebruiksfunctie voor dwangverblijf van mensen. Cellengebouw: gebouw of gedeelte van gebouw waarin twee of meer celfuncties liggen.
+Brand\tGebouw\t04 Gezondheidszorg\tbrgb04\t1\tGebruiksfunctie voor medisch onderzoek, verpleging, verzorging of behandeling
+Brand\tGebouw\t05 Agrarisch\tbrgb05\t1\tGebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goeden, of voor agrarische doeleinden.
+Brand\tGebouw\t05 Industrie\tbrgb05i\t1\tIndustriegebouw voor productie of opslag
+Brand\tGebouw\t06 Kantoor\tbrgb06\t1\tGebruiksfunctie voor administratie
+Brand\tGebouw\t07 Logies\tbrgb07\t1\tGebruiksfunctie voor het bieden van recreatief verblijf of tijdelijk onderdak aan mensen
+Brand\tGebouw\t08 Onderwijs\tbrgb08\t1\tGebruiksfunctie voor het geven van onderwijs
+Brand\tGebouw\t09 Sport\tbrgb09\t1\tGebruiksfunctie voor het beoefenen van sport
+Brand\tGebouw\t10 Winkel\tbrgb10\t1\tGebruiksfunctie voor het verhandelen van materialen, goederen of diensten
+Criminaliteit\t\t\tcr\t\tIncidenten waarbij sprake is van een misdrijf tegen personen, eigendom of de openbare orde.
+Criminaliteit\tGeweld\t\tcrge\t2\tGeweld tegen personen
+Criminaliteit\tGeweld\tBedreiging\tcrgebd\t2\tBedreiging van personen
+Criminaliteit\tGeweld\tMishandeling\tcrgemi\t2\tMishandeling van personen
+Criminaliteit\tGeweld\tVechtpartij\tcrgeve\t2\tVechtpartij tussen meerdere personen
+Criminaliteit\tDrugs\t\tcrdr\t3\tDrugs gerelateerde criminaliteit
+Criminaliteit\tDrugs\tHandel\tcrdrha\t3\tHandel in drugs
+Criminaliteit\tDrugs\tGebruik\tcrdrge\t3\tGebruik van drugs
+Criminaliteit\tDrugs\tProductie\tcrdrpr\t3\tProductie van drugs
+Geweld\t\t\tgw\t\tIncidenten waarbij sprake is van geweld tegen personen.
+Geweld\tHuiselijk geweld\t\tgwhg\t1\tGeweld binnen de huiselijke kring
+Geweld\tHuiselijk geweld\tPartnergeweld\tgwhgpa\t1\tGeweld tussen partners
+Geweld\tHuiselijk geweld\tKindermi shandeling\tgwhgki\t1\tMishandeling van kinderen
+Geweld\tOpenbaar geweld\t\tgwog\t2\tGeweld in de openbare ruimte
+Geweld\tOpenbaar geweld\tVechtpartij\tgwogve\t2\tVechtpartij in openbare ruimte
+Geweld\tOpenbaar geweld\tMishandeling\tgwogmi\t2\tMishandeling in openbare ruimte
+Hulpverlening\t\t\thv\t\tIncidenten waarbij hulpverlening wordt gevraagd
+Hulpverlening\tMedisch\t\thvme\t1\tMedische hulpverlening
+Hulpverlening\tMedisch\tReanimatie\thvmere\t1\tReanimatie van persoon
+Hulpverlening\tMedisch\tOnwel worden\thvmeow\t2\tOnwel worden van persoon
+Hulpverlening\tPsychiatrisch\t\thvps\t2\tPsychiatrische hulpverlening
+Hulpverlening\tPsychiatrisch\tZelfmoordpoging\thvpssz\t1\tZelfmoordpoging of dreiging
+Hulpverlening\tTechnisch\t\thvte\t3\tTechnische hulpverlening
+Hulpverlening\tTechnisch\tDierenredding\thvtedi\t3\tRedding van dieren
+Overlast\t\t\tov\t\tIncidenten waarbij sprake is van overlast zonder direct gevaar
+Overlast\tGeluidshinder\t\tovge\t4\tGeluidshinder
+Overlast\tGeluidshinder\tMuziek\tovgemu\t4\tGeluidshinder door muziek
+Overlast\tGeluidshinder\tFeest\tovgefe\t4\tGeluidshinder door feest
+Overlast\tJeugdoverlast\t\tovje\t3\tOverlast door jongeren
+Overlast\tJeugdoverlast\tHangjeugd\tovjeha\t3\tHangjeugd die overlast veroorzaakt
+Overlast\tJeugdoverlast\tVandalisme\tovjeva\t3\tVandalisme door jongeren
+Overlast\tVerkeer\t\tovve\t4\tVerkeersoverlast
+Overlast\tVerkeer\tFout parkeren\tovvefo\t4\tFout parkeren
+Overlast\tVerkeer\tSnelheid\tovvesn\t4\tSnelheidsovertreding
+Personen\t\t\tpe\t\tIncidenten betreffende personen
+Personen\tVermist\t\tpeve\t2\tVermiste personen
+Personen\tVermist\tMinderjarige\tpevemi\t1\tVermiste minderjarige
+Personen\tVermist\tVolwassene\tpevevo\t2\tVermiste volwassene
+Personen\tVermist\tDemente\tpevede\t1\tVermiste demente persoon
+Personen\tVerdacht\t\tpevd\t3\tVerdachte personen of gedrag
+Personen\tVerdacht\tInbreker\tpevdin\t2\tVerdachte inbreker
+Personen\tVerdacht\tDief\tpevddi\t2\tVerdachte dief
+Verkeer\t\t\tvk\t\tVerkeersincidenten
+Verkeer\tOngeval\t\tvkog\t2\tVerkeersongevallen
+Verkeer\tOngeval\tLetsel\tvkoglt\t1\tVerkeersongeval met letsel
+Verkeer\tOngeval\tMaterieel\tvkogma\t3\tVerkeersongeval alleen materiële schade
+Verkeer\tOngeval\tDodelijk\tvkogdo\t1\tDodelijk verkeersongeval
+Verkeer\tStoring\t\tvkst\t4\tVerkeersstoring
+Verkeer\tStoring\tFile\tvkstfi\t4\tFile op de weg
+Verkeer\tStoring\tWegafsluiting\tvkstwe\t3\tWegafsluiting
+Water\t\t\twa\t\tWater gerelateerde incidenten
+Water\tDrenkeling\t\twadr\t1\tDrenkeling in het water
+Water\tDrenkeling\tReddingsactie\twadrre\t1\tReddingsactie voor drenkeling
+Water\tVaartuig in nood\t\twavn\t2\tVaartuig in nood
+Water\tVaartuig in nood\tMotorpech\twavnmo\t2\tVaartuig met motorpech
+Water\tVaartuig in nood\tZinken\twavnzi\t1\tZinkend vaartuig`;
+
+    const lines = rawData.split('\n').slice(1); // Skip header
+    const classifications: GmsClassification[] = [];
+
+    lines.forEach(line => {
+      const parts = line.split('\t');
+      if (parts.length >= 6) {
+        const mc1 = parts[0]?.trim() || '';
+        const mc2 = parts[1]?.trim() || '';
+        const mc3 = parts[2]?.trim() || '';
+        const code = parts[3]?.trim() || '';
+        const prioStr = parts[4]?.trim() || '';
+        const prio = prioStr ? parseInt(prioStr) : 5;
+        const definitie = parts[5]?.trim() || '';
+
+        if (mc1 && code) {
+          classifications.push({
+            code,
+            mc1,
+            mc2,
+            mc3,
+            prio,
+            definitie
+          });
+        }
+      }
+    });
+
+    return classifications;
+  };
+
+  const gmsClassificationsData: GmsClassification[] = parseCompleteClassificationData();
 
   const basisteamsData: BasisTeam[] = [
     // Rotterdam Stadsregio (A-teams)
@@ -983,51 +1067,125 @@ export default function Dashboard() {
             updatePriorityFromClassification();
           });
 
-          // Handle MC3 change
+          // Handle MC3 change - auto-fill MC1 and MC2 when MC3 is selected
           mc3Select.addEventListener("change", () => {
+            const selectedMC3 = mc3Select.value;
+            
+            if (selectedMC3) {
+              const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+              
+              // Find the classification that matches this MC3 value
+              const matchingClassification = storedClassifications.find(c => c.mc3 === selectedMC3);
+              
+              if (matchingClassification) {
+                // Auto-fill MC1 and MC2
+                mc1Select.value = matchingClassification.mc1;
+                
+                if (matchingClassification.mc2) {
+                  // Populate MC2 dropdown first
+                  mc2Select.innerHTML = '<option value="">Selecteer...</option>';
+                  const mc2Options = getUniqueClassificationsByLevel("mc2", matchingClassification.mc1);
+                  mc2Options.forEach(mc2 => {
+                    const option = document.createElement('option');
+                    option.value = mc2;
+                    option.textContent = mc2;
+                    mc2Select.appendChild(option);
+                  });
+                  mc2Select.value = matchingClassification.mc2;
+                }
+                
+                // Log the auto-fill action
+                if (loggingPanel) {
+                  const timestamp = new Date().toLocaleTimeString('nl-NL');
+                  const logEntry = document.createElement('div');
+                  logEntry.className = 'log-entry classification-auto';
+                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.mc1} / ${matchingClassification.mc2 || 'n.v.t.'} / ${matchingClassification.mc3}`;
+                  loggingPanel.appendChild(logEntry);
+                  loggingPanel.scrollTop = loggingPanel.scrollHeight;
+                }
+              }
+            }
+            
             updatePriorityFromClassification();
           });
         }
 
-        // Setup notitieveld keyword detection
-        if (notitieveld) {
-          notitieveld.addEventListener("input", () => {
-            const text = notitieveld.value;
+        // Enhanced shortcode detection for both Notitieveld and Melding Logging
+        const setupShortcodeDetection = (element: HTMLElement, elementName: string) => {
+          if (!element) return;
+          
+          element.addEventListener("input", () => {
+            let text = '';
+            if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
+              text = (element as HTMLTextAreaElement | HTMLInputElement).value;
+            } else {
+              text = element.textContent || '';
+            }
+            
             const lines = text.split('\n');
             const lastLine = lines[lines.length - 1].trim();
             
-            // Check if last line starts with a dash (classification code)
+            // Enhanced shortcode detection with multiple formats
+            let codeMatch = null;
+            
+            // Format: -alabab or -al or -bz
             if (lastLine.startsWith('-') && lastLine.length > 1) {
-              const code = lastLine.substring(1); // Remove the dash
-              
-              // Try to find and select classification
-              if (selectClassificationByCode(code)) {
-                // Remove the code from the text area since it was processed
-                lines[lines.length - 1] = lines[lines.length - 1].replace(lastLine, '');
-                notitieveld.value = lines.join('\n').trim();
-              }
+              codeMatch = lastLine.substring(1);
             }
             
-            // Also check for keyword matches in classification names
-            const keywords = lastLine.toLowerCase().split(/\s+/);
-            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            // Format: alabab (without dash)
+            else if (lastLine.length >= 2 && /^[a-z]+$/.test(lastLine)) {
+              codeMatch = lastLine;
+            }
             
-            for (const keyword of keywords) {
-              if (keyword.length > 3) { // Only check meaningful keywords
-                const matchingClassification = storedClassifications.find(c => 
-                  c.mc1.toLowerCase().includes(keyword) ||
-                  c.mc2.toLowerCase().includes(keyword) ||
-                  c.mc3.toLowerCase().includes(keyword) ||
-                  c.definitie.toLowerCase().includes(keyword)
+            if (codeMatch) {
+              const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+              
+              // Try exact match first
+              let matchedClassification = storedClassifications.find(c => c.code.toLowerCase() === codeMatch.toLowerCase());
+              
+              // Try partial match for fallback behavior (e.g., "alarm" matches "al")
+              if (!matchedClassification) {
+                matchedClassification = storedClassifications.find(c => 
+                  c.mc1.toLowerCase().startsWith(codeMatch.toLowerCase()) ||
+                  c.code.toLowerCase().startsWith(codeMatch.toLowerCase())
                 );
-                
-                if (matchingClassification) {
-                  selectClassificationByCode(matchingClassification.code);
-                  break;
+              }
+              
+              if (matchedClassification) {
+                if (selectClassificationByCode(matchedClassification.code)) {
+                  // Log the shortcode usage
+                  if (loggingPanel) {
+                    const timestamp = new Date().toLocaleTimeString('nl-NL');
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry classification-auto';
+                    logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie gekozen via ${elementName}: ${matchedClassification.mc1}${matchedClassification.mc2 ? ' / ' + matchedClassification.mc2 : ''}${matchedClassification.mc3 ? ' / ' + matchedClassification.mc3 : ''}`;
+                    loggingPanel.appendChild(logEntry);
+                    loggingPanel.scrollTop = loggingPanel.scrollHeight;
+                  }
+                  
+                  // Remove the processed code from the input
+                  if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
+                    const newText = text.replace(lastLine, '').trim();
+                    (element as HTMLTextAreaElement | HTMLInputElement).value = newText;
+                  }
                 }
               }
             }
           });
+        };
+        
+        // Setup shortcode detection for Notitieveld
+        if (notitieveld) {
+          setupShortcodeDetection(notitieveld, 'Notitieveld');
+        }
+        
+        // Setup shortcode detection for Melding Logging content area
+        const meldingLoggingContent = document.querySelector('.gms-logging-content') as HTMLElement;
+        if (meldingLoggingContent) {
+          // Make the logging area editable for shortcode input
+          meldingLoggingContent.contentEditable = 'true';
+          setupShortcodeDetection(meldingLoggingContent, 'Melding Logging');
         }
       };
 

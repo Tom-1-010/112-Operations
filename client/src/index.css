@@ -1626,6 +1626,24 @@ body {
   overflow-y: auto;
 }
 
+.gms-logging-content[contenteditable="true"] {
+  border-bottom: 1px dashed #0066cc;
+  padding-bottom: 2px;
+  cursor: text;
+}
+
+.gms-logging-content[contenteditable="true"]:focus {
+  outline: 1px solid #0066cc;
+  background: #f8f9ff;
+}
+
+.gms-logging-content[contenteditable="true"]:empty:before {
+  content: "Type shortcode (bijv. -alabab of -al)...";
+  color: #999;
+  font-style: italic;
+  font-size: 9px;
+}
+
 .log-entry {
   margin: 2px 0;
   padding: 1px 0;
