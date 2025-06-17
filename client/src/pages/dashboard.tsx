@@ -26,6 +26,10 @@ export default function Dashboard() {
   
   // Current active incident in GMS
   const [currentGmsIncident, setCurrentGmsIncident] = useState<any>(null);
+  
+  // Phone numbers management
+  const [phoneNumbers, setPhoneNumbers] = useState<any[]>([]);
+  const [loadingPhoneNumbers, setLoadingPhoneNumbers] = useState(false);
   interface PoliceUnit {
     id: string;
     roepnaam: string;
@@ -4239,6 +4243,250 @@ export default function Dashboard() {
     });
   };
 
+  // Phone numbers management functions
+  const loadPhoneNumbers = async () => {
+    setLoadingPhoneNumbers(true);
+    try {
+      const response = await fetch('/api/phone-numbers');
+      if (response.ok) {
+        const data = await response.json();
+        setPhoneNumbers(data);
+      }
+    } catch (error) {
+      console.error('Failed to load phone numbers:', error);
+    }
+    setLoadingPhoneNumbers(false);
+  };
+
+  const savePhoneNumber = async () => {
+    const phoneNaam = (document.getElementById('phoneNaam') as HTMLInputElement)?.value?.trim();
+    const phoneTelefoonnummer = (document.getElementById('phoneTelefoonnummer') as HTMLInputElement)?.value?.trim();
+    const phoneCategorie = (document.getElementById('phoneCategorie') as HTMLSelectElement)?.value;
+    const phoneFunctie = (document.getElementById('phoneFunctie') as HTMLInputElement)?.value?.trim();
+    const phoneDiensten = (document.getElementById('phoneDiensten') as HTMLInputElement)?.value?.trim();
+    const phoneOpmerkingen = (document.getElementById('phoneOpmerkingen') as HTMLTextAreaElement)?.value?.trim();
+
+    if (!phoneNaam || !phoneTelefoonnummer || !phoneCategorie) {
+      showNotificationMessage('Vul alle verplichte velden in');
+      return;
+    }
+
+    const phoneData = {
+      naam: phoneNaam,
+      telefoonnummer: phoneTelefoonnummer,
+      categorie: phoneCategorie,
+      functie: phoneFunctie || null,
+      diensten: phoneDiensten || null,
+      opmerkingen: phoneOpmerkingen || null
+    };
+
+    try {
+      const response = await fetch('/api/phone-numbers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(phoneData)
+      });
+
+      if (response.ok) {
+        showNotificationMessage('Telefoonnummer opgeslagen');
+        resetPhoneForm();
+        loadPhoneNumbers();
+        updateIntakeContacts();
+      } else {
+        showNotificationMessage('Fout bij opslaan telefoonnummer');
+      }
+    } catch (error) {
+      console.error('Failed to save phone number:', error);
+      showNotificationMessage('Fout bij opslaan telefoonnummer');
+    }
+  };
+
+  const resetPhoneForm = () => {
+    const inputs = ['phoneNaam', 'phoneTelefoonnummer', 'phoneFunctie', 'phoneDiensten'];
+    inputs.forEach(id => {
+      const element = document.getElementById(id) as HTMLInputElement;
+      if (element) element.value = '';
+    });
+    
+    const categorySelect = document.getElementById('phoneCategorie') as HTMLSelectElement;
+    if (categorySelect) categorySelect.value = '';
+    
+    const textarea = document.getElementById('phoneOpmerkingen') as HTMLTextAreaElement;
+    if (textarea) textarea.value = '';
+  };
+
+  const deletePhoneNumber = async (id: number) => {
+    if (!confirm('Weet je zeker dat je dit telefoonnummer wilt verwijderen?')) return;
+
+    try {
+      const response = await fetch(`/api/phone-numbers/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showNotificationMessage('Telefoonnummer verwijderd');
+        loadPhoneNumbers();
+        updateIntakeContacts();
+      }
+    } catch (error) {
+      console.error('Failed to delete phone number:', error);
+    }
+  };
+
+  const editPhoneNumber = (phone: any) => {
+    // Populate form with existing data
+    const phoneNaam = document.getElementById('phoneNaam') as HTMLInputElement;
+    const phoneTelefoonnummer = document.getElementById('phoneTelefoonnummer') as HTMLInputElement;
+    const phoneCategorie = document.getElementById('phoneCategorie') as HTMLSelectElement;
+    const phoneFunctie = document.getElementById('phoneFunctie') as HTMLInputElement;
+    const phoneDiensten = document.getElementById('phoneDiensten') as HTMLInputElement;
+    const phoneOpmerkingen = document.getElementById('phoneOpmerkingen') as HTMLTextAreaElement;
+
+    if (phoneNaam) phoneNaam.value = phone.naam;
+    if (phoneTelefoonnummer) phoneTelefoonnummer.value = phone.telefoonnummer;
+    if (phoneCategorie) phoneCategorie.value = phone.categorie;
+    if (phoneFunctie) phoneFunctie.value = phone.functie || '';
+    if (phoneDiensten) phoneDiensten.value = phone.diensten || '';
+    if (phoneOpmerkingen) phoneOpmerkingen.value = phone.opmerkingen || '';
+
+    // Update save button to handle editing
+    const saveBtn = document.getElementById('savePhoneNumberBtn') as HTMLButtonElement;
+    if (saveBtn) {
+      saveBtn.textContent = 'Bijwerken';
+      saveBtn.onclick = () => updatePhoneNumber(phone.id);
+    }
+  };
+
+  const updatePhoneNumber = async (id: number) => {
+    const phoneNaam = (document.getElementById('phoneNaam') as HTMLInputElement)?.value?.trim();
+    const phoneTelefoonnummer = (document.getElementById('phoneTelefoonnummer') as HTMLInputElement)?.value?.trim();
+    const phoneCategorie = (document.getElementById('phoneCategorie') as HTMLSelectElement)?.value;
+    const phoneFunctie = (document.getElementById('phoneFunctie') as HTMLInputElement)?.value?.trim();
+    const phoneDiensten = (document.getElementById('phoneDiensten') as HTMLInputElement)?.value?.trim();
+    const phoneOpmerkingen = (document.getElementById('phoneOpmerkingen') as HTMLTextAreaElement)?.value?.trim();
+
+    if (!phoneNaam || !phoneTelefoonnummer || !phoneCategorie) {
+      showNotificationMessage('Vul alle verplichte velden in');
+      return;
+    }
+
+    const phoneData = {
+      naam: phoneNaam,
+      telefoonnummer: phoneTelefoonnummer,
+      categorie: phoneCategorie,
+      functie: phoneFunctie || null,
+      diensten: phoneDiensten || null,
+      opmerkingen: phoneOpmerkingen || null
+    };
+
+    try {
+      const response = await fetch(`/api/phone-numbers/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(phoneData)
+      });
+
+      if (response.ok) {
+        showNotificationMessage('Telefoonnummer bijgewerkt');
+        resetPhoneForm();
+        loadPhoneNumbers();
+        updateIntakeContacts();
+        
+        // Reset save button
+        const saveBtn = document.getElementById('savePhoneNumberBtn') as HTMLButtonElement;
+        if (saveBtn) {
+          saveBtn.textContent = 'Opslaan';
+          saveBtn.onclick = savePhoneNumber;
+        }
+      } else {
+        showNotificationMessage('Fout bij bijwerken telefoonnummer');
+      }
+    } catch (error) {
+      console.error('Failed to update phone number:', error);
+      showNotificationMessage('Fout bij bijwerken telefoonnummer');
+    }
+  };
+
+  const updateIntakeContacts = () => {
+    // Update contacts in Intake section when phone numbers change
+    const collegas = phoneNumbers.filter(p => p.categorie === 'Collega');
+    const externe = phoneNumbers.filter(p => p.categorie === 'Externe partner');
+    
+    // Update Intake page contacts
+    setTimeout(() => {
+      updateIntakeContactsList(collegas, externe);
+    }, 100);
+  };
+
+  const updateIntakeContactsList = (collegas: any[], externe: any[]) => {
+    const collegasContainer = document.getElementById('collegasContactList');
+    const externeContainer = document.getElementById('externeContactList');
+
+    if (collegasContainer) {
+      collegasContainer.innerHTML = collegas.map(contact => `
+        <div class="telefoon-contact-item">
+          <div class="contact-info">
+            <div class="contact-name">${contact.naam}</div>
+            <div class="contact-role">${contact.functie || 'Politie'}</div>
+            <div class="contact-availability">${contact.diensten || 'Beschikbaar'}</div>
+          </div>
+          <div class="contact-phone clickable-phone" onclick="simulatePhoneCall('${contact.telefoonnummer}', '${contact.naam}')">${contact.telefoonnummer}</div>
+        </div>
+      `).join('');
+    }
+
+    if (externeContainer) {
+      externeContainer.innerHTML = externe.map(contact => `
+        <div class="telefoon-contact-item">
+          <div class="contact-info">
+            <div class="contact-name">${contact.naam}</div>
+            <div class="contact-role">${contact.functie || 'Partner'}</div>
+            <div class="contact-availability">${contact.diensten || 'Beschikbaar'}</div>
+          </div>
+          <div class="contact-phone clickable-phone" onclick="simulatePhoneCall('${contact.telefoonnummer}', '${contact.naam}')">${contact.telefoonnummer}</div>
+        </div>
+      `).join('');
+    }
+  };
+
+  // Load phone numbers when telefoonnummers section is accessed
+  useEffect(() => {
+    if (activeSection === 'telefoonnummers') {
+      loadPhoneNumbers();
+    }
+  }, [activeSection]);
+
+  // Update Intake contacts when phone numbers change
+  useEffect(() => {
+    if (activeSection === 'intake' && phoneNumbers.length > 0) {
+      updateIntakeContacts();
+    }
+  }, [phoneNumbers, activeSection]);
+
+  // Add event handlers for phone number form
+  useEffect(() => {
+    const saveBtn = document.getElementById('savePhoneNumberBtn');
+    const resetBtn = document.getElementById('resetPhoneFormBtn');
+
+    if (saveBtn && !saveBtn.onclick) {
+      saveBtn.onclick = savePhoneNumber;
+    }
+    if (resetBtn && !resetBtn.onclick) {
+      resetBtn.onclick = () => {
+        resetPhoneForm();
+        // Reset save button to default state
+        const saveButton = document.getElementById('savePhoneNumberBtn') as HTMLButtonElement;
+        if (saveButton) {
+          saveButton.textContent = 'Opslaan';
+          saveButton.onclick = savePhoneNumber;
+        }
+      };
+    }
+
+    // Global phone call simulation function
+    (window as any).simulatePhoneCall = (phoneNumber: string, name: string) => {
+      showNotificationMessage(`Bellen naar ${name} (${phoneNumber})...`);
+      // Future: AI conversation simulation will be implemented here
+    };
+  }, [activeSection]);
+
   const renderPlaceholderSection = (title: string, icon: string) => (
     <div className="section">
       <div className="section-header">
@@ -5292,7 +5540,51 @@ export default function Dashboard() {
                         </tr>
                       </thead>
                       <tbody id="telefoonnummersTableBody">
-                        {/* Phone numbers will be loaded here dynamically */}
+                        {loadingPhoneNumbers ? (
+                          <tr>
+                            <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>
+                              Laden...
+                            </td>
+                          </tr>
+                        ) : phoneNumbers.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                              Nog geen telefoonnummers opgeslagen
+                            </td>
+                          </tr>
+                        ) : (
+                          phoneNumbers.map((phone) => (
+                            <tr key={phone.id}>
+                              <td>{phone.naam}</td>
+                              <td>
+                                <span className="clickable-phone" onClick={() => window.simulatePhoneCall?.(phone.telefoonnummer, phone.naam)}>
+                                  {phone.telefoonnummer}
+                                </span>
+                              </td>
+                              <td>
+                                <span className={`phone-category-badge ${phone.categorie === 'Collega' ? 'collega' : 'externe-partner'}`}>
+                                  {phone.categorie}
+                                </span>
+                              </td>
+                              <td>{phone.functie || '-'}</td>
+                              <td>{phone.diensten || '-'}</td>
+                              <td>
+                                <button 
+                                  className="phone-action-btn"
+                                  onClick={() => editPhoneNumber(phone)}
+                                >
+                                  Bewerken
+                                </button>
+                                <button 
+                                  className="phone-action-btn delete"
+                                  onClick={() => deletePhoneNumber(phone.id)}
+                                >
+                                  Verwijderen
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
