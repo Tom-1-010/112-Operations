@@ -1157,7 +1157,7 @@ export default function Dashboard() {
         const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
         const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
         const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-        const notitieveld = document.getElementById("gmsNotitie") as HTMLTextAreaElement;
+        const notitieveld = document.getElementById("gmsKladblok") as HTMLElement;
         const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
 
         // Function to update priority based on selected classification
@@ -1350,7 +1350,12 @@ export default function Dashboard() {
 
         // Enhanced shortcode detection for both Notitieveld and Melding Logging
         const setupShortcodeDetection = (element: HTMLElement, elementName: string) => {
-          if (!element) return;
+          if (!element) {
+            console.log(`Element not found for ${elementName}`);
+            return;
+          }
+          
+          console.log(`Setting up shortcode detection for ${elementName}`, element);
           
           element.addEventListener("input", () => {
             let text = '';
@@ -1360,8 +1365,12 @@ export default function Dashboard() {
               text = element.textContent || '';
             }
             
+            console.log(`Input detected in ${elementName}: "${text}"`);
+            
             const lines = text.split('\n');
             const lastLine = lines[lines.length - 1].trim();
+            
+            console.log(`Last line: "${lastLine}"`);
             
             // Enhanced shortcode detection with multiple formats
             let searchQuery = null;
@@ -1371,17 +1380,21 @@ export default function Dashboard() {
             if (lastLine.startsWith('-') && lastLine.length > 1) {
               searchQuery = lastLine.substring(1).trim();
               isHyphenFormat = true;
+              console.log(`Hyphen format detected: "${searchQuery}"`);
             }
             
             // Format: alabab (without dash, legacy support)
             else if (lastLine.length >= 2 && /^[a-z]+$/.test(lastLine)) {
               searchQuery = lastLine;
               isHyphenFormat = false;
+              console.log(`Legacy format detected: "${searchQuery}"`);
             }
             
             if (searchQuery && isHyphenFormat) {
               const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
               let matchedClassification = null;
+              
+              console.log(`Searching for: "${searchQuery}" in ${storedClassifications.length} classifications`);
               
               // 1. Try exact code match first (e.g., -alabab)
               matchedClassification = storedClassifications.find(c => 
@@ -1461,6 +1474,10 @@ export default function Dashboard() {
                   if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
                     const newText = text.replace(lastLine, '').trim();
                     (element as HTMLTextAreaElement | HTMLInputElement).value = newText;
+                  } else {
+                    // For contentEditable elements
+                    const newText = text.replace(lastLine, '').trim();
+                    element.textContent = newText;
                   }
                 }
               }
