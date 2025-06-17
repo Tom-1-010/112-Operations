@@ -1057,28 +1057,64 @@ export default function Dashboard() {
                 const searchQuery = trimmedLine.substring(1).trim();
                 console.log('🎯 Searching for hyphen-based code:', searchQuery);
                 
-                // Try exact code match first
+                // 1. Try exact code match first
                 matchedClassification = storedClassifications.find(c => 
                   c.code.toLowerCase() === searchQuery.toLowerCase()
                 );
-                console.log('🔍 Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                console.log('🔍 1. Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 
-                // Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
+                // 2. Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
                   );
-                  console.log('🔍 Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log('🔍 2. Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
-                // Try text matches for MC1, MC2, MC3
+                // 3. Try text matches for full classification strings (e.g., "ongeval wegvervoer letsel")
+                if (!matchedClassification) {
+                  const searchWords = searchQuery.toLowerCase().split(' ').filter(word => word.length > 2);
+                  console.log('🔍 3. Searching for words:', searchWords);
+                  
+                  matchedClassification = storedClassifications.find(c => {
+                    const fullClassification = `${c.MC1} ${c.MC2} ${c.MC3}`.toLowerCase();
+                    const uitleg = c.uitleg.toLowerCase();
+                    
+                    // Check if all search words are present in the classification or explanation
+                    return searchWords.every(word => 
+                      fullClassification.includes(word) || 
+                      uitleg.includes(word) ||
+                      c.MC1.toLowerCase().includes(word) ||
+                      c.MC2.toLowerCase().includes(word) ||
+                      c.MC3.toLowerCase().includes(word)
+                    );
+                  });
+                  console.log('🔍 3. Multi-word match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                }
+                
+                // 4. Try individual text matches for MC1, MC2, MC3
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
                   );
-                  console.log('🔍 Text match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log('🔍 4. Individual text match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                }
+                
+                // 5. Try fuzzy matching for partial matches
+                if (!matchedClassification && searchQuery.length > 3) {
+                  matchedClassification = storedClassifications.find(c => {
+                    const searchLower = searchQuery.toLowerCase();
+                    return c.MC1.toLowerCase().includes(searchLower) ||
+                           c.MC2.toLowerCase().includes(searchLower) ||
+                           c.MC3.toLowerCase().includes(searchLower) ||
+                           c.uitleg.toLowerCase().includes(searchLower) ||
+                           searchLower.includes(c.MC1.toLowerCase()) ||
+                           searchLower.includes(c.MC2.toLowerCase()) ||
+                           searchLower.includes(c.MC3.toLowerCase());
+                  });
+                  console.log('🔍 5. Fuzzy match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
                 if (matchedClassification) {
@@ -1203,6 +1239,12 @@ export default function Dashboard() {
               }
             } else {
               console.log('❌ No classification matched for input');
+              console.log('💡 Available classification samples:', storedClassifications.slice(0, 5).map(c => ({
+                code: c.code,
+                MC1: c.MC1,
+                MC2: c.MC2,
+                MC3: c.MC3
+              })));
             }
           }
         }
@@ -1341,13 +1383,27 @@ export default function Dashboard() {
         showNotificationMessage("GMS melding opgeslagen");
       };
 
-      // Add event listeners
+      // Add event listeners for both button click and Enter key
       const verzendButton = document.getElementById("gmsVerzendButton");
+      const kladblokElement = document.getElementById("gmsKladblok");
+      
       if (verzendButton) {
         console.log('📌 Verzend button found, attaching event listener');
         verzendButton.addEventListener("click", handleGMSSubmit);
       } else {
         console.error('❌ Verzend button not found!');
+      }
+      
+      // Add Enter key support for kladblok
+      if (kladblokElement) {
+        console.log('📌 Kladblok found, attaching Enter key listener');
+        kladblokElement.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            console.log('⌨️ Enter key pressed in kladblok, triggering classification detection');
+            handleGMSSubmit();
+          }
+        });
       }
       
       // Also try backup button ID in case of mismatch
