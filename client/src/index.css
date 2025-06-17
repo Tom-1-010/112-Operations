@@ -1597,6 +1597,28 @@ body {
   content: none;
 }
 
+/* Notitieveld horizontal split layout */
+.gms-notitie-container {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.gms-notitie-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gms-notitie-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 80px;
+}
+
 .gms-text-controls {
   display: flex;
   gap: 4px;
@@ -1625,8 +1647,18 @@ body {
   cursor: pointer;
   color: white;
   font-weight: bold;
-  margin-left: auto;
-  margin-right: 4px;
+  width: 100%;
+}
+
+.gms-action-btn {
+  background: #28a745;
+  border: 1px outset #c0c0c0;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  width: 100%;
 }
 
 .gms-alert-btn:hover {

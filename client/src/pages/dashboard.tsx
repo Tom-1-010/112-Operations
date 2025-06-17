@@ -4568,47 +4568,53 @@ export default function Dashboard() {
                       {/* Main Text Field */}
                       <div className="gms-block gms-text-block gms-text-block-compact">
                         <div className="gms-block-title">Notitieveld</div>
-                        <div
-                          id="gmsKladblok"
-                          contentEditable="true"
-                          className="gms-text-area gms-text-area-compact"
-                          data-placeholder="Voer hier de melding in..."
-                        ></div>
-                        <div className="gms-text-controls">
-                          <button
-                            type="button"
-                            className="gms-text-btn"
-                            onClick={() => document.execCommand("bold")}
-                          >
-                            B
-                          </button>
-                          <button
-                            type="button"
-                            className="gms-text-btn"
-                            onClick={() => document.execCommand("underline")}
-                          >
-                            U
-                          </button>
-                          <button
-                            type="button"
-                            className="gms-text-btn"
-                            onClick={() => document.execCommand("italic")}
-                          >
-                            I
-                          </button>
-                          <button
-                            id="gmsAlertButton"
-                            className="gms-alert-btn"
-                            title="Markeer als spoedmelding"
-                          >
-                            ❗
-                          </button>
-                          <button
-                            id="gmsVerzendButton"
-                            className="gms-action-btn"
-                          >
-                            Verzend
-                          </button>
+                        <div className="gms-notitie-container">
+                          <div className="gms-notitie-left">
+                            <div
+                              id="gmsKladblok"
+                              contentEditable="true"
+                              className="gms-text-area gms-text-area-compact"
+                              data-placeholder="Voer hier de melding in..."
+                            ></div>
+                            <div className="gms-text-controls">
+                              <button
+                                type="button"
+                                className="gms-text-btn"
+                                onClick={() => document.execCommand("bold")}
+                              >
+                                B
+                              </button>
+                              <button
+                                type="button"
+                                className="gms-text-btn"
+                                onClick={() => document.execCommand("underline")}
+                              >
+                                U
+                              </button>
+                              <button
+                                type="button"
+                                className="gms-text-btn"
+                                onClick={() => document.execCommand("italic")}
+                              >
+                                I
+                              </button>
+                            </div>
+                          </div>
+                          <div className="gms-notitie-right">
+                            <button
+                              id="gmsAlertButton"
+                              className="gms-alert-btn"
+                              title="Markeer als spoedmelding"
+                            >
+                              ❗
+                            </button>
+                            <button
+                              id="gmsVerzendButton"
+                              className="gms-action-btn"
+                            >
+                              Verzend
+                            </button>
+                          </div>
                         </div>
                       </div>
 
