@@ -133,6 +133,31 @@ export default function Dashboard() {
             "Komt voor elkaar. Ik delegeer naar surveillant De Jong, hij kent het protocol.",
             "Geen probleem, ik regel versterking en kom persoonlijk kijken."
           ],
+          fire: [
+            "Brand - ik stuur direct een team ter ondersteuning van de brandweer.",
+            "Mijn eenheden gaan assisteren bij evacuatie en perimeter bewaking.",
+            "Team wordt ingezet voor crowd control en brandweer ondersteuning."
+          ],
+          medical: [
+            "Medisch incident - ik stuur surveillanten voor begeleiding ambulance.",
+            "Team regelt vrije doorgang voor ambulancedienst.",
+            "Mijn mensen assisteren bij medische noodhulp."
+          ],
+          police: [
+            "Politie-operatie - mijn team staat gereed voor ondersteuning.",
+            "Ik coördineer met andere teams voor gezamenlijke actie.",
+            "Team wordt ingezet volgens tactisch plan."
+          ],
+          traffic: [
+            "Verkeersincident - ik stuur team voor afsluiting en regeling.",
+            "Mijn eenheden regelen verkeersomleidingen ter plaatse.",
+            "Team gaat assisteren bij verkeersafhandeling."
+          ],
+          public: [
+            "Openbare orde - ik stuur extra patrouilles naar het gebied.",
+            "Team wordt ingezet voor handhaving en deëscalatie.",
+            "Mijn eenheden gaan assisteren bij ordehandhaving."
+          ],
           default: [
             "Teamleider hier - mijn jongens staan paraat voor elke klus.",
             "Operationeel team beschikbaar. Wat moet er gebeuren?",
@@ -163,6 +188,31 @@ export default function Dashboard() {
             "Verzoek genoteerd en doorgegeven. Ik monitor de voortgang en rapporteer terug.",
             "Coördinatie gestart. Ik breng alle partijen bij elkaar en regel de uitvoering.",
             "Opdracht in het systeem gezet. Ik zorg voor follow-up en statusupdates."
+          ],
+          fire: [
+            "Brand coördinatie - ik verbind brandweer met politie en ambulance.",
+            "Ik regel logistieke ondersteuning voor brandbestrijding.",
+            "Coördineer evacuatieprocedures met alle betrokken diensten."
+          ],
+          medical: [
+            "Medische coördinatie - ik schakel alle benodigde diensten in.",
+            "Ik regel vrije toegang voor hulpdiensten naar locatie.",
+            "Coördineer ziekenhuisopname en nazorg procedures."
+          ],
+          police: [
+            "Politie coördinatie - ik verbind alle operationele teams.",
+            "Ik regel communicatie tussen verschillende politie-eenheden.",
+            "Coördineer tactische ondersteuning en backup."
+          ],
+          traffic: [
+            "Verkeer coördinatie - ik schakel verkeerscentrale en wegbeheer in.",
+            "Ik regel omleidingen en verkeersinformatie naar publiek.",
+            "Coördineer berging en wegopruiming."
+          ],
+          public: [
+            "Openbare orde coördinatie - ik schakel ME en extra eenheden in.",
+            "Ik regel communicatie met burgemeester en bestuur.",
+            "Coördineer media-aanpak en informatievoorziening."
           ],
           default: [
             "Coördinatiecentrum hier. Ik zorg voor de verbindingen tussen alle diensten.",
@@ -262,6 +312,62 @@ export default function Dashboard() {
             "Rotterdam commandocentrum hier - alle middelen zijn beschikbaar."
           ]
         }
+      },
+      "OVD OC": {
+        tone: "kalm, autoritair, direct, professioneel",
+        expertise: ["grote incidenten coördinatie", "eenheden informeren", "opschaling", "hulpdiensten afstemming", "politiecapaciteit inzet"],
+        responses: {
+          urgent: [
+            "OVD OC hier - spoedmelding ontvangen. Ik stuur direct de benodigde eenheden ter plaatse.",
+            "Begrijpen, ik schakel onmiddellijk over naar code geel en mobiliseer extra mankracht.",
+            "OVD OC neemt de leiding - ik coördineer alle beschikbare middelen voor deze situatie."
+          ],
+          location: [
+            "Locatie bekend - ik stuur het dichtstbijzijnde basisteam en regel toegang.",
+            "Ik ken dat gebied, stuur direct verkeerspolitie voor afsluiting en begeleiding.",
+            "Locatie genoteerd - ik coördineer met de wijkagent voor lokale kennis."
+          ],
+          status: [
+            "Status update: 6 eenheden actief, 3 basisteams beschikbaar, recherche stand-by.",
+            "Operationele situatie stabiel - alle teams zijn bereikbaar en inzetbaar.",
+            "Huidige capaciteit: voldoende mankracht, verkeerspolitie en ME beschikbaar."
+          ],
+          request: [
+            "Begrepen, ik regel dat direct via mijn bevoegdheden als OVD.",
+            "Komt voor elkaar - ik neem contact op met de juiste diensten en houd je op de hoogte.",
+            "Dat valt onder mijn verantwoordelijkheid, wordt onmiddellijk uitgevoerd."
+          ],
+          fire: [
+            "Begrijpelijk. Ik stem direct af met de brandweercentrale en regel de inzet.",
+            "Woningbrand - ik informeer de brandweer en stuur politie ter ondersteuning voor afzetting.",
+            "Brand gemeld - ik coördineer met brandweer, regel verkeersafsluiting en evacuatie."
+          ],
+          medical: [
+            "Medische nood - ik activeer ambulancedienst en stuur politie voor begeleiding.",
+            "Ik schakel direct de ambulancedienst in en regel vrije doorgang.",
+            "Ambulance wordt gealarmeerd - ik coördineer met ziekenhuis voor opname."
+          ],
+          police: [
+            "Dank je, ik licht de recherche direct in en stuur ter plaatse. Hou me op de hoogte van nieuwe info.",
+            "Ik stuur direct een basisteam en verkeerspolitie ter ondersteuning. Ik blijf stand-by voor verdere instructies.",
+            "Politie-inzet gecoördineerd - surveillanceteam en wijkagent zijn onderweg."
+          ],
+          traffic: [
+            "Verkeersongeval - ik stuur verkeerspolitie en regel berging via weginspectie.",
+            "Ik coördineer met verkeerscentrale voor omleidingen en stuur toezicht ter plaatse.",
+            "Verkeerssituatie - ik activeer wegbeheer en regel politiebegeleiding."
+          ],
+          public: [
+            "Openbare orde verstoring - ik stuur ME en basisteams voor handhaving.",
+            "Overlast gemeld - ik coördineer met wijkteam en stuur extra patrouilles.",
+            "Ik regel directe politie-inzet en neem contact op met burgemeester voor eventuele maatregelen."
+          ],
+          default: [
+            "OVD OC hier, wat vereist mijn aandacht?",
+            "Officier van Dienst beschikbaar - geef me de situatieschets.",
+            "OVD OC operationeel, hoe kan ik de operatie ondersteunen?"
+          ]
+        }
       }
     };
 
@@ -313,17 +419,17 @@ export default function Dashboard() {
     // Select appropriate response category based on context and incident type
     let selectedResponses;
     
-    // Priority 1: Check for specific incident types
-    if (incidentTypes.fire && profile.responses.fire) {
-      selectedResponses = profile.responses.fire;
-    } else if (incidentTypes.medical && profile.responses.medical) {
-      selectedResponses = profile.responses.medical;
-    } else if (incidentTypes.police && profile.responses.police) {
-      selectedResponses = profile.responses.police;
-    } else if (incidentTypes.traffic && profile.responses.traffic) {
-      selectedResponses = profile.responses.traffic;
-    } else if (incidentTypes.public && profile.responses.public) {
-      selectedResponses = profile.responses.public;
+    // Priority 1: Check for specific incident types (using optional chaining)
+    if (incidentTypes.fire && (profile.responses as any).fire) {
+      selectedResponses = (profile.responses as any).fire;
+    } else if (incidentTypes.medical && (profile.responses as any).medical) {
+      selectedResponses = (profile.responses as any).medical;
+    } else if (incidentTypes.police && (profile.responses as any).police) {
+      selectedResponses = (profile.responses as any).police;
+    } else if (incidentTypes.traffic && (profile.responses as any).traffic) {
+      selectedResponses = (profile.responses as any).traffic;
+    } else if (incidentTypes.public && (profile.responses as any).public) {
+      selectedResponses = (profile.responses as any).public;
     }
     // Priority 2: Check for context categories
     else if (isUrgent) {
