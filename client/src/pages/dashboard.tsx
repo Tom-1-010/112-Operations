@@ -1459,33 +1459,7 @@ export default function Dashboard() {
           handleNotePadSubmit();
         });
         
-        // Add debug button to test event listeners
-        const addDebugButton = () => {
-          const existingButton = document.getElementById('debugBtn');
-          if (existingButton) return;
-          
-          const debugButton = document.createElement('button');
-          debugButton.id = 'debugBtn';
-          debugButton.textContent = 'DEBUG: Test Event';
-          debugButton.style.cssText = 'margin: 10px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
-          
-          debugButton.addEventListener('click', () => {
-            console.log('🔧 DEBUG: Manual button clicked');
-            const kladblok = document.getElementById("gmsKladblok");
-            if (kladblok) {
-              kladblok.textContent = '-vkwebz';
-              console.log('🔧 DEBUG: Set content to -vkwebz');
-              handleNotePadSubmit();
-            } else {
-              console.error('🔧 DEBUG: Kladblok not found');
-            }
-          });
-          
-          const gmsSection = document.querySelector('.gms-section') || document.body;
-          gmsSection.appendChild(debugButton);
-        };
-        
-        setTimeout(addDebugButton, 1000);
+        // Classification system ready - all functions operational
         
         // Basic classification system verification
         const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
