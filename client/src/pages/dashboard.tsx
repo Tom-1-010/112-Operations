@@ -1018,26 +1018,33 @@ export default function Dashboard() {
 
           if (mc1Select && mc2Select && mc3Select) {
             const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
+            console.log('📝 Input text:', notitieText);
+            
             const lines = notitieText.split('\n');
             let matchedClassification = null;
 
             for (const line of lines) {
               const trimmedLine = line.trim();
+              console.log('🔍 Processing line:', trimmedLine);
               
               // Check for hyphen-based codes (-brgb, -wvoi, etc.)
               if (trimmedLine.startsWith('-') && trimmedLine.length > 1) {
                 const searchQuery = trimmedLine.substring(1).trim();
+                console.log('🎯 Searching for hyphen-based code:', searchQuery);
                 
                 // Try exact code match first
                 matchedClassification = storedClassifications.find(c => 
                   c.code.toLowerCase() === searchQuery.toLowerCase()
                 );
+                console.log('🔍 Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 
                 // Try partial code match (e.g., -brgb matches brgb01, brgb02, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find(c => 
                     c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
                   );
+                  console.log('🔍 Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
                 // Try text matches for MC1, MC2, MC3
@@ -1047,14 +1054,19 @@ export default function Dashboard() {
                     c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
                   );
+                  console.log('🔍 Text match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
                 }
                 
-                if (matchedClassification) break;
+                if (matchedClassification) {
+                  console.log('✅ Match found for hyphen code:', matchedClassification);
+                  break;
+                }
               }
               
               // Check for text-based classifications without hyphen
               else if (trimmedLine.length > 2) {
                 const searchQuery = trimmedLine.toLowerCase();
+                console.log('🎯 Searching for text-based classification:', searchQuery);
                 
                 matchedClassification = storedClassifications.find(c => 
                   c.MC3.toLowerCase().includes(searchQuery) ||
@@ -1065,17 +1077,32 @@ export default function Dashboard() {
                   searchQuery.includes(c.MC1.toLowerCase())
                 );
                 
-                if (matchedClassification) break;
+                if (matchedClassification) {
+                  console.log('✅ Match found for text:', matchedClassification);
+                  break;
+                }
               }
             }
 
             // Apply the matched classification
             if (matchedClassification) {
-              console.log('Matched classification:', matchedClassification);
+              console.log('🎯 MATCHED CLASSIFICATION:', matchedClassification);
+              console.log('🔧 Starting dropdown population...');
               
-              // Populate MC1 dropdown
+              // Debug current dropdown state
+              console.log('📋 Current dropdown elements:', {
+                mc1Select: mc1Select?.id,
+                mc2Select: mc2Select?.id, 
+                mc3Select: mc3Select?.id,
+                prioriteitSelect: prioriteitSelect?.id
+              });
+              
+              // Step 1: Populate MC1 dropdown and set value
+              console.log('📋 Populating MC1...');
               mc1Select.innerHTML = '<option value="">Selecteer...</option>';
               const mc1Options = getUniqueClassificationsByLevel("MC1");
+              console.log('📋 MC1 options available:', mc1Options.length, mc1Options);
+              
               mc1Options.forEach(mc1 => {
                 const option = document.createElement('option');
                 option.value = mc1;
@@ -1083,11 +1110,15 @@ export default function Dashboard() {
                 mc1Select.appendChild(option);
               });
               mc1Select.value = matchedClassification.MC1;
+              console.log('✅ MC1 set to:', mc1Select.value);
               
-              // Populate MC2 dropdown if MC2 exists
-              if (matchedClassification.MC2) {
+              // Step 2: Populate MC2 dropdown if MC2 exists
+              if (matchedClassification.MC2 && matchedClassification.MC2.trim() !== '') {
+                console.log('📋 Populating MC2...');
                 mc2Select.innerHTML = '<option value="">Selecteer...</option>';
                 const mc2Options = getUniqueClassificationsByLevel("MC2", matchedClassification.MC1);
+                console.log('📋 MC2 options for', matchedClassification.MC1, ':', mc2Options.length, mc2Options);
+                
                 mc2Options.forEach(mc2 => {
                   const option = document.createElement('option');
                   option.value = mc2;
@@ -1095,11 +1126,15 @@ export default function Dashboard() {
                   mc2Select.appendChild(option);
                 });
                 mc2Select.value = matchedClassification.MC2;
+                console.log('✅ MC2 set to:', mc2Select.value);
                 
-                // Populate MC3 dropdown if MC3 exists
-                if (matchedClassification.MC3) {
+                // Step 3: Populate MC3 dropdown if MC3 exists
+                if (matchedClassification.MC3 && matchedClassification.MC3.trim() !== '') {
+                  console.log('📋 Populating MC3...');
                   mc3Select.innerHTML = '<option value="">Selecteer...</option>';
                   const mc3Options = getUniqueClassificationsByLevel("MC3", matchedClassification.MC2);
+                  console.log('📋 MC3 options for', matchedClassification.MC2, ':', mc3Options.length, mc3Options);
+                  
                   mc3Options.forEach(mc3 => {
                     const option = document.createElement('option');
                     option.value = mc3;
@@ -1107,20 +1142,31 @@ export default function Dashboard() {
                     mc3Select.appendChild(option);
                   });
                   mc3Select.value = matchedClassification.MC3;
+                  console.log('✅ MC3 set to:', mc3Select.value);
+                } else {
+                  console.log('⚠️ No MC3 in matched classification');
+                  mc3Select.innerHTML = '<option value="">Selecteer...</option>';
                 }
+              } else {
+                console.log('⚠️ No MC2 in matched classification');
+                mc2Select.innerHTML = '<option value="">Selecteer...</option>';
+                mc3Select.innerHTML = '<option value="">Selecteer...</option>';
               }
               
-              // Set priority
-              if (prioriteitSelect) {
+              // Step 4: Set priority
+              if (prioriteitSelect && matchedClassification.prio) {
                 prioriteitSelect.value = matchedClassification.prio.toString();
+                console.log('✅ Priority set to:', prioriteitSelect.value);
               }
               
-              console.log('Final dropdown values:', {
+              // Final verification
+              const finalValues = {
                 MC1: mc1Select.value,
                 MC2: mc2Select.value,
                 MC3: mc3Select.value,
-                Priority: prioriteitSelect.value
-              });
+                Priority: prioriteitSelect?.value || 'not set'
+              };
+              console.log('🎯 FINAL DROPDOWN VALUES:', finalValues);
               
               // Log the automatic classification
               if (loggingPanel) {
@@ -1131,6 +1177,8 @@ export default function Dashboard() {
                 loggingPanel.appendChild(logEntry);
                 loggingPanel.scrollTop = loggingPanel.scrollHeight;
               }
+            } else {
+              console.log('❌ No classification matched for input');
             }
           }
         }
