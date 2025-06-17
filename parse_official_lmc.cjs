@@ -1,4 +1,4 @@
-// Parse the official LMC classification file
+// Parse the official LMC classification file - only official data
 const fs = require('fs');
 
 // Read the complete official file
@@ -29,6 +29,7 @@ blocks.forEach(block => {
     }
   });
 
+  // Only include entries with both MC1 and Code (essential fields)
   if (mc1 && code) {
     classifications.push({
       code,
@@ -41,13 +42,18 @@ blocks.forEach(block => {
   }
 });
 
-console.log(`Total official classifications parsed: ${classifications.length}`);
+console.log(`Parsed ${classifications.length} official LMC classifications`);
 
-// Generate TypeScript array
-console.log('const officialClassifications: GmsClassification[] = [');
-classifications.forEach((c, index) => {
+// Write complete TypeScript implementation
+const output = `// Official LMC classifications - complete dataset from authentic Dutch police file
+const getOfficialLMCClassifications = (): GmsClassification[] => {
+  return [
+${classifications.map((c, index) => {
   const comma = index < classifications.length - 1 ? ',' : '';
-  const escapedDefinitie = c.definitie.replace(/"/g, '\\"').replace(/\n/g, ' ');
-  console.log(`  { code: "${c.code}", mc1: "${c.mc1}", mc2: "${c.mc2}", mc3: "${c.mc3}", prio: ${c.prio}, definitie: "${escapedDefinitie}" }${comma}`);
-});
-console.log('];');
+  const escapedDefinitie = c.definitie.replace(/"/g, '\\"').replace(/\n/g, ' ').replace(/\r/g, '');
+  return `    { code: "${c.code}", mc1: "${c.mc1}", mc2: "${c.mc2}", mc3: "${c.mc3}", prio: ${c.prio}, definitie: "${escapedDefinitie}" }${comma}`;
+}).join('\n')}
+  ];
+};`;
+
+console.log(output);

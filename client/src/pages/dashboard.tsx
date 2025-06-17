@@ -240,7 +240,7 @@ export default function Dashboard() {
     definitie: string;
   }
 
-  // Official LMC classification database - All 341 authentic Dutch police classifications from official file
+  // Official LMC classifications - complete dataset from authentic Dutch police file
   const getOfficialLMCClassifications = (): GmsClassification[] => {
     return [
       { code: "al", mc1: "Alarm", mc2: "", mc3: "", prio: 5, definitie: "Alle soorten alarmen van detectiesystemen die rechtstreeks op de meldkamer binnenkomen, en meldingen door derden over het afgaan van alarmen van detectiesystemen." },
