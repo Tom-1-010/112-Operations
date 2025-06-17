@@ -1060,7 +1060,8 @@ export default function Dashboard() {
 
           if (mc1Select && mc2Select && mc3Select) {
             console.log('✅ All dropdown elements found, proceeding with classification detection');
-            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+            const classificationsData = localStorage.getItem("gmsClassifications");
+            const storedClassifications = (classificationsData && classificationsData !== "undefined") ? JSON.parse(classificationsData) : [] as GmsClassification[];
             console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
             console.log('📝 Input text:', `"${notitieText}"`);
             
@@ -2097,7 +2098,8 @@ export default function Dashboard() {
             const selectedMC3 = mc3Select.value;
             
             if (selectedMC3) {
-              const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
+              const classificationsData = localStorage.getItem("gmsClassifications");
+              const storedClassifications = (classificationsData && classificationsData !== "undefined") ? JSON.parse(classificationsData) : [] as GmsClassification[];
               
               // Find the classification that matches this MC3 value
               const matchingClassification = storedClassifications.find(c => c.MC3 === selectedMC3);
@@ -2351,7 +2353,8 @@ export default function Dashboard() {
           
           // Restore classifications with proper cascading
           setTimeout(() => {
-            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+            const classificationsData = localStorage.getItem("gmsClassifications");
+            const storedClassifications = (classificationsData && classificationsData !== "undefined") ? JSON.parse(classificationsData) : [];
             
             if (mc1Field && currentGmsIncident.mc1) {
               console.log('Restoring classifications:', currentGmsIncident.mc1, currentGmsIncident.mc2, currentGmsIncident.mc3);
@@ -4365,7 +4368,6 @@ export default function Dashboard() {
                   {/* Top Header Bar */}
                   <div className="gms-header-bar">
                     <div className="gms-incident-info">
-                      <span className="gms-incident-id">P Zaakafhandel 1</span>
                       <span
                         className="gms-incident-time"
                         id="gmsHeaderTime"
