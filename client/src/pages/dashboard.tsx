@@ -17,6 +17,15 @@ export default function Dashboard() {
     "policeIncidents",
     [],
   );
+  
+  // GMS Incidents database for complete incident lifecycle
+  const [gmsIncidents, setGmsIncidents] = useLocalStorage<any[]>(
+    "gmsIncidentsDB",
+    [],
+  );
+  
+  // Current active incident in GMS
+  const [currentGmsIncident, setCurrentGmsIncident] = useState<any>(null);
   interface PoliceUnit {
     id: string;
     roepnaam: string;
@@ -1604,18 +1613,121 @@ export default function Dashboard() {
         console.log('✅ Form saved successfully, staying on GMS page');
       };
 
-      // Handle "Uitgifte" button - saves incident and redirects to Incidents tab
+      // Helper function to collect all GMS form data
+      const collectGMSFormData = () => {
+        const melderNaam = (document.getElementById("gmsMeldernaam") as HTMLInputElement)?.value?.trim() || '';
+        const melderAdres = (document.getElementById("gmsMelderadres") as HTMLInputElement)?.value?.trim() || '';
+        const telefoonnummer = (document.getElementById("gmsTelefoonnummer") as HTMLInputElement)?.value?.trim() || '';
+        
+        const straatnaam = (document.getElementById("gmsStraatnaam") as HTMLInputElement)?.value?.trim() || '';
+        const huisnummer = (document.getElementById("gmsHuisnummer") as HTMLInputElement)?.value?.trim() || '';
+        const toevoeging = (document.getElementById("gmsToevoeging") as HTMLInputElement)?.value?.trim() || '';
+        const postcode = (document.getElementById("gmsPostcode") as HTMLInputElement)?.value?.trim() || '';
+        const plaatsnaam = (document.getElementById("gmsPlaatsnaam") as HTMLInputElement)?.value?.trim() || '';
+        const gemeente = (document.getElementById("gmsGemeente") as HTMLInputElement)?.value?.trim() || '';
+        
+        const mc1 = (document.getElementById("gmsClassificatie1") as HTMLSelectElement)?.value || '';
+        const mc2 = (document.getElementById("gmsClassificatie2") as HTMLSelectElement)?.value || '';
+        const mc3 = (document.getElementById("gmsClassificatie3") as HTMLSelectElement)?.value || '';
+        
+        const tijdstip = (document.getElementById("gmsTijdstip") as HTMLInputElement)?.value || new Date().toISOString().slice(0, 16);
+        const prioriteit = parseInt((document.getElementById("gmsPrioriteit") as HTMLSelectElement)?.value || '3');
+        
+        const meldingslogging = document.getElementById("gmsMeldingLogging")?.innerHTML || '';
+        const notities = document.getElementById("gmsKladblok")?.textContent || '';
+        
+        if (!straatnaam) {
+          showNotificationMessage("Vul minimaal de straatnaam in om uit te geven");
+          return null;
+        }
+        
+        return {
+          melderNaam,
+          melderAdres,
+          telefoonnummer,
+          straatnaam,
+          huisnummer,
+          toevoeging,
+          postcode,
+          plaatsnaam,
+          gemeente,
+          mc1,
+          mc2,
+          mc3,
+          tijdstip,
+          prioriteit,
+          meldingslogging,
+          notities,
+          aangemaaktOp: new Date().toISOString()
+        };
+      };
+
+      // Helper function to calculate time ago
+      const calculateTimeAgo = (date: Date) => {
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        
+        if (diffMins < 1) return 'zojuist';
+        if (diffMins < 60) return `${diffMins} min geleden`;
+        if (diffHours < 24) return `${diffHours} uur geleden`;
+        return `${Math.floor(diffHours / 24)} dagen geleden`;
+      };
+
+      // Handle "Uitgifte" button - dispatch incident to central database
       const handleUitgifte = () => {
-        console.log('📤 Uitgifte button clicked - Saving incident');
+        console.log('📤 Uitgifte button clicked - Dispatching incident');
         
-        // First save the current form data
-        handleGMSFormSubmit();
+        // Collect all form data
+        const formData = collectGMSFormData();
+        if (!formData) return;
         
-        // Then redirect to incidents tab after a brief delay
-        setTimeout(() => {
-          setActiveSection('incidents');
-          showNotificationMessage("Incident uitgegeven en toegevoegd aan overzicht");
-        }, 500);
+        // Create or update incident in central database
+        const incidentId = currentGmsIncident?.id || Date.now();
+        const dispatchedIncident = {
+          ...formData,
+          id: incidentId,
+          status: "Uitgegeven",
+          uitgegeven: new Date().toISOString(),
+        };
+        
+        // Save to GMS incidents database
+        setGmsIncidents(prev => {
+          const existing = prev.find(inc => inc.id === incidentId);
+          if (existing) {
+            return prev.map(inc => inc.id === incidentId ? dispatchedIncident : inc);
+          } else {
+            return [...prev, dispatchedIncident];
+          }
+        });
+        
+        // Add to main incidents list for Incidenten tab
+        const mainIncident: Incident = {
+          id: incidentId,
+          type: `${formData.mc1 || 'Melding'}${formData.mc2 ? ' - ' + formData.mc2 : ''}`,
+          location: `${formData.straatnaam || ''} ${formData.huisnummer || ''}, ${formData.plaatsnaam || ''}`.trim(),
+          timestamp: formData.tijdstip,
+          timeAgo: calculateTimeAgo(new Date(formData.tijdstip)),
+          unitsAssigned: 0,
+          priority: formData.prioriteit === 1 ? 'high' : formData.prioriteit === 2 ? 'medium' : 'low',
+          status: 'active'
+        };
+        
+        setIncidents(prev => {
+          const existing = prev.find(inc => inc.id === incidentId);
+          if (existing) {
+            return prev.map(inc => inc.id === incidentId ? mainIncident : inc);
+          } else {
+            return [...prev, mainIncident];
+          }
+        });
+        
+        // Update current incident state but stay on GMS
+        setCurrentGmsIncident(dispatchedIncident);
+        
+        showNotificationMessage("Incident uitgegeven en toegevoegd aan overzicht");
+        console.log('✅ Incident dispatched, staying on GMS tab');
       };
 
       // Add event listeners for both button click and Enter key
@@ -1668,41 +1780,158 @@ export default function Dashboard() {
         uitgifteButton.addEventListener("click", handleUitgifte);
       }
 
+      // Helper function to clear GMS form
+      const clearGMSForm = () => {
+        const form = document.querySelector('.gms-form');
+        if (form) {
+          const inputs = form.querySelectorAll('input, select, textarea');
+          inputs.forEach(input => {
+            if (input instanceof HTMLInputElement) {
+              input.value = '';
+            } else if (input instanceof HTMLSelectElement) {
+              input.value = '';
+            } else if (input instanceof HTMLTextAreaElement) {
+              input.value = '';
+            }
+          });
+        }
+        
+        const kladblok = document.getElementById("gmsKladblok");
+        if (kladblok) kladblok.textContent = "";
+        
+        const meldingLogging = document.getElementById("gmsMeldingLogging");
+        if (meldingLogging) meldingLogging.innerHTML = "";
+        
+        updateGMSTime();
+        setCurrentGmsIncident(null);
+      };
+
+      // Helper function to populate classification dropdowns
+      const populateClassificationDropdowns = (mc1Field: HTMLSelectElement, mc2Field: HTMLSelectElement, mc3Field: HTMLSelectElement, mc1Value: string, mc2Value: string, mc3Value: string) => {
+        const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
+        
+        // Populate MC1
+        mc1Field.innerHTML = '<option value="">Selecteer...</option>';
+        const mc1Options = Array.from(new Set(storedClassifications.map((c: any) => c.MC1).filter(Boolean))).sort();
+        mc1Options.forEach(mc1 => {
+          const option = document.createElement('option');
+          option.value = mc1;
+          option.textContent = mc1;
+          mc1Field.appendChild(option);
+        });
+        mc1Field.value = mc1Value;
+        
+        // Populate MC2 if MC1 is set
+        if (mc1Value && mc2Value) {
+          mc2Field.innerHTML = '<option value="">Selecteer...</option>';
+          const mc2Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC1 === mc1Value).map((c: any) => c.MC2).filter(Boolean))).sort();
+          mc2Options.forEach(mc2 => {
+            const option = document.createElement('option');
+            option.value = mc2;
+            option.textContent = mc2;
+            mc2Field.appendChild(option);
+          });
+          mc2Field.value = mc2Value;
+          
+          // Populate MC3 if MC2 is set
+          if (mc2Value && mc3Value) {
+            mc3Field.innerHTML = '<option value="">Selecteer...</option>';
+            const mc3Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC2 === mc2Value).map((c: any) => c.MC3).filter(Boolean))).sort();
+            mc3Options.forEach(mc3 => {
+              const option = document.createElement('option');
+              option.value = mc3;
+              option.textContent = mc3;
+              mc3Field.appendChild(option);
+            });
+            mc3Field.value = mc3Value;
+          }
+        }
+      };
+
+      // Helper function to load incident data into GMS form
+      const loadIncidentIntoGMS = (incidentData: any) => {
+        console.log('Loading incident data into GMS form:', incidentData);
+        
+        // Clear form first
+        clearGMSForm();
+        
+        // Set current incident
+        setCurrentGmsIncident(incidentData);
+        
+        // Fill form fields
+        const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
+        const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
+        const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
+        const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
+        const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
+        const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
+        const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
+        const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+        const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
+        const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
+        const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
+        const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
+        const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
+        const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+        const meldingLoggingField = document.getElementById("gmsMeldingLogging");
+        
+        // Fill meldergegevens
+        if (melderNaamField && incidentData.melderNaam) melderNaamField.value = incidentData.melderNaam;
+        if (melderAdresField && incidentData.melderAdres) melderAdresField.value = incidentData.melderAdres;
+        if (telefoonnummerField && incidentData.telefoonnummer) telefoonnummerField.value = incidentData.telefoonnummer;
+        
+        // Fill locatie
+        if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
+        if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
+        if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
+        if (postcodeField && incidentData.postcode) postcodeField.value = incidentData.postcode;
+        if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
+        if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
+        
+        // Fill tijdstip en prioriteit
+        if (tijdstipField && incidentData.tijdstip) tijdstipField.value = incidentData.tijdstip;
+        if (prioriteitField && incidentData.prioriteit) prioriteitField.value = incidentData.prioriteit.toString();
+        
+        // Restore classifications with proper cascading
+        setTimeout(() => {
+          if (mc1Field && incidentData.mc1) {
+            populateClassificationDropdowns(mc1Field, mc2Field, mc3Field, incidentData.mc1, incidentData.mc2, incidentData.mc3);
+          }
+        }, 100);
+        
+        // Restore meldingslogging
+        if (meldingLoggingField && incidentData.meldingslogging) {
+          meldingLoggingField.innerHTML = incidentData.meldingslogging;
+        }
+        
+        // Keep notepad empty for new notes
+        const kladblokField = document.getElementById("gmsKladblok");
+        if (kladblokField) kladblokField.textContent = '';
+        
+        console.log('Incident data loaded into GMS form');
+      };
+
       // Handle incident closure buttons
       const handleIncidentClosure = (actionType: string) => {
-        const currentIncidentData = localStorage.getItem('currentGmsIncident');
-        if (currentIncidentData) {
-          try {
-            const incidentData = JSON.parse(currentIncidentData);
-            const incidentId = incidentData.incidentId;
-            
-            // Close the incident in the main incidents list
-            setIncidents((prev) =>
-              prev.map((inc) =>
-                inc.id === incidentId ? { ...inc, status: "closed" as const } : inc,
-              ),
-            );
-            
-            // Remove GMS data for finalized incident
-            localStorage.removeItem(`gmsData_${incidentId}`);
-            localStorage.removeItem('currentGmsIncident');
-            
-            // Clear the GMS form
-            const form = document.querySelector('.gms-form') as HTMLFormElement;
-            if (form) {
-              form.reset();
-              const kladblok = document.getElementById("gmsKladblok");
-              if (kladblok) kladblok.textContent = '';
-            }
-            
-            showNotificationMessage(`Incident ${incidentId} ${actionType === 'close' ? 'afgesloten' : 'gefinaliseerd'}`);
-            console.log(`Incident ${incidentId} finalized with action: ${actionType}`);
-            
-            // Switch back to incidents overview
-            setActiveSection('incidents');
-          } catch (error) {
-            console.error('Error finalizing incident:', error);
-          }
+        if (currentGmsIncident) {
+          // Update incident status in GMS database
+          setGmsIncidents(prev => prev.map(inc => 
+            inc.id === currentGmsIncident.id 
+              ? { ...inc, status: "Afgesloten", afgesloten: new Date().toISOString() }
+              : inc
+          ));
+          
+          // Remove from main incidents list
+          setIncidents(prev => prev.filter(inc => inc.id !== currentGmsIncident.id));
+          
+          // Clear current incident and form
+          clearGMSForm();
+          
+          showNotificationMessage(
+            actionType === 'close' ? 'Incident afgesloten' : 'Eindrapport voltooid'
+          );
+          
+          console.log(`Incident ${actionType === 'close' ? 'closed' : 'finalized'} and removed from active list`);
         } else {
           showNotificationMessage('Geen actief incident om af te sluiten');
         }
