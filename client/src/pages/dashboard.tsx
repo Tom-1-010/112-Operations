@@ -576,18 +576,14 @@ Water\tVaartuig in nood\tZinken\twavnzi\t1\tZinkend vaartuig`;
     basisteamsData,
   );
 
-  const [gmsClassifications, setGmsClassifications] = useLocalStorage<GmsClassification[]>(
-    "gmsClassifications",
-    gmsClassificationsData,
-  );
+  // Use state directly with the full classification data
+  const [gmsClassifications, setGmsClassifications] = useState<GmsClassification[]>(gmsClassificationsData);
 
-  // Ensure classifications are loaded and available
+  // Store in localStorage for persistence
   useEffect(() => {
-    if (gmsClassifications.length === 0) {
-      console.log('Loading GMS classifications...', gmsClassificationsData.length, 'entries');
-      setGmsClassifications(gmsClassificationsData);
-    }
-  }, [gmsClassifications.length, setGmsClassifications]);
+    localStorage.setItem("gmsClassifications", JSON.stringify(gmsClassificationsData));
+    console.log('Loaded GMS classifications:', gmsClassificationsData.length, 'entries');
+  }, []);
 
   // GMS Classification database helper functions
   const searchGmsClassifications = (query: string): GmsClassification[] => {
@@ -3554,7 +3550,7 @@ Water\tVaartuig in nood\tZinken\twavnzi\t1\tZinkend vaartuig`;
                             >
                               <option value="">Selecteer...</option>
                               {getUniqueClassificationsByLevel("mc1").map(
-                                (mc1) => (
+                                (mc1: string) => (
                                   <option key={mc1} value={mc1}>
                                     {mc1}
                                   </option>
