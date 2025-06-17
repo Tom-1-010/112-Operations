@@ -1483,66 +1483,7 @@ export default function Dashboard() {
           });
         }
 
-        // Enhanced shortcode detection for both Notitieveld and Melding Logging
-        const setupShortcodeDetection = (element: HTMLElement, elementName: string) => {
-          if (!element) return;
-          
-          const handleInput = () => {
-            const text = element.textContent || '';
-            const lines = text.split('\n');
-            const lastLine = lines[lines.length - 1].trim();
-            
-            // Only process hyphen-based input
-            if (lastLine.startsWith('-') && lastLine.length > 1) {
-              const searchQuery = lastLine.substring(1).trim();
-              const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
-              
-              // Find matching classification
-              let matchedClassification = storedClassifications.find(c => 
-                c.code.toLowerCase() === searchQuery.toLowerCase() ||
-                c.MC3.toLowerCase() === searchQuery.toLowerCase() ||
-                c.MC2.toLowerCase() === searchQuery.toLowerCase() ||
-                c.MC1.toLowerCase() === searchQuery.toLowerCase() ||
-                c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
-              );
-              
-              if (matchedClassification && selectClassificationByCode(matchedClassification.code)) {
-                // Set priority
-                if (prioriteitSelect) {
-                  prioriteitSelect.value = matchedClassification.prio.toString();
-                }
-                
-                // Log the action
-                if (loggingPanel) {
-                  const timestamp = new Date().toLocaleTimeString('nl-NL');
-                  const logEntry = document.createElement('div');
-                  logEntry.className = 'log-entry classification-auto';
-                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Auto-classificatie: "${searchQuery}" → ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
-                  loggingPanel.appendChild(logEntry);
-                  loggingPanel.scrollTop = loggingPanel.scrollHeight;
-                }
-              }
-            }
-          };
-          
-          element.addEventListener("input", handleInput);
-          element.addEventListener("keyup", handleInput);
-        };
-        
-        // Setup shortcode detection for Notitieveld
-        if (notitieveld) {
-          setupShortcodeDetection(notitieveld, 'Notitieveld');
-        }
-        
-        // Setup shortcode detection for Melding Logging content area
-        const meldingLoggingContent = document.querySelector('.gms-logging-content') as HTMLElement;
-        if (meldingLoggingContent) {
-          // Make the logging area editable for shortcode input
-          meldingLoggingContent.contentEditable = 'true';
-          setupShortcodeDetection(meldingLoggingContent, 'Melding Logging');
-        }
+        // Note: Real-time classification detection disabled - only processes on "Verzend" button click
       };
 
       setupClassificationDropdowns();
