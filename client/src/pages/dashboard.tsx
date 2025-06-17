@@ -3354,16 +3354,25 @@ export default function Dashboard() {
 
             const statusClass = `legacy-status-${status.toLowerCase()}`;
 
+            // Combine MC1, MC2, MC3 classifications
+            const mc1 = incident.classificatie1 || "";
+            const mc2 = incident.classificatie2 || "";
+            const mc3 = incident.classificatie3 || "";
+            const combinedMC = [mc1, mc2, mc3].filter(Boolean).join(" / ") || "-";
+            
+            // Get assigned units (placeholder for now)
+            const assignedUnits = incident.toegewezenEenheden || "Geen";
+
             return `
             <div class="legacy-incident-row" data-incident-id="${incident.id || index}" onclick="redirectToGMS(${incident.id || index})">
-              <div class="legacy-col-id">${incidentNumber}</div>
-              <div class="legacy-col-tijd">${formattedTime}</div>
-              <div class="legacy-col-mc">${mc}</div>
+              <div class="legacy-col-prio">
+                <div class="priority-circle priority-${prioriteitNummer}">${prioriteitNummer}</div>
+              </div>
+              <div class="legacy-col-mc" title="${combinedMC}">${combinedMC}</div>
               <div class="legacy-col-locatie" title="${locatie}">${locatie}</div>
               <div class="legacy-col-plaats" title="${plaats}">${plaats}</div>
-              <div class="legacy-col-prio">
-                <span class="priority-box priority-box-${prioriteitNummer}">${prioriteitNummer}</span>
-              </div>
+              <div class="legacy-col-id">${incidentNumber}</div>
+              <div class="legacy-col-units">${assignedUnits}</div>
               <div class="legacy-col-status ${statusClass}">${status}</div>
             </div>
           `;
@@ -4924,18 +4933,9 @@ export default function Dashboard() {
 
         {activeSection === "incidents" && (
           <div className="content-section active">
-            <IncidentTable
-              incidents={incidents}
-              onAccept={acceptIncident}
-              onClose={closeIncident}
-              onRemove={removeIncident}
-              onSimulateNew={simulateNewIncident}
-              onIncidentClick={handleIncidentClick}
-            />
-            
             <div className="section">
               <div className="section-header">
-                <h3 className="section-title">Alle Incidenten (Legacy)</h3>
+                <h3 className="section-title">Alle Incidenten</h3>
                 <button
                   className="delete-all-incidents-btn"
                   onClick={() => setShowDeleteConfirmModal(true)}
@@ -4946,12 +4946,12 @@ export default function Dashboard() {
               <div className="incidents-legacy-content">
                 <div className="incidents-legacy-table">
                   <div className="legacy-table-header">
-                    <div className="legacy-col-id">Incidentnummer</div>
-                    <div className="legacy-col-tijd">Tijd</div>
-                    <div className="legacy-col-mc">MC</div>
-                    <div className="legacy-col-locatie">Locatie</div>
-                    <div className="legacy-col-plaats">Plaats</div>
-                    <div className="legacy-col-prio">P</div>
+                    <div className="legacy-col-prio">Prio</div>
+                    <div className="legacy-col-mc">MC1 / MC2 / MC3</div>
+                    <div className="legacy-col-locatie">Straatnaam + Huisnummer</div>
+                    <div className="legacy-col-plaats">Plaatsnaam</div>
+                    <div className="legacy-col-id">Incident Nummer</div>
+                    <div className="legacy-col-units">Toegewezen Eenheden</div>
                     <div className="legacy-col-status">Status</div>
                   </div>
                   <div
