@@ -3963,10 +3963,12 @@ export default function Dashboard() {
       />
 
       <main className="main-content">
-        <div className="header">
-          <h1>Meldkamer Dashboard</h1>
-          <div className="header-time">{formatTime(currentTime)}</div>
-        </div>
+        {activeSection !== "gms" && (
+          <div className="header">
+            <h1>Meldkamer Dashboard</h1>
+            <div className="header-time">{formatTime(currentTime)}</div>
+          </div>
+        )}
 
         {activeSection === "dashboard" && (
           <div className="content-section active">
@@ -4355,11 +4357,8 @@ export default function Dashboard() {
           </div>
         )}
         {activeSection === "gms" && (
-          <div className="content-section active">
-            <div id="gms" className="section">
-              <div className="section-header">
-                <h3 className="section-title">GMS - Meldkamer Simulator</h3>
-              </div>
+          <div className="content-section active gms-fullscreen">
+            <div id="gms" className="gms-wrapper">
               <div className="gms-content">
                 {/* Classic GMS Interface Layout */}
                 <div className="gms-classic-layout">
