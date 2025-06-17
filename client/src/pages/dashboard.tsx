@@ -1037,6 +1037,12 @@ export default function Dashboard() {
             mc3Select: !!mc3Select,
             prioriteitSelect: !!prioriteitSelect
           });
+          
+          // Add critical error check
+          if (!mc1Select || !mc2Select || !mc3Select) {
+            console.error('❌ Critical: One or more dropdown elements missing!');
+            return;
+          }
 
           if (mc1Select && mc2Select && mc3Select) {
             console.log('✅ All dropdown elements found, proceeding with classification detection');
@@ -1048,6 +1054,16 @@ export default function Dashboard() {
             const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
             console.log('🧪 Test - BRGB codes available:', testBrgb.length, testBrgb.slice(0, 3));
             
+            // Direct test for "-brgb" input
+            if (notitieText.includes('-brgb')) {
+              console.log('🎯 DIRECT TEST: Searching for BRGB classification...');
+              const directBrgbMatch = storedClassifications.find(c => 
+                c.code.toLowerCase().includes('brgb') || 
+                c.code.toLowerCase().startsWith('brgb')
+              );
+              console.log('🎯 DIRECT MATCH RESULT:', directBrgbMatch);
+            }
+            
             // Test specific searches
             const testOngevall = storedClassifications.filter(c => 
               c.MC1.toLowerCase().includes('ongeval') || 
@@ -1058,6 +1074,9 @@ export default function Dashboard() {
             
             const lines = notitieText.split('\n');
             let matchedClassification = null;
+            
+            console.log('🔄 Starting line-by-line processing...');
+            console.log('📝 Lines to process:', lines);
 
             for (const line of lines) {
               const trimmedLine = line.trim();
@@ -1155,6 +1174,8 @@ export default function Dashboard() {
               }
             }
 
+            console.log('🏁 Classification search completed. Result:', matchedClassification ? 'FOUND' : 'NOT FOUND');
+            
             // Apply the matched classification
             if (matchedClassification) {
               console.log('🎯 MATCHED CLASSIFICATION:', matchedClassification);
