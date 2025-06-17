@@ -1408,9 +1408,14 @@ export default function Dashboard() {
       
       if (verzendButton) {
         console.log('📌 Verzend button found, attaching notepad submit listener');
-        verzendButton.addEventListener("click", handleNotePadSubmit);
+        verzendButton.addEventListener("click", (e) => {
+          e.preventDefault();
+          console.log('🔥 VERZEND BUTTON CLICKED - Event triggered');
+          handleNotePadSubmit();
+        });
       } else {
-        console.error('❌ Verzend button not found!');
+        console.error('❌ Verzend button not found! Available buttons:', 
+          Array.from(document.querySelectorAll('button')).map(b => b.id).filter(id => id));
       }
       
       // Add Enter key support for kladblok
@@ -1419,10 +1424,12 @@ export default function Dashboard() {
         kladblokElement.addEventListener("keydown", (e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            console.log('⌨️ Enter key pressed in kladblok, triggering notepad submit');
+            console.log('⌨️ ENTER KEY PRESSED - Event triggered');
             handleNotePadSubmit();
           }
         });
+      } else {
+        console.error('❌ Kladblok element not found!');
       }
       
       // Form save button (for full form submission)
