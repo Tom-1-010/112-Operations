@@ -1578,8 +1578,8 @@ body {
 }
 
 .gms-text-area-compact {
-  min-height: 80px;
-  max-height: 80px;
+  min-height: 160px;
+  max-height: 160px;
   width: 200px;
   resize: none;
 }

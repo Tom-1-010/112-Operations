@@ -4576,29 +4576,6 @@ export default function Dashboard() {
                               className="gms-text-area gms-text-area-compact"
                               data-placeholder="Voer hier de melding in..."
                             ></div>
-                            <div className="gms-text-controls">
-                              <button
-                                type="button"
-                                className="gms-text-btn"
-                                onClick={() => document.execCommand("bold")}
-                              >
-                                B
-                              </button>
-                              <button
-                                type="button"
-                                className="gms-text-btn"
-                                onClick={() => document.execCommand("underline")}
-                              >
-                                U
-                              </button>
-                              <button
-                                type="button"
-                                className="gms-text-btn"
-                                onClick={() => document.execCommand("italic")}
-                              >
-                                I
-                              </button>
-                            </div>
                           </div>
                           <div className="gms-notitie-right">
                             <button
