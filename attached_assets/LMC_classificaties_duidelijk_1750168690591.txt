@@ -1,0 +1,3068 @@
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : 
+MC3   : 
+Code  : al
+Prio  : 
+Uitleg: Alle soorten alarmen van detectiesystemen die rechtstreeks op de meldkamer binnenkomen, en meldingen door derden over het afgaan van alarmen van detectiesystemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. brand
+MC3   : 
+Code  : alab
+Prio  : 2.0
+Uitleg: Alarmen van aangesloten OMS die direct op de meldkamer binnenkomen en automatische brandmeldingen door PAC aan de meldkamer doorgegeven.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. brand
+MC3   : Autom. brand OMS
+Code  : alabab
+Prio  : 2.0
+Uitleg: Melding via OMS van inwerkingtreding van een automatische brandmelder
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. brand
+MC3   : Br beheerssysteem
+Code  : alabbb
+Prio  : 2.0
+Uitleg: Melding via OMS van inwerkingtreding van een automatische blusinstallatie
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. brand
+MC3   : Brandmelding PAC
+Code  : alabbm
+Prio  : 2.0
+Uitleg: Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. brand
+MC3   : Drukknopmelding OMS
+Code  : alabdk
+Prio  : 2.0
+Uitleg: Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. brand
+MC3   : Handmelder OMS
+Code  : alabhm
+Prio  : 2.0
+Uitleg: Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. Gev stof
+MC3   : 
+Code  : algs
+Prio  : 2.0
+Uitleg: Automatische meldingen van ontsnapping van een gevaarlijke stof via direct op de meldkamer aangesloten OMS en door PAC aan de meldkamer doorgegeven.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. Gev stof
+MC3   : Gev. stof OMS
+Code  : algsom
+Prio  : 2.0
+Uitleg: Melding via OMS van detectie van een gevaarlijke stof.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. Gev stof
+MC3   : Gev. stof PAC
+Code  : algspa
+Prio  : 2.0
+Uitleg: Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Autom. systeemmelding
+MC3   : 
+Code  : alas
+Prio  : 4.0
+Uitleg: Alle binnenkomende meldingen via de OMS waarvoor, op basis van de aard van de melding, geen repressieve brandweer inzet nodig is. Het betreft in hoofdzaak storings-, onderhouds-, test en buiten werking stelling meldingen van OMS systemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Hoog water alarm
+MC3   : 
+Code  : alhw
+Prio  : 4.0
+Uitleg: Alarmen/waarschuwingen afgegeven door Rijkswaterstaat/waterschappen i.v.m. dreigend bijzonder hoogwater.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Luid/optisch alarm
+MC3   : 
+Code  : allo
+Prio  : 3.0
+Uitleg: Melding door een persoon aan de meldkamer dat ergens een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas alarm) hoor- of zichtbaar is, en waarop door de beheerder /gebruiker van het betreffende object niet gereageerd lijkt te worden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Luid/optisch alarm
+MC3   : CO-melder
+Code  : alloco
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Luid/optisch alarm
+MC3   : Gebouw
+Code  : allogb
+Prio  : 3.0
+Uitleg: Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Luid/optisch alarm
+MC3   : Rookmelder
+Code  : allorm
+Prio  : 3.0
+Uitleg: Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Luid/optisch alarm
+MC3   : Voertuig/Vaartuig
+Code  : allovv
+Prio  : 3.0
+Uitleg: Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : PAC alarm
+MC3   : 
+Code  : alpa
+Prio  : 2.0
+Uitleg: Alarmmeldingen die via de PAC op de meldkamer binnenkomen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : PAC alarm
+MC3   : Inbraakalarm
+Code  : alpaib
+Prio  : 2.0
+Uitleg: Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : PAC alarm
+MC3   : Overvalalarm
+Code  : alpaov
+Prio  : 2.0
+Uitleg: (Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : PAC alarm
+MC3   : Persoonsalarm
+Code  : alpaps
+Prio  : 1.0
+Uitleg: Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : RAC alarm
+MC3   : 
+Code  : alra
+Prio  : 1.0
+Uitleg: Inbraakmeldingen die via de RAC binnenkomen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : RAC alarm
+MC3   : Inbraakalarm
+Code  : alraib
+Prio  : 1.0
+Uitleg: Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : RAC alarm
+MC3   : Overvalalarm
+Code  : alraov
+Prio  : 1.0
+Uitleg: (Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : RAC alarm
+MC3   : Persoonsalarm
+Code  : alraps
+Prio  : 1.0
+Uitleg: Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Sensing
+MC3   : 
+Code  : alse
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Sensing
+MC3   : Alert
+Code  : alseal
+Prio  : 2.0
+Uitleg: Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen. 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Sensing
+MC3   : ANPR-hit
+Code  : alseah
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Sensing
+MC3   : Opsporingsmiddel
+Code  : alseom
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Sensing
+MC3   : Toezichtsalarm
+Code  : alsetz
+Prio  : 1.0
+Uitleg: Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Tunnelalarm
+MC3   : 
+Code  : altu
+Prio  : 2.0
+Uitleg: Automatische alarmmelding via vanuit tunnel zonder indicatie dat het een brandmelding betreft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Alarm
+MC2   : Weeralarm
+MC3   : 
+Code  : alma
+Prio  : 4.0
+Uitleg: Alarmen/waarschuwingen afgegeven door meteorologische diensten i.v.m. dreigend gevaarlijk/extreem weer.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : 
+MC3   : 
+Code  : bz
+Prio  : 
+Uitleg: Aantasting van andermans bezit of een poging daartoe.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : 
+Code  : bzds
+Prio  : 3.0
+Uitleg: Het wegnemen of toe-eigenen van enig goed dat geheel of gedeeltelijk aan een ander toebehoort.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Afpersing
+Code  : bzdsap
+Prio  : 3.0
+Uitleg: Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Beroving
+Code  : bzdsbr
+Prio  : 1.0
+Uitleg: Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Dier
+Code  : bzdsdi
+Prio  : 3.0
+Uitleg: Diefstal van een dier.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Fraude
+Code  : bzdsfd
+Prio  : 3.0
+Uitleg: Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Goederen
+Code  : bzdsgd
+Prio  : 3.0
+Uitleg: Diefstal van goederen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Heling
+Code  : bzdshl
+Prio  : 3.0
+Uitleg: Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Luchtvaartuig
+Code  : bzdslu
+Prio  : 3.0
+Uitleg: Diefstal van een luchtvaartuig.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Oplichting
+Code  : bzdsol
+Prio  : 3.0
+Uitleg: Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Vaartuig
+Code  : bzdsva
+Prio  : 3.0
+Uitleg: Zie diefstal.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Verduistering
+Code  : bzdsvd
+Prio  : 3.0
+Uitleg: Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Voertuig
+Code  : bzdsvo
+Prio  : 3.0
+Uitleg: Diefstal van een voertuig
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Winkeldiefstal
+Code  : bzdswk
+Prio  : 2.0
+Uitleg: Diefstal uit een winkel
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Diefstal
+MC3   : Zakkenrollerij
+Code  : bzdszk
+Prio  : 3.0
+Uitleg: Diefstal door een zakkenroller
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : 
+Code  : bzib
+Prio  : 3.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Bedrijf/Instelling
+Code  : bzibbi
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Bijgebouw
+Code  : bzibbg
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Luchtvaartuig
+Code  : bziblu
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Spoorvervoer
+Code  : bzibsp
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Vaartuig
+Code  : bzibva
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Voertuig
+Code  : bzibvo
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Inbraak
+MC3   : Woning
+Code  : bzibwn
+Prio  : 2.0
+Uitleg: Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Overval
+MC3   : 
+Code  : bzov
+Prio  : 1.0
+Uitleg: Het dwingen tot afgifte van enig goed door middel van geweld of het dreigen met geweld met voorbedachte rade.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Overval
+MC3   : Bedrijf/Instelling
+Code  : bzovbi
+Prio  : 1.0
+Uitleg: Een geplande overval op een bedrijf of instelling
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Overval
+MC3   : Luchtvaartuig
+Code  : bzovlu
+Prio  : 1.0
+Uitleg: Een geplande overval op of in luchtvaartuig niet zijnde een kaping.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Overval
+MC3   : Voertuig/Vaartuig
+Code  : bzovvv
+Prio  : 1.0
+Uitleg: Een geplande overval op een voer- of vaartuig.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Overval
+MC3   : Waardetransport
+Code  : bzovwd
+Prio  : 1.0
+Uitleg: Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Overval
+MC3   : Woning
+Code  : bzovwn
+Prio  : 1.0
+Uitleg: Een geplande overval op een particulier persoon vaak binnenshuis
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Stroperij
+MC3   : 
+Code  : bzsp
+Prio  : 2.0
+Uitleg: Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten, dieren etc. wegnemen met het oogmerk van toe-eigening.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Stroperij
+MC3   : Dier
+Code  : bzspdi
+Prio  : 2.0
+Uitleg: Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Stroperij
+MC3   : Goederen
+Code  : bzspgd
+Prio  : 2.0
+Uitleg: Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : 
+Code  : bzvn
+Prio  : 3.0
+Uitleg: Het opzettelijk en wederrechtelijk vernielen, beschadigen, onbruikbaar of wegmaken van enig goed dat aan een ander toebehoort.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Gebouw
+Code  : bzvngb
+Prio  : 3.0
+Uitleg: Zie vernieling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Goederen
+Code  : bzvngd
+Prio  : 3.0
+Uitleg: Zie vernieling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Graffiti
+Code  : bzvngf
+Prio  : 3.0
+Uitleg: Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Luchtvaartuig
+Code  : bzvnlu
+Prio  : 3.0
+Uitleg: Zie vernieling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Spoorvervoer
+Code  : bzvnsp
+Prio  : 3.0
+Uitleg: Zie vernieling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Vaartuig
+Code  : bzvnva
+Prio  : 3.0
+Uitleg: Zie vernieling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Bezitsaantasting
+MC2   : Vernieling
+MC3   : Voertuig
+Code  : bzvnvo
+Prio  : 3.0
+Uitleg: Zie vernieling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : 
+MC3   : 
+Code  : br
+Prio  : 
+Uitleg: Incident waarbij het primair om brand gaat/ging of waarbij een explosie heeft plaatsgevonden met brand als overheersend effect tot gevolg.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Bijgebouw
+MC3   : 
+Code  : brbg
+Prio  : 1.0
+Uitleg: De BAG definieert als een bijgebouw: Een bijgebouw is een al dan niet vrijstaand pand dat dienstbaar is aan een hoofdgebouw en bevat geen verblijfsobjecten. Een pand zonder verblijfsobjecten heeft geen adres.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Buiten
+MC3   : 
+Code  : brbt
+Prio  : 2.0
+Uitleg: Alle buiten brandmeldingen, maar geen industrie/natuur/vervoer/scenario of gebouwen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Buiten
+MC3   : Afval/Rommel
+Code  : brbtar
+Prio  : 2.0
+Uitleg: Brandmelding van afval/rommel. Geen grote als industrieel aangemerkte objecten met opslag van afval. Rommel betreft die goederen die geen of weinig waarde hebben, buiten staande/opgeslagen gebruiksgoederen. 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Buiten
+MC3   : Berm/Ruigte/Bosschage
+Code  : brbtbb
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing op een terrein dat op gebruiks-/natuurkaart en of in GMS NIET als bos heide veen of riet gebied aan te merken is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Buiten
+MC3   : Container
+Code  : brbtct
+Prio  : 2.0
+Uitleg: Brandmelding van, in principe alleen voor opslag van afval of goederen bedoelde, containers/bakken. De containers zijn bedoeld om menselijke activiteiten daarin te laten plaatsvinden (toilet-, douche-, schaftcontainers en dergelijke), en vallen onder gebouwen of kleine opstal.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Buiten
+MC3   : Industrie
+Code  : brbtid
+Prio  : 2.0
+Uitleg: Brandmelding van industrieel aangemerkt terrein.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 
+Code  : brgb
+Prio  : 1.0
+Uitleg: Brandmeldingen van/in gebouwen die niet vallen onder industriegebouwen of speciale scenario's. Een gebouw is elk vast of verplaatsbare, maar niet mobiel overdekte constructie, waarbinnen zich bij normaal gebruik of onderhoud mensen kunnen bevinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 01 Woning/Woongebouw
+Code  : brgb01
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het wonen. Woongebouw: gebouw of gedeelte van gebouw waarin twee of meer woonfuncties zijn ondergebracht, die zijn aangewezen op een of meer gemeenschappelijke verkeersroutes.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 02 Bijeenkomst
+Code  : brgb02
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het samenkomen van mensen voor kunst, cultuur, godsdienst, communicatie, kinderopvang, verstrekken van consumpties voor het gebruik ter plaatse en aanschouwen sport
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 03 Cel
+Code  : brgb03
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor dwangverblijf van mensen. Cellengebouw: gebouw of gedeelte van gebouw waarin twee of meer celfuncties liggen, die zijn aangewezen op een of meer gemeenschappelijke verkeersroutes
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 04 Gezondheidszorg
+Code  : brgb04
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor medisch onderzoek, verpleging, verzorging of behandeling
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 05 Agrarisch
+Code  : brgb05
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het bedrijfsmatig bewerken of opslaan van materialen en goeden, of voor agrarische doeleinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 05 Industrie
+Code  : brgb05
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 06 Kantoor
+Code  : brgb06
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor administratie
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 07 Logies
+Code  : brgb07
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het bieden van recreatief verblijf of tijdelijk onderdak aan mensen Bij de voorbeelden staan ook: vakantiehuisje, een trekkershut en stacaravan! Deze voorbeelden hebben wel logiesfunctie maar zijn geen logiesgebouw. De WOZ vertaal tabel plaatst ze bij de woningen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 08 Onderwijs
+Code  : brgb08
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het geven van onderwijs
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 09 Sport
+Code  : brgb09
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het beoefenen van sport (Dus niet die voor het aanschouwen van sport. Die vallen onder bijeenkomst gebouw)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 10 Winkel
+Code  : brgb10
+Prio  : 1.0
+Uitleg: Gebruiksfunctie voor het verhandelen van materialen, goederen of diensten. Bij de voorbeelden staan ook: benzinestation, (auto)showroom, kaartverkoopkantoor, praktijkruimte dierenarts, kapsalon/pedicure, zonnestudie en bordeel.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Gebouw
+MC3   : 11 Overige
+Code  : brgb11
+Prio  : 1.0
+Uitleg: Gebruiksfunctie van een deel van een gebouw, voor activiteiten waarbij het verblijven van mensen een ondergeschikte rol speelt en die niet valt onder de eerste tien meer specifiek benoemde gebruiksfuncties Met de subgroepen: voor personenvervoer, stallen motorvoertuigen, opslaan afval. Bij de voorbeelden staan: Parkeergarage, bergruimte of garage bij woning, wachtlokaal passagiers op station, telefooncel, transformatorgebouw, sanitairgebouw op camping, observatiehut in bos.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Luchtvaart
+MC3   : 
+Code  : brlu
+Prio  : 1.0
+Uitleg: Brand in een op de grond staand luchtvaartuig, waarbij geen passagiers zijn betrokken / aanwezig zijn. (Bijv. een op een platform staand vliegtuig dat in de brand vliegt tijdens beladen of tanken)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : 
+Code  : brnt
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als natuur/bos/duin/heide/veen of riet gebied wordt aangemerkt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : Akker/Weide
+Code  : brntak
+Prio  : 2.0
+Uitleg: Brand van op akker/weide perceel aanwezige landbouwgewassen ook gras. Al dan niet gemaaid of op wiers liggend maar geen hooi/stro bulten of ander landbouwgewas (tussen) opslag op het veld waar het geoogst is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : Bos
+Code  : brntbo
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als bosgebied wordt aangemerkt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : Duin
+Code  : brntdu
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als duingebied wordt aangemerkt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : Heide
+Code  : brnthe
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als heidegebied wordt aangemerkt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : Riet
+Code  : brntri
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing in een gebied wat op gebruiksdoeleinden-/natuurkaart/in GMS als rietvelden wordt aangemerkt. Het gaat hier om grotere oppervlaktes en dus niet om een strook riet langs een sloot of waterweg. In die laatste gevallen gaat het om een buitenbrand berm/ruigte of bosschage.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Natuur
+MC3   : Veen
+Code  : brntve
+Prio  : 2.0
+Uitleg: Brandmelding van begroeiing en of veenbodem in gebied dat op gebruiksdoeleinden-/ natuur kaart/ in GMS als veengebied wordt aangemerkt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Scheepvaart
+MC3   : 
+Code  : brsh
+Prio  : 2.0
+Uitleg: Brandmelding van/in vaartuig met uitzondering van drijvende objecten die in verband met de primaire functie zelden verplaatst worden zoals een woonboot, gevangenisboot, hotelschip en dergelijke.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Specifiek
+MC3   : 
+Code  : brsf
+Prio  : 3.0
+Uitleg: Classificatie voor brandmeldingen waarbij naar verwachting geen, of geen omvangrijke, brandweerinzet (meer) nodig is. En het type object, in principe, niet bepalend is voor de inzet.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Specifiek
+MC3   : Brandgerucht
+Code  : brsfbg
+Prio  : 3.0
+Uitleg: Meldingen waarbij het zeer twijfelachtig is of er een te blussen brand is. Dit omdat de melder alleen een brandlucht waarneemt of alleen rook of vuurverschijnselen op afstand meldt, waarbij de melder niet kan aangeven wat er dan mogelijk in brand staat.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Specifiek
+MC3   : Nablussen
+Code  : brsfnb
+Prio  : 3.0
+Uitleg: Meldingen dat er op locatie waar, niet al te lang daarvoor een brand is geblust, het opnieuw begint te branden. Dit is echter niet zodanig dat een inzet met spoed nodig geacht wordt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Specifiek
+MC3   : Nacontrole
+Code  : brsfnc
+Prio  : 3.0
+Uitleg: Melding van mensen die zelf een brandje geblust hebben maar er niet 100 procent zeker van zijn dat het uit is, of die na blikseminslag zonder direct waarneembare brandverschijnselen aangeven er niet zeker van te zijn of die echt geen brand veroorzaakt heeft en de brandweer verzoeken een nacontrole te doen, of er echt geen brand meer is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Spoorvervoer
+MC3   : 
+Code  : brsp
+Prio  : 2.0
+Uitleg: Brandmelding van/in spoorvervoermiddel maar niet in een tunnel of in een station. Indien vervoermiddel in tunnel en/of onderstations overkapping dan wel direct tegen stationsgebouw, dan gebouwbrand betreffende tunnel en/of stationsobject.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Brand
+MC2   : Wegvervoer
+MC3   : 
+Code  : brwe
+Prio  : 2.0
+Uitleg: Brandmelding van/in wegvervoermiddel en (land/wegen)bouwmachine op de weg of in het vrije veld. Indien de brand in de tunnel/onder viaduct of in/direct tegen gebouw is, dan voor gebouwbrand, en zo mogelijk betreffend object(type) kiezen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : 
+MC3   : 
+Code  : dv
+Prio  : 
+Uitleg: Het verlenen van hulp en diensten aan derden en aan de eigen dienst. Niet betreffende de directe inzet voor een incident of besteld vervoer tenzij het grootschalige bijstand buiten de regio/ werkingsgebied meldkamer betreft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : 
+Code  : dvab
+Prio  : 5.0
+Uitleg: Het verlenen van hulp en leveren van diensten door de ambulancedienst aan derden en de eigen dienst. Niet zijnde directe inzet tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Afgebroken inzet
+Code  : dvabai
+Prio  : 5.0
+Uitleg: Een gestartte versnelde inzet waarbij na triage duidelijk is dat er geen inzet benodigd is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Afstemverzoek
+Code  : dvabav
+Prio  : 5.0
+Uitleg: Verzoek van de alarmcentrale aan contactpersoon van de ambulancedienst in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Bijstand
+Code  : dvabbs
+Prio  : 5.0
+Uitleg: Bijstand aanvraag/-inzet van de ambulancedienst voor (grootschalige) inzet buiten het werkgebied van de meldkamer
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Dienst aan derden
+Code  : dvabdd
+Prio  : 5.0
+Uitleg: Het verlenen van diensten aan derden door de ambulancedienst
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Geplande actie
+Code  : dvabga
+Prio  : 5.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Oefening
+Code  : dvaboe
+Prio  : 5.0
+Uitleg: Het verwerken van een fictief incident, voor trainingsdoeleinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Opnamestop
+Code  : dvabos
+Prio  : 5.0
+Uitleg: Indien een ziekenhuis een opnamestop afkondigt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : Testmelding
+Code  : dvabtm
+Prio  : 5.0
+Uitleg: Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Ambulancezorg
+MC3   : VWS
+Code  : dvabvw
+Prio  : 4.0
+Uitleg: Voorwaardescheppend
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : 
+Code  : dvbw
+Prio  : 5.0
+Uitleg: Het verlenen van hulp en leveren van diensten door de brandweer aan derden en de eigen dienst. Niet zijnde directe inzet voor een incident tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Afstemverzoek
+Code  : dvbwav
+Prio  : 5.0
+Uitleg: Verzoek van de alarmcentrale aan contactpersoon van de brandweer in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Bijstand
+Code  : dvbwbs
+Prio  : 4.0
+Uitleg: Bijstand aanvraag/-inzet van de brandweer voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Dienst aan derden
+Code  : dvbwdd
+Prio  : 4.0
+Uitleg: Het verlenen van diensten aan derden door de Brandweer
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Geplande actie
+Code  : dvbwga
+Prio  : 5.0
+Uitleg: Acties van de brandweer die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Herbez./Kazern.
+Code  : dvbwhb
+Prio  : 5.0
+Uitleg: Acties van de brandweer om een kazerne die zelf geen eenheden meer kan leveren, in verband met de inzet, bij een incident of anderszins bezet te krijgen voor de noodzaakelijk geachte dekking in een bepaald gebied.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Liftopsluiting
+Code  : dvbwlo
+Prio  : 3.0
+Uitleg: Melding van/inzet voor mensen die vast in een lift zitten waarbij inzet van de brandweer wenselijk geacht wordt in verband met lange wachttijd op de liftmonteur.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Oefening
+Code  : dvbwoe
+Prio  : 5.0
+Uitleg: Het verwerken van een fictief incident, voor trainingsdoeleinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Brandweer
+MC3   : Testmelding
+Code  : dvbwtm
+Prio  : 5.0
+Uitleg: Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dienst door derden
+MC3   : 
+Code  : dvdd
+Prio  : 5.0
+Uitleg: Het gaat hier om een bij de MK binnen gekomen hulpvraag waarvan geconcludeerd wordt dat het niet nodig is 1 van de disciplines te betrekken (anders dan de centralist waarbij die binnen gekomen is) en die niet onder 1 van de andere MC’s te plaatsen is en die beter door een andere niet direct aan de OOV diensten gelieerde partij af te handelen is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dieren
+MC3   : 
+Code  : dvdi
+Prio  : 3.0
+Uitleg: Hulpverlening in verband met dieren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dieren
+MC3   : Dier in problemen
+Code  : dvdipb
+Prio  : 3.0
+Uitleg: Hulpverlening aan een dier in problemen, niet specifiek benoemd.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dieren
+MC3   : In of op ijs
+Code  : dvdiij
+Prio  : 3.0
+Uitleg: Hulpverlening aan een dier dat door het ijs is gezakt of dreigt te zakken of is vastgevroren en waarvan naar redelijkheid niet verwacht kan worden dat het zelfstandig uit het water/van het ijs kan komen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dieren
+MC3   : In put/bassin/kelder
+Code  : dvdipu
+Prio  : 3.0
+Uitleg: Hulpverlening aan een dier dat zich bevindt in een opslagruimte voor vloeistof/mest of andere stof waarin het kan zinken.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dieren
+MC3   : Op hoogte
+Code  : dvdiho
+Prio  : 3.0
+Uitleg: Hulpverlening aan een dier dat zich op een plek hoog boven de grond bevindt waarvan redelijkerwijs niet verwacht mag worden dat het dier zelf weer de normale leefomgeving kan bereiken.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Dieren
+MC3   : Te water
+Code  : dvdiwa
+Prio  : 3.0
+Uitleg: Hulpverlening aan een dier dat te water is geraakt en waarvan naar alle redelijkheid niet verwacht kan worden dat het zelfstandig weer uit het water kan komen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : 
+Code  : dvkm
+Prio  : 3.0
+Uitleg: Inzet van de KMAR.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Afstemverzoek
+Code  : dvkav
+Prio  : 5.0
+Uitleg: Verzoek van de alarmcentrale aan contactpersoon van de KMAR in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Begeleiden
+Code  : dvkmbg
+Prio  : 3.0
+Uitleg: Inzet van de KMAR bij de begeleiding van personen  en goederen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Beveil. waardetransport
+Code  : dvkmwd
+Prio  : 3.0
+Uitleg: Inzet van de KMAR bij het beveiligen van een waardetransport.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Bijstand
+Code  : dvkmbs
+Prio  : 3.0
+Uitleg: Bijstand aanvraag/-inzet van de KMAR.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Dienst aan derden
+Code  : dvkmdd
+Prio  : 3.0
+Uitleg: Het verlenen van diensten aan derden door de KMAR
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Geplande actie
+Code  : dvkmga
+Prio  : 3.0
+Uitleg: Acties van de KMAR die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Signalering
+Code  : dvkmsn
+Prio  : 3.0
+Uitleg: Signalering uit een opsporingssysteem, niet zijnde via sensing.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : KMAR
+MC3   : Testmelding
+Code  : dvkmtm
+Prio  : 5.0
+Uitleg: Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : 
+Code  : dvmu
+Prio  : 5.0
+Uitleg: Het verlenen van hulp en leveren van diensten door meerdere disciplines aan derden en de eigen dienst.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Afstemverzoek
+Code  : dvmuav
+Prio  : 5.0
+Uitleg: Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Buitensluiting
+Code  : dvmubt
+Prio  : 5.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Geplande actie
+Code  : dvmuga
+Prio  : 4.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Oefening
+Code  : dvmuoe
+Prio  : 5.0
+Uitleg: Het verwerken van een fictief incident, voor trainingsdoeleinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Overname meldkamer
+Code  : dvmuom
+Prio  : 5.0
+Uitleg: Het overnemen van een meldkamer door een andere meldkamer.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Testmelding
+Code  : dvmutm
+Prio  : 5.0
+Uitleg: Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Uitval meldkamer
+Code  : dvmumk
+Prio  : 5.0
+Uitleg: De melding aan de disciplines dat de meldkamer beperkt of niet functioneert.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Multi
+MC3   : Uitval systeem
+Code  : dvmuc2
+Prio  : 5.0
+Uitleg: De melding aan de disciplines dat C2000 is uitgevallen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : 
+Code  : dvpo
+Prio  : 5.0
+Uitleg: Het verlenen van hulp en leveren van diensten door de politie aan derden en de eigen dienst. Niet zijnde directe inzet voor een incident tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Aan instanties
+Code  : dvpoai
+Prio  : 3.0
+Uitleg: Het verlenen van hulp en leveren van diensten door de politie aan instanties.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Aantreffen van
+Code  : dvpoav
+Prio  : 3.0
+Uitleg: De inzet van de politie in het kader van het aantreffen van personen of goederen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Afstemverzoek
+Code  : dvplav
+Prio  : 3.0
+Uitleg: Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Begeleiden
+Code  : dvpobg
+Prio  : 3.0
+Uitleg: Inzet van de politie bij de begeleiding van personen  en goederen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Bijstand
+Code  : dvpobs
+Prio  : 3.0
+Uitleg: Bijstand aanvraag/-inzet van de politie voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Controle Wet ID
+Code  : dvpoci
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Dienst aan derden
+Code  : dvpodd
+Prio  : 3.0
+Uitleg: Het verlenen van diensten aan derden door de politie.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Eigen initiatief
+Code  : dvpoei
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Geplande actie
+Code  : dvpoga
+Prio  : 5.0
+Uitleg: Acties van de politie die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Oefening
+Code  : dvpooe
+Prio  : 5.0
+Uitleg: Het verwerken van een fictief incident, voor trainingsdoeleinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Overbrengen
+Code  : dvpoob
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Testmelding
+Code  : dvpltm
+Prio  : 5.0
+Uitleg: Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Dienstverlening
+MC2   : Politie
+MC3   : Vermissing
+Code  : dvpovm
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Gezondheid
+MC2   : 
+MC3   : 
+Code  : gz
+Prio  : 
+Uitleg: Gezondheidsproblemen die niet gerelateerd zijn aan brand of een ongeval (of andere MC).
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Gezondheid
+MC2   : Onwel/Ziekte
+MC3   : 
+Code  : gzoz
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Gezondheid
+MC2   : Poging zelfdoding
+MC3   : 
+Code  : gzpz
+Prio  : 1.0
+Uitleg: Er is een melding voor een van de disciplines van poging tot zelfdoding.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Gezondheid
+MC2   : Reanimatie
+MC3   : 
+Code  : gzra
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Gezondheid
+MC2   : Suicidaal persoon
+MC3   : 
+Code  : gzsp
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Hulpvraag
+MC2   : 
+MC3   : 
+Code  : hvr
+Prio  : 
+Uitleg: Hulpaanvragen die bij de meldkamer binnenkomen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Hulpvraag
+MC2   : Ambulancezorg
+MC3   : 
+Code  : hvaz
+Prio  : 2.0
+Uitleg: Hulpaanvragen die bij de ambulanzezorg binnenkomen
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Hulpvraag
+MC2   : Ambulancezorg
+MC3   : Directe inzet
+Code  : hvazdi
+Prio  : 2.0
+Uitleg: De centralist van de meldkamer ambulancezorg stuurt op basis van een 112-melding zo snel als mogelijk en voor afronding van de triage een ambulance-eenheid in de richting van het incident. Het uitsturen van de ambulance gebeurt met een A2-urgentie. Triage, terwijl de ambulance al onderweg is, kan aanleiding geven de inzetopdracht en/of de urgentie bij te stellen of eventueel zelfs de inzetopdracht af te breken.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Hulpvraag
+MC2   : Ambulancezorg
+MC3   : Versnelde inzet
+Code  : hvazvi
+Prio  : 2.0
+Uitleg: De centralist van de meldkamer ambulancezorg stuurt op basis van een 112-melding of melding van een zorg professional vanuit NTS zo snel als mogelijk en voor afronding van de triage een ambulance-eenheid in de richting van het incident. Het uitsturen van de ambulance gebeurt met een A1- of A2-urgentie (keuze vanuit NTS). Triage, terwijl de ambulance al onderweg is, kan aanleiding geven de urgentie bij te stellen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : 
+MC3   : 
+Code  : lm
+Prio  : 
+Uitleg: Aantasting van de leefomgeving (hinder) of dreiging daartoe, zonder directe of indirecte invloed op de gezondheid van mensen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Aardschok
+MC3   : 
+Code  : lmas
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Conflict
+MC3   : 
+Code  : lmcf
+Prio  : 2.0
+Uitleg: Een situatie waarin twee of meer mensen tegengestelde opvattingen hebben.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Conflict
+MC3   : Burenruzie
+Code  : lmcfbu
+Prio  : 2.0
+Uitleg: Een conflict tussen buren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Conflict
+MC3   : Conflictbemiddeling
+Code  : lmcfbm
+Prio  : 2.0
+Uitleg: Een conflict tussen twee (samenwonende) personen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Conflict
+MC3   : Hulpverlener
+Code  : lmcfhv
+Prio  : 1.0
+Uitleg: Een conflict tussen een burger en een hulpverlener van een particuliere- of overheidsinstelling.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Dieren
+MC3   : 
+Code  : lmdi
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Dieren
+MC3   : Agressieve dieren
+Code  : lmdiag
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Dieren
+MC3   : Dierenkwelling
+Code  : lmdikw
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Dieren
+MC3   : Zieke/Dode dieren
+Code  : lmdizd
+Prio  : 3.0
+Uitleg: Aantreffen van zieke en/of dode dieren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : 
+Code  : lmol
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : Dieren
+Code  : lmoldi
+Prio  : 3.0
+Uitleg: Overlast veroorzaakt door dieren, waaronder blaffende honden en bijenzwermen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : Geluid
+Code  : lmolgl
+Prio  : 3.0
+Uitleg: Overlast veroorzaakt door geluid in de woonomgeving.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : Jeugd
+Code  : lmolje
+Prio  : 3.0
+Uitleg: Het veroorzaken van overlast door jeugdige personen, waaronder zogenaamde hangjongeren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : Persoon
+Code  : lmolps
+Prio  : 3.0
+Uitleg: Het veroorzaken van overlast door een individueel persoon.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : Verkeer
+Code  : lmolvk
+Prio  : 3.0
+Uitleg: Overlast veroorzaakt door weg-, water-, spoor- en luchtverkeer.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Overlast van/door
+MC3   : Vuurwerk
+Code  : lmolvw
+Prio  : 3.0
+Uitleg: Overlast ten gevolge van het afsteken van vuurwerk.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Stank/Hinder. Lucht
+MC3   : 
+Code  : lmst
+Prio  : 3.0
+Uitleg: Overlast van stinkende stoffen, bijvoorbeeld door chemisch stoffen of het uitrijden van mest.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Uitval nutsvoorziening
+MC3   : 
+Code  : lmun
+Prio  : 5.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Verontreiniging
+MC3   : 
+Code  : lmvo
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Verontreiniging
+MC3   : Bodem
+Code  : lmvobd
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Verontreiniging
+MC3   : Lucht
+Code  : lmvolu
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Verontreiniging
+MC3   : Object
+Code  : lmvoob
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Verontreiniging
+MC3   : Oppervlaktewater
+Code  : lmvoow
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : 
+Code  : lmww
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : Gladheid/Sneeuw
+Code  : lmwwgl
+Prio  : 4.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : Hoogwater
+Code  : lmwwhw
+Prio  : 4.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : Overstroming/Dijkdoorbraak
+Code  : lmwwos
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : Stormschade
+Code  : lmwwst
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : Warmte/Droogte
+Code  : lmwwwd
+Prio  : 5.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Leefmilieu
+MC2   : Water/weer problemen
+MC3   : Wateroverlast
+Code  : lmwwol
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : 
+MC3   : 
+Code  : og
+Prio  : 
+Uitleg: Een onvoorziene gebeurtenis met urgentie waarbij op enige wijze schade is veroorzaakt (ontstaan) aan mensen of goederen waarbij het niet primair om brand of een explosie gaat. Alleen onder luchtvaartongevallen worden ook alle branden van luchtvaartuigen gerekend.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Luchtvaart
+MC3   : 
+Code  : oglu
+Prio  : 2.0
+Uitleg: Een onvoorziene gebeurtenis waarbij een vliegtuig is betrokken.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Luchtvaart
+MC3   : Crash
+Code  : ogluco
+Prio  : 1.0
+Uitleg: Een onvoorziene landing of neerstorting of aanrijding met ernstige gevolgen. (Bijv. vliegtuig stort neer tijdens landing, twee vliegtuigen komen op de start-/landingsbaan met elkaar in botsing, een helikopter raakt hoogspanningskabel en stort neer)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Luchtvaart
+MC3   : Gevaarlijke stof
+Code  : oglugs
+Prio  : 1.0
+Uitleg: Een ongeval (incident) met gevaarlijke stoffen (niet zijnde een crash, noodsituatie of voorzorgslanding), vanuit een luchtvaartuig.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Luchtvaart
+MC3   : Noodsituatie
+Code  : ogluns
+Prio  : 1.0
+Uitleg: Piloot doet May Day Call. Hierbij is sprake van een ernstige situatie waarbij direct levensgevaar voor de aanwezigen is of kan ontstaan en waarbij direct assistentie is vereist. Het luchtvaartuig wil voorrang op alle luchtvaartbewegingen om te landen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Luchtvaart
+MC3   : Overig LVO
+Code  : ogluki
+Prio  : 1.0
+Uitleg: Onder de luchtvaart ongevallen vallende overige incidenten met luchtvaartuig, wat de luchthaven in eerste instantie zelf af kan met de luchthavenbrandweer. (Dit zijn geen crashes, runway incursion, voorzorgslandingen, etc.)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Luchtvaart
+MC3   : Voorzorg
+Code  : ogluvz
+Prio  : 1.0
+Uitleg: Een melding uit voorzorg (pan pan call) met als doel vroegtijdig maatregelen te kunnen treffen of hulpverlening op te starten. Er wordt nog geen ernstig incident verwacht en de luchthaven moet het incident in principe met eigen potentieel af kunnen handelen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Overig
+MC3   : 
+Code  : ogov
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Overig
+MC3   : Gevaarlijke stof
+Code  : ogovgs
+Prio  : 1.0
+Uitleg: Een ongeval (incident) (niet zijnde luchtvaart, spoorvervoer, water of wegvervoer), waarbij gevaarlijke stoffen betrokken zijn en deze stof(fen) het grootste gevaar van het incident zijn voor de hulpverleners en de omgeving.(bijvoorbeeld het vrijkomen van een gevaarlijke stof uit een installatie bij een bedrijf)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Overig
+MC3   : Letsel
+Code  : ogovls
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Overig
+MC3   : Materieel
+Code  : ogovmt
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Spoorvervoer
+MC3   : 
+Code  : ogsp
+Prio  : 2.0
+Uitleg: Een ongeval op het spoor.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Spoorvervoer
+MC3   : Gevaarlijke stof
+Code  : ogspgs
+Prio  : 1.0
+Uitleg: Een ongeval (incident) met gevaarlijke stoffen op het spoor ( bijvoorbeeld een lekkende ketelwagon)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Spoorvervoer
+MC3   : Letsel
+Code  : ogspls
+Prio  : 1.0
+Uitleg: Een ongeval op het spoor met (ander) voertuig of voorwerp waarbij enig menselijk letsel is ontstaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Spoorvervoer
+MC3   : Materieel
+Code  : ogspmt
+Prio  : 2.0
+Uitleg: Een ongeval op het spoor met (ander) voertuig of voorwerp waarbij slechts sprake is van materiele schade.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : 
+Code  : ogwt
+Prio  : 2.0
+Uitleg: Een ongeval te water.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Gevaarlijke stof
+Code  : ogwtgs
+Prio  : 1.0
+Uitleg: Een ongeval (incident) met gevaarlijke stoffen op het water ( bijvoorbeeld een lekkende tank/compartiment van een binnenvaartschip)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Lek/zinken woonboot
+Code  : ogwtzi
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Letsel
+Code  : ogwtls
+Prio  : 1.0
+Uitleg: Een ongeval te water waarbij enig menselijk letsel is ontstaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Materieel
+Code  : ogwtmt
+Prio  : 3.0
+Uitleg: Een ongeval te water waarbij slechts van materiele schade sprake is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Noodsignaal
+Code  : ogwtns
+Prio  : 1.0
+Uitleg: Een (melding) waarneming signaal dat wordt uitgezonden/gegeven om aan te geven dat een vaartuig in nood verkeert en waarbij geen direct mondeling contact is met de opvarende op het vaartuig, en door de waarnemer ook niet vast te stellen is dat er zich daadwerkelijk een vaartuig in nood verkeert.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Persoon in drijfzand
+Code  : ogwtpd
+Prio  : 1.0
+Uitleg: Een persoon in nood die zich in drijfzand begeeft.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Persoon te water
+Code  : ogwtpw
+Prio  : 1.0
+Uitleg: Een persoon in nood die te water is geraakt en niet in het bezit is van een drijfmiddel (drenkeling).
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Water
+MC3   : Schip/watersp. in problemen
+Code  : ogwtpr
+Prio  : 2.0
+Uitleg: Een vaartuig waarover de bemanning de controle heeft verloren of welke in gevaar verkeert. Dit wordt bepaald op basis van direct contact met opvarenden, of door waarneming van de toestand van het vaartuig door derden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Wegvervoer
+MC3   : 
+Code  : ogwe
+Prio  : 2.0
+Uitleg: Een ongeval op de weg.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Wegvervoer
+MC3   : Gevaarlijke stof
+Code  : ogwegs
+Prio  : 1.0
+Uitleg: Een ongeval (incident) met gevaarlijke stoffen op de weg / vanuit een voertuig ( bijvoorbeeld een lekkende tankwagen)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Wegvervoer
+MC3   : Letsel
+Code  : ogwels
+Prio  : 1.0
+Uitleg: Een ongeval waarbij een voertuig (wegvervoer) is betrokken waarbij enig lichamelijk letsel is ontstaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Wegvervoer
+MC3   : Materieel
+Code  : ogwemt
+Prio  : 3.0
+Uitleg: Een ongeval waarbij een voertuig (wegvervoer) is betrokken en waarbij slechts sprake is van materiele schade.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Ongeval
+MC2   : Wegvervoer
+MC3   : Voertuig te water
+Code  : ogwewt
+Prio  : 1.0
+Uitleg: Een ongeval waarbij een voertuig (wegvervoer) te water is geraakt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : 
+MC3   : 
+Code  : vo
+Prio  : 
+Uitleg: Aantasting van de lichamelijke integriteit van persoon of dreiging met maatschappelijke gevolgen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : 
+Code  : voat
+Prio  : 3.0
+Uitleg: Verstoring van de openbare orde
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Demonstratie
+Code  : voatdm
+Prio  : 4.0
+Uitleg: Een spontane of aangekondigde betoging op de openbare weg door een of meerdere personen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Evenementen
+Code  : voatev
+Prio  : 4.0
+Uitleg: Een spontane of aangekondigde gebeurtenis op de openbare weg door eenn of meerdere personen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Huis/lok. vredebreuk
+Code  : voatvb
+Prio  : 2.0
+Uitleg: Het wederrechtelijk binnendringen van een woning of lokaliteit.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Onbevoegd betreden
+Code  : voatob
+Prio  : 3.0
+Uitleg: Zonder toestemming van de eigenaar betreden van een terrein of gebouw.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Overtreding avondklok
+Code  : vooak
+Prio  : 3.0
+Uitleg: Zonder toestemming zich in de openbaarheid begeven gedurende de periode dat een avondklok van toepassing is
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Samenscholing
+Code  : voatsm
+Prio  : 3.0
+Uitleg: Samen zijn van een groep personen dat als hinderlijk wordt ervaren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Aantast. Openb orde
+MC3   : Stalking
+Code  : vostk
+Prio  : 2.0
+Uitleg: Iemand opzettelijk en structureel lastigvallen, waardoor die persoon zich in zijn of haar vrijheid en veiligheid voelt aangetast.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging
+MC3   : 
+Code  : vobev
+Prio  : 3.0
+Uitleg: Beveiligingswerkzaamheden uitgevoerd door 1 of meerdere eenheden van de politie en/of KMAR.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging luchtvaart
+MC3   : 
+Code  : vobb
+Prio  : 3.0
+Uitleg: Incidenten met betrekking tot vliegvelden en vliegtuigen van de burgerluchtvaart.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging luchtvaart
+MC3   : Onbeheerde bagage
+Code  : vobbbg
+Prio  : 2.0
+Uitleg: Aantreffen van bagage zonder dat een eigenaar waarneembaar is.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging luchtvaart
+MC3   : Security incident
+Code  : vobbsi
+Prio  : 2.0
+Uitleg: Incident waarvoor 'security' protocollen gelden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging luchtvaart
+MC3   : Startverbod vliegtuig
+Code  : vobbsv
+Prio  : 1.0
+Uitleg: Een of meerdere vliegtuigen is verboden op te starten.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging luchtvaart
+MC3   : Steekproef security
+Code  : vobbss
+Prio  : 3.0
+Uitleg: Vanuit beveiligingsoverweging steekproefsgewijs extra controle uitvoeren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Beveiliging luchtvaart
+MC3   : Vluchtafhandeling
+Code  : vobbva
+Prio  : 3.0
+Uitleg: Beveiliging incheck, bagage, passagiers, platform etcetera.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Bijzondere Wetten
+MC3   : 
+Code  : vobzw
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Bijzondere Wetten
+MC3   : GB Controle
+Code  : vogbc
+Prio  : 3.0
+Uitleg: Controle aan de Nederlandse grens
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Bijzondere Wetten
+MC3   : Militaire Zaken
+Code  : vomi
+Prio  : 3.0
+Uitleg: Meldingen met betrekking tot het militair tucht of strafrecht, welke niet onder een andere MC’s kunnen vallen, of andere zaken met betrekking tot de Nederlandse Krijgsmacht. 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Bijzondere Wetten
+MC3   : MTV Controle
+Code  : vomtv
+Prio  : 3.0
+Uitleg: Controle aan de Schengen binnengrens van het Koninkrijk. (NL-DU en NL-BE) 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Bijzondere Wetten
+MC3   : Veiligheidscontrole WWM
+Code  : vovhc
+Prio  : 2.0
+Uitleg: Veiligheidscontrole Wet Wapens en Munitie
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Bijzondere Wetten
+MC3   : Vreemdelingenzaak
+Code  : vovzk
+Prio  : 3.0
+Uitleg: Overige vreemdelingenzaken, niet zijnde GB of MTV
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Digitaal
+MC3   : 
+Code  : vodg
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Digitaal
+MC3   : Cybercrime
+Code  : vodgcc
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Digitaal
+MC3   : Digitale criminaliteit
+Code  : vodgdc
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Drugszaak
+MC3   : 
+Code  : vodz
+Prio  : 3.0
+Uitleg: Alle meldingen met betrekking tot het bezit en gebruik van drugs.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Drugszaak
+MC3   : Dealen
+Code  : vodzdl
+Prio  : 3.0
+Uitleg: Het (illegaal) handelen in drugs.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Drugszaak
+MC3   : Drugslab
+Code  : vodzlb
+Prio  : 2.0
+Uitleg: Het aantreffen van een drugslaboratorium.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Drugszaak
+MC3   : Wietplantage
+Code  : vodzwp
+Prio  : 2.0
+Uitleg: Het aantreffen van hennep- en wietplantages.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Explosief/Munitie
+MC3   : 
+Code  : voex
+Prio  : 2.0
+Uitleg: Het aantreffen van een explosief of munitie, niet zijnde het gebruik hiervan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Explosief/Munitie
+MC3   : Aantref. explosieven
+Code  : voexat
+Prio  : 1.0
+Uitleg: Het aantreffen van explosieven.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Explosief/Munitie
+MC3   : Bommelding
+Code  : voexbm
+Prio  : 1.0
+Uitleg: Een melding waarbij gedreigd wordt tot het gebruik van een explosief.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Explosief/Munitie
+MC3   : Explosie
+Code  : voexex
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Explosief/Munitie
+MC3   : Munitie
+Code  : voexmu
+Prio  : 3.0
+Uitleg: Het aantreffen van vuurwapens en/of munitie.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Explosief/Munitie
+MC3   : Vuurwerkopslag
+Code  : voexvw
+Prio  : 3.0
+Uitleg: Het aantreffen van (illegaal) vuurwerk.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Gevangenis
+MC3   : 
+Code  : vogv
+Prio  : 2.0
+Uitleg: Een gebouw om gedetineerden in bewaring te stellen of in hechtenis te nemen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Gevangenis
+MC3   : Ontsnapping
+Code  : vogvos
+Prio  : 1.0
+Uitleg: Het zonder toestemming verlaten van de gevangenis.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Gevangenis
+MC3   : Oproer
+Code  : vogvor
+Prio  : 1.0
+Uitleg: Een melding van verzet, onrust door meerdere personen in een gevangenis.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : 
+Code  : vogw
+Prio  : 2.0
+Uitleg: Het opzettelijk, door middel van het toepassen van geweld, toebrengen van pijn of letsel aan personen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Bedreiging
+Code  : vogwbd
+Prio  : 2.0
+Uitleg: Het verbaal bedreigen van personen met het toebrengen van schade, pijn of letsel zonder dit daadwerkelijk al te hebben uitgevoerd.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : CBRN-e dreiging
+Code  : vogwcb
+Prio  : 1.0
+Uitleg: De dreiging van chemische, biologische, radioactieve, nucleaire stoffen/wapens waarbij pijn of letsel kan ontstaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Gijzeling
+Code  : vogwgz
+Prio  : 1.0
+Uitleg: Personen met geweld of bedreiging met geweld tegen hun wil vasthouden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Kaping
+Code  : vogwkp
+Prio  : 1.0
+Uitleg: Het met geweld of dreiging met geweld het commando overnemen van een voertuig, vaartuig, of luchtvaartuig.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Mishandeling
+Code  : vogwmh
+Prio  : 2.0
+Uitleg: Het opzettelijk toebrengen van pijn of letsel aan een ander.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Ontvoering
+Code  : vogwon
+Prio  : 1.0
+Uitleg: Iemand tegen diens wil onttrekken uit zijn/haar vertrouwde omgeving en wederrechtelijk verplaatsen/wegvoeren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Schietpartij
+Code  : vogwsi
+Prio  : 1.0
+Uitleg: Een vuurgevecht door middel van vuurwapens tussen of gericht tegen personen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Steekpartij
+Code  : vogwst
+Prio  : 1.0
+Uitleg: Het gebruiken van steekwapens gericht tegen personen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Terrorisme
+Code  : vogwte
+Prio  : 1.0
+Uitleg: Op de meldkamer geeft de politie aan of een incident als terrorisme geclassificeerd moet worden. Het betreffen acties met oogmerk om de bevolking of een deel van de bevolking van een land vrees aan te jagen, dan wel een overheid of internationale organisatie te dwingen iets te doen, niet te doen of te dulden, dan wel de fundamentele politieke, constitutionele, economische of sociale structuren van een land of een internationale organisatie ernstig te ontwrichten of te vernietigen. (bron: AIVD) Deze definitie die het gevolg is van het Europese standpunt van de Raad van de Europese Unie inzake terrorismebestrijding, zoals deze materieel gelijk is beschreven in de bepaling in de (ontwerp-)WTM, artikel 83a WvSr: wet- en regelgeving Art. 83a WvSr en 140 WvSr hiërarchische verhouding
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Geweld
+MC3   : Vechtpartij
+Code  : vogwve
+Prio  : 1.0
+Uitleg: Door toepassing van lijfelijk geweld een geschil trachten te slechten.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Noodoproep
+MC3   : 
+Code  : vono
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Verdachte situatie
+MC3   : 
+Code  : vovs
+Prio  : 2.0
+Uitleg: Een ongewone situatie die om nader onderzoek vraagt
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Verdachte situatie
+MC3   : Gebouw
+Code  : vovsgb
+Prio  : 2.0
+Uitleg: Een ongewone situatie in en om een gebouw die om nader onderzoek vraagt
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Verdachte situatie
+MC3   : Overleden persoon
+Code  : vovsop
+Prio  : 2.0
+Uitleg: Het aantreffen van een overleden persoon waarvan de identiteit niet direct kan worden vastgesteld en de doodsoorzaak vraagt om nader onderzoek.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Verdachte situatie
+MC3   : Pakket/Voorwerp
+Code  : vovspv
+Prio  : 2.0
+Uitleg: Het aantreffen van een verdacht pakket of voorwerp.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Verdachte situatie
+MC3   : Persoon
+Code  : vovsps
+Prio  : 2.0
+Uitleg: Het aantreffen van een persoon die verdacht is of verdacht gedraagt
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Verdachte situatie
+MC3   : Voertuig/Vaartuig
+Code  : vovsvv
+Prio  : 2.0
+Uitleg: Het aantreffen van een verdacht voertuig 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : 
+Code  : vosd
+Prio  : 2.0
+Uitleg: Een melding van een incident waarbij sprake is van een seksueel misdrijf
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Aanranding
+Code  : vosdar
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Aanstootgevend gedrag
+Code  : vosdag
+Prio  : 2.0
+Uitleg: Tonen geslachtsdeel (bijv potloodventer), kan ook live via internet
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Kinderpornografie
+Code  : vosdkp
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Ontucht minderjarigen
+Code  : vozdom
+Prio  : 2.0
+Uitleg: Het plegen van ontucht (seksuele handelingen) met een minderjarig persoon. Onder ontucht wordt hier ook verstaan het betasten van intieme delen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Prostitutie
+Code  : vosdpt
+Prio  : 2.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Seksueel benaderen kind
+Code  : vosdbk
+Prio  : 2.0
+Uitleg: Seksuele benadering van een kind, schriftelijk of mondeling (sexchatting of grooming)
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Seksueel misbruik kind
+Code  : vosdmk
+Prio  : 2.0
+Uitleg: Seksuele handelingen met kind (verkrachting of aanranding kind).
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Seksuele intimidatie
+Code  : vosdsi
+Prio  : 2.0
+Uitleg: Seksuele intimidatie in het openbaar (op straat of online). Kan gaan om opmerkingen, geluiden, gebaren of aanrakingen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Veiligheid en openbare orde
+MC2   : Seksueel delict
+MC3   : Verkrachting
+Code  : vosdvk
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : 
+MC3   : 
+Code  : vk
+Prio  : 
+Uitleg: Een verkeersgebeurtenis niet zijnde een ongeval.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Luchtvaart
+MC3   : 
+Code  : vklu
+Prio  : 3.0
+Uitleg: Betreft alle luchtvaartvervoermiddelen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Luchtvaart
+MC3   : Laag vliegen
+Code  : vklulv
+Prio  : 2.0
+Uitleg: Het lager vliegen dan de voorgeschreven minimale hoogte.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Luchtvaart
+MC3   : Onbevoegd vliegen
+Code  : vkluov
+Prio  : 2.0
+Uitleg: Zonder daarvoor voorafgegane toestemming vliegen met een luchtvaartuig.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Luchtvaart
+MC3   : Onbevoegde landing
+Code  : vkluol
+Prio  : 2.0
+Uitleg: Zonder daarvoor voorafgegane toestemming op een luchtvaartterrein of ander terrein landen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Luchtvaart
+MC3   : Onder invloed
+Code  : vkluoi
+Prio  : 2.0
+Uitleg: Een luchtvaartuig besturen terwijl de gezagvoerder onder invloed van alcoholische drank of drugs verkeert.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Luchtvaart
+MC3   : Runway incursion
+Code  : vkluri
+Prio  : 2.0
+Uitleg: Er is sprake van een runway incursion wanneer een vliegtuig, een voertuig of een persoon zich ten onrechte op de start- en of landingsbaan bevindt of binnen de beschermende zone daarvan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : 
+Code  : vksh
+Prio  : 3.0
+Uitleg: Incidenten die het vervoer op het water aangaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : Aanmeerproblemen
+Code  : vkshap
+Prio  : 3.0
+Uitleg: Er doen zich problemen voor bij het afmeren aan een steiger of kade of bij het ankeren.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : Afgevallen lading
+Code  : vkshal
+Prio  : 3.0
+Uitleg: Lading dat van een schip is gevallen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : ASO-vaargedrag
+Code  : vkshav
+Prio  : 3.0
+Uitleg: Gedrag op het water waar anderen hinder van ondervinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : Hinderl. waterbeweging
+Code  : vkshhw
+Prio  : 3.0
+Uitleg: Een vaartuig veroorzaakt een golfbeweging die hinder of schade veroorzaakt.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : Onbevoegd varen
+Code  : vkshov
+Prio  : 3.0
+Uitleg: Het besturen van een vaartuig zonder in het bezit te zijn van de vereiste documenten.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : Onder invloed
+Code  : vkshoi
+Prio  : 2.0
+Uitleg: Een vaartuig onder invloed van alcoholische drank of drugs besturen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Scheepvaart
+MC3   : Stremming
+Code  : vkshsm
+Prio  : 3.0
+Uitleg: Gedeeltelijke of gehele stremming van de vaarweg niet zijnde een ongeval
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : 
+Code  : vksp
+Prio  : 3.0
+Uitleg: Incidenten die het vervoer op of om het spoor aangaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Defect meubilair
+Code  : vkspdm
+Prio  : 5.0
+Uitleg: Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Loslopende dieren
+Code  : vkspld
+Prio  : 2.0
+Uitleg: Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Negeren rood sein
+Code  : vksprs
+Prio  : 1.0
+Uitleg: Een treinmachinist geeft geen gevolg aan een rood stopteken.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Onder invloed
+Code  : vkspoi
+Prio  : 2.0
+Uitleg: Een persoon bevindt zich onbevoegd op het spoor.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Persoon o/b spoor
+Code  : vkspps
+Prio  : 1.0
+Uitleg: Een persoon bevindt zich onbevoegd op of bij het spoor of spoorbed.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Stremming
+Code  : vkspss
+Prio  : 3.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Spoorvervoer
+MC3   : Verstoring treindienst
+Code  : vkspvt
+Prio  : 4.0
+Uitleg: Trein Incident Management onderscheid 4 gradaties van in toenemende mate ernstiger wordende verstoringen van de treindienst: TIS 1.1 t/m TIS 1.4 Zolang het geen ontsporing zonder slachtoffers, verstoring door slecht weer of door de overheid opgelegde verstoring treindienst is b.v. voor het ruimen van WO2 bom kunnen deze meldingen hieronder geplaatst worden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : 
+Code  : vkwe
+Prio  : 3.0
+Uitleg: Betreft alle wegvervoermiddelen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Achtervolging
+Code  : vkweav
+Prio  : 1.0
+Uitleg: 
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Afgevallen lading
+Code  : vkweal
+Prio  : 2.0
+Uitleg: Lading dat van een voertuig is gevallen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : ASO-rijgedrag
+Code  : vkwear
+Prio  : 3.0
+Uitleg: Gedrag op de weg waar anderen hinder van ondervinden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Bijz. Verk zaken
+Code  : vkwebz
+Prio  : 3.0
+Uitleg: Bijzondere verkeerszaken bijv. extreem vervoer
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Defect straatmeubilair
+Code  : vkweds
+Prio  : 4.0
+Uitleg: Hulpmiddelen langs de weg bijv. verkeersborden, lichtmasten, wegbebording, schrikhekken die defect of beschadigd zijn.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Fietser o/b rijbaan
+Code  : vkwefs
+Prio  : 2.0
+Uitleg: Een fietser bevindt zich onbevoegd op of bij de rijbaan
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Gladheid
+Code  : vkwegh
+Prio  : 3.0
+Uitleg: Wegdek dat door atmosferische invloed glad is geworden of dreigt te worden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Joyriding
+Code  : vkwejr
+Prio  : 2.0
+Uitleg: Het zonder toestemming van de eigenaar met een motorvoertuig over de voor het openbaar verkeer openstaande weg rijden.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Loslopende dieren
+Code  : vkwedi
+Prio  : 2.0
+Uitleg: Dieren die zonder een geleider op of langs de rijbaan van een weg lopen.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Onder invloed
+Code  : vkweoi
+Prio  : 2.0
+Uitleg: Een voertuig besturen terwijl de bestuurder onder invloed van alcoholische drank of drugs verkeert.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Parkeerprobleem
+Code  : vkwepk
+Prio  : 3.0
+Uitleg: Er doen zich problemen voor door of met het parkeren van een voertuig.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Persoon o/b rijbaan
+Code  : vkweps
+Prio  : 2.0
+Uitleg: Een persoon bevindt zich onbevoegd op of bij de rijbaan
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Spookrijder
+Code  : vkwesr
+Prio  : 1.0
+Uitleg: Een bestuurder van een motorvoertuig rijdt tegen de rijrichting van het overige verkeer in.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Verkeersgeleiding
+Code  : vkwegl
+Prio  : 4.0
+Uitleg: Bestuurders krijgen een aanwijzing door middel van matrix- borden om een bepaalde snelheid te rijden of van een bepaalde rijstrook gebruik te maken.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Verkeersstremming
+Code  : vkwest
+Prio  : 3.0
+Uitleg: De rijbaan is geheel of gedeeltelijk gestremd door een voorwerp of voertuig waardoor het verkeer niet of slechts gedeeltelijk door kan gaan.
+---------------------------
+
+--- CLASSIFICATIE BLOK ---
+MC1   : Verkeer
+MC2   : Wegverkeer
+MC3   : Vervuild wegdek
+Code  : vkwevw
+Prio  : 3.0
+Uitleg: Wegdekvervuiling door gelekte vloeistof, afvallende lading of loslatende modder van banden.
+---------------------------
