@@ -1019,7 +1019,6 @@ export default function Dashboard() {
         console.log('🚀 CLASSIFICATION DETECTION TRIGGERED');
         
         const kladblok = document.getElementById("gmsKladblok");
-        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
         
         if (!kladblok) {
           console.error('❌ Kladblok element not found!');
@@ -1287,15 +1286,9 @@ export default function Dashboard() {
               };
               console.log('🎯 FINAL DROPDOWN VALUES:', finalValues);
               
-              // Log the automatic classification
-              if (loggingPanel) {
-                const timestamp = new Date().toLocaleTimeString('nl-NL');
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry classification-auto';
-                logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`;
-                loggingPanel.appendChild(logEntry);
-                loggingPanel.scrollTop = loggingPanel.scrollHeight;
-              }
+              // Log the automatic classification to console
+              const timestamp = new Date().toLocaleTimeString('nl-NL');
+              console.log(`${timestamp} ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`);
             } else {
               console.log('❌ No classification matched for input');
               console.log('💡 Available classification samples:', storedClassifications.slice(0, 5).map(c => ({
@@ -1307,13 +1300,9 @@ export default function Dashboard() {
             }
           }
           
-          // Log the note to the logging panel
+          // Log the note to console
           const timestamp = new Date().toLocaleTimeString('nl-NL');
-          const logEntry = document.createElement('div');
-          logEntry.className = 'log-entry';
-          logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ${notitieText}`;
-          loggingPanel.appendChild(logEntry);
-          loggingPanel.scrollTop = loggingPanel.scrollHeight;
+          console.log(`${timestamp} Note: ${notitieText}`);
           
           // Clear the notepad after sending
           kladblok.textContent = '';
@@ -1518,7 +1507,7 @@ export default function Dashboard() {
         const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
         const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
         const notitieveld = document.getElementById("gmsKladblok") as HTMLElement;
-        const loggingPanel = document.querySelector(".gms-logging-content") as HTMLElement;
+        // Removed logging panel dependency to fix null reference error
 
         // Populate MC1 dropdown without auto-selecting any value
         if (mc1Select && gmsClassifications.length > 0) {
@@ -1569,15 +1558,9 @@ export default function Dashboard() {
                 priorityIndicator.classList.add(`priority-${matchingClassification.prio}`);
               }
               
-              // Log the priority update
-              if (loggingPanel) {
-                const timestamp = new Date().toLocaleTimeString('nl-NL');
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry priority-auto';
-                logEntry.innerHTML = `<span class="log-time">${timestamp}</span> Prioriteit automatisch ingesteld op ${matchingClassification.prio} voor classificatie ${matchingClassification.code}`;
-                loggingPanel.appendChild(logEntry);
-                loggingPanel.scrollTop = loggingPanel.scrollHeight;
-              }
+              // Log the priority update to console
+              const timestamp = new Date().toLocaleTimeString('nl-NL');
+              console.log(`${timestamp} Prioriteit automatisch ingesteld op ${matchingClassification.prio} voor classificatie ${matchingClassification.code}`);
             }
           }
         };
@@ -1654,14 +1637,8 @@ export default function Dashboard() {
                 }
                 
                 // Log the auto-fill action
-                if (loggingPanel) {
-                  const timestamp = new Date().toLocaleTimeString('nl-NL');
-                  const logEntry = document.createElement('div');
-                  logEntry.className = 'log-entry classification-auto';
-                  logEntry.innerHTML = `<span class="log-time">${timestamp}</span> ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.MC1} / ${matchingClassification.MC2 || 'n.v.t.'} / ${matchingClassification.MC3}`;
-                  loggingPanel.appendChild(logEntry);
-                  loggingPanel.scrollTop = loggingPanel.scrollHeight;
-                }
+                const timestamp = new Date().toLocaleTimeString('nl-NL');
+                console.log(`${timestamp} ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.MC1} / ${matchingClassification.MC2 || 'n.v.t.'} / ${matchingClassification.MC3}`);
               }
             }
             
