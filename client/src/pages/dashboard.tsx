@@ -1949,26 +1949,26 @@ export default function Dashboard() {
                 // 1. Try exact code match first
                 matchedClassification = storedClassifications.find(
                   (c) =>
-                    typeof c.code === "string" &&
-                    c.code.toLowerCase() === searchQuery.toLowerCase(),
+                    typeof c.Code === "string" &&
+                    c.Code.toLowerCase() === searchQuery.toLowerCase(),
                 );
                 console.log(
                   "🔍 1. Exact code match result:",
                   matchedClassification
-                    ? `Found: ${matchedClassification.code}`
+                    ? `Found: ${matchedClassification.Code}`
                     : "Not found",
                 );
 
                 // 2. Try partial code match (e.g., -bz matches bzdsap, bzdsbr, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find((c) =>
-                    typeof c.code === "string" &&
-                    c.code.toLowerCase().startsWith(searchQuery.toLowerCase()),
+                    typeof c.Code === "string" &&
+                    c.Code.toLowerCase().startsWith(searchQuery.toLowerCase()),
                   );
                   console.log(
                     "🔍 2. Partial code match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.code}`
+                      ? `Found: ${matchedClassification.Code}`
                       : "Not found",
                   );
                 }
@@ -1986,12 +1986,12 @@ export default function Dashboard() {
                   const mappedCode = specialMappings[searchQuery.toLowerCase()];
                   if (mappedCode) {
                     matchedClassification = storedClassifications.find(
-                      (c) => typeof c.code === "string" && c.code.toLowerCase() === mappedCode.toLowerCase(),
+                      (c) => typeof c.Code === "string" && c.Code.toLowerCase() === mappedCode.toLowerCase(),
                     );
                     console.log(
                       "🔍 3. Special mapping result:",
                       matchedClassification
-                        ? `Found: ${matchedClassification.code}`
+                        ? `Found: ${matchedClassification.Code}`
                         : "Not found",
                     );
                   } else {
