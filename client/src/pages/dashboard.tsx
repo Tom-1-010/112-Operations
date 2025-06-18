@@ -6615,7 +6615,7 @@ export default function Dashboard() {
                             <input
                               type="datetime-local"
                               id="gmsTijdstip"
-                              className="gms-field"
+                              className="gms-field gms-field-small"
                               readOnly
                             />
                           </div>
