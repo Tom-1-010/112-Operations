@@ -1,0 +1,1784 @@
+[
+  {
+    "roepnummer": "RT 12.01",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.02",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.03",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.04",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.05",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.06",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.07",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.08",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.09",
+    "aantal_mensen": 1,
+    "rol": "Senior",
+    "rol_2": "ACO",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.10",
+    "aantal_mensen": 1,
+    "rol": "Opr. Expert",
+    "rol_2": "OPCO",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.11",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.12",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.13",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.14",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.15",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.16",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.17",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.18",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.19",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.20",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "OSA",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.21",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.22",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.23",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.24",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.25",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.26",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.27",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.28",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.29",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.30",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.31",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.32",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.33",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.34",
+    "aantal_mensen": 3,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.35",
+    "aantal_mensen": 3,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.36",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.37",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.38",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.39",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.40",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.41",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.42",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.43",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.44",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.45",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.46",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.47",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.48",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.49",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.50",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.51",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.52",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.53",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.54",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.55",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.56",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.57",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.58",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.59",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.60",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.61",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.62",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.63",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.64",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.65",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.66",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.67",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.68",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.69",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.70",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.71",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.72",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.73",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.74",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.75",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.76",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.77",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.78",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.79",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.80",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.81",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.82",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.83",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.84",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.85",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.86",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.87",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.88",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.89",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.90",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.91",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.92",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.93",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.94",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.95",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.96",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.97",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.98",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 12.99",
+    "aantal_mensen": 1,
+    "rol": "teamchef",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Schiedam (A2)"
+  },
+  {
+    "roepnummer": "RT 13.01",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.02",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.03",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.04",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.05",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.06",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.07",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.08",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV - bus",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.09",
+    "aantal_mensen": 1,
+    "rol": "Senior",
+    "rol_2": "ACO",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.10",
+    "aantal_mensen": 1,
+    "rol": "Opr. Expert",
+    "rol_2": "OPCO",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.11",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.12",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.13",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.14",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.15",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Solo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.16",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.17",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.18",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.19",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Onopvallend",
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.20",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "OSA",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.21",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.22",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.23",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.24",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.25",
+    "aantal_mensen": 1,
+    "rol": "Noodhulp",
+    "rol_2": "Motor",
+    "rol_3": NaN,
+    "soort_auto": "BPV-motor",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.26",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.27",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.28",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.29",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.30",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.31",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.32",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.33",
+    "aantal_mensen": 2,
+    "rol": "Voet/fiets",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "Fiets",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.34",
+    "aantal_mensen": 3,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.35",
+    "aantal_mensen": 3,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.36",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.37",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.38",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.39",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Studenten",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.40",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.41",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.42",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.43",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.44",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.45",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.46",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.47",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.48",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.49",
+    "aantal_mensen": 2,
+    "rol": "Noodhulp",
+    "rol_2": "Hor/proj/demo",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.50",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.51",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.52",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.53",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.54",
+    "aantal_mensen": 1,
+    "rol": "Opsporing",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-onopvallend",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.55",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.56",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.57",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.58",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.59",
+    "aantal_mensen": 2,
+    "rol": "Uniform z. vwp",
+    "rol_2": "Noodhulp",
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.60",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.61",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.62",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.63",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.64",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.65",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.66",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.67",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.68",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.69",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.70",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.71",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.72",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.73",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.74",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.75",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.76",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.77",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.78",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.79",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.80",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.81",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.82",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.83",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.84",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.85",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.86",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.87",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.88",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.89",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.90",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.91",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.92",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.93",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.94",
+    "aantal_mensen": 1,
+    "rol": "Wijkagent",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.95",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.96",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.97",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.98",
+    "aantal_mensen": 1,
+    "rol": "Reisnummer",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  },
+  {
+    "roepnummer": "RT 13.99",
+    "aantal_mensen": 1,
+    "rol": "teamchef",
+    "rol_2": NaN,
+    "rol_3": NaN,
+    "soort_auto": "BPV-auto",
+    "basisteam": "Basisteam Midden-Schieland (A3)"
+  }
+]
