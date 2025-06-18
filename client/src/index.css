@@ -2206,7 +2206,7 @@ body {
 }
 
 .log-time {
-  color: #0066cc;
+  color: black;
   font-weight: bold;
   margin-right: 8px;
 }
@@ -2233,7 +2233,7 @@ body {
   border: 1px solid #28a745;
   border-radius: 3px;
   font-weight: bold;
-  color: #155724;
+  color: black;
   margin: 4px 0;
 }
 
@@ -2460,21 +2460,21 @@ body {
 }
 
 .gms-log-time {
-  color: hsl(208, 79%, 51%);
+  color: black;
   font-weight: 600;
   margin-right: 8px;
 }
 
 .gms-log-message {
-  color: hsl(213, 22%, 24%);
+  color: black;
 }
 
 .gms-log-entry.urgent .gms-log-time {
-  color: #721c24;
+  color: black;
 }
 
 .gms-log-entry.urgent .gms-log-message {
-  color: #721c24;
+  color: black;
 }
 
 .gms-priority-wrapper {
@@ -2617,14 +2617,14 @@ body {
 
 .gms-log-timestamp {
   font-weight: 600;
-  color: hsl(208, 79%, 51%);
+  color: black;
   margin-right: 8px;
   font-family: 'Courier New', monospace;
   font-size: 13px;
 }
 
 .gms-log-content {
-  color: hsl(213, 22%, 24%);
+  color: black;
 }
 
 #gmsMeldingLogging {
