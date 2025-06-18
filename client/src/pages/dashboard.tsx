@@ -6411,7 +6411,7 @@ export default function Dashboard() {
                             <input
                               type="text"
                               id="gmsTelefoonnummer"
-                              className="gms-field gms-field-small"
+                              className="gms-field"
                             />
                           </div>
                           <div className="gms-checkboxes">
