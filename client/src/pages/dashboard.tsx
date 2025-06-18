@@ -5659,7 +5659,7 @@ export default function Dashboard() {
                             <input
                               type="text"
                               id="gmsHuisnummer"
-                              className="gms-field gms-field-small"
+                              className="gms-field"
                             />
                           </div>
                           <div className="gms-field-group gms-field-extension">
