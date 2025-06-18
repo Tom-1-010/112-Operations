@@ -2060,9 +2060,9 @@ body {
 }
 
 .gms-text-area-compact {
-  min-height: 100px;
-  max-height: 100px;
-  width: 160px;
+  min-height: 140px;
+  max-height: 140px;
+  width: 220px;
   resize: none;
 }
 
@@ -2084,12 +2084,12 @@ body {
 /* Notitieveld horizontal split layout */
 .gms-notitie-container {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
 }
 
 .gms-notitie-left {
-  width: 200px;
+  width: 280px;
   display: flex;
   flex-direction: column;
 }
@@ -2097,11 +2097,11 @@ body {
 .gms-notitie-right {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   align-items: flex-start;
   justify-content: flex-start;
-  min-width: 80px;
-  margin-left: 20px;
+  min-width: 100px;
+  margin-left: 25px;
 }
 
 .gms-text-controls {
@@ -2114,8 +2114,8 @@ body {
 .gms-text-btn {
   background: #e0e0e0;
   border: 1px outset #c0c0c0;
-  padding: 2px 8px;
-  font-size: 10px;
+  padding: 4px 12px;
+  font-size: 11px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -2127,23 +2127,25 @@ body {
 .gms-alert-btn {
   background: #dc3545;
   border: 1px outset #c0c0c0;
-  padding: 4px 8px;
-  font-size: 12px;
+  padding: 6px 12px;
+  font-size: 13px;
   cursor: pointer;
   color: white;
   font-weight: bold;
   width: 100%;
+  margin-bottom: 4px;
 }
 
 .gms-action-btn {
   background: #28a745;
   border: 1px outset #c0c0c0;
-  padding: 4px 8px;
-  font-size: 12px;
+  padding: 6px 12px;
+  font-size: 13px;
   cursor: pointer;
   color: white;
   font-weight: bold;
   width: 100%;
+  margin-bottom: 4px;
 }
 
 .gms-alert-btn:hover {
@@ -2198,9 +2200,9 @@ body {
 }
 
 .gms-priority-dot {
-  width: 12px;
-  height: 12px;
-  border: 1px solid #666;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #666;
   border-radius: 50%;
   background: #ccc;
   transition: all 0.3s ease;
@@ -2425,20 +2427,22 @@ body {
 .gms-priority-wrapper {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .gms-priority-input {
   flex: 1;
-  max-width: 40px !important;
-  height: 18px !important;
-  padding: 1px 3px !important;
-  font-size: 10px !important;
+  max-width: 60px !important;
+  height: 24px !important;
+  padding: 3px 6px !important;
+  font-size: 12px !important;
+  font-weight: bold;
+  text-align: center;
 }
 
 .gms-priority-indicator {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid hsl(214, 13%, 91%);
   transition: all 0.3s ease;
@@ -2467,17 +2471,18 @@ body {
 }
 
 .gms-priority-help {
-  font-size: 11px;
-  color: hsl(220, 9%, 60%);
+  font-size: 12px;
+  color: hsl(220, 9%, 50%);
   font-style: italic;
-  margin-top: 2px;
-  line-height: 1.2;
+  margin-top: 4px;
+  line-height: 1.3;
+  font-weight: 500;
 }
 
 /* Specific compact styling for additional fields section */
 .gms-additional-fields .gms-priority-help {
-  font-size: 10px;
-  margin-top: 1px;
+  font-size: 11px;
+  margin-top: 2px;
 }
 
 .gms-input {
