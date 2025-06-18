@@ -2015,13 +2015,13 @@ export default function Dashboard() {
                     const mc2 = (c.MC2 || '').toLowerCase();
                     const mc3 = (c.MC3 || '').toLowerCase();
                     const fullClassification = `${mc1} ${mc2} ${mc3}`;
-                    const uitleg = (c.uitleg || '').toLowerCase();
+                    const definitie = (c.DEFINITIE || '').toLowerCase();
 
                     // Check if all search words are present in the classification or explanation
                     return searchWords.every(
                       (word) =>
                         fullClassification.includes(word) ||
-                        uitleg.includes(word) ||
+                        definitie.includes(word) ||
                         mc1.includes(word) ||
                         mc2.includes(word) ||
                         mc3.includes(word),
@@ -2030,7 +2030,7 @@ export default function Dashboard() {
                   console.log(
                     "🔍 4. Multi-word match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.code}`
+                      ? `Found: ${matchedClassification.Code}`
                       : "Not found",
                   );
                 }
@@ -2046,7 +2046,7 @@ export default function Dashboard() {
                   console.log(
                     "🔍 4. Individual text match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.code}`
+                      ? `Found: ${matchedClassification.Code}`
                       : "Not found",
                   );
                 }
@@ -2058,12 +2058,12 @@ export default function Dashboard() {
                     const mc1 = (c.MC1 || '').toLowerCase();
                     const mc2 = (c.MC2 || '').toLowerCase();
                     const mc3 = (c.MC3 || '').toLowerCase();
-                    const uitleg = (c.uitleg || '').toLowerCase();
+                    const definitie = (c.DEFINITIE || '').toLowerCase();
                     return (
                       mc1.includes(searchLower) ||
                       mc2.includes(searchLower) ||
                       mc3.includes(searchLower) ||
-                      uitleg.includes(searchLower) ||
+                      definitie.includes(searchLower) ||
                       searchLower.includes(mc1) ||
                       searchLower.includes(mc2) ||
                       searchLower.includes(mc3)
@@ -2072,7 +2072,7 @@ export default function Dashboard() {
                   console.log(
                     "🔍 5. Fuzzy match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.code}`
+                      ? `Found: ${matchedClassification.Code}`
                       : "Not found",
                   );
                 }
@@ -2096,12 +2096,12 @@ export default function Dashboard() {
 
                 matchedClassification = storedClassifications.find(
                   (c) =>
-                    c.MC3.toLowerCase().includes(searchQuery) ||
-                    c.MC2.toLowerCase().includes(searchQuery) ||
-                    c.MC1.toLowerCase().includes(searchQuery) ||
-                    searchQuery.includes(c.MC3.toLowerCase()) ||
-                    searchQuery.includes(c.MC2.toLowerCase()) ||
-                    searchQuery.includes(c.MC1.toLowerCase()),
+                    (c.MC3 || '').toLowerCase().includes(searchQuery) ||
+                    (c.MC2 || '').toLowerCase().includes(searchQuery) ||
+                    (c.MC1 || '').toLowerCase().includes(searchQuery) ||
+                    searchQuery.includes((c.MC3 || '').toLowerCase()) ||
+                    searchQuery.includes((c.MC2 || '').toLowerCase()) ||
+                    searchQuery.includes((c.MC1 || '').toLowerCase()),
                 );
 
                 if (matchedClassification) {
