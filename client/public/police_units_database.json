@@ -1,0 +1,1031 @@
+
+[
+  {
+    "roepnummer": "RT 11.01",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.02",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.03",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.04",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.05",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.06",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.07",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.08",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV - bus",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.09",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Senior",
+      "ACO"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.10",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Opr. Expert",
+      "OPCO"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.11",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Solo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.12",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Solo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.13",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Solo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.14",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Solo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.15",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Solo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.16",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Onopvallend"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.17",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Onopvallend"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.18",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Onopvallend"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.19",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Onopvallend"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.20",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "OSA"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.21",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Motor"
+    ],
+    "soort_auto": "BPV-motor",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.22",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Motor"
+    ],
+    "soort_auto": "BPV-motor",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.23",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Motor"
+    ],
+    "soort_auto": "BPV-motor",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.24",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Motor"
+    ],
+    "soort_auto": "BPV-motor",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.25",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Noodhulp",
+      "Motor"
+    ],
+    "soort_auto": "BPV-motor",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.26",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.27",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.28",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.29",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.30",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.31",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.32",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.33",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Voet/fiets"
+    ],
+    "soort_auto": "Fiets",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.34",
+    "aantal_mensen": 3,
+    "rollen": [
+      "Noodhulp",
+      "Studenten"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.35",
+    "aantal_mensen": 3,
+    "rollen": [
+      "Noodhulp",
+      "Studenten"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.36",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Studenten"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.37",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Studenten"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.38",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Studenten"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.39",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Studenten"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.40",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.41",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.42",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.43",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.44",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.45",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.46",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.47",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.48",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.49",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Noodhulp",
+      "Hor/proj/demo"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.50",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Opsporing"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.51",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Opsporing"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.52",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Opsporing"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.53",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Opsporing"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.54",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Opsporing"
+    ],
+    "soort_auto": "BPV-onopvallend",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.55",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Uniform z. vwp",
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.56",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Uniform z. vwp",
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.57",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Uniform z. vwp",
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.58",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Uniform z. vwp",
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.59",
+    "aantal_mensen": 2,
+    "rollen": [
+      "Uniform z. vwp",
+      "Noodhulp"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.60",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.61",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.62",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.63",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.64",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.65",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.66",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.67",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.68",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.69",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.70",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.71",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.72",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.73",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.74",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.75",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.76",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.77",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.78",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.79",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.80",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.81",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.82",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.83",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.84",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.85",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.86",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.87",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.88",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.89",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.90",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.91",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.92",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.93",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.94",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Wijkagent"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.95",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Reisnummer"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.96",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Reisnummer"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.97",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Reisnummer"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.98",
+    "aantal_mensen": 1,
+    "rollen": [
+      "Reisnummer"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  },
+  {
+    "roepnummer": "RT 11.99",
+    "aantal_mensen": 1,
+    "rollen": [
+      "teamchef"
+    ],
+    "soort_auto": "BPV-auto",
+    "team": "Basisteam Waterweg (A1)",
+    "status": "Beschikbaar"
+  }
+]

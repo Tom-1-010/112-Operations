@@ -651,58 +651,816 @@ export default function Dashboard() {
     opmerkingen: "",
   });
   interface PoliceUnit {
-    id: string;
-    roepnaam: string;
-    mensen: number;
+    roepnummer: string;
+    aantal_mensen: number;
     rollen: string[];
-    voertuigtype: string;
+    soort_auto: string;
+    team: string;
     status: string;
+    locatie?: string;
+    incident?: string;
+    lastUpdate?: string;
   }
 
+  // Default JSON database from provided file
+  const defaultPoliceUnitsData: PoliceUnit[] = [
+    {
+      roepnummer: "RT 11.01",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.02",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.03",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.04",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.05",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.06",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.07",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.08",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp"],
+      soort_auto: "BPV - bus",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.09",
+      aantal_mensen: 1,
+      rollen: ["Senior", "ACO"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.10",
+      aantal_mensen: 1,
+      rollen: ["Opr. Expert", "OPCO"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.11",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Solo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.12",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Solo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.13",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Solo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.14",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Solo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.15",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Solo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.16",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Onopvallend"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.17",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Onopvallend"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.18",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Onopvallend"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.19",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Onopvallend"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.20",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "OSA"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.21",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Motor"],
+      soort_auto: "BPV-motor",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.22",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Motor"],
+      soort_auto: "BPV-motor",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.23",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Motor"],
+      soort_auto: "BPV-motor",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.24",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Motor"],
+      soort_auto: "BPV-motor",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.25",
+      aantal_mensen: 1,
+      rollen: ["Noodhulp", "Motor"],
+      soort_auto: "BPV-motor",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.26",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.27",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.28",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.29",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.30",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.31",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.32",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.33",
+      aantal_mensen: 2,
+      rollen: ["Voet/fiets"],
+      soort_auto: "Fiets",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.34",
+      aantal_mensen: 3,
+      rollen: ["Noodhulp", "Studenten"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.35",
+      aantal_mensen: 3,
+      rollen: ["Noodhulp", "Studenten"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.36",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Studenten"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.37",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Studenten"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.38",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Studenten"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.39",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Studenten"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.40",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.41",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.42",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.43",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.44",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.45",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.46",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.47",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.48",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.49",
+      aantal_mensen: 2,
+      rollen: ["Noodhulp", "Hor/proj/demo"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.50",
+      aantal_mensen: 1,
+      rollen: ["Opsporing"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.51",
+      aantal_mensen: 1,
+      rollen: ["Opsporing"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.52",
+      aantal_mensen: 1,
+      rollen: ["Opsporing"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.53",
+      aantal_mensen: 1,
+      rollen: ["Opsporing"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.54",
+      aantal_mensen: 1,
+      rollen: ["Opsporing"],
+      soort_auto: "BPV-onopvallend",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.55",
+      aantal_mensen: 2,
+      rollen: ["Uniform z. vwp", "Noodhulp"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.56",
+      aantal_mensen: 2,
+      rollen: ["Uniform z. vwp", "Noodhulp"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.57",
+      aantal_mensen: 2,
+      rollen: ["Uniform z. vwp", "Noodhulp"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.58",
+      aantal_mensen: 2,
+      rollen: ["Uniform z. vwp", "Noodhulp"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.59",
+      aantal_mensen: 2,
+      rollen: ["Uniform z. vwp", "Noodhulp"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.60",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.61",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.62",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.63",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.64",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.65",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.66",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.67",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.68",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.69",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.70",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.71",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.72",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.73",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.74",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.75",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.76",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.77",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.78",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.79",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.80",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.81",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.82",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.83",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.84",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.85",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.86",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.87",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.88",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.89",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.90",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.91",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.92",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.93",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.94",
+      aantal_mensen: 1,
+      rollen: ["Wijkagent"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.95",
+      aantal_mensen: 1,
+      rollen: ["Reisnummer"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.96",
+      aantal_mensen: 1,
+      rollen: ["Reisnummer"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.97",
+      aantal_mensen: 1,
+      rollen: ["Reisnummer"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.98",
+      aantal_mensen: 1,
+      rollen: ["Reisnummer"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    },
+    {
+      roepnummer: "RT 11.99",
+      aantal_mensen: 1,
+      rollen: ["teamchef"],
+      soort_auto: "BPV-auto",
+      team: "Basisteam Waterweg (A1)",
+      status: "Beschikbaar"
+    }
+  ];
+
   const [policeUnits, setPoliceUnits] = useLocalStorage<PoliceUnit[]>(
-    "policeUnitsDB",
-    [
-      {
-        id: "RT11-01",
-        roepnaam: "RT11-01",
-        mensen: 2,
-        rollen: ["Patrouille", "Noodhulp"],
-        voertuigtype: "Audi A6 Avant (Snelle Interventie)",
-        status: "Beschikbaar",
-      },
-      {
-        id: "RT11-02",
-        roepnaam: "RT11-02",
-        mensen: 2,
-        rollen: ["Patrouille"],
-        voertuigtype: "Mercedes-Benz B‑klasse (Politieauto)",
-        status: "Onderweg",
-      },
-      {
-        id: "MT21-01",
-        roepnaam: "MT21-01",
-        mensen: 1,
-        rollen: ["Verkeer", "Surveillance"],
-        voertuigtype: "BMW R1250 RT (Motoragent)",
-        status: "Beschikbaar",
-      },
-      {
-        id: "BT31-01",
-        roepnaam: "BT31-01",
-        mensen: 4,
-        rollen: ["Surveillance", "Onderzoek"],
-        voertuigtype: "Volkswagen Transporter T6 (Bus)",
-        status: "Bezig",
-      },
-      {
-        id: "HE41-01",
-        roepnaam: "HE41-01",
-        mensen: 3,
-        rollen: ["Surveillance", "Noodhulp"],
-        voertuigtype: "Airbus EC135 (Helikopter)",
-        status: "Onderhoud",
-      },
-    ],
+    "policeUnitsDatabase",
+    defaultPoliceUnitsData
   );
 
   // Keep old units for compatibility with existing incident system
@@ -761,36 +1519,49 @@ export default function Dashboard() {
   };
 
   const [showAddUnitForm, setShowAddUnitForm] = useState(false);
-  const [newUnit, setNewUnit] = useState<Omit<PoliceUnit, "id">>({
-    roepnaam: "",
-    mensen: 2,
+  const [newUnit, setNewUnit] = useState<Omit<PoliceUnit, "lastUpdate">>({
+    roepnummer: "",
+    aantal_mensen: 2,
     rollen: [],
-    voertuigtype: "",
+    soort_auto: "",
+    team: "Basisteam Waterweg (A1)",
     status: "Beschikbaar",
   });
 
   const vehicleTypes = [
-    "Audi A6 Avant (Snelle Interventie)",
-    "BMW R1250 RT (Motoragent)",
-    "Mercedes-Benz B‑klasse (Politieauto)",
-    "Volkswagen Transporter T6 (Bus)",
-    "Airbus EC135 (Helikopter)",
+    "BPV - bus",
+    "BPV-auto",
+    "BPV-onopvallend",
+    "BPV-motor",
+    "Fiets"
   ];
 
   const inzetRollen = [
-    "Patrouille",
-    "Verkeer",
-    "Surveillance",
     "Noodhulp",
-    "Onderzoek",
+    "Senior",
+    "ACO",
+    "Opr. Expert",
+    "OPCO",
+    "Solo",
+    "Onopvallend",
+    "OSA",
+    "Motor",
+    "Voet/fiets",
+    "Studenten",
+    "Hor/proj/demo",
+    "Opsporing",
+    "Uniform z. vwp",
+    "Wijkagent",
+    "Reisnummer",
+    "teamchef"
   ];
 
   const npStatuses = ["Beschikbaar", "Onderweg", "Bezig", "Onderhoud"];
 
   const addNewUnit = () => {
     if (
-      !newUnit.roepnaam ||
-      !newUnit.voertuigtype ||
+      !newUnit.roepnummer ||
+      !newUnit.soort_auto ||
       newUnit.rollen.length === 0
     ) {
       alert("Vul alle verplichte velden in.");
@@ -799,15 +1570,16 @@ export default function Dashboard() {
 
     const unitToAdd: PoliceUnit = {
       ...newUnit,
-      id: newUnit.roepnaam,
+      lastUpdate: new Date().toISOString(),
     };
 
     setPoliceUnits((prev) => [...prev, unitToAdd]);
     setNewUnit({
-      roepnaam: "",
-      mensen: 2,
+      roepnummer: "",
+      aantal_mensen: 2,
       rollen: [],
-      voertuigtype: "",
+      soort_auto: "",
+      team: "Basisteam Waterweg (A1)",
       status: "Beschikbaar",
     });
     setShowAddUnitForm(false);
@@ -6223,13 +6995,13 @@ export default function Dashboard() {
                     
                     <div className="gms-form-row">
                       <div className="gms-field-group">
-                        <label>Roepnaam *</label>
+                        <label>Roepnummer *</label>
                         <input
                           type="text"
                           className="gms-field"
-                          value={newUnit.roepnaam}
-                          onChange={(e) => setNewUnit(prev => ({ ...prev, roepnaam: e.target.value }))}
-                          placeholder="RT11-01"
+                          value={newUnit.roepnummer}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, roepnummer: e.target.value }))}
+                          placeholder="RT 11.01"
                         />
                       </div>
                       <div className="gms-field-group">
@@ -6239,8 +7011,8 @@ export default function Dashboard() {
                           className="gms-field"
                           min="1"
                           max="10"
-                          value={newUnit.mensen}
-                          onChange={(e) => setNewUnit(prev => ({ ...prev, mensen: parseInt(e.target.value) || 1 }))}
+                          value={newUnit.aantal_mensen}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, aantal_mensen: parseInt(e.target.value) || 1 }))}
                         />
                       </div>
                       <div className="gms-field-group">
@@ -6258,18 +7030,28 @@ export default function Dashboard() {
                     </div>
 
                     <div className="gms-form-row">
-                      <div className="gms-field-group gms-field-full">
+                      <div className="gms-field-group">
                         <label>Voertuigtype *</label>
                         <select
                           className="gms-field"
-                          value={newUnit.voertuigtype}
-                          onChange={(e) => setNewUnit(prev => ({ ...prev, voertuigtype: e.target.value }))}
+                          value={newUnit.soort_auto}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, soort_auto: e.target.value }))}
                         >
                           <option value="">Selecteer voertuigtype...</option>
                           {vehicleTypes.map(type => (
                             <option key={type} value={type}>{type}</option>
                           ))}
                         </select>
+                      </div>
+                      <div className="gms-field-group">
+                        <label>Team</label>
+                        <input
+                          type="text"
+                          className="gms-field"
+                          value={newUnit.team}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, team: e.target.value }))}
+                          placeholder="Basisteam Waterweg (A1)"
+                        />
                       </div>
                     </div>
 
@@ -6312,11 +7094,12 @@ export default function Dashboard() {
                 <table className="units-table">
                   <thead>
                     <tr>
-                      <th>Roepnaam</th>
+                      <th>Roepnummer</th>
                       <th>Status</th>
                       <th>Mensen</th>
                       <th>Rollen</th>
                       <th>Voertuigtype</th>
+                      <th>Team</th>
                       <th>Locatie</th>
                       <th>Incident</th>
                       <th>Laatste Update</th>
@@ -6326,12 +7109,12 @@ export default function Dashboard() {
                   <tbody>
                     {policeUnits.map((unit) => (
                       <tr 
-                        key={unit.id} 
+                        key={unit.roepnummer} 
                         className="unit-row" 
                         data-unit={JSON.stringify(unit)}
                       >
                         <td className="unit-roepnaam">
-                          <strong>{unit.roepnaam}</strong>
+                          <strong>{unit.roepnummer}</strong>
                         </td>
                         <td>
                           <select
@@ -6340,9 +7123,9 @@ export default function Dashboard() {
                             onChange={(e) => {
                               const newStatus = e.target.value;
                               setPoliceUnits(prev => prev.map(u => 
-                                u.id === unit.id ? { ...u, status: newStatus } : u
+                                u.roepnummer === unit.roepnummer ? { ...u, status: newStatus, lastUpdate: new Date().toISOString() } : u
                               ));
-                              showNotificationMessage(`Status ${unit.roepnaam} gewijzigd naar ${newStatus}`);
+                              showNotificationMessage(`Status ${unit.roepnummer} gewijzigd naar ${newStatus}`);
                             }}
                           >
                             {npStatuses.map(status => (
@@ -6356,11 +7139,11 @@ export default function Dashboard() {
                             className="mensen-input"
                             min="1"
                             max="10"
-                            value={unit.mensen}
+                            value={unit.aantal_mensen}
                             onChange={(e) => {
                               const newMensen = parseInt(e.target.value) || 1;
                               setPoliceUnits(prev => prev.map(u => 
-                                u.id === unit.id ? { ...u, mensen: newMensen } : u
+                                u.roepnummer === unit.roepnummer ? { ...u, aantal_mensen: newMensen, lastUpdate: new Date().toISOString() } : u
                               ));
                             }}
                           />
@@ -6373,10 +7156,16 @@ export default function Dashboard() {
                             </span>
                           ))}
                         </td>
-                        <td className="unit-voertuig" title={unit.voertuigtype}>
-                          {unit.voertuigtype.length > 30 
-                            ? `${unit.voertuigtype.substring(0, 30)}...` 
-                            : unit.voertuigtype
+                        <td className="unit-voertuig" title={unit.soort_auto}>
+                          {unit.soort_auto.length > 15 
+                            ? `${unit.soort_auto.substring(0, 15)}...` 
+                            : unit.soort_auto
+                          }
+                        </td>
+                        <td className="unit-team" title={unit.team}>
+                          {unit.team.length > 20 
+                            ? `${unit.team.substring(0, 20)}...` 
+                            : unit.team
                           }
                         </td>
                         <td className="unit-location">
@@ -6384,24 +7173,26 @@ export default function Dashboard() {
                             type="text"
                             className="location-input"
                             placeholder="Voer locatie in..."
-                            defaultValue=""
-                            onBlur={(e) => {
-                              // Update unit location when input loses focus
+                            value={unit.locatie || ""}
+                            onChange={(e) => {
                               const location = e.target.value;
-                              if (location) {
-                                console.log(`${unit.roepnaam} locatie: ${location}`);
-                              }
+                              setPoliceUnits(prev => prev.map(u => 
+                                u.roepnummer === unit.roepnummer ? { ...u, locatie: location, lastUpdate: new Date().toISOString() } : u
+                              ));
                             }}
                           />
                         </td>
                         <td className="unit-incident">
                           <select
                             className="incident-select"
-                            defaultValue=""
+                            value={unit.incident || ""}
                             onChange={(e) => {
                               const incidentId = e.target.value;
+                              setPoliceUnits(prev => prev.map(u => 
+                                u.roepnummer === unit.roepnummer ? { ...u, incident: incidentId, lastUpdate: new Date().toISOString() } : u
+                              ));
                               if (incidentId) {
-                                showNotificationMessage(`${unit.roepnaam} toegewezen aan incident ${incidentId}`);
+                                showNotificationMessage(`${unit.roepnummer} toegewezen aan incident ${incidentId}`);
                               }
                             }}
                           >
@@ -6414,17 +7205,23 @@ export default function Dashboard() {
                           </select>
                         </td>
                         <td className="unit-timestamp">
-                          {new Date().toLocaleTimeString('nl-NL', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          {unit.lastUpdate 
+                            ? new Date(unit.lastUpdate).toLocaleTimeString('nl-NL', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : new Date().toLocaleTimeString('nl-NL', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                          }
                         </td>
                         <td className="unit-actions">
                           <button
                             className="btn btn-sm btn-secondary"
                             onClick={() => {
                               // Edit unit functionality
-                              console.log('Edit unit:', unit.roepnaam);
+                              console.log('Edit unit:', unit.roepnummer);
                             }}
                             title="Bewerk eenheid"
                           >
@@ -6433,9 +7230,9 @@ export default function Dashboard() {
                           <button
                             className="btn btn-sm btn-danger"
                             onClick={() => {
-                              if (confirm(`Weet u zeker dat u eenheid ${unit.roepnaam} wilt verwijderen?`)) {
-                                setPoliceUnits(prev => prev.filter(u => u.id !== unit.id));
-                                showNotificationMessage(`Eenheid ${unit.roepnaam} verwijderd`);
+                              if (confirm(`Weet u zeker dat u eenheid ${unit.roepnummer} wilt verwijderen?`)) {
+                                setPoliceUnits(prev => prev.filter(u => u.roepnummer !== unit.roepnummer));
+                                showNotificationMessage(`Eenheid ${unit.roepnummer} verwijderd`);
                               }
                             }}
                             title="Verwijder eenheid"
