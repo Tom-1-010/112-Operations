@@ -1293,7 +1293,7 @@ body {
   .telefoon-main-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .contact-grid {
     grid-template-columns: 1fr;
   }
@@ -1305,11 +1305,11 @@ body {
     gap: 8px;
     align-items: stretch;
   }
-  
+
   .telefoon-header-buttons {
     justify-content: center;
   }
-  
+
   .status-left, .status-right {
     flex-direction: column;
     gap: 4px;
@@ -2164,81 +2164,25 @@ body {
 
 /* Logging Block */
 .gms-logging-block {
-  flex: 0.6;
+  flex: 0.5;
 }
 
 .gms-logging-block-tall {
-  flex: 0.8; /* Increased from 0.6 to 0.8 for taller logging area */
+  flex: 0.65;
 }
 
 .gms-logging-area {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 4px;
-  font-size: 10px;
+  padding: 3px;
+  font-size: 9px;
   font-family: 'Courier New', monospace;
-  height: 100px;
+  height: 80px;
   overflow-y: auto;
 }
 
-.gms-logging-content[contenteditable="true"] {
-  border-bottom: 1px dashed #0066cc;
-  padding-bottom: 2px;
-  cursor: text;
-}
-
-.gms-logging-content[contenteditable="true"]:focus {
-  outline: 1px solid #0066cc;
-  background: #f8f9ff;
-}
-
-.gms-logging-content[contenteditable="true"]:empty:before {
-  content: "Type shortcode (bijv. -alabab of -al)...";
-  color: #999;
-  font-style: italic;
-  font-size: 9px;
-}
-
-.log-entry {
-  margin: 2px 0;
-  padding: 1px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.log-time {
-  color: black;
-  font-weight: bold;
-  margin-right: 8px;
-}
-
-.log-entry.classification-auto {
-  color: #228b22;
-}
-
-.log-entry.priority-auto {
-  color: #ff8c00;
-}
-
-.gms-log-entry {
-  display: flex;
-  margin: 2px 0;
-  padding: 2px 4px;
-  font-size: 10px;
-  font-family: 'Courier New', monospace;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.gms-log-entry.operator-acceptance {
-  background-color: #e8f5e8;
-  border: 1px solid #28a745;
-  border-radius: 3px;
-  font-weight: bold;
-  color: black;
-  margin: 4px 0;
-}
-
 .gms-logging-area-tall {
-  height: 130px; /* 30% taller than the original 100px */
+  height: 100px;
 }
 
 /* Additional Fields */
@@ -3146,54 +3090,6 @@ body {
   color: hsl(200, 70%, 45%);
 }
 
-.status-select.status-noodoproep {
-  background-color: hsla(0, 80%, 35%, 0.1);
-  border-color: hsl(0, 80%, 35%);
-  color: hsl(0, 80%, 35%);
-}
-
-.status-select.status-ter-plaatse {
-  background-color: hsla(208, 79%, 51%, 0.1);
-  border-color: hsl(208, 79%, 51%);
-  color: hsl(208, 79%, 51%);
-}
-
-.status-select.status-niet-inzetbaar {
-  background-color: hsla(0, 65%, 51%, 0.1);
-  border-color: hsl(0, 65%, 51%);
-  color: hsl(0, 65%, 51%);
-}
-
-.status-select.status-afmelden {
-  background-color: hsla(220, 9%, 40%, 0.1);
-  border-color: hsl(220, 9%, 40%);
-  color: hsl(220, 9%, 40%);
-}
-
-.status-select.status-spraakaanvraag {
-  background-color: hsla(280, 60%, 50%, 0.1);
-  border-color: hsl(280, 60%, 50%);
-  color: hsl(280, 60%, 50%);
-}
-
-.status-select.status-urgente-spraakaanvraag {
-  background-color: hsla(340, 75%, 45%, 0.1);
-  border-color: hsl(340, 75%, 45%);
-  color: hsl(340, 75%, 45%);
-}
-
-.status-select.status-eigen-melding-maken {
-  background-color: hsla(200, 70%, 45%, 0.1);
-  border-color: hsl(200, 70%, 45%);
-  color: hsl(200, 70%, 45%);
-}
-
-.status-select.status-informatieaanvraag {
-  background-color: hsla(45, 85%, 35%, 0.1);
-  border-color: hsl(45, 85%, 35%);
-  color: hsl(45, 85%, 35%);
-}
-
 .status-select.status-noodoproep-noodknop {
   background-color: hsla(0, 80%, 35%, 0.1);
   border-color: hsl(0, 80%, 35%);
@@ -3673,7 +3569,7 @@ body {
   .content-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .gms-form-grid {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -3703,49 +3599,49 @@ body {
   .incident-actions {
     justify-content: flex-start;
   }
-  
+
   .gms-content {
     padding: 16px;
   }
-  
+
   /* Responsive adjustments for vertical layout */
-  
+
   .gms-vertical-container {
     gap: 16px;
   }
-  
+
   .gms-section-card {
     padding: 16px;
   }
-  
+
   .gms-classificatie-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .gms-compact-fields {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .gms-compact-fields .gms-input {
     max-width: 100%;
   }
-  
+
   /* Legacy responsive styles */
   .gms-form-grid {
     gap: 16px;
   }
-  
+
   .gms-form-sections {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .gms-classificatie-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .gms-existing-fields {
     grid-template-columns: 1fr;
   }
