@@ -2975,20 +2975,95 @@ body {
   color: hsl(213, 22%, 24%);
 }
 
-.stat-available {
+/* Status color styles for Dutch police units */
+.stat-vrij {
+  color: hsl(123, 38%, 44%); /* Green for available */
+}
+
+.stat-aanrijding {
+  color: hsl(32, 95%, 44%); /* Orange for accident */
+}
+
+.stat-ter-plaatse {
+  color: hsl(208, 79%, 51%); /* Blue for on location */
+}
+
+.stat-niet-inzetbaar {
+  color: hsl(0, 65%, 51%); /* Red for not deployable */
+}
+
+.stat-afmelden {
+  color: hsl(220, 9%, 40%); /* Gray for sign off */
+}
+
+.stat-spraakaanvraag {
+  color: hsl(280, 60%, 50%); /* Purple for voice request */
+}
+
+.stat-noodoproep {
+  color: hsl(0, 80%, 35%); /* Dark red for emergency call */
+}
+
+/* Status select dropdown styles */
+.status-select.status-vrij {
+  background-color: hsla(123, 38%, 44%, 0.1);
+  border-color: hsl(123, 38%, 44%);
   color: hsl(123, 38%, 44%);
 }
 
-.stat-onderweg {
+.status-select.status-aanrijding {
+  background-color: hsla(32, 95%, 44%, 0.1);
+  border-color: hsl(32, 95%, 44%);
   color: hsl(32, 95%, 44%);
 }
 
-.stat-bezig {
+.status-select.status-ter-plaatse {
+  background-color: hsla(208, 79%, 51%, 0.1);
+  border-color: hsl(208, 79%, 51%);
   color: hsl(208, 79%, 51%);
 }
 
-.stat-onderhoud {
+.status-select.status-niet-inzetbaar {
+  background-color: hsla(0, 65%, 51%, 0.1);
+  border-color: hsl(0, 65%, 51%);
   color: hsl(0, 65%, 51%);
+}
+
+.status-select.status-afmelden {
+  background-color: hsla(220, 9%, 40%, 0.1);
+  border-color: hsl(220, 9%, 40%);
+  color: hsl(220, 9%, 40%);
+}
+
+.status-select.status-spraakaanvraag {
+  background-color: hsla(280, 60%, 50%, 0.1);
+  border-color: hsl(280, 60%, 50%);
+  color: hsl(280, 60%, 50%);
+}
+
+.status-select.status-urgente-spraakaanvraag {
+  background-color: hsla(340, 75%, 45%, 0.1);
+  border-color: hsl(340, 75%, 45%);
+  color: hsl(340, 75%, 45%);
+}
+
+.status-select.status-eigen-melding-maken {
+  background-color: hsla(200, 70%, 45%, 0.1);
+  border-color: hsl(200, 70%, 45%);
+  color: hsl(200, 70%, 45%);
+}
+
+.status-select.status-informatieaanvraag {
+  background-color: hsla(45, 85%, 35%, 0.1);
+  border-color: hsl(45, 85%, 35%);
+  color: hsl(45, 85%, 35%);
+}
+
+.status-select.status-noodoproep-noodknop {
+  background-color: hsla(0, 80%, 35%, 0.1);
+  border-color: hsl(0, 80%, 35%);
+  color: hsl(0, 80%, 35%);
+  font-weight: bold;
 }
 
 .no-units-message {
