@@ -17,408 +17,488 @@ export default function Dashboard() {
     "policeIncidents",
     [],
   );
-  
+
   // GMS Incidents database for complete incident lifecycle
   const [gmsIncidents, setGmsIncidents] = useLocalStorage<any[]>(
     "gmsIncidentsDB",
     [],
   );
-  
+
   // Current active incident in GMS
   const [currentGmsIncident, setCurrentGmsIncident] = useState<any>(null);
-  
+
   // Settings subtab state
   const [activeSettingsTab, setActiveSettingsTab] = useState("basisteams");
-  
+
   // Phone numbers management with localStorage fallback
-  const [phoneNumbers, setPhoneNumbers] = useLocalStorage<any[]>("telefoonlijst", []);
-  
+  const [phoneNumbers, setPhoneNumbers] = useLocalStorage<any[]>(
+    "telefoonlijst",
+    [],
+  );
+
   // Ensure phoneNumbers is always an array
   const phoneNumbersArray = Array.isArray(phoneNumbers) ? phoneNumbers : [];
-  
+
   // Chat state management
   const [activeChatTab, setActiveChatTab] = useState("burgers");
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
 
   // Enhanced AI Conversation Engine for Emergency Services
-  const generateColleagueResponse = (contact: any, userMessage: string, conversationHistory: any[] = []) => {
+  const generateColleagueResponse = (
+    contact: any,
+    userMessage: string,
+    conversationHistory: any[] = [],
+  ) => {
     const message = userMessage.toLowerCase();
-    
+
     // Enhanced Dutch emergency terminology analysis
-    const isUrgent = /urgent|spoed|direct|nu|emergency|prio|meteen|code rood|code geel|alarm|acuut/.test(message);
-    const isLocation = /waar|locatie|adres|plaats|richting|straat|wijk|gebied|route/.test(message);
-    const isStatus = /status|situatie|stand|update|rapport|overzicht/.test(message);
-    const isRequest = /kun je|kan je|wil je|zou je|help|stuur|regel|informeer|activeer|mobiliseer/.test(message);
-    const isQuestion = /\?/.test(userMessage) || /wat|wie|waar|wanneer|waarom|hoe/.test(message);
-    
+    const isUrgent =
+      /urgent|spoed|direct|nu|emergency|prio|meteen|code rood|code geel|alarm|acuut/.test(
+        message,
+      );
+    const isLocation =
+      /waar|locatie|adres|plaats|richting|straat|wijk|gebied|route/.test(
+        message,
+      );
+    const isStatus = /status|situatie|stand|update|rapport|overzicht/.test(
+      message,
+    );
+    const isRequest =
+      /kun je|kan je|wil je|zou je|help|stuur|regel|informeer|activeer|mobiliseer/.test(
+        message,
+      );
+    const isQuestion =
+      /\?/.test(userMessage) || /wat|wie|waar|wanneer|waarom|hoe/.test(message);
+
     // Emergency incident types detection
     const incidentTypes = {
-      fire: /brand|vuur|rook|brandweer|blussen|woningbrand|bedrijfsbrand/.test(message),
-      medical: /ambulance|ziekenwagen|gewond|letsel|onwel|hartstilstand|reanimatie/.test(message),
-      police: /politie|inbraak|diefstal|geweld|arrestatie|verdachte|overval/.test(message),
-      traffic: /verkeer|ongeval|aanrijding|file|wegafsluiting|a20|snelweg/.test(message),
-      public: /overlast|verstoring|openbare orde|relschoppers|vechtpartij/.test(message)
+      fire: /brand|vuur|rook|brandweer|blussen|woningbrand|bedrijfsbrand/.test(
+        message,
+      ),
+      medical:
+        /ambulance|ziekenwagen|gewond|letsel|onwel|hartstilstand|reanimatie/.test(
+          message,
+        ),
+      police:
+        /politie|inbraak|diefstal|geweld|arrestatie|verdachte|overval/.test(
+          message,
+        ),
+      traffic: /verkeer|ongeval|aanrijding|file|wegafsluiting|a20|snelweg/.test(
+        message,
+      ),
+      public: /overlast|verstoring|openbare orde|relschoppers|vechtpartij/.test(
+        message,
+      ),
     };
-    
+
     // Role-specific personality and knowledge base with incident-specific responses
     const roleProfiles = {
-      "Dienstchef": {
+      Dienstchef: {
         tone: "autoritair en beslissend",
-        expertise: ["operationeel overzicht", "resource management", "perscontacten", "escalatieprocedures"],
+        expertise: [
+          "operationeel overzicht",
+          "resource management",
+          "perscontacten",
+          "escalatieprocedures",
+        ],
         responses: {
           urgent: [
             "Urgent genoteerd. Ik schakel direct over naar code geel. Welke eenheden heb je nodig?",
             "Dit krijgt mijn onmiddellijke aandacht. Ik mobiliseer extra mankracht.",
-            "Prioriteit 1 - ik neem persoonlijk de leiding over deze operatie."
+            "Prioriteit 1 - ik neem persoonlijk de leiding over deze operatie.",
           ],
           location: [
             "Ik ken dat gebied goed. Laat me de beste aanrijroute voor je regelen.",
             "Die locatie valt onder district Zuid. Ik stuur de dichtstbijzijnde eenheden.",
-            "Complexe locatie - ik regel coördinatie met verkeersdienst voor toegang."
+            "Complexe locatie - ik regel coördinatie met verkeersdienst voor toegang.",
           ],
           status: [
             "Operationeel overzicht: 12 eenheden actief, 3 in reserve. Alles onder controle.",
             "Situatie is stabiel. Ik houd alle partijen geïnformeerd via het commandocentrum.",
-            "Status groen op alle fronten. Pers is nog niet geïnformeerd."
+            "Status groen op alle fronten. Pers is nog niet geïnformeerd.",
           ],
           request: [
             "Akkoord, ik regel dat direct via mijn kanalen.",
             "Geen probleem, ik heb de autoriteit om dat goed te keuren.",
-            "Dat valt onder mijn verantwoordelijkheid - wordt onmiddellijk geregeld."
+            "Dat valt onder mijn verantwoordelijkheid - wordt onmiddellijk geregeld.",
           ],
           fire: [
             "Brand geregistreerd. Ik schakel direct de brandweer in en regel perimeter.",
             "Woningbrand - ik activeer tankautospuit en hoogwerker. Evacuatie nodig?",
-            "Code rood brand. Ik regel omliggende korpsen voor bijstand."
+            "Code rood brand. Ik regel omliggende korpsen voor bijstand.",
           ],
           medical: [
             "Medische nood - ambulance wordt direct ingezet. Traumahelikopter nodig?",
             "Ik schakel A1 ambulance in. MMT wordt gealarmeerd voor ondersteuning.",
-            "Spoedeisende hulp geactiveerd. Ziekenhuis is geïnformeerd."
+            "Spoedeisende hulp geactiveerd. Ziekenhuis is geïnformeerd.",
           ],
           police: [
             "Politie-inzet geregeld. Hoeveel eenheden zijn ter plaatse nodig?",
             "Ik stuur surveillanceteams. Arrestatieteam wordt geactiveerd.",
-            "Politieoptreden - ik coördineer met OvdD en regel ondersteuning."
+            "Politieoptreden - ik coördineer met OvdD en regel ondersteuning.",
           ],
           default: [
             "Spreek je met urgentie? Dan neem ik direct actie.",
             "Ik heb volledige operationele autoriteit hier. Wat heb je nodig?",
-            "Als dienstchef kan ik alle resources inzetten. Geef me de details."
-          ]
-        }
+            "Als dienstchef kan ik alle resources inzetten. Geef me de details.",
+          ],
+        },
       },
-      "Teamleider": {
+      Teamleider: {
         tone: "praktisch en operationeel",
-        expertise: ["tactische operaties", "team coördinatie", "terreinkennis", "veiligheidsprocedures"],
+        expertise: [
+          "tactische operaties",
+          "team coördinatie",
+          "terreinkennis",
+          "veiligheidsprocedures",
+        ],
         responses: {
           urgent: [
             "Team alpha staat gereed! Geef me coördinaten en we rukken uit.",
             "Spoedmelding - ik stuur direct twee surveillanceauto's jouw kant op.",
-            "Mijn team is al onderweg. ETA 4 minuten ter plaatse."
+            "Mijn team is al onderweg. ETA 4 minuten ter plaatse.",
           ],
           location: [
             "Die straat ken ik goed - smalle toegang, let op geparkeerde auto's.",
             "Wijk Rotterdam-Zuid, sector 7. Mijn eenheden patrouilleren daar nu.",
-            "Moeilijk bereikbaar gebied. Ik stuur een motor vooruit voor verkenning."
+            "Moeilijk bereikbaar gebied. Ik stuur een motor vooruit voor verkenning.",
           ],
           status: [
             "Team operationeel: 6 man actief, 2 in voertuigen, alles 100% beschikbaar.",
             "Situatie ter plaatse onder controle. Verdachte aangehouden, geen incidenten.",
-            "Gebied afgezet, forensisch onderzoek loopt. Verwachte afronding over 2 uur."
+            "Gebied afgezet, forensisch onderzoek loopt. Verwachte afronding over 2 uur.",
           ],
           request: [
             "Roger dat. Mijn team pakt het op - wordt direct uitgevoerd.",
             "Komt voor elkaar. Ik delegeer naar surveillant De Jong, hij kent het protocol.",
-            "Geen probleem, ik regel versterking en kom persoonlijk kijken."
+            "Geen probleem, ik regel versterking en kom persoonlijk kijken.",
           ],
           fire: [
             "Brand - ik stuur direct een team ter ondersteuning van de brandweer.",
             "Mijn eenheden gaan assisteren bij evacuatie en perimeter bewaking.",
-            "Team wordt ingezet voor crowd control en brandweer ondersteuning."
+            "Team wordt ingezet voor crowd control en brandweer ondersteuning.",
           ],
           medical: [
             "Medisch incident - ik stuur surveillanten voor begeleiding ambulance.",
             "Team regelt vrije doorgang voor ambulancedienst.",
-            "Mijn mensen assisteren bij medische noodhulp."
+            "Mijn mensen assisteren bij medische noodhulp.",
           ],
           police: [
             "Politie-operatie - mijn team staat gereed voor ondersteuning.",
             "Ik coördineer met andere teams voor gezamenlijke actie.",
-            "Team wordt ingezet volgens tactisch plan."
+            "Team wordt ingezet volgens tactisch plan.",
           ],
           traffic: [
             "Verkeersincident - ik stuur team voor afsluiting en regeling.",
             "Mijn eenheden regelen verkeersomleidingen ter plaatse.",
-            "Team gaat assisteren bij verkeersafhandeling."
+            "Team gaat assisteren bij verkeersafhandeling.",
           ],
           public: [
             "Openbare orde - ik stuur extra patrouilles naar het gebied.",
             "Team wordt ingezet voor handhaving en deëscalatie.",
-            "Mijn eenheden gaan assisteren bij ordehandhaving."
+            "Mijn eenheden gaan assisteren bij ordehandhaving.",
           ],
           default: [
             "Teamleider hier - mijn jongens staan paraat voor elke klus.",
             "Operationeel team beschikbaar. Wat moet er gebeuren?",
-            "Direct inzetbaar met volledig team. Geef instructies door."
-          ]
-        }
+            "Direct inzetbaar met volledig team. Geef instructies door.",
+          ],
+        },
       },
-      "Coördinator": {
+      Coördinator: {
         tone: "systematisch en ondersteunend",
-        expertise: ["communicatie", "logistiek", "planning", "multi-agency coördinatie"],
+        expertise: [
+          "communicatie",
+          "logistiek",
+          "planning",
+          "multi-agency coördinatie",
+        ],
         responses: {
           urgent: [
             "Urgentie geregistreerd. Ik activeer het crisisteam en informeer alle betrokken diensten.",
             "Code rood procedures in werking. Ambulance, brandweer en bijzondere bijstand worden geactiveerd.",
-            "Spoedsysteem actief - alle communicatie loopt nu via prioriteitskanaal."
+            "Spoedsysteem actief - alle communicatie loopt nu via prioriteitskanaal.",
           ],
           location: [
             "Locatie geplot in het systeem. Ik coördineer toegangsroutes met verkeerscentrale.",
             "GPS coördinaten doorgestuurd naar alle eenheden. Kaartmateriaal beschikbaar.",
-            "Gebied gemarkeerd als operationeel. Ik regel perimeter en verkeersomleidingen."
+            "Gebied gemarkeerd als operationeel. Ik regel perimeter en verkeersomleidingen.",
           ],
           status: [
             "Realtime overview: 15 actieve incidenten, 23 eenheden ingezet, capaciteit 78%.",
             "Communicatie verloopt vlot. Alle diensten zijn sync en rapporteren volgens schema.",
-            "Operationele status optimaal. Back-up systemen functioneren, geen verstoringen."
+            "Operationele status optimaal. Back-up systemen functioneren, geen verstoringen.",
           ],
           request: [
             "Verzoek genoteerd en doorgegeven. Ik monitor de voortgang en rapporteer terug.",
             "Coördinatie gestart. Ik breng alle partijen bij elkaar en regel de uitvoering.",
-            "Opdracht in het systeem gezet. Ik zorg voor follow-up en statusupdates."
+            "Opdracht in het systeem gezet. Ik zorg voor follow-up en statusupdates.",
           ],
           fire: [
             "Brand coördinatie - ik verbind brandweer met politie en ambulance.",
             "Ik regel logistieke ondersteuning voor brandbestrijding.",
-            "Coördineer evacuatieprocedures met alle betrokken diensten."
+            "Coördineer evacuatieprocedures met alle betrokken diensten.",
           ],
           medical: [
             "Medische coördinatie - ik schakel alle benodigde diensten in.",
             "Ik regel vrije toegang voor hulpdiensten naar locatie.",
-            "Coördineer ziekenhuisopname en nazorg procedures."
+            "Coördineer ziekenhuisopname en nazorg procedures.",
           ],
           police: [
             "Politie coördinatie - ik verbind alle operationele teams.",
             "Ik regel communicatie tussen verschillende politie-eenheden.",
-            "Coördineer tactische ondersteuning en backup."
+            "Coördineer tactische ondersteuning en backup.",
           ],
           traffic: [
             "Verkeer coördinatie - ik schakel verkeerscentrale en wegbeheer in.",
             "Ik regel omleidingen en verkeersinformatie naar publiek.",
-            "Coördineer berging en wegopruiming."
+            "Coördineer berging en wegopruiming.",
           ],
           public: [
             "Openbare orde coördinatie - ik schakel ME en extra eenheden in.",
             "Ik regel communicatie met burgemeester en bestuur.",
-            "Coördineer media-aanpak en informatievoorziening."
+            "Coördineer media-aanpak en informatievoorziening.",
           ],
           default: [
             "Coördinatiecentrum hier. Ik zorg voor de verbindingen tussen alle diensten.",
             "Alles loopt via mij - communicatie, planning en logistieke ondersteuning.",
-            "Operationele coördinatie actief. Hoe kan ik de operatie ondersteunen?"
-          ]
-        }
+            "Operationele coördinatie actief. Hoe kan ik de operatie ondersteunen?",
+          ],
+        },
       },
-      "Centralist": {
+      Centralist: {
         tone: "alert en ondersteunend",
-        expertise: ["meldingen", "communicatie", "protocollen", "administratie"],
+        expertise: [
+          "meldingen",
+          "communicatie",
+          "protocollen",
+          "administratie",
+        ],
         responses: {
           urgent: [
             "Spoedmelding - ik schakel direct door naar de eerstvolgende beschikbare eenheid.",
             "112 lijn vrijgehouden. Alle nieuwe meldingen route ik om naar collega's.",
-            "Prioriteit omhoog gezet. Ik monitor alle kanalen voor gerelateerde meldingen."
+            "Prioriteit omhoog gezet. Ik monitor alle kanalen voor gerelateerde meldingen.",
           ],
           location: [
             "Adresgegevens geverifieerd in het systeem. Bewoners en bijzonderheden bekend.",
             "Locatie gekoppeld aan eerdere meldingen. Zie historiek in het dossier.",
-            "Postcode gebied bekende probleemlocatie. Extra aandachtspunten genoteerd."
+            "Postcode gebied bekende probleemlocatie. Extra aandachtspunten genoteerd.",
           ],
           status: [
             "Meldkamer status: 23 open calls, gemiddelde wachttijd 45 seconden.",
             "Communicatielijn helder. Alle eenheden bereikbaar, systemen operationeel.",
-            "Administratie bijgewerkt. Alle rapporten ingevoerd, dossier compleet."
+            "Administratie bijgewerkt. Alle rapporten ingevoerd, dossier compleet.",
           ],
           request: [
             "Ik regel dat direct via het systeem. Koppeling naar de juiste dienstverlening.",
             "Verzoek gelogd en doorgestuurd. Ik houd de status bij en inform je over updates.",
-            "Direct opgepakt. Ik neem contact op met de betreffende dienst namens jou."
+            "Direct opgepakt. Ik neem contact op met de betreffende dienst namens jou.",
           ],
           fire: [
             "Brand melding ontvangen. Ik informeer direct de brandweer en regel coördinatie.",
             "Woningbrand - tankautospuit wordt gealarmeerd. Adres doorgestuurd.",
-            "Brandmelding geregistreerd. Ik schakel automatisch door naar de kazerne."
+            "Brandmelding geregistreerd. Ik schakel automatisch door naar de kazerne.",
           ],
           medical: [
             "Ambulance wordt direct gealarmeerd. Ik geef de details door aan de bemanning.",
             "Medische spoed - A1 rit geactiveerd. ETA wordt doorgegeven.",
-            "Ziekenwagen onderweg. Ik houd contact met de ambulancedienst."
+            "Ziekenwagen onderweg. Ik houd contact met de ambulancedienst.",
           ],
           police: [
             "Politiemelding doorgegeven. Surveillancewagen wordt naar locatie gestuurd.",
             "Ik schakel direct door naar de eerstvolgende politie-eenheid.",
-            "Melding geregistreerd en doorgezet naar de wijkagent."
+            "Melding geregistreerd en doorgezet naar de wijkagent.",
           ],
           default: [
             "Meldkamer centraal - ik houd alle lijnen open en ondersteun waar nodig.",
             "Communicatie hub actief. Wat kan ik voor je betekenen in de operatie?",
-            "Alle systemen online. Ik sta klaar voor ondersteuning en coördinatie."
-          ]
-        }
+            "Alle systemen online. Ik sta klaar voor ondersteuning en coördinatie.",
+          ],
+        },
       },
       "ACO OC Rotterdam": {
         tone: "operationeel commandocentrum",
-        expertise: ["regionale coördinatie", "operationele commando", "eenheid dispatch", "situational awareness"],
+        expertise: [
+          "regionale coördinatie",
+          "operationele commando",
+          "eenheid dispatch",
+          "situational awareness",
+        ],
         responses: {
           urgent: [
             "ACO OC Rotterdam - spoedmelding genoteerd. Ik activeer onmiddellijk de benodigde eenheden.",
             "Operationeel commando geactiveerd. Welke ondersteuning is vereist ter plaatse?",
-            "Rotterdam OC hier - ik schakel direct over naar spoedroutine."
+            "Rotterdam OC hier - ik schakel direct over naar spoedroutine.",
           ],
           location: [
             "Rotterdam gebied - ik ken de locatie. Beste aanrijroute wordt berekend.",
             "OC Rotterdam coördineert toegang tot die locatie. Verkeer wordt omgeleid.",
-            "Gebied Rotterdam-centrum/zuid/noord - onze eenheden zijn in de buurt."
+            "Gebied Rotterdam-centrum/zuid/noord - onze eenheden zijn in de buurt.",
           ],
           status: [
             "OC Rotterdam operationeel status: alle eenheden beschikbaar, systemen online.",
             "Huidige operaties Rotterdam: 8 actieve incidenten, voldoende capaciteit.",
-            "Commandocentrum Rotterdam - alle communicatielijnen helder."
+            "Commandocentrum Rotterdam - alle communicatielijnen helder.",
           ],
           request: [
             "ACO Rotterdam regelt dat direct. Ik coördineer met de betreffende diensten.",
             "Operationeel commando Rotterdam neemt het over. Wordt direct uitgevoerd.",
-            "OC Rotterdam heeft de autoriteit - ik handel dit persoonlijk af."
+            "OC Rotterdam heeft de autoriteit - ik handel dit persoonlijk af.",
           ],
           fire: [
             "Brandmelding Rotterdam - ik informeer direct de brandweer en regel ondersteuning.",
             "Woningbrand gemeld - ACO Rotterdam activeert tankautospuit en hoogwerker.",
-            "Brand Rotterdam gebied - ik coördineer met kazerne Charlois voor snelle inzet."
+            "Brand Rotterdam gebied - ik coördineer met kazerne Charlois voor snelle inzet.",
           ],
           medical: [
             "Medische noodsituatie - ACO Rotterdam schakelt ambulancedienst in.",
             "Rotterdam ambulancedienst wordt gealarmeerd. Ik regel spoedinzet.",
-            "Medische spoed Rotterdam - ik activeer A1 rit en informeer het ziekenhuis."
+            "Medische spoed Rotterdam - ik activeer A1 rit en informeer het ziekenhuis.",
           ],
           police: [
             "Politie Rotterdam wordt ingeschakeld. Ik stuur surveillanceteam ter plaatse.",
             "ACO Rotterdam coördineert politie-inzet. Welke ondersteuning is nodig?",
-            "Rotterdam politie ontvangt melding. Ik regel directe respons."
+            "Rotterdam politie ontvangt melding. Ik regel directe respons.",
           ],
           default: [
             "ACO OC Rotterdam operationeel. Hoe kan ik de situatie ondersteunen?",
             "Operationeel Commando Rotterdam staat klaar. Wat vereist onze aandacht?",
-            "Rotterdam commandocentrum hier - alle middelen zijn beschikbaar."
-          ]
-        }
+            "Rotterdam commandocentrum hier - alle middelen zijn beschikbaar.",
+          ],
+        },
       },
       "OVD OC": {
         tone: "kalm, autoritair, direct, professioneel",
-        expertise: ["grote incidenten coördinatie", "eenheden informeren", "opschaling", "hulpdiensten afstemming", "politiecapaciteit inzet"],
+        expertise: [
+          "grote incidenten coördinatie",
+          "eenheden informeren",
+          "opschaling",
+          "hulpdiensten afstemming",
+          "politiecapaciteit inzet",
+        ],
         responses: {
           urgent: [
             "OVD OC hier - spoedmelding ontvangen. Ik stuur direct de benodigde eenheden ter plaatse.",
             "Begrijpen, ik schakel onmiddellijk over naar code geel en mobiliseer extra mankracht.",
-            "OVD OC neemt de leiding - ik coördineer alle beschikbare middelen voor deze situatie."
+            "OVD OC neemt de leiding - ik coördineer alle beschikbare middelen voor deze situatie.",
           ],
           location: [
             "Locatie bekend - ik stuur het dichtstbijzijnde basisteam en regel toegang.",
             "Ik ken dat gebied, stuur direct verkeerspolitie voor afsluiting en begeleiding.",
-            "Locatie genoteerd - ik coördineer met de wijkagent voor lokale kennis."
+            "Locatie genoteerd - ik coördineer met de wijkagent voor lokale kennis.",
           ],
           status: [
             "Status update: 6 eenheden actief, 3 basisteams beschikbaar, recherche stand-by.",
             "Operationele situatie stabiel - alle teams zijn bereikbaar en inzetbaar.",
-            "Huidige capaciteit: voldoende mankracht, verkeerspolitie en ME beschikbaar."
+            "Huidige capaciteit: voldoende mankracht, verkeerspolitie en ME beschikbaar.",
           ],
           request: [
             "Begrepen, ik regel dat direct via mijn bevoegdheden als OVD.",
             "Komt voor elkaar - ik neem contact op met de juiste diensten en houd je op de hoogte.",
-            "Dat valt onder mijn verantwoordelijkheid, wordt onmiddellijk uitgevoerd."
+            "Dat valt onder mijn verantwoordelijkheid, wordt onmiddellijk uitgevoerd.",
           ],
           fire: [
             "Begrijpelijk. Ik stem direct af met de brandweercentrale en regel de inzet.",
             "Woningbrand - ik informeer de brandweer en stuur politie ter ondersteuning voor afzetting.",
-            "Brand gemeld - ik coördineer met brandweer, regel verkeersafsluiting en evacuatie."
+            "Brand gemeld - ik coördineer met brandweer, regel verkeersafsluiting en evacuatie.",
           ],
           medical: [
             "Medische nood - ik activeer ambulancedienst en stuur politie voor begeleiding.",
             "Ik schakel direct de ambulancedienst in en regel vrije doorgang.",
-            "Ambulance wordt gealarmeerd - ik coördineer met ziekenhuis voor opname."
+            "Ambulance wordt gealarmeerd - ik coördineer met ziekenhuis voor opname.",
           ],
           police: [
             "Dank je, ik licht de recherche direct in en stuur ter plaatse. Hou me op de hoogte van nieuwe info.",
             "Ik stuur direct een basisteam en verkeerspolitie ter ondersteuning. Ik blijf stand-by voor verdere instructies.",
-            "Politie-inzet gecoördineerd - surveillanceteam en wijkagent zijn onderweg."
+            "Politie-inzet gecoördineerd - surveillanceteam en wijkagent zijn onderweg.",
           ],
           traffic: [
             "Verkeersongeval - ik stuur verkeerspolitie en regel berging via weginspectie.",
             "Ik coördineer met verkeerscentrale voor omleidingen en stuur toezicht ter plaatse.",
-            "Verkeerssituatie - ik activeer wegbeheer en regel politiebegeleiding."
+            "Verkeerssituatie - ik activeer wegbeheer en regel politiebegeleiding.",
           ],
           public: [
             "Openbare orde verstoring - ik stuur ME en basisteams voor handhaving.",
             "Overlast gemeld - ik coördineer met wijkteam en stuur extra patrouilles.",
-            "Ik regel directe politie-inzet en neem contact op met burgemeester voor eventuele maatregelen."
+            "Ik regel directe politie-inzet en neem contact op met burgemeester voor eventuele maatregelen.",
           ],
           default: [
             "OVD OC hier, wat vereist mijn aandacht?",
             "Officier van Dienst beschikbaar - geef me de situatieschets.",
-            "OVD OC operationeel, hoe kan ik de operatie ondersteunen?"
-          ]
-        }
-      }
+            "OVD OC operationeel, hoe kan ik de operatie ondersteunen?",
+          ],
+        },
+      },
     };
 
     // Get role profile or create custom one based on function and notes
     let profile = roleProfiles[contact.functie as keyof typeof roleProfiles];
-    
+
     if (!profile) {
       // Create custom profile based on function name and notes
       profile = {
         tone: "professioneel en behulpzaam",
         expertise: ["algemene ondersteuning", "hulpverlening"],
         responses: {
-          urgent: [`Als ${contact.functie} spring ik direct bij voor deze urgentie.`],
-          location: [`Ik ken het gebied redelijk goed in mijn rol als ${contact.functie}.`],
-          status: [`Vanuit mijn positie als ${contact.functie} kan ik bevestigen dat alles loopt.`],
-          request: [`Natuurlijk, als ${contact.functie} kan ik dat voor je regelen.`],
-          default: [`${contact.functie} hier, hoe kan ik je helpen?`]
-        }
+          urgent: [
+            `Als ${contact.functie} spring ik direct bij voor deze urgentie.`,
+          ],
+          location: [
+            `Ik ken het gebied redelijk goed in mijn rol als ${contact.functie}.`,
+          ],
+          status: [
+            `Vanuit mijn positie als ${contact.functie} kan ik bevestigen dat alles loopt.`,
+          ],
+          request: [
+            `Natuurlijk, als ${contact.functie} kan ik dat voor je regelen.`,
+          ],
+          default: [`${contact.functie} hier, hoe kan ik je helpen?`],
+        },
       };
     }
 
     // Enhance responses based on notes/comments
     if (contact.opmerkingen) {
       const notes = contact.opmerkingen.toLowerCase();
-      
-      if (notes.includes('specialist')) {
+
+      if (notes.includes("specialist")) {
         profile.expertise.push("gespecialiseerde kennis");
-        profile.responses.default.push(`Met mijn specialistische achtergrond kan ik hier specifiek advies over geven.`);
+        profile.responses.default.push(
+          `Met mijn specialistische achtergrond kan ik hier specifiek advies over geven.`,
+        );
       }
-      
-      if (notes.includes('ervaren')) {
-        profile.responses.default.push(`Door mijn jarenlange ervaring herken ik dit soort situaties direct.`);
+
+      if (notes.includes("ervaren")) {
+        profile.responses.default.push(
+          `Door mijn jarenlange ervaring herken ik dit soort situaties direct.`,
+        );
       }
-      
-      if (notes.includes('verkeer')) {
+
+      if (notes.includes("verkeer")) {
         profile.expertise.push("verkeersmanagement");
-        profile.responses.location.push(`Verkeerssituatie is mijn expertise - ik regel optimale routes.`);
+        profile.responses.location.push(
+          `Verkeerssituatie is mijn expertise - ik regel optimale routes.`,
+        );
       }
-      
-      if (notes.includes('nacht')) {
-        profile.responses.default.push(`Nachtdienst is mijn specialiteit, 24/7 beschikbaar.`);
+
+      if (notes.includes("nacht")) {
+        profile.responses.default.push(
+          `Nachtdienst is mijn specialiteit, 24/7 beschikbaar.`,
+        );
       }
-      
-      if (notes.includes('crisis')) {
-        profile.responses.urgent.push(`Crisismanagement is precies waar ik voor opgeleid ben.`);
+
+      if (notes.includes("crisis")) {
+        profile.responses.urgent.push(
+          `Crisismanagement is precies waar ik voor opgeleid ben.`,
+        );
       }
     }
 
     // Select appropriate response category based on context and incident type
     let selectedResponses;
-    
+
     // Priority 1: Check for specific incident types (using optional chaining)
     if (incidentTypes.fire && (profile.responses as any).fire) {
       selectedResponses = (profile.responses as any).fire;
@@ -449,7 +529,7 @@ export default function Dashboard() {
       const contextual = [
         `Zoals we eerder bespraken...`,
         `In aanvulling op mijn vorige bericht...`,
-        `Update: de situatie ontwikkelt zich verder...`
+        `Update: de situatie ontwikkelt zich verder...`,
       ];
       if (Math.random() > 0.7) {
         selectedResponses = [...selectedResponses, ...contextual];
@@ -464,56 +544,60 @@ export default function Dashboard() {
   const startConversationWithContact = (contact: any) => {
     setActiveChatTab("collega");
     setCurrentConversation(contact);
-    
+
     // Generate role-specific greeting
     const greetings = {
-      "Dienstchef": [
+      Dienstchef: [
         "Dienstchef hier. Ik hoop dat het geen spoedgeval is?",
         "Je spreekt met de dienstchef. Wat vereist mijn aandacht?",
-        "Dienstcommando beschikbaar. Geef me een situatieschets."
+        "Dienstcommando beschikbaar. Geef me een situatieschets.",
       ],
-      "Teamleider": [
+      Teamleider: [
         "Teamleider operationeel. Mijn jongens staan klaar - wat is er aan de hand?",
         "Team alpha leader hier. Hebben we een operationele situatie?",
-        "Teamcommando beschikbaar. Welke ondersteuning heb je nodig?"
+        "Teamcommando beschikbaar. Welke ondersteuning heb je nodig?",
       ],
-      "Coördinator": [
+      Coördinator: [
         "Coördinatiecentrum. Alle systemen zijn online - hoe kan ik helpen?",
         "Operationele coördinatie hier. Welke verbindingen moet ik leggen?",
-        "Communicatiecentrale beschikbaar. Wat moet gecoördineerd worden?"
+        "Communicatiecentrale beschikbaar. Wat moet gecoördineerd worden?",
       ],
-      "Centralist": [
+      Centralist: [
         "Meldkamer hier. Ik zie je oproep binnenkomen - wat is de situatie?",
         "Communicatie centraal. Alle lijnen zijn helder - ga je gang.",
-        "112 centralist beschikbaar. Hoe kan ik je ondersteunen?"
-      ]
+        "112 centralist beschikbaar. Hoe kan ik je ondersteunen?",
+      ],
     };
-    
+
     let greeting = `Hallo, je spreekt met ${contact.functie}. Wat kan ik voor je doen?`;
-    
+
     const roleGreetings = greetings[contact.functie as keyof typeof greetings];
     if (roleGreetings) {
-      greeting = roleGreetings[Math.floor(Math.random() * roleGreetings.length)];
+      greeting =
+        roleGreetings[Math.floor(Math.random() * roleGreetings.length)];
     }
-    
+
     // Add context from notes if available
     if (contact.opmerkingen) {
-      if (contact.opmerkingen.toLowerCase().includes('specialist')) {
+      if (contact.opmerkingen.toLowerCase().includes("specialist")) {
         greeting += " Mijn specialistische kennis staat tot je beschikking.";
       }
-      if (contact.opmerkingen.toLowerCase().includes('nacht')) {
+      if (contact.opmerkingen.toLowerCase().includes("nacht")) {
         greeting += " Nachtdienst operationeel.";
       }
     }
-    
+
     const initialMessage = {
       id: Date.now(),
       sender: contact.functie,
       content: greeting,
-      timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-      type: 'incoming'
+      timestamp: new Date().toLocaleTimeString("nl-NL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      type: "incoming",
     };
-    
+
     setChatMessages([initialMessage]);
   };
 
@@ -522,26 +606,39 @@ export default function Dashboard() {
 
     const userMessage = {
       id: Date.now(),
-      sender: 'Meldkamer',
+      sender: "Meldkamer",
       content: message,
-      timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-      type: 'outgoing'
+      timestamp: new Date().toLocaleTimeString("nl-NL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      type: "outgoing",
     };
 
-    setChatMessages(prev => [...prev, userMessage]);
+    setChatMessages((prev) => [...prev, userMessage]);
 
     // Generate AI response after a short delay
-    setTimeout(() => {
-      const aiResponse = generateColleagueResponse(currentConversation, message, chatMessages);
-      const responseMessage = {
-        id: Date.now() + 1,
-        sender: currentConversation.functie,
-        content: aiResponse,
-        timestamp: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-        type: 'incoming'
-      };
-      setChatMessages(prev => [...prev, responseMessage]);
-    }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+    setTimeout(
+      () => {
+        const aiResponse = generateColleagueResponse(
+          currentConversation,
+          message,
+          chatMessages,
+        );
+        const responseMessage = {
+          id: Date.now() + 1,
+          sender: currentConversation.functie,
+          content: aiResponse,
+          timestamp: new Date().toLocaleTimeString("nl-NL", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          type: "incoming",
+        };
+        setChatMessages((prev) => [...prev, responseMessage]);
+      },
+      1000 + Math.random() * 2000,
+    ); // Random delay between 1-3 seconds
   };
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState({
@@ -780,417 +877,454 @@ export default function Dashboard() {
   const getOfficialLMCClassifications = (): GmsClassification[] => {
     return [
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. brand",
-        "MC3": "Autom. brand OMS",
-        "code": "alabab",
-        "prio": 2,
-        "uitleg": "Melding via OMS van inwerkingtreding van een automatische brandmelder"
+        MC1: "Alarm",
+        MC2: "Autom. brand",
+        MC3: "Autom. brand OMS",
+        code: "alabab",
+        prio: 2,
+        uitleg:
+          "Melding via OMS van inwerkingtreding van een automatische brandmelder",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. brand",
-        "MC3": "Br beheerssysteem",
-        "code": "alabbb",
-        "prio": 2,
-        "uitleg": "Melding via OMS van inwerkingtreding van een automatische blusinstallatie"
+        MC1: "Alarm",
+        MC2: "Autom. brand",
+        MC3: "Br beheerssysteem",
+        code: "alabbb",
+        prio: 2,
+        uitleg:
+          "Melding via OMS van inwerkingtreding van een automatische blusinstallatie",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. brand",
-        "MC3": "Brandmelding PAC",
-        "code": "alabbm",
-        "prio": 2,
-        "uitleg": "Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen."
+        MC1: "Alarm",
+        MC2: "Autom. brand",
+        MC3: "Brandmelding PAC",
+        code: "alabbm",
+        prio: 2,
+        uitleg:
+          "Binnenkomende brandmeldingen via de PAC van op PAC aangesloten automatische branddetectiesystemen.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. brand",
-        "MC3": "Drukknopmelding OMS",
-        "code": "alabdk",
-        "prio": 2,
-        "uitleg": "Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding."
+        MC1: "Alarm",
+        MC2: "Autom. brand",
+        MC3: "Drukknopmelding OMS",
+        code: "alabdk",
+        prio: 2,
+        uitleg:
+          "Melding via het OMS van een aangesloten handmelder in controle-/portiersruimtes van risicovolle objecten. Bediening mag uitsluitend door kundige medewerkers worden verricht. Dit zijn dan ook meldingen waaraan de hoogste urgentie moet worden gegeven voor afhandeling melding.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. brand",
-        "MC3": "Handmelder OMS",
-        "code": "alabhm",
-        "prio": 2,
-        "uitleg": "Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven."
+        MC1: "Alarm",
+        MC2: "Autom. brand",
+        MC3: "Handmelder OMS",
+        code: "alabhm",
+        prio: 2,
+        uitleg:
+          "Brandmeldingen op de meldkamer die direct binnenkomen via de aangesloten OMS, en automatische brandmeldingen via de PAC aan de meldkamer doorgegeven.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. Gev stof",
-        "MC3": "Gev. stof OMS",
-        "code": "algsom",
-        "prio": 2,
-        "uitleg": "Melding via OMS van detectie van een gevaarlijke stof."
+        MC1: "Alarm",
+        MC2: "Autom. Gev stof",
+        MC3: "Gev. stof OMS",
+        code: "algsom",
+        prio: 2,
+        uitleg: "Melding via OMS van detectie van een gevaarlijke stof.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Autom. Gev stof",
-        "MC3": "Gev. stof PAC",
-        "code": "algspa",
-        "prio": 2,
-        "uitleg": "Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen."
+        MC1: "Alarm",
+        MC2: "Autom. Gev stof",
+        MC3: "Gev. stof PAC",
+        code: "algspa",
+        prio: 2,
+        uitleg:
+          "Binnenkomende meldingen via PAC van op PAC aangesloten automatische Gevaarlijke Stof detectiesystemen.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Luid/optisch alarm",
-        "MC3": "Gebouw",
-        "code": "allogb",
-        "prio": 3,
-        "uitleg": "Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+        MC1: "Alarm",
+        MC2: "Luid/optisch alarm",
+        MC3: "Gebouw",
+        code: "allogb",
+        prio: 3,
+        uitleg:
+          "Melding door een persoon aan de meldkamer dat uit/ in of aan een gebouw een luid/optisch (bijvoorbeeld inbraak-, brand-, (co)gas) alarm hoor- of zichtbaar is waarop door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Luid/optisch alarm",
-        "MC3": "Rookmelder",
-        "code": "allorm",
-        "prio": 3,
-        "uitleg": "Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+        MC1: "Alarm",
+        MC2: "Luid/optisch alarm",
+        MC3: "Rookmelder",
+        code: "allorm",
+        prio: 3,
+        uitleg:
+          "Melding door een persoon aan de meldkamer zonder dat diegene toegang heeft tot het object, maar voldoende kennis heeft van het object, om te bepalen dat in het object een rookmelder hoorbaar is. Verder zijn er geen indicaties dat er brand is, maar waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Luid/optisch alarm",
-        "MC3": "Voertuig/Vaartuig",
-        "code": "allovv",
-        "prio": 3,
-        "uitleg": "Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden."
+        MC1: "Alarm",
+        MC2: "Luid/optisch alarm",
+        MC3: "Voertuig/Vaartuig",
+        code: "allovv",
+        prio: 3,
+        uitleg:
+          "Melding van een persoon aan de meldkamer dat uit/in of aan een voer-/vaartuig een luid/optisch (b.v. inbraak-, brand-, (co)gas) alarm hoor-/zichtbaar is waarop vanuit/door de beheerder/gebruiker van het betreffende object niet gereageerd lijkt te worden.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "PAC alarm",
-        "MC3": "Inbraakalarm",
-        "code": "alpaib",
-        "prio": 2,
-        "uitleg": "Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen."
+        MC1: "Alarm",
+        MC2: "PAC alarm",
+        MC3: "Inbraakalarm",
+        code: "alpaib",
+        prio: 2,
+        uitleg:
+          "Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "PAC alarm",
-        "MC3": "Overvalalarm",
-        "code": "alpaov",
-        "prio": 2,
-        "uitleg": "(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding."
+        MC1: "Alarm",
+        MC2: "PAC alarm",
+        MC3: "Overvalalarm",
+        code: "alpaov",
+        prio: 2,
+        uitleg:
+          "(Drukknop) overvalmeldingen via de PAC aan de meldkamer doorgegeven, van systemen voor het doorgeven van een overvalmelding.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "PAC alarm",
-        "MC3": "Persoonsalarm",
-        "code": "alpaps",
-        "prio": 1,
-        "uitleg": "Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is."
+        MC1: "Alarm",
+        MC2: "PAC alarm",
+        MC3: "Persoonsalarm",
+        code: "alpaps",
+        prio: 1,
+        uitleg:
+          "Melding via de PAC van een persoonsgebonden noodoproepsysteem met de indicatie dat hulp van de OOV dienst nodig is.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "RAC alarm",
-        "MC3": "Inbraakalarm",
-        "code": "alraib",
-        "prio": 1,
-        "uitleg": "Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen."
+        MC1: "Alarm",
+        MC2: "RAC alarm",
+        MC3: "Inbraakalarm",
+        code: "alraib",
+        prio: 1,
+        uitleg:
+          "Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "RAC alarm",
-        "MC3": "Overvalalarm",
-        "code": "alraov",
-        "prio": 1,
-        "uitleg": "(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding."
+        MC1: "Alarm",
+        MC2: "RAC alarm",
+        MC3: "Overvalalarm",
+        code: "alraov",
+        prio: 1,
+        uitleg:
+          "(Drukknop) overvalmeldingen aan de meldkamer doorgegeven via de RAC, van systemen voor het doorgeven van een overvalmelding.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "RAC alarm",
-        "MC3": "Persoonsalarm",
-        "code": "alraps",
-        "prio": 1,
-        "uitleg": "Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel."
+        MC1: "Alarm",
+        MC2: "RAC alarm",
+        MC3: "Persoonsalarm",
+        code: "alraps",
+        prio: 1,
+        uitleg:
+          "Melding die rechtstreeks op de meldkamer binnenkomt van een speciaal voor het doorgeven van noodoproepen bedoeld, op de persoon, draagbaar middel. Dit is geen C2000-verbindingsmiddel.",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Sensing",
-        "MC3": "Alert",
-        "code": "alseal",
-        "prio": 2,
-        "uitleg": "Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen. "
+        MC1: "Alarm",
+        MC2: "Sensing",
+        MC3: "Alert",
+        code: "alseal",
+        prio: 2,
+        uitleg:
+          "Alert is een hit vanuit een van de bij de marechaussee gebruikte sensing systemen ten behoeve van de grensbewaking van de lucht, land of zeegrenzen. ",
       },
       {
-        "MC1": "Alarm",
-        "MC2": "Sensing",
-        "MC3": "Toezichtsalarm",
-        "code": "alsetz",
-        "prio": 1,
-        "uitleg": "Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP."
+        MC1: "Alarm",
+        MC2: "Sensing",
+        MC3: "Toezichtsalarm",
+        code: "alsetz",
+        prio: 1,
+        uitleg:
+          "Een gedetineerde of TBS-er krijgt een GPS band waardoor hij voordurend onder toezicht is. Als de betrokkene de naleving van bijzondere voorwaarde niet opvolgt, volgt er een melding naar de MKP.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Afpersing",
-        "code": "bzdsap",
-        "prio": 3,
-        "uitleg": "Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Afpersing",
+        code: "bzdsap",
+        prio: 3,
+        uitleg:
+          "Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Beroving",
-        "code": "bzdsbr",
-        "prio": 1,
-        "uitleg": "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Beroving",
+        code: "bzdsbr",
+        prio: 1,
+        uitleg:
+          "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Dier",
-        "code": "bzdsdi",
-        "prio": 3,
-        "uitleg": "Diefstal van een dier."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Dier",
+        code: "bzdsdi",
+        prio: 3,
+        uitleg: "Diefstal van een dier.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Fraude",
-        "code": "bzdsfd",
-        "prio": 3,
-        "uitleg": "Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Fraude",
+        code: "bzdsfd",
+        prio: 3,
+        uitleg:
+          "Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Goederen",
-        "code": "bzdsgd",
-        "prio": 3,
-        "uitleg": "Diefstal van goederen."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Goederen",
+        code: "bzdsgd",
+        prio: 3,
+        uitleg: "Diefstal van goederen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Heling",
-        "code": "bzdshl",
-        "prio": 3,
-        "uitleg": "Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Heling",
+        code: "bzdshl",
+        prio: 3,
+        uitleg:
+          "Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Luchtvaartuig",
-        "code": "bzdslu",
-        "prio": 3,
-        "uitleg": "Diefstal van een luchtvaartuig."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Luchtvaartuig",
+        code: "bzdslu",
+        prio: 3,
+        uitleg: "Diefstal van een luchtvaartuig.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Oplichting",
-        "code": "bzdsol",
-        "prio": 3,
-        "uitleg": "Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Oplichting",
+        code: "bzdsol",
+        prio: 3,
+        uitleg:
+          "Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Vaartuig",
-        "code": "bzdsva",
-        "prio": 3,
-        "uitleg": "Zie diefstal."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Vaartuig",
+        code: "bzdsva",
+        prio: 3,
+        uitleg: "Zie diefstal.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Verduistering",
-        "code": "bzdsvd",
-        "prio": 3,
-        "uitleg": "Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft."
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Verduistering",
+        code: "bzdsvd",
+        prio: 3,
+        uitleg:
+          "Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Voertuig",
-        "code": "bzdsvo",
-        "prio": 3,
-        "uitleg": "Diefstal van een voertuig"
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Voertuig",
+        code: "bzdsvo",
+        prio: 3,
+        uitleg: "Diefstal van een voertuig",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Winkeldiefstal",
-        "code": "bzdswk",
-        "prio": 2,
-        "uitleg": "Diefstal uit een winkel"
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Winkeldiefstal",
+        code: "bzdswk",
+        prio: 2,
+        uitleg: "Diefstal uit een winkel",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Diefstal",
-        "MC3": "Zakkenrollerij",
-        "code": "bzdszk",
-        "prio": 3,
-        "uitleg": "Diefstal door een zakkenroller"
+        MC1: "Bezitsaantasting",
+        MC2: "Diefstal",
+        MC3: "Zakkenrollerij",
+        code: "bzdszk",
+        prio: 3,
+        uitleg: "Diefstal door een zakkenroller",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Bedrijf/Instelling",
-        "code": "bzibbi",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Bedrijf/Instelling",
+        code: "bzibbi",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Bijgebouw",
-        "code": "bzibbg",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Bijgebouw",
+        code: "bzibbg",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Luchtvaartuig",
-        "code": "bziblu",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Luchtvaartuig",
+        code: "bziblu",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Spoorvervoer",
-        "code": "bzibsp",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Spoorvervoer",
+        code: "bzibsp",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Vaartuig",
-        "code": "bzibva",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Vaartuig",
+        code: "bzibva",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Voertuig",
-        "code": "bzibvo",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Voertuig",
+        code: "bzibvo",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Inbraak",
-        "MC3": "Woning",
-        "code": "bzibwn",
-        "prio": 2,
-        "uitleg": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen."
+        MC1: "Bezitsaantasting",
+        MC2: "Inbraak",
+        MC3: "Woning",
+        code: "bzibwn",
+        prio: 2,
+        uitleg:
+          "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Overval",
-        "MC3": "Bedrijf/Instelling",
-        "code": "bzovbi",
-        "prio": 1,
-        "uitleg": "Een geplande overval op een bedrijf of instelling"
+        MC1: "Bezitsaantasting",
+        MC2: "Overval",
+        MC3: "Bedrijf/Instelling",
+        code: "bzovbi",
+        prio: 1,
+        uitleg: "Een geplande overval op een bedrijf of instelling",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Overval",
-        "MC3": "Luchtvaartuig",
-        "code": "bzovlu",
-        "prio": 1,
-        "uitleg": "Een geplande overval op of in luchtvaartuig niet zijnde een kaping."
+        MC1: "Bezitsaantasting",
+        MC2: "Overval",
+        MC3: "Luchtvaartuig",
+        code: "bzovlu",
+        prio: 1,
+        uitleg:
+          "Een geplande overval op of in luchtvaartuig niet zijnde een kaping.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Overval",
-        "MC3": "Voertuig/Vaartuig",
-        "code": "bzovvv",
-        "prio": 1,
-        "uitleg": "Een geplande overval op een voer- of vaartuig."
+        MC1: "Bezitsaantasting",
+        MC2: "Overval",
+        MC3: "Voertuig/Vaartuig",
+        code: "bzovvv",
+        prio: 1,
+        uitleg: "Een geplande overval op een voer- of vaartuig.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Overval",
-        "MC3": "Waardetransport",
-        "code": "bzovwd",
-        "prio": 1,
-        "uitleg": "Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe."
+        MC1: "Bezitsaantasting",
+        MC2: "Overval",
+        MC3: "Waardetransport",
+        code: "bzovwd",
+        prio: 1,
+        uitleg:
+          "Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Overval",
-        "MC3": "Woning",
-        "code": "bzovwn",
-        "prio": 1,
-        "uitleg": "Een geplande overval op een particulier persoon vaak binnenshuis"
+        MC1: "Bezitsaantasting",
+        MC2: "Overval",
+        MC3: "Woning",
+        code: "bzovwn",
+        prio: 1,
+        uitleg:
+          "Een geplande overval op een particulier persoon vaak binnenshuis",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Stroperij",
-        "MC3": "Dier",
-        "code": "bzspdi",
-        "prio": 2,
-        "uitleg": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening."
+        MC1: "Bezitsaantasting",
+        MC2: "Stroperij",
+        MC3: "Dier",
+        code: "bzspdi",
+        prio: 2,
+        uitleg:
+          "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Stroperij",
-        "MC3": "Goederen",
-        "code": "bzspgd",
-        "prio": 2,
-        "uitleg": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening."
+        MC1: "Bezitsaantasting",
+        MC2: "Stroperij",
+        MC3: "Goederen",
+        code: "bzspgd",
+        prio: 2,
+        uitleg:
+          "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Vernieling",
-        "MC3": "Gebouw",
-        "code": "bzvngb",
-        "prio": 3,
-        "uitleg": "Zie vernieling."
+        MC1: "Bezitsaantasting",
+        MC2: "Vernieling",
+        MC3: "Gebouw",
+        code: "bzvngb",
+        prio: 3,
+        uitleg: "Zie vernieling.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Vernieling",
-        "MC3": "Goederen",
-        "code": "bzvngd",
-        "prio": 3,
-        "uitleg": "Zie vernieling."
+        MC1: "Bezitsaantasting",
+        MC2: "Vernieling",
+        MC3: "Goederen",
+        code: "bzvngd",
+        prio: 3,
+        uitleg: "Zie vernieling.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Vernieling",
-        "MC3": "Graffiti",
-        "code": "bzvngf",
-        "prio": 3,
-        "uitleg": "Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan."
+        MC1: "Bezitsaantasting",
+        MC2: "Vernieling",
+        MC3: "Graffiti",
+        code: "bzvngf",
+        prio: 3,
+        uitleg:
+          "Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Vernieling",
-        "MC3": "Luchtvaartuig",
-        "code": "bzvnlu",
-        "prio": 3,
-        "uitleg": "Zie vernieling."
+        MC1: "Bezitsaantasting",
+        MC2: "Vernieling",
+        MC3: "Luchtvaartuig",
+        code: "bzvnlu",
+        prio: 3,
+        uitleg: "Zie vernieling.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Vernieling",
-        "MC3": "Spoorvervoer",
-        "code": "bzvnsp",
-        "prio": 3,
-        "uitleg": "Zie vernieling."
+        MC1: "Bezitsaantasting",
+        MC2: "Vernieling",
+        MC3: "Spoorvervoer",
+        code: "bzvnsp",
+        prio: 3,
+        uitleg: "Zie vernieling.",
       },
       {
-        "MC1": "Bezitsaantasting",
-        "MC2": "Vernieling",
-        "MC3": "Vaartuig",
-        "code": "bzvnva",
-        "prio": 3,
-        "uitleg": "Zie vernieling."
-      }
+        MC1: "Bezitsaantasting",
+        MC2: "Vernieling",
+        MC3: "Vaartuig",
+        code: "bzvnva",
+        prio: 3,
+        uitleg: "Zie vernieling.",
+      },
     ];
   };
 
-  const gmsClassificationsData: GmsClassification[] = getOfficialLMCClassifications();
+  const gmsClassificationsData: GmsClassification[] =
+    getOfficialLMCClassifications();
 
   const basisteamsData: BasisTeam[] = [
     // Rotterdam Stadsregio (A-teams)
@@ -1335,33 +1469,48 @@ export default function Dashboard() {
   );
 
   // Initialize GMS classifications with complete official data
-  const [gmsClassifications, setGmsClassifications] = useState<GmsClassification[]>([]);
+  const [gmsClassifications, setGmsClassifications] = useState<
+    GmsClassification[]
+  >([]);
 
   // Load complete official LMC classifications
   useEffect(() => {
     const loadOfficialClassifications = async () => {
       // Don't clear existing data - preserve it for reliability
-      
+
       try {
-        const response = await fetch('/lmc_classifications.json');
+        const response = await fetch("/lmc_classifications.json");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const officialClassifications: GmsClassification[] = await response.json();
-        
-        localStorage.setItem("gmsClassifications", JSON.stringify(officialClassifications));
+        const officialClassifications: GmsClassification[] =
+          await response.json();
+
+        localStorage.setItem(
+          "gmsClassifications",
+          JSON.stringify(officialClassifications),
+        );
         setGmsClassifications(officialClassifications);
-        console.log("Loaded complete official GMS classifications:", officialClassifications.length, "entries");
+        console.log(
+          "Loaded complete official GMS classifications:",
+          officialClassifications.length,
+          "entries",
+        );
       } catch (error) {
         console.warn("Could not load from server, checking localStorage...");
-        
+
         // Try to load from localStorage if server fails
-        const storedClassifications = localStorage.getItem("gmsClassifications");
+        const storedClassifications =
+          localStorage.getItem("gmsClassifications");
         if (storedClassifications) {
           try {
             const parsedClassifications = JSON.parse(storedClassifications);
             setGmsClassifications(parsedClassifications);
-            console.log("Loaded GMS classifications from localStorage:", parsedClassifications.length, "entries");
+            console.log(
+              "Loaded GMS classifications from localStorage:",
+              parsedClassifications.length,
+              "entries",
+            );
           } catch (parseError) {
             console.error("Failed to parse stored classifications");
             setGmsClassifications([]);
@@ -1510,19 +1659,19 @@ export default function Dashboard() {
       // Auto-log operator acceptance when any field is first clicked
       const logOperatorAcceptance = () => {
         if (operatorAcceptanceLogged) return;
-        
+
         const meldingLogging = document.getElementById("gmsMeldingLogging");
         if (!meldingLogging) return;
 
         const now = new Date();
         const dateStr = now.toLocaleDateString("nl-NL", {
           day: "2-digit",
-          month: "2-digit", 
-          year: "numeric"
+          month: "2-digit",
+          year: "numeric",
         });
         const timeStr = now.toLocaleTimeString("nl-NL", {
           hour: "2-digit",
-          minute: "2-digit"
+          minute: "2-digit",
         });
 
         // Determine active discipline (default to Politie)
@@ -1545,8 +1694,6 @@ export default function Dashboard() {
         operatorAcceptanceLogged = true;
         console.log(`Operator acceptance logged at ${dateStr} ${timeStr}`);
       };
-
-
 
       // Update GMS status bar with live Dutch date and time
       const updateGMSStatusDateTime = () => {
@@ -1592,137 +1739,164 @@ export default function Dashboard() {
         }
       };
 
-
-
       // Handle notepad note submission (Verzend button in notepad)
       const handleNotePadSubmit = () => {
-        console.log('🚀 CLASSIFICATION DETECTION TRIGGERED');
-        
+        console.log("🚀 CLASSIFICATION DETECTION TRIGGERED");
+
         const kladblok = document.getElementById("gmsKladblok");
-        
+
         if (!kladblok) {
-          console.error('❌ Kladblok element not found!');
+          console.error("❌ Kladblok element not found!");
           return;
         }
-        
-        const notitieText = kladblok.textContent || kladblok.innerText || '';
-        console.log('📝 Raw note content:', JSON.stringify(notitieText));
-        console.log('📝 Note length:', notitieText.length);
-        
+
+        const notitieText = kladblok.textContent || kladblok.innerText || "";
+        console.log("📝 Raw note content:", JSON.stringify(notitieText));
+        console.log("📝 Note length:", notitieText.length);
+
         if (!notitieText.trim()) {
-          console.log('⚠️ Empty note content, skipping classification');
+          console.log("⚠️ Empty note content, skipping classification");
           return;
         }
-        
+
         // Only process classification detection, don't save full form
         if (notitieText.trim()) {
           // Process classification codes
-          const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-          const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-          const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-          const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-          
-          console.log('🔧 Dropdown elements found:', {
+          const mc1Select = document.getElementById(
+            "gmsClassificatie1",
+          ) as HTMLSelectElement;
+          const mc2Select = document.getElementById(
+            "gmsClassificatie2",
+          ) as HTMLSelectElement;
+          const mc3Select = document.getElementById(
+            "gmsClassificatie3",
+          ) as HTMLSelectElement;
+          const prioriteitSelect = document.getElementById(
+            "gmsPrioriteit",
+          ) as HTMLSelectElement;
+
+          console.log("🔧 Dropdown elements found:", {
             mc1Select: !!mc1Select,
             mc2Select: !!mc2Select,
             mc3Select: !!mc3Select,
-            prioriteitSelect: !!prioriteitSelect
+            prioriteitSelect: !!prioriteitSelect,
           });
 
           if (mc1Select && mc2Select && mc3Select) {
-            console.log('✅ All dropdown elements found, proceeding with classification detection');
-            const classificationsData = localStorage.getItem("gmsClassifications");
-            const storedClassifications = (classificationsData && classificationsData !== "undefined") ? JSON.parse(classificationsData) : [] as GmsClassification[];
-            console.log('🔍 Starting classification search with', storedClassifications.length, 'classifications loaded');
-            console.log('📝 Input text:', `"${notitieText}"`);
-            
-            // Quick test: check if we have any "brgb" codes in our data
-            const testBrgb = storedClassifications.filter(c => c.code.toLowerCase().includes('brgb'));
-            console.log('🧪 Test - BRGB codes available:', testBrgb.length, testBrgb.slice(0, 3));
-            
-            // Test specific searches
-            const testOngevall = storedClassifications.filter(c => 
-              c.MC1.toLowerCase().includes('ongeval') || 
-              c.MC2.toLowerCase().includes('wegvervoer') ||
-              c.MC3.toLowerCase().includes('letsel')
+            console.log(
+              "✅ All dropdown elements found, proceeding with classification detection",
             );
-            console.log('🧪 Test - Ongeval/wegvervoer/letsel matches:', testOngevall.length);
-            
-            const lines = notitieText.split('\n');
+            const classificationsData =
+              localStorage.getItem("gmsClassifications");
+            const storedClassifications =
+              classificationsData && classificationsData !== "undefined"
+                ? JSON.parse(classificationsData)
+                : ([] as GmsClassification[]);
+            console.log(
+              "🔍 Starting classification search with",
+              storedClassifications.length,
+              "classifications loaded",
+            );
+            console.log("📝 Input text:", `"${notitieText}"`);
+
+            // Test specific searches
+            const testOngevall = storedClassifications.filter(
+              (c) =>
+                c.MC1.toLowerCase().includes("ongeval") ||
+                c.MC2.toLowerCase().includes("wegvervoer") ||
+                c.MC3.toLowerCase().includes("letsel"),
+            );
+            console.log(
+              "🧪 Test - Ongeval/wegvervoer/letsel matches:",
+              testOngevall.length,
+            );
+
+            const lines = notitieText.split("\n");
             let matchedClassification = null;
 
             for (const line of lines) {
               const trimmedLine = line.trim();
-              console.log('🔍 Processing line:', trimmedLine);
-              
+              console.log("🔍 Processing line:", trimmedLine);
+
               // Check for Meldergegevens format (m/phone/name)
-              if (trimmedLine.startsWith('m/') && trimmedLine.length > 2) {
+              if (trimmedLine.startsWith("m/") && trimmedLine.length > 2) {
                 const melderData = trimmedLine.substring(2); // Remove 'm/' prefix
-                const parts = melderData.split('/');
-                
+                const parts = melderData.split("/");
+
                 if (parts.length >= 2) {
                   const phoneNumber = parts[0].trim();
-                  const melderName = parts.slice(1).join('/').trim(); // Join remaining parts for name
-                  
-                  console.log('📞 Processing Meldergegevens:', { phoneNumber, melderName });
-                  
+                  const melderName = parts.slice(1).join("/").trim(); // Join remaining parts for name
+
+                  console.log("📞 Processing Meldergegevens:", {
+                    phoneNumber,
+                    melderName,
+                  });
+
                   // Fill in the Meldergegevens fields
-                  const phoneField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
-                  const nameField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
-                  
+                  const phoneField = document.getElementById(
+                    "gmsTelefoonnummer",
+                  ) as HTMLInputElement;
+                  const nameField = document.getElementById(
+                    "gmsMeldernaam",
+                  ) as HTMLInputElement;
+
                   if (phoneField) {
                     phoneField.value = phoneNumber;
-                    console.log('✅ Phone number set to:', phoneNumber);
+                    console.log("✅ Phone number set to:", phoneNumber);
                   } else {
-                    console.error('❌ Phone field not found');
+                    console.error("❌ Phone field not found");
                   }
-                  
+
                   if (nameField) {
                     nameField.value = melderName;
-                    console.log('✅ Melder name set to:', melderName);
+                    console.log("✅ Melder name set to:", melderName);
                   } else {
-                    console.error('❌ Name field not found');
+                    console.error("❌ Name field not found");
                   }
-                  
+
                   // Log the automatic fill
-                  const timestamp = new Date().toLocaleTimeString('nl-NL');
-                  console.log(`${timestamp} ✅ Meldergegevens automatisch ingevuld: ${melderName} - ${phoneNumber}`);
+                  const timestamp = new Date().toLocaleTimeString("nl-NL");
+                  console.log(
+                    `${timestamp} ✅ Meldergegevens automatisch ingevuld: ${melderName} - ${phoneNumber}`,
+                  );
                 } else {
-                  console.log('⚠️ Invalid Meldergegevens format. Expected: m/phone/name');
+                  console.log(
+                    "⚠️ Invalid Meldergegevens format. Expected: m/phone/name",
+                  );
                 }
-                
+
                 continue; // Skip to next line
               }
-              
+
               // Check for location commands starting with =
-              if (trimmedLine.startsWith('=') && trimmedLine.length > 1) {
+              if (trimmedLine.startsWith("=") && trimmedLine.length > 1) {
                 const locationData = trimmedLine.substring(1); // Remove the =
-                console.log('📍 Processing location command:', locationData);
-                
+                console.log("📍 Processing location command:", locationData);
+
                 // Parse location data
-                let plaatsnaam = '';
-                let straatnaam = '';
-                let huisnummer = '';
-                
+                let plaatsnaam = "";
+                let straatnaam = "";
+                let huisnummer = "";
+
                 // Handle format: =Rotterdam+ (plus sign is optional and ignored)
-                if (locationData.endsWith('+')) {
+                if (locationData.endsWith("+")) {
                   plaatsnaam = locationData.slice(0, -1).trim();
                 }
                 // Handle format: =Rotterdam/Laan op zuid 12
-                else if (locationData.includes('/')) {
-                  const [city, streetAndNumber] = locationData.split('/');
+                else if (locationData.includes("/")) {
+                  const [city, streetAndNumber] = locationData.split("/");
                   plaatsnaam = city.trim();
-                  
+
                   // Parse street and number
-                  const streetParts = streetAndNumber.trim().split(' ');
+                  const streetParts = streetAndNumber.trim().split(" ");
                   const lastPart = streetParts[streetParts.length - 1];
-                  
+
                   // Check if last part is a number
                   const isNumber = /^\d+[a-zA-Z]*$/.test(lastPart);
-                  
+
                   if (isNumber) {
                     huisnummer = lastPart;
-                    straatnaam = streetParts.slice(0, -1).join(' ');
+                    straatnaam = streetParts.slice(0, -1).join(" ");
                   } else {
                     straatnaam = streetAndNumber.trim();
                   }
@@ -1731,142 +1905,210 @@ export default function Dashboard() {
                 else {
                   plaatsnaam = locationData.trim();
                 }
-                
+
                 // Fill in the location fields
-                const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
-                const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
-                const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
-                
+                const plaatsnaamField = document.getElementById(
+                  "gmsPlaatsnaam",
+                ) as HTMLInputElement;
+                const straatnaamField = document.getElementById(
+                  "gmsStraatnaam",
+                ) as HTMLInputElement;
+                const huisnummerField = document.getElementById(
+                  "gmsHuisnummer",
+                ) as HTMLInputElement;
+
                 if (plaatsnaamField && plaatsnaam) {
                   plaatsnaamField.value = plaatsnaam;
-                  console.log('✅ Plaatsnaam set to:', plaatsnaam);
+                  console.log("✅ Plaatsnaam set to:", plaatsnaam);
                 }
-                
+
                 if (straatnaamField && straatnaam) {
                   straatnaamField.value = straatnaam;
-                  console.log('✅ Straatnaam set to:', straatnaam);
+                  console.log("✅ Straatnaam set to:", straatnaam);
                 }
-                
+
                 if (huisnummerField && huisnummer) {
                   huisnummerField.value = huisnummer;
-                  console.log('✅ Huisnummer set to:', huisnummer);
+                  console.log("✅ Huisnummer set to:", huisnummer);
                 }
-                
+
                 // Log the automatic fill
-                const timestamp = new Date().toLocaleTimeString('nl-NL');
-                console.log(`${timestamp} ✅ Locatie automatisch ingevuld: ${plaatsnaam}${straatnaam ? ' / ' + straatnaam : ''}${huisnummer ? ' ' + huisnummer : ''}`);
-                
+                const timestamp = new Date().toLocaleTimeString("nl-NL");
+                console.log(
+                  `${timestamp} ✅ Locatie automatisch ingevuld: ${plaatsnaam}${straatnaam ? " / " + straatnaam : ""}${huisnummer ? " " + huisnummer : ""}`,
+                );
+
                 continue; // Skip to next line
               }
-              
+
               // Check for hyphen-based codes (-brgb, -wvoi, etc.)
-              if (trimmedLine.startsWith('-') && trimmedLine.length > 1) {
+              if (trimmedLine.startsWith("-") && trimmedLine.length > 1) {
                 const searchQuery = trimmedLine.substring(1).trim();
-                console.log('🎯 Searching for hyphen-based code:', searchQuery);
-                
+                console.log("🎯 Searching for hyphen-based code:", searchQuery);
+
                 // 1. Try exact code match first
-                matchedClassification = storedClassifications.find(c => 
-                  c.code.toLowerCase() === searchQuery.toLowerCase()
+                matchedClassification = storedClassifications.find(
+                  (c) =>
+                    typeof c.code === "string" &&
+                    c.code.toLowerCase() === searchQuery.toLowerCase(),
                 );
-                console.log('🔍 1. Exact code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
-                
+                console.log(
+                  "🔍 1. Exact code match result:",
+                  matchedClassification
+                    ? `Found: ${matchedClassification.code}`
+                    : "Not found",
+                );
+
                 // 2. Try partial code match (e.g., -bz matches bzdsap, bzdsbr, etc.)
                 if (!matchedClassification) {
-                  matchedClassification = storedClassifications.find(c => 
-                    c.code.toLowerCase().startsWith(searchQuery.toLowerCase())
+                  matchedClassification = storedClassifications.find((c) =>
+                    typeof c.code === "string" &&
+                    c.code.toLowerCase().startsWith(searchQuery.toLowerCase()),
                   );
-                  console.log('🔍 2. Partial code match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log(
+                    "🔍 2. Partial code match result:",
+                    matchedClassification
+                      ? `Found: ${matchedClassification.code}`
+                      : "Not found",
+                  );
                 }
-                
+
                 // 3. Special mappings for common abbreviations
                 if (!matchedClassification) {
                   const specialMappings: Record<string, string> = {
-                    'wegverkeer onder invloed': 'vkweoi',
-                    'onder invloed': 'vkweoi',
-                    'bz': 'bzdsap', // Default to first bz code
-                    'brgb': 'brgb01', // Default to first brgb code
-                    'vkwebz': 'vkwebz' // Direct mapping for vkwebz
+                    "wegverkeer onder invloed": "vkweoi",
+                    "onder invloed": "vkweoi",
+                    bz: "bzdsap", // Default to first bz code
+                    brgb: "brgb01", // Default to first brgb code
+                    vkwebz: "vkwebz", // Direct mapping for vkwebz
                   };
-                  
+
                   const mappedCode = specialMappings[searchQuery.toLowerCase()];
                   if (mappedCode) {
-                    matchedClassification = storedClassifications.find(c => 
-                      c.code.toLowerCase() === mappedCode.toLowerCase()
+                    matchedClassification = storedClassifications.find(
+                      (c) => typeof c.code === "string" && c.code.toLowerCase() === mappedCode.toLowerCase(),
                     );
-                    console.log('🔍 3. Special mapping result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                    console.log(
+                      "🔍 3. Special mapping result:",
+                      matchedClassification
+                        ? `Found: ${matchedClassification.code}`
+                        : "Not found",
+                    );
                   } else {
-                    console.log('🔍 3. No special mapping found for:', searchQuery.toLowerCase());
+                    console.log(
+                      "🔍 3. No special mapping found for:",
+                      searchQuery.toLowerCase(),
+                    );
                   }
                 }
-                
+
                 // 4. Try text matches for full classification strings
                 if (!matchedClassification) {
-                  const searchWords = searchQuery.toLowerCase().split(' ').filter(word => word.length > 2);
-                  console.log('🔍 4. Searching for words:', searchWords);
-                  
-                  matchedClassification = storedClassifications.find(c => {
-                    const fullClassification = `${c.MC1} ${c.MC2} ${c.MC3}`.toLowerCase();
-                    const uitleg = c.uitleg.toLowerCase();
-                    
+                  const searchWords = searchQuery
+                    .toLowerCase()
+                    .split(" ")
+                    .filter((word) => word.length > 2);
+                  console.log("🔍 4. Searching for words:", searchWords);
+
+                  matchedClassification = storedClassifications.find((c) => {
+                    const mc1 = (c.MC1 || '').toLowerCase();
+                    const mc2 = (c.MC2 || '').toLowerCase();
+                    const mc3 = (c.MC3 || '').toLowerCase();
+                    const fullClassification = `${mc1} ${mc2} ${mc3}`;
+                    const uitleg = (c.uitleg || '').toLowerCase();
+
                     // Check if all search words are present in the classification or explanation
-                    return searchWords.every(word => 
-                      fullClassification.includes(word) || 
-                      uitleg.includes(word) ||
-                      c.MC1.toLowerCase().includes(word) ||
-                      c.MC2.toLowerCase().includes(word) ||
-                      c.MC3.toLowerCase().includes(word)
+                    return searchWords.every(
+                      (word) =>
+                        fullClassification.includes(word) ||
+                        uitleg.includes(word) ||
+                        mc1.includes(word) ||
+                        mc2.includes(word) ||
+                        mc3.includes(word),
                     );
                   });
-                  console.log('🔍 4. Multi-word match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log(
+                    "🔍 4. Multi-word match result:",
+                    matchedClassification
+                      ? `Found: ${matchedClassification.code}`
+                      : "Not found",
+                  );
                 }
-                
+
                 // 5. Try individual text matches for MC1, MC2, MC3
                 if (!matchedClassification) {
-                  matchedClassification = storedClassifications.find(c => 
-                    c.MC3.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    c.MC2.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    c.MC1.toLowerCase().includes(searchQuery.toLowerCase())
+                  matchedClassification = storedClassifications.find(
+                    (c) =>
+                      (c.MC3 || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (c.MC2 || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (c.MC1 || '').toLowerCase().includes(searchQuery.toLowerCase()),
                   );
-                  console.log('🔍 4. Individual text match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log(
+                    "🔍 4. Individual text match result:",
+                    matchedClassification
+                      ? `Found: ${matchedClassification.code}`
+                      : "Not found",
+                  );
                 }
-                
+
                 // 5. Try fuzzy matching for partial matches
                 if (!matchedClassification && searchQuery.length > 3) {
-                  matchedClassification = storedClassifications.find(c => {
+                  matchedClassification = storedClassifications.find((c) => {
                     const searchLower = searchQuery.toLowerCase();
-                    return c.MC1.toLowerCase().includes(searchLower) ||
-                           c.MC2.toLowerCase().includes(searchLower) ||
-                           c.MC3.toLowerCase().includes(searchLower) ||
-                           c.uitleg.toLowerCase().includes(searchLower) ||
-                           searchLower.includes(c.MC1.toLowerCase()) ||
-                           searchLower.includes(c.MC2.toLowerCase()) ||
-                           searchLower.includes(c.MC3.toLowerCase());
+                    const mc1 = (c.MC1 || '').toLowerCase();
+                    const mc2 = (c.MC2 || '').toLowerCase();
+                    const mc3 = (c.MC3 || '').toLowerCase();
+                    const uitleg = (c.uitleg || '').toLowerCase();
+                    return (
+                      mc1.includes(searchLower) ||
+                      mc2.includes(searchLower) ||
+                      mc3.includes(searchLower) ||
+                      uitleg.includes(searchLower) ||
+                      searchLower.includes(mc1) ||
+                      searchLower.includes(mc2) ||
+                      searchLower.includes(mc3)
+                    );
                   });
-                  console.log('🔍 5. Fuzzy match result:', matchedClassification ? `Found: ${matchedClassification.code}` : 'Not found');
+                  console.log(
+                    "🔍 5. Fuzzy match result:",
+                    matchedClassification
+                      ? `Found: ${matchedClassification.code}`
+                      : "Not found",
+                  );
                 }
-                
+
                 if (matchedClassification) {
-                  console.log('✅ Match found for hyphen code:', matchedClassification);
+                  console.log(
+                    "✅ Match found for hyphen code:",
+                    matchedClassification,
+                  );
                   break;
                 }
               }
-              
+
               // Check for text-based classifications without hyphen
               else if (trimmedLine.length > 2) {
                 const searchQuery = trimmedLine.toLowerCase();
-                console.log('🎯 Searching for text-based classification:', searchQuery);
-                
-                matchedClassification = storedClassifications.find(c => 
-                  c.MC3.toLowerCase().includes(searchQuery) ||
-                  c.MC2.toLowerCase().includes(searchQuery) ||
-                  c.MC1.toLowerCase().includes(searchQuery) ||
-                  searchQuery.includes(c.MC3.toLowerCase()) ||
-                  searchQuery.includes(c.MC2.toLowerCase()) ||
-                  searchQuery.includes(c.MC1.toLowerCase())
+                console.log(
+                  "🎯 Searching for text-based classification:",
+                  searchQuery,
                 );
-                
+
+                matchedClassification = storedClassifications.find(
+                  (c) =>
+                    c.MC3.toLowerCase().includes(searchQuery) ||
+                    c.MC2.toLowerCase().includes(searchQuery) ||
+                    c.MC1.toLowerCase().includes(searchQuery) ||
+                    searchQuery.includes(c.MC3.toLowerCase()) ||
+                    searchQuery.includes(c.MC2.toLowerCase()) ||
+                    searchQuery.includes(c.MC1.toLowerCase()),
+                );
+
                 if (matchedClassification) {
-                  console.log('✅ Match found for text:', matchedClassification);
+                  console.log(
+                    "✅ Match found for text:",
+                    matchedClassification,
+                  );
                   break;
                 }
               }
@@ -1874,161 +2116,192 @@ export default function Dashboard() {
 
             // Apply the matched classification
             if (matchedClassification) {
-              console.log('🎯 MATCHED CLASSIFICATION:', matchedClassification);
-              console.log('🔧 Starting dropdown population...');
-              
+              console.log("🎯 MATCHED CLASSIFICATION:", matchedClassification);
+              console.log("🔧 Starting dropdown population...");
+
               // Debug current dropdown state
-              console.log('📋 Current dropdown elements:', {
+              console.log("📋 Current dropdown elements:", {
                 mc1Select: mc1Select?.id,
-                mc2Select: mc2Select?.id, 
+                mc2Select: mc2Select?.id,
                 mc3Select: mc3Select?.id,
-                prioriteitSelect: prioriteitSelect?.id
+                prioriteitSelect: prioriteitSelect?.id,
               });
-              
+
               // Step 1: Populate MC1 dropdown and set value
-              console.log('📋 Populating MC1...');
+              console.log("📋 Populating MC1...");
               mc1Select.innerHTML = '<option value="">Selecteer...</option>';
-              
+
               // Get MC1 options from stored classifications
-              const mc1Values = storedClassifications.map(c => c.MC1).filter(Boolean);
+              const mc1Values = storedClassifications
+                .map((c) => c.MC1)
+                .filter(Boolean);
               const mc1Options = Array.from(new Set(mc1Values)).sort();
-              console.log('📋 MC1 options available:', mc1Options.length, mc1Options);
-              
-              mc1Options.forEach(mc1 => {
-                const option = document.createElement('option');
+              console.log(
+                "📋 MC1 options available:",
+                mc1Options.length,
+                mc1Options,
+              );
+
+              mc1Options.forEach((mc1) => {
+                const option = document.createElement("option");
                 option.value = mc1;
                 option.textContent = mc1;
                 mc1Select.appendChild(option);
               });
               mc1Select.value = matchedClassification.MC1;
-              console.log('✅ MC1 set to:', mc1Select.value);
-              
+              console.log("✅ MC1 set to:", mc1Select.value);
+
               // Step 2: Populate MC2 dropdown if MC2 exists
-              if (matchedClassification.MC2 && matchedClassification.MC2.trim() !== '') {
-                console.log('📋 Populating MC2...');
+              if (
+                matchedClassification.MC2 &&
+                matchedClassification.MC2.trim() !== ""
+              ) {
+                console.log("📋 Populating MC2...");
                 mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-                
+
                 // Get MC2 options from stored classifications for the selected MC1
                 const mc2Values = storedClassifications
-                  .filter(c => c.MC1 === matchedClassification.MC1)
-                  .map(c => c.MC2)
+                  .filter((c) => c.MC1 === matchedClassification.MC1)
+                  .map((c) => c.MC2)
                   .filter(Boolean);
                 const mc2Options = Array.from(new Set(mc2Values)).sort();
-                console.log('📋 MC2 options for', matchedClassification.MC1, ':', mc2Options.length, mc2Options);
-                
-                mc2Options.forEach(mc2 => {
-                  const option = document.createElement('option');
+                console.log(
+                  "📋 MC2 options for",
+                  matchedClassification.MC1,
+                  ":",
+                  mc2Options.length,
+                  mc2Options,
+                );
+
+                mc2Options.forEach((mc2) => {
+                  const option = document.createElement("option");
                   option.value = mc2;
                   option.textContent = mc2;
                   mc2Select.appendChild(option);
                 });
                 mc2Select.value = matchedClassification.MC2;
-                console.log('✅ MC2 set to:', mc2Select.value);
-                
+                console.log("✅ MC2 set to:", mc2Select.value);
+
                 // Step 3: Populate MC3 dropdown if MC3 exists
-                if (matchedClassification.MC3 && matchedClassification.MC3.trim() !== '') {
-                  console.log('📋 Populating MC3...');
-                  mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-                  
+                if (
+                  matchedClassification.MC3 &&
+                  matchedClassification.MC3.trim() !== ""
+                ) {
+                  console.log("📋 Populating MC3...");
+                  mc3Select.innerHTML =
+                    '<option value="">Selecteer...</option>';
+
                   // Get MC3 options from stored classifications for the selected MC2
                   const mc3Values = storedClassifications
-                    .filter(c => c.MC2 === matchedClassification.MC2)
-                    .map(c => c.MC3)
+                    .filter((c) => c.MC2 === matchedClassification.MC2)
+                    .map((c) => c.MC3)
                     .filter(Boolean);
                   const mc3Options = Array.from(new Set(mc3Values)).sort();
-                  console.log('📋 MC3 options for', matchedClassification.MC2, ':', mc3Options.length, mc3Options);
-                  
-                  mc3Options.forEach(mc3 => {
-                    const option = document.createElement('option');
+                  console.log(
+                    "📋 MC3 options for",
+                    matchedClassification.MC2,
+                    ":",
+                    mc3Options.length,
+                    mc3Options,
+                  );
+
+                  mc3Options.forEach((mc3) => {
+                    const option = document.createElement("option");
                     option.value = mc3;
                     option.textContent = mc3;
                     mc3Select.appendChild(option);
                   });
                   mc3Select.value = matchedClassification.MC3;
-                  console.log('✅ MC3 set to:', mc3Select.value);
+                  console.log("✅ MC3 set to:", mc3Select.value);
                 } else {
-                  console.log('⚠️ No MC3 in matched classification');
-                  mc3Select.innerHTML = '<option value="">Selecteer...</option>';
+                  console.log("⚠️ No MC3 in matched classification");
+                  mc3Select.innerHTML =
+                    '<option value="">Selecteer...</option>';
                 }
               } else {
-                console.log('⚠️ No MC2 in matched classification');
+                console.log("⚠️ No MC2 in matched classification");
                 mc2Select.innerHTML = '<option value="">Selecteer...</option>';
                 mc3Select.innerHTML = '<option value="">Selecteer...</option>';
               }
-              
+
               // Step 4: Set priority
               if (prioriteitSelect && matchedClassification.prio) {
                 prioriteitSelect.value = matchedClassification.prio.toString();
-                console.log('✅ Priority set to:', prioriteitSelect.value);
+                console.log("✅ Priority set to:", prioriteitSelect.value);
               }
-              
+
               // Final verification
               const finalValues = {
                 MC1: mc1Select.value,
                 MC2: mc2Select.value,
                 MC3: mc3Select.value,
-                Priority: prioriteitSelect?.value || 'not set'
+                Priority: prioriteitSelect?.value || "not set",
               };
-              console.log('🎯 FINAL DROPDOWN VALUES:', finalValues);
-              
+              console.log("🎯 FINAL DROPDOWN VALUES:", finalValues);
+
               // Log the automatic classification to console
-              const timestamp = new Date().toLocaleTimeString('nl-NL');
-              console.log(`${timestamp} ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? ' / ' + matchedClassification.MC2 : ''}${matchedClassification.MC3 ? ' / ' + matchedClassification.MC3 : ''} (Prio ${matchedClassification.prio})`);
+              const timestamp = new Date().toLocaleTimeString("nl-NL");
+              console.log(
+                `${timestamp} ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? " / " + matchedClassification.MC2 : ""}${matchedClassification.MC3 ? " / " + matchedClassification.MC3 : ""} (Prio ${matchedClassification.prio})`,
+              );
             } else {
-              console.log('❌ No classification matched for input');
-              console.log('💡 Available classification samples:', storedClassifications.slice(0, 5).map(c => ({
-                code: c.code,
-                MC1: c.MC1,
-                MC2: c.MC2,
-                MC3: c.MC3
-              })));
+              console.log("❌ No classification matched for input");
+              console.log(
+                "💡 Available classification samples:",
+                storedClassifications.slice(0, 5).map((c) => ({
+                  code: c.code,
+                  MC1: c.MC1,
+                  MC2: c.MC2,
+                  MC3: c.MC3,
+                })),
+              );
             }
           }
-          
+
           // Filter out only m/ command lines from the logging display (keep = lines)
           const filteredText = notitieText
-            .split('\n')
-            .filter(line => !line.trim().startsWith('m/'))
-            .join('\n')
+            .split("\n")
+            .filter((line) => !line.trim().startsWith("m/"))
+            .join("\n")
             .trim();
-          
+
           // Add the filtered note to the logging section
           const meldingLogging = document.getElementById("gmsMeldingLogging");
           if (meldingLogging && filteredText.trim()) {
-            const timestamp = new Date().toLocaleString('nl-NL', {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
+            const timestamp = new Date().toLocaleString("nl-NL", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
             });
-            
+
             // Create log entry element
-            const logEntry = document.createElement('div');
-            logEntry.className = 'gms-log-entry';
+            const logEntry = document.createElement("div");
+            logEntry.className = "gms-log-entry";
             logEntry.innerHTML = `
               <span class="gms-log-timestamp">[${timestamp}]</span>
               <span class="gms-log-content">${filteredText}</span>
             `;
-            
+
             // Insert at the top of the logging area
             if (meldingLogging.firstChild) {
               meldingLogging.insertBefore(logEntry, meldingLogging.firstChild);
             } else {
               meldingLogging.appendChild(logEntry);
             }
-            
+
             // Also log to console
             console.log(`${timestamp} Note: ${filteredText}`);
           }
-          
+
           // Clear the notepad after sending
-          kladblok.textContent = '';
+          kladblok.textContent = "";
         }
       };
 
       // Handle full GMS form submission (separate function for actual form saving)
       const handleGMSFormSubmit = () => {
-        console.log('💾 FORM SUBMIT - Saving full GMS form');
-        
+        console.log("💾 FORM SUBMIT - Saving full GMS form");
+
         const kladblok = document.getElementById("gmsKladblok");
 
         // Melder informatie
@@ -2123,10 +2396,11 @@ export default function Dashboard() {
         // Save to localStorage and create incident for Incidents tab
         try {
           // Get current incident data if exists (for updates)
-          const currentIncidentData = localStorage.getItem('currentGmsIncident');
+          const currentIncidentData =
+            localStorage.getItem("currentGmsIncident");
           let incidentId = null;
           let isNewIncident = false;
-          
+
           if (currentIncidentData) {
             const parsedIncident = JSON.parse(currentIncidentData);
             incidentId = parsedIncident.incidentId;
@@ -2135,17 +2409,23 @@ export default function Dashboard() {
             incidentId = Date.now();
             isNewIncident = true;
           }
-          
+
           // Create comprehensive incident data with all GMS form information
           const completeIncidentData = {
             incidentId: incidentId,
-            type: gmsData.classificatie1 || 'Onbekend',
-            location: gmsData.straatnaam && gmsData.huisnummer 
-              ? `${gmsData.straatnaam} ${gmsData.huisnummer}` 
-              : gmsData.straatnaam || 'Onbekend',
+            type: gmsData.classificatie1 || "Onbekend",
+            location:
+              gmsData.straatnaam && gmsData.huisnummer
+                ? `${gmsData.straatnaam} ${gmsData.huisnummer}`
+                : gmsData.straatnaam || "Onbekend",
             timestamp: new Date().toISOString(),
-            priority: gmsData.prioriteit === 1 ? 'high' : gmsData.prioriteit === 2 ? 'medium' : 'low',
-            status: 'active',
+            priority:
+              gmsData.prioriteit === 1
+                ? "high"
+                : gmsData.prioriteit === 2
+                  ? "medium"
+                  : "low",
+            status: "active",
             // Complete GMS form data
             melderNaam: gmsData.meldernaam,
             melderAdres: gmsData.melderadres,
@@ -2161,56 +2441,78 @@ export default function Dashboard() {
             mc3: gmsData.classificatie3,
             notities: gmsData.opmerkingen,
             tijdstip: gmsData.tijdstip,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
           };
-          
+
           // Save complete incident data
-          localStorage.setItem('currentGmsIncident', JSON.stringify(completeIncidentData));
-          localStorage.setItem(`gmsData_${incidentId}`, JSON.stringify(completeIncidentData));
-          
+          localStorage.setItem(
+            "currentGmsIncident",
+            JSON.stringify(completeIncidentData),
+          );
+          localStorage.setItem(
+            `gmsData_${incidentId}`,
+            JSON.stringify(completeIncidentData),
+          );
+
           // Add to main incidents list for Incidents tab
           if (isNewIncident) {
             const newIncident: Incident = {
               id: incidentId,
-              type: gmsData.classificatie1 || 'Onbekend',
-              location: gmsData.straatnaam && gmsData.huisnummer 
-                ? `${gmsData.straatnaam} ${gmsData.huisnummer}` 
-                : gmsData.straatnaam || 'Onbekend',
+              type: gmsData.classificatie1 || "Onbekend",
+              location:
+                gmsData.straatnaam && gmsData.huisnummer
+                  ? `${gmsData.straatnaam} ${gmsData.huisnummer}`
+                  : gmsData.straatnaam || "Onbekend",
               timestamp: new Date().toISOString(),
-              timeAgo: 'Nu',
+              timeAgo: "Nu",
               unitsAssigned: 0,
-              priority: gmsData.prioriteit === 1 ? 'high' : gmsData.prioriteit === 2 ? 'medium' : 'low',
-              status: 'active'
+              priority:
+                gmsData.prioriteit === 1
+                  ? "high"
+                  : gmsData.prioriteit === 2
+                    ? "medium"
+                    : "low",
+              status: "active",
             };
-            
+
             // Add to React state incidents list
-            setIncidents(prev => [newIncident, ...prev]);
-            
-            console.log(`Created new incident ${incidentId} and added to Incidents tab`);
+            setIncidents((prev) => [newIncident, ...prev]);
+
+            console.log(
+              `Created new incident ${incidentId} and added to Incidents tab`,
+            );
           } else {
             // Update existing incident in React state
-            setIncidents(prev => prev.map(inc => 
-              inc.id === incidentId 
-                ? {
-                    ...inc,
-                    type: gmsData.classificatie1 || inc.type,
-                    location: gmsData.straatnaam && gmsData.huisnummer 
-                      ? `${gmsData.straatnaam} ${gmsData.huisnummer}` 
-                      : gmsData.straatnaam || inc.location,
-                    priority: gmsData.prioriteit === 1 ? 'high' : gmsData.prioriteit === 2 ? 'medium' : 'low',
-                    lastUpdated: new Date().toISOString()
-                  }
-                : inc
-            ));
-            
+            setIncidents((prev) =>
+              prev.map((inc) =>
+                inc.id === incidentId
+                  ? {
+                      ...inc,
+                      type: gmsData.classificatie1 || inc.type,
+                      location:
+                        gmsData.straatnaam && gmsData.huisnummer
+                          ? `${gmsData.straatnaam} ${gmsData.huisnummer}`
+                          : gmsData.straatnaam || inc.location,
+                      priority:
+                        gmsData.prioriteit === 1
+                          ? "high"
+                          : gmsData.prioriteit === 2
+                            ? "medium"
+                            : "low",
+                      lastUpdated: new Date().toISOString(),
+                    }
+                  : inc,
+              ),
+            );
+
             console.log(`Updated existing incident ${incidentId}`);
           }
-          
+
           // Also save to legacy incidenten array for compatibility
           const existingIncidenten = JSON.parse(
             localStorage.getItem("incidenten") || "[]",
           );
-          
+
           if (isNewIncident) {
             existingIncidenten.push(gmsData);
             localStorage.setItem(
@@ -2218,7 +2520,6 @@ export default function Dashboard() {
               JSON.stringify(existingIncidenten),
             );
           }
-          
         } catch (error) {
           console.error("Error saving incident data:", error);
         }
@@ -2251,48 +2552,97 @@ export default function Dashboard() {
         if (prioriteit) prioriteit.value = "3";
         updateGMSTime();
 
-        showNotificationMessage("GMS melding opgeslagen en toegevoegd aan incidenten");
-        
+        showNotificationMessage(
+          "GMS melding opgeslagen en toegevoegd aan incidenten",
+        );
+
         // Do NOT redirect to incidents tab - stay on GMS page
-        console.log('✅ Form saved successfully, staying on GMS page');
+        console.log("✅ Form saved successfully, staying on GMS page");
       };
 
       // Enhanced helper function to collect all GMS form data comprehensively
       const collectGMSFormData = () => {
-        const melderNaam = (document.getElementById("gmsMeldernaam") as HTMLInputElement)?.value?.trim() || '';
-        const melderAdres = (document.getElementById("gmsMelderadres") as HTMLInputElement)?.value?.trim() || '';
-        const telefoonnummer = (document.getElementById("gmsTelefoonnummer") as HTMLInputElement)?.value?.trim() || '';
-        
-        const straatnaam = (document.getElementById("gmsStraatnaam") as HTMLInputElement)?.value?.trim() || '';
-        const huisnummer = (document.getElementById("gmsHuisnummer") as HTMLInputElement)?.value?.trim() || '';
-        const toevoeging = (document.getElementById("gmsToevoeging") as HTMLInputElement)?.value?.trim() || '';
-        const postcode = (document.getElementById("gmsPostcode") as HTMLInputElement)?.value?.trim() || '';
-        const plaatsnaam = (document.getElementById("gmsPlaatsnaam") as HTMLInputElement)?.value?.trim() || '';
-        const gemeente = (document.getElementById("gmsGemeente") as HTMLInputElement)?.value?.trim() || '';
-        
-        const mc1 = (document.getElementById("gmsClassificatie1") as HTMLSelectElement)?.value || '';
-        const mc2 = (document.getElementById("gmsClassificatie2") as HTMLSelectElement)?.value || '';
-        const mc3 = (document.getElementById("gmsClassificatie3") as HTMLSelectElement)?.value || '';
-        
-        const tijdstip = (document.getElementById("gmsTijdstip") as HTMLInputElement)?.value || new Date().toISOString().slice(0, 16);
-        const prioriteit = parseInt((document.getElementById("gmsPrioriteit") as HTMLSelectElement)?.value || '3');
-        
-        const meldingLoggingElement = document.getElementById("gmsMeldingLogging");
-        const meldingslogging = meldingLoggingElement?.innerHTML || '';
-        const notities = document.getElementById("gmsKladblok")?.textContent || '';
-        
+        const melderNaam =
+          (
+            document.getElementById("gmsMeldernaam") as HTMLInputElement
+          )?.value?.trim() || "";
+        const melderAdres =
+          (
+            document.getElementById("gmsMelderadres") as HTMLInputElement
+          )?.value?.trim() || "";
+        const telefoonnummer =
+          (
+            document.getElementById("gmsTelefoonnummer") as HTMLInputElement
+          )?.value?.trim() || "";
+
+        const straatnaam =
+          (
+            document.getElementById("gmsStraatnaam") as HTMLInputElement
+          )?.value?.trim() || "";
+        const huisnummer =
+          (
+            document.getElementById("gmsHuisnummer") as HTMLInputElement
+          )?.value?.trim() || "";
+        const toevoeging =
+          (
+            document.getElementById("gmsToevoeging") as HTMLInputElement
+          )?.value?.trim() || "";
+        const postcode =
+          (
+            document.getElementById("gmsPostcode") as HTMLInputElement
+          )?.value?.trim() || "";
+        const plaatsnaam =
+          (
+            document.getElementById("gmsPlaatsnaam") as HTMLInputElement
+          )?.value?.trim() || "";
+        const gemeente =
+          (
+            document.getElementById("gmsGemeente") as HTMLInputElement
+          )?.value?.trim() || "";
+
+        const mc1 =
+          (document.getElementById("gmsClassificatie1") as HTMLSelectElement)
+            ?.value || "";
+        const mc2 =
+          (document.getElementById("gmsClassificatie2") as HTMLSelectElement)
+            ?.value || "";
+        const mc3 =
+          (document.getElementById("gmsClassificatie3") as HTMLSelectElement)
+            ?.value || "";
+
+        const tijdstip =
+          (document.getElementById("gmsTijdstip") as HTMLInputElement)?.value ||
+          new Date().toISOString().slice(0, 16);
+        const prioriteit = parseInt(
+          (document.getElementById("gmsPrioriteit") as HTMLSelectElement)
+            ?.value || "3",
+        );
+
+        const meldingLoggingElement =
+          document.getElementById("gmsMeldingLogging");
+        const meldingslogging = meldingLoggingElement?.innerHTML || "";
+        const notities =
+          document.getElementById("gmsKladblok")?.textContent || "";
+
         // Create comprehensive location string
-        const locationParts = [straatnaam, huisnummer, plaatsnaam].filter(part => part.trim());
-        const location = locationParts.length > 0 ? locationParts.join(" ") : "Onbekende locatie";
-        
+        const locationParts = [straatnaam, huisnummer, plaatsnaam].filter(
+          (part) => part.trim(),
+        );
+        const location =
+          locationParts.length > 0
+            ? locationParts.join(" ")
+            : "Onbekende locatie";
+
         // Create incident type from classifications
         const type = mc3 || mc2 || mc1 || "Onbekend incident";
-        
+
         if (!straatnaam) {
-          showNotificationMessage("Vul minimaal de straatnaam in om uit te geven");
+          showNotificationMessage(
+            "Vul minimaal de straatnaam in om uit te geven",
+          );
           return null;
         }
-        
+
         return {
           // Compatibility with both naming conventions
           melderNaam,
@@ -2300,7 +2650,7 @@ export default function Dashboard() {
           melderAdres,
           melderadres: melderAdres,
           telefoonnummer,
-          
+
           // Location data
           straatnaam,
           huisnummer,
@@ -2309,7 +2659,7 @@ export default function Dashboard() {
           plaatsnaam,
           gemeente,
           location,
-          
+
           // Classification data
           mc1,
           mc2,
@@ -2318,18 +2668,19 @@ export default function Dashboard() {
           classificatie2: mc2,
           classificatie3: mc3,
           type,
-          
+
           // Operational data
           tijdstip,
           prioriteit,
-          priority: prioriteit <= 2 ? 'high' : prioriteit === 3 ? 'medium' : 'low',
+          priority:
+            prioriteit <= 2 ? "high" : prioriteit === 3 ? "medium" : "low",
           meldingslogging,
           notities,
-          
+
           // Metadata
           timeAgo: "Nu",
           unitsAssigned: 0,
-          aangemaaktOp: new Date().toISOString()
+          aangemaaktOp: new Date().toISOString(),
         };
       };
 
@@ -2339,8 +2690,8 @@ export default function Dashboard() {
         const diffMs = now.getTime() - date.getTime();
         const diffMins = Math.floor(diffMs / 60000);
         const diffHours = Math.floor(diffMins / 60);
-        
-        if (diffMins < 1) return 'zojuist';
+
+        if (diffMins < 1) return "zojuist";
         if (diffMins < 60) return `${diffMins} min geleden`;
         if (diffHours < 24) return `${diffHours} uur geleden`;
         return `${Math.floor(diffHours / 24)} dagen geleden`;
@@ -2348,15 +2699,15 @@ export default function Dashboard() {
 
       // Handle "Uitgifte" button - dispatch incident to central database
       const handleUitgifte = () => {
-        console.log('Uitgifte button clicked - Dispatching incident');
-        
+        console.log("Uitgifte button clicked - Dispatching incident");
+
         // Collect all form data including current logging
         const formData = collectGMSFormData();
         if (!formData) return;
-        
+
         // Create or update incident in central database
         const incidentId = currentGmsIncident?.id || Date.now();
-        
+
         // Create complete incident object with all data
         const completeIncident = {
           id: incidentId,
@@ -2383,43 +2734,55 @@ export default function Dashboard() {
           meldingslogging: formData.meldingslogging,
           notities: formData.notities,
           // Metadata
-          aangemaaktOp: currentGmsIncident?.aangemaaktOp || new Date().toISOString(),
-          uitgegeven: new Date().toISOString()
+          aangemaaktOp:
+            currentGmsIncident?.aangemaaktOp || new Date().toISOString(),
+          uitgegeven: new Date().toISOString(),
         };
-        
-        console.log('Saving complete incident:', completeIncident);
-        
+
+        console.log("Saving complete incident:", completeIncident);
+
         // Save to GMS incidents database
-        setGmsIncidents(prev => {
-          const existing = prev.find(inc => inc.id === incidentId);
+        setGmsIncidents((prev) => {
+          const existing = prev.find((inc) => inc.id === incidentId);
           if (existing) {
-            return prev.map(inc => inc.id === incidentId ? completeIncident : inc);
+            return prev.map((inc) =>
+              inc.id === incidentId ? completeIncident : inc,
+            );
           } else {
             return [...prev, completeIncident];
           }
         });
-        
+
         // Create simplified incident for main incidents list
         const mainIncident: Incident = {
           id: incidentId,
-          type: formData.mc1 || 'Melding',
-          location: `${formData.straatnaam} ${formData.huisnummer || ''}`.trim() + (formData.plaatsnaam ? `, ${formData.plaatsnaam}` : ''),
+          type: formData.mc1 || "Melding",
+          location:
+            `${formData.straatnaam} ${formData.huisnummer || ""}`.trim() +
+            (formData.plaatsnaam ? `, ${formData.plaatsnaam}` : ""),
           timestamp: formData.tijdstip,
           timeAgo: calculateTimeAgo(new Date(formData.tijdstip)),
           unitsAssigned: 0,
-          priority: formData.prioriteit === 1 ? 'high' : formData.prioriteit === 2 ? 'medium' : 'low',
-          status: 'active'
+          priority:
+            formData.prioriteit === 1
+              ? "high"
+              : formData.prioriteit === 2
+                ? "medium"
+                : "low",
+          status: "active",
         };
-        
-        setIncidents(prev => {
-          const existing = prev.find(inc => inc.id === incidentId);
+
+        setIncidents((prev) => {
+          const existing = prev.find((inc) => inc.id === incidentId);
           if (existing) {
-            return prev.map(inc => inc.id === incidentId ? mainIncident : inc);
+            return prev.map((inc) =>
+              inc.id === incidentId ? mainIncident : inc,
+            );
           } else {
             return [...prev, mainIncident];
           }
         });
-        
+
         // Save to localStorage for persistence (using both naming conventions)
         const storageIncident = {
           ...completeIncident,
@@ -2429,115 +2792,132 @@ export default function Dashboard() {
           classificatie1: formData.mc1,
           classificatie2: formData.mc2,
           classificatie3: formData.mc3,
-          timestamp: formData.tijdstip
+          timestamp: formData.tijdstip,
         };
-        
-        const existingIncidenten = JSON.parse(localStorage.getItem("incidenten") || "[]");
-        const existingIndex = existingIncidenten.findIndex((inc: any) => (inc.id || inc.incidentId) === incidentId);
-        
+
+        const existingIncidenten = JSON.parse(
+          localStorage.getItem("incidenten") || "[]",
+        );
+        const existingIndex = existingIncidenten.findIndex(
+          (inc: any) => (inc.id || inc.incidentId) === incidentId,
+        );
+
         if (existingIndex >= 0) {
           existingIncidenten[existingIndex] = storageIncident;
         } else {
           existingIncidenten.push(storageIncident);
         }
-        
+
         localStorage.setItem("incidenten", JSON.stringify(existingIncidenten));
-        
+
         // Update current incident state but stay on GMS
         setCurrentGmsIncident(completeIncident);
-        
-        showNotificationMessage("Incident uitgegeven en toegevoegd aan overzicht");
-        console.log('Incident dispatched and saved to database and localStorage');
+
+        showNotificationMessage(
+          "Incident uitgegeven en toegevoegd aan overzicht",
+        );
+        console.log(
+          "Incident dispatched and saved to database and localStorage",
+        );
       };
 
       // Telefoon Dashboard Interactive Functionality
       const initializeTelefoonDashboard = () => {
         // Chat functionality
-        const chatSendBtn = document.getElementById('chatSendBtn');
-        const chatInput = document.getElementById('chatInput') as HTMLInputElement;
-        const chatMessages = document.getElementById('chatMessages');
-        
+        const chatSendBtn = document.getElementById("chatSendBtn");
+        const chatInput = document.getElementById(
+          "chatInput",
+        ) as HTMLInputElement;
+        const chatMessages = document.getElementById("chatMessages");
+
         const sendChatMessage = () => {
           if (!chatInput || !chatMessages) return;
-          
+
           const messageText = chatInput.value.trim();
           if (!messageText) return;
-          
-          const timestamp = new Date().toLocaleTimeString('nl-NL', {
-            hour: '2-digit',
-            minute: '2-digit'
+
+          const timestamp = new Date().toLocaleTimeString("nl-NL", {
+            hour: "2-digit",
+            minute: "2-digit",
           });
-          
+
           // Create outgoing message
-          const messageDiv = document.createElement('div');
-          messageDiv.className = 'chat-message outgoing';
+          const messageDiv = document.createElement("div");
+          messageDiv.className = "chat-message outgoing";
           messageDiv.innerHTML = `
             <div class="message-sender">Meldkamer</div>
             <div class="message-content">${messageText}</div>
             <div class="message-time">${timestamp}</div>
           `;
-          
+
           chatMessages.appendChild(messageDiv);
           chatMessages.scrollTop = chatMessages.scrollHeight;
-          
+
           // Clear input
-          chatInput.value = '';
-          
+          chatInput.value = "";
+
           // Simulate response after 2-3 seconds
-          setTimeout(() => {
-            const responseDiv = document.createElement('div');
-            responseDiv.className = 'chat-message incoming';
-            const responses = [
-              'Bedankt voor de snelle reactie.',
-              'Ik begrijp het. Hulpdiensten zijn onderweg.',
-              'Kunt u op een veilige plek blijven?',
-              'We houden contact voor updates.',
-              'De eenheden zijn ter plaatse aangekomen.'
-            ];
-            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-            
-            responseDiv.innerHTML = `
+          setTimeout(
+            () => {
+              const responseDiv = document.createElement("div");
+              responseDiv.className = "chat-message incoming";
+              const responses = [
+                "Bedankt voor de snelle reactie.",
+                "Ik begrijp het. Hulpdiensten zijn onderweg.",
+                "Kunt u op een veilige plek blijven?",
+                "We houden contact voor updates.",
+                "De eenheden zijn ter plaatse aangekomen.",
+              ];
+              const randomResponse =
+                responses[Math.floor(Math.random() * responses.length)];
+
+              responseDiv.innerHTML = `
               <div class="message-sender">Melder - 06-12345678</div>
               <div class="message-content">${randomResponse}</div>
-              <div class="message-time">${new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}</div>
+              <div class="message-time">${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}</div>
             `;
-            
-            chatMessages.appendChild(responseDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          }, 2000 + Math.random() * 1000);
+
+              chatMessages.appendChild(responseDiv);
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+            },
+            2000 + Math.random() * 1000,
+          );
         };
-        
+
         if (chatSendBtn) {
-          chatSendBtn.addEventListener('click', sendChatMessage);
+          chatSendBtn.addEventListener("click", sendChatMessage);
         }
-        
+
         if (chatInput) {
-          chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+          chatInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
               e.preventDefault();
               sendChatMessage();
             }
           });
         }
-        
+
         // Chat tab switching
-        const chatTabs = document.querySelectorAll('.chat-tab');
-        chatTabs.forEach(tab => {
-          tab.addEventListener('click', (e) => {
+        const chatTabs = document.querySelectorAll(".chat-tab");
+        chatTabs.forEach((tab) => {
+          tab.addEventListener("click", (e) => {
             const target = e.target as HTMLElement;
             const chatType = target.dataset.chat;
-            
+
             // Remove active class from all tabs
-            chatTabs.forEach(t => t.classList.remove('active'));
-            target.classList.add('active');
-            
+            chatTabs.forEach((t) => t.classList.remove("active"));
+            target.classList.add("active");
+
             // Update chat messages based on chat type
             if (chatMessages) {
-              let newContent = '';
-              const timestamp = new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-              
+              let newContent = "";
+              const timestamp = new Date().toLocaleTimeString("nl-NL", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
               switch (chatType) {
-                case 'burgers':
+                case "burgers":
                   newContent = `
                     <div class="chat-message incoming">
                       <div class="message-sender">Melder - 06-12345678</div>
@@ -2551,7 +2931,7 @@ export default function Dashboard() {
                     </div>
                   `;
                   break;
-                case 'collega':
+                case "collega":
                   newContent = `
                     <div class="chat-message incoming">
                       <div class="message-sender">Dienstchef</div>
@@ -2565,7 +2945,7 @@ export default function Dashboard() {
                     </div>
                   `;
                   break;
-                case 'partners':
+                case "partners":
                   newContent = `
                     <div class="chat-message incoming">
                       <div class="message-sender">Brandweer Rotterdam</div>
@@ -2580,53 +2960,58 @@ export default function Dashboard() {
                   `;
                   break;
               }
-              
+
               chatMessages.innerHTML = newContent;
             }
           });
         });
-        
+
         // Contact button functionality
-        const contactButtons = document.querySelectorAll('.contact-btn');
-        contactButtons.forEach(btn => {
-          btn.addEventListener('click', (e) => {
+        const contactButtons = document.querySelectorAll(".contact-btn");
+        contactButtons.forEach((btn) => {
+          btn.addEventListener("click", (e) => {
             const target = e.target as HTMLElement;
-            const service = target.dataset.service || target.dataset.colleague || target.dataset.partner;
-            const buttonText = target.textContent?.trim() || '';
-            
+            const service =
+              target.dataset.service ||
+              target.dataset.colleague ||
+              target.dataset.partner;
+            const buttonText = target.textContent?.trim() || "";
+
             // Visual feedback
-            target.style.background = '#ffeb3b';
+            target.style.background = "#ffeb3b";
             setTimeout(() => {
-              target.style.background = '';
+              target.style.background = "";
             }, 200);
-            
+
             // Simulate call initiation
-            const statusBar = document.querySelector('.telefoon-status-bar .status-left');
+            const statusBar = document.querySelector(
+              ".telefoon-status-bar .status-left",
+            );
             if (statusBar) {
-              const callStatus = document.createElement('span');
-              callStatus.className = 'call-status';
-              callStatus.textContent = `📞 Verbinding maken met ${buttonText.split('\n')[0]}...`;
-              callStatus.style.color = '#ff9800';
-              
+              const callStatus = document.createElement("span");
+              callStatus.className = "call-status";
+              callStatus.textContent = `📞 Verbinding maken met ${buttonText.split("\n")[0]}...`;
+              callStatus.style.color = "#ff9800";
+
               statusBar.appendChild(callStatus);
-              
+
               setTimeout(() => {
-                callStatus.textContent = `📞 Verbonden met ${buttonText.split('\n')[0]}`;
-                callStatus.style.color = '#4caf50';
-                
+                callStatus.textContent = `📞 Verbonden met ${buttonText.split("\n")[0]}`;
+                callStatus.style.color = "#4caf50";
+
                 setTimeout(() => {
                   callStatus.remove();
                 }, 5000);
               }, 2000);
             }
-            
+
             console.log(`📞 Calling ${service}: ${buttonText}`);
           });
         });
       };
-      
+
       // Initialize telefoon dashboard if on intake page
-      if (activeSection === 'intake') {
+      if (activeSection === "intake") {
         setTimeout(initializeTelefoonDashboard, 100);
       }
 
@@ -2634,111 +3019,148 @@ export default function Dashboard() {
       const verzendButton = document.getElementById("gmsVerzendButton");
       const uitgifteButton = document.getElementById("gmsUitgifteButton");
       const kladblokElement = document.getElementById("gmsKladblok");
-      
+
       if (verzendButton) {
-        console.log('📌 Verzend button found, attaching notepad submit listener');
+        console.log(
+          "📌 Verzend button found, attaching notepad submit listener",
+        );
         verzendButton.addEventListener("click", (e) => {
           e.preventDefault();
-          console.log('🔥 VERZEND BUTTON CLICKED - Event triggered');
+          console.log("🔥 VERZEND BUTTON CLICKED - Event triggered");
           handleNotePadSubmit();
         });
-        
+
         // Classification system ready - all functions operational
-        
+
         // Basic classification system verification
-        const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-        console.log('📊 Classifications loaded:', storedClassifications.length, 'entries available');
+        const storedClassifications = JSON.parse(
+          localStorage.getItem("gmsClassifications") || "[]",
+        );
+        console.log(
+          "📊 Classifications loaded:",
+          storedClassifications.length,
+          "entries available",
+        );
       } else {
-        console.error('❌ Verzend button not found! Available buttons:', 
-          Array.from(document.querySelectorAll('button')).map(b => b.id).filter(id => id));
+        console.error(
+          "❌ Verzend button not found! Available buttons:",
+          Array.from(document.querySelectorAll("button"))
+            .map((b) => b.id)
+            .filter((id) => id),
+        );
       }
-      
+
       // Add Enter key support for kladblok
       if (kladblokElement) {
-        console.log('📌 Kladblok found, attaching Enter key listener');
+        console.log("📌 Kladblok found, attaching Enter key listener");
         kladblokElement.addEventListener("keydown", (e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            console.log('⌨️ ENTER KEY PRESSED - Event triggered');
+            console.log("⌨️ ENTER KEY PRESSED - Event triggered");
             handleNotePadSubmit();
           }
         });
       } else {
-        console.error('❌ Kladblok element not found!');
+        console.error("❌ Kladblok element not found!");
       }
-      
+
       // Form save button (for full form submission)
       const saveButton = document.getElementById("gmsSaveButton");
       if (saveButton) {
-        console.log('📌 Save button found, attaching form submit listener');
+        console.log("📌 Save button found, attaching form submit listener");
         saveButton.addEventListener("click", handleGMSFormSubmit);
       }
 
       // Uitgifte button (for incident dispatch)
       if (uitgifteButton) {
-        console.log('📌 Uitgifte button found, attaching dispatch listener');
+        console.log("📌 Uitgifte button found, attaching dispatch listener");
         uitgifteButton.addEventListener("click", handleUitgifte);
       }
 
       // Helper function to clear GMS form
       const clearGMSForm = () => {
-        const form = document.querySelector('.gms-form');
+        const form = document.querySelector(".gms-form");
         if (form) {
-          const inputs = form.querySelectorAll('input, select, textarea');
-          inputs.forEach(input => {
+          const inputs = form.querySelectorAll("input, select, textarea");
+          inputs.forEach((input) => {
             if (input instanceof HTMLInputElement) {
-              input.value = '';
+              input.value = "";
             } else if (input instanceof HTMLSelectElement) {
-              input.value = '';
+              input.value = "";
             } else if (input instanceof HTMLTextAreaElement) {
-              input.value = '';
+              input.value = "";
             }
           });
         }
-        
+
         const kladblok = document.getElementById("gmsKladblok");
         if (kladblok) kladblok.textContent = "";
-        
+
         const meldingLogging = document.getElementById("gmsMeldingLogging");
         if (meldingLogging) meldingLogging.innerHTML = "";
-        
+
         updateGMSTime();
         setCurrentGmsIncident(null);
       };
 
       // Helper function to populate classification dropdowns
-      const populateClassificationDropdowns = (mc1Field: HTMLSelectElement, mc2Field: HTMLSelectElement, mc3Field: HTMLSelectElement, mc1Value: string, mc2Value: string, mc3Value: string) => {
-        const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]");
-        
+      const populateClassificationDropdowns = (
+        mc1Field: HTMLSelectElement,
+        mc2Field: HTMLSelectElement,
+        mc3Field: HTMLSelectElement,
+        mc1Value: string,
+        mc2Value: string,
+        mc3Value: string,
+      ) => {
+        const storedClassifications = JSON.parse(
+          localStorage.getItem("gmsClassifications") || "[]",
+        );
+
         // Populate MC1
         mc1Field.innerHTML = '<option value="">Selecteer...</option>';
-        const mc1Options = Array.from(new Set(storedClassifications.map((c: any) => c.MC1).filter(Boolean))).sort();
+        const mc1Options = Array.from(
+          new Set(storedClassifications.map((c: any) => c.MC1).filter(Boolean)),
+        ).sort();
         mc1Options.forEach((mc1, index) => {
-          const option = document.createElement('option');
+          const option = document.createElement("option");
           option.value = String(mc1);
           option.textContent = String(mc1);
           mc1Field.appendChild(option);
         });
         mc1Field.value = mc1Value;
-        
+
         // Populate MC2 if MC1 is set
         if (mc1Value && mc2Value) {
           mc2Field.innerHTML = '<option value="">Selecteer...</option>';
-          const mc2Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC1 === mc1Value).map((c: any) => c.MC2).filter(Boolean))).sort();
+          const mc2Options = Array.from(
+            new Set(
+              storedClassifications
+                .filter((c: any) => c.MC1 === mc1Value)
+                .map((c: any) => c.MC2)
+                .filter(Boolean),
+            ),
+          ).sort();
           mc2Options.forEach((mc2, index) => {
-            const option = document.createElement('option');
+            const option = document.createElement("option");
             option.value = String(mc2);
             option.textContent = String(mc2);
             mc2Field.appendChild(option);
           });
           mc2Field.value = mc2Value;
-          
+
           // Populate MC3 if MC2 is set
           if (mc2Value && mc3Value) {
             mc3Field.innerHTML = '<option value="">Selecteer...</option>';
-            const mc3Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC2 === mc2Value).map((c: any) => c.MC3).filter(Boolean))).sort();
+            const mc3Options = Array.from(
+              new Set(
+                storedClassifications
+                  .filter((c: any) => c.MC2 === mc2Value)
+                  .map((c: any) => c.MC3)
+                  .filter(Boolean),
+              ),
+            ).sort();
             mc3Options.forEach((mc3, index) => {
-              const option = document.createElement('option');
+              const option = document.createElement("option");
               option.value = String(mc3);
               option.textContent = String(mc3);
               mc3Field.appendChild(option);
@@ -2748,44 +3170,58 @@ export default function Dashboard() {
         }
       };
 
-
-
       // Handle incident closure buttons
       const handleIncidentClosure = (actionType: string) => {
         if (currentGmsIncident) {
           // Update incident status in GMS database
-          setGmsIncidents(prev => prev.map(inc => 
-            inc.id === currentGmsIncident.id 
-              ? { ...inc, status: "Afgesloten", afgesloten: new Date().toISOString() }
-              : inc
-          ));
-          
+          setGmsIncidents((prev) =>
+            prev.map((inc) =>
+              inc.id === currentGmsIncident.id
+                ? {
+                    ...inc,
+                    status: "Afgesloten",
+                    afgesloten: new Date().toISOString(),
+                  }
+                : inc,
+            ),
+          );
+
           // Remove from main incidents list
-          setIncidents(prev => prev.filter(inc => inc.id !== currentGmsIncident.id));
-          
+          setIncidents((prev) =>
+            prev.filter((inc) => inc.id !== currentGmsIncident.id),
+          );
+
           // Clear current incident and form
           clearGMSForm();
-          
+
           showNotificationMessage(
-            actionType === 'close' ? 'Incident afgesloten' : 'Eindrapport voltooid'
+            actionType === "close"
+              ? "Incident afgesloten"
+              : "Eindrapport voltooid",
           );
-          
-          console.log(`Incident ${actionType === 'close' ? 'closed' : 'finalized'} and removed from active list`);
+
+          console.log(
+            `Incident ${actionType === "close" ? "closed" : "finalized"} and removed from active list`,
+          );
         } else {
-          showNotificationMessage('Geen actief incident om af te sluiten');
+          showNotificationMessage("Geen actief incident om af te sluiten");
         }
       };
 
       // Sluit af button
       const sluitAfButton = document.getElementById("gmsSluitAfButton");
       if (sluitAfButton) {
-        sluitAfButton.addEventListener("click", () => handleIncidentClosure('close'));
+        sluitAfButton.addEventListener("click", () =>
+          handleIncidentClosure("close"),
+        );
       }
 
       // Eindrapport button
       const eindrapportButton = document.getElementById("gmsEindrapportButton");
       if (eindrapportButton) {
-        eindrapportButton.addEventListener("click", () => handleIncidentClosure('finalize'));
+        eindrapportButton.addEventListener("click", () =>
+          handleIncidentClosure("finalize"),
+        );
       }
 
       // Initialize time immediately and then every minute
@@ -2798,19 +3234,29 @@ export default function Dashboard() {
 
       // Setup classification cascading dropdowns with priority integration
       const setupClassificationDropdowns = () => {
-        const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-        const mc2Select = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-        const mc3Select = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-        const prioriteitSelect = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-        const notitieveld = document.getElementById("gmsKladblok") as HTMLElement;
+        const mc1Select = document.getElementById(
+          "gmsClassificatie1",
+        ) as HTMLSelectElement;
+        const mc2Select = document.getElementById(
+          "gmsClassificatie2",
+        ) as HTMLSelectElement;
+        const mc3Select = document.getElementById(
+          "gmsClassificatie3",
+        ) as HTMLSelectElement;
+        const prioriteitSelect = document.getElementById(
+          "gmsPrioriteit",
+        ) as HTMLSelectElement;
+        const notitieveld = document.getElementById(
+          "gmsKladblok",
+        ) as HTMLElement;
         // Removed logging panel dependency to fix null reference error
 
         // Populate MC1 dropdown without auto-selecting any value
         if (mc1Select && gmsClassifications.length > 0) {
           mc1Select.innerHTML = '<option value="">Selecteer...</option>';
           const mc1Options = getUniqueClassificationsByLevel("MC1");
-          mc1Options.forEach(mc1 => {
-            const option = document.createElement('option');
+          mc1Options.forEach((mc1) => {
+            const option = document.createElement("option");
             option.value = mc1;
             option.textContent = mc1;
             mc1Select.appendChild(option);
@@ -2824,121 +3270,148 @@ export default function Dashboard() {
           const selectedMC3 = mc3Select.value;
 
           if (selectedMC1) {
-            const storedClassifications = JSON.parse(localStorage.getItem("gmsClassifications") || "[]") as GmsClassification[];
-            
+            const storedClassifications = JSON.parse(
+              localStorage.getItem("gmsClassifications") || "[]",
+            ) as GmsClassification[];
+
             // Find most specific match (MC3 > MC2 > MC1)
             let matchingClassification;
             if (selectedMC3) {
-              matchingClassification = storedClassifications.find(c => 
-                c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
+              matchingClassification = storedClassifications.find(
+                (c) =>
+                  c.MC1 === selectedMC1 &&
+                  c.MC2 === selectedMC2 &&
+                  c.MC3 === selectedMC3,
               );
             } else if (selectedMC2) {
-              matchingClassification = storedClassifications.find(c => 
-                c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && !c.MC3
+              matchingClassification = storedClassifications.find(
+                (c) => c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && !c.MC3,
               );
             } else {
-              matchingClassification = storedClassifications.find(c => 
-                c.MC1 === selectedMC1 && !c.MC2 && !c.MC3
+              matchingClassification = storedClassifications.find(
+                (c) => c.MC1 === selectedMC1 && !c.MC2 && !c.MC3,
               );
             }
 
             if (matchingClassification && prioriteitSelect) {
               prioriteitSelect.value = matchingClassification.prio.toString();
-              
+
               // Update priority visual indicator
-              const priorityIndicator = document.getElementById("gmsPriorityIndicator");
+              const priorityIndicator = document.getElementById(
+                "gmsPriorityIndicator",
+              );
               if (priorityIndicator) {
                 // Remove existing priority classes
                 priorityIndicator.className = "gms-priority-dot";
                 // Add new priority class
-                priorityIndicator.classList.add(`priority-${matchingClassification.prio}`);
+                priorityIndicator.classList.add(
+                  `priority-${matchingClassification.prio}`,
+                );
               }
-              
+
               // Log the priority update to console
-              const timestamp = new Date().toLocaleTimeString('nl-NL');
-              console.log(`${timestamp} Prioriteit automatisch ingesteld op ${matchingClassification.prio} voor classificatie ${matchingClassification.code}`);
+              const timestamp = new Date().toLocaleTimeString("nl-NL");
+              console.log(
+                `${timestamp} Prioriteit automatisch ingesteld op ${matchingClassification.prio} voor classificatie ${matchingClassification.code}`,
+              );
             }
           }
         };
-
-
 
         if (mc1Select && mc2Select && mc3Select) {
           // Handle MC1 change
           mc1Select.addEventListener("change", () => {
             const selectedMC1 = mc1Select.value;
-            
+
             // Clear and populate MC2
             mc2Select.innerHTML = '<option value="">Selecteer...</option>';
             mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-            
+
             if (selectedMC1) {
-              const mc2Options = getUniqueClassificationsByLevel("MC2", selectedMC1);
-              mc2Options.forEach(mc2 => {
-                const option = document.createElement('option');
+              const mc2Options = getUniqueClassificationsByLevel(
+                "MC2",
+                selectedMC1,
+              );
+              mc2Options.forEach((mc2) => {
+                const option = document.createElement("option");
                 option.value = mc2;
                 option.textContent = mc2;
                 mc2Select.appendChild(option);
               });
             }
-            
+
             updatePriorityFromClassification();
           });
 
           // Handle MC2 change
           mc2Select.addEventListener("change", () => {
             const selectedMC2 = mc2Select.value;
-            
+
             // Clear and populate MC3
             mc3Select.innerHTML = '<option value="">Selecteer...</option>';
-            
+
             if (selectedMC2) {
-              const mc3Options = getUniqueClassificationsByLevel("MC3", selectedMC2);
-              mc3Options.forEach(mc3 => {
-                const option = document.createElement('option');
+              const mc3Options = getUniqueClassificationsByLevel(
+                "MC3",
+                selectedMC2,
+              );
+              mc3Options.forEach((mc3) => {
+                const option = document.createElement("option");
                 option.value = mc3;
                 option.textContent = mc3;
                 mc3Select.appendChild(option);
               });
             }
-            
+
             updatePriorityFromClassification();
           });
 
           // Handle MC3 change - auto-fill MC1 and MC2 when MC3 is selected
           mc3Select.addEventListener("change", () => {
             const selectedMC3 = mc3Select.value;
-            
+
             if (selectedMC3) {
-              const classificationsData = localStorage.getItem("gmsClassifications");
-              const storedClassifications = (classificationsData && classificationsData !== "undefined") ? JSON.parse(classificationsData) : [] as GmsClassification[];
-              
+              const classificationsData =
+                localStorage.getItem("gmsClassifications");
+              const storedClassifications =
+                classificationsData && classificationsData !== "undefined"
+                  ? JSON.parse(classificationsData)
+                  : ([] as GmsClassification[]);
+
               // Find the classification that matches this MC3 value
-              const matchingClassification = storedClassifications.find(c => c.MC3 === selectedMC3);
-              
+              const matchingClassification = storedClassifications.find(
+                (c) => c.MC3 === selectedMC3,
+              );
+
               if (matchingClassification) {
                 // Auto-fill MC1 and MC2
                 mc1Select.value = matchingClassification.MC1;
-                
+
                 if (matchingClassification.MC2) {
                   // Populate MC2 dropdown first
-                  mc2Select.innerHTML = '<option value="">Selecteer...</option>';
-                  const mc2Options = getUniqueClassificationsByLevel("MC2", matchingClassification.MC1);
-                  mc2Options.forEach(mc2 => {
-                    const option = document.createElement('option');
+                  mc2Select.innerHTML =
+                    '<option value="">Selecteer...</option>';
+                  const mc2Options = getUniqueClassificationsByLevel(
+                    "MC2",
+                    matchingClassification.MC1,
+                  );
+                  mc2Options.forEach((mc2) => {
+                    const option = document.createElement("option");
                     option.value = mc2;
                     option.textContent = mc2;
                     mc2Select.appendChild(option);
                   });
                   mc2Select.value = matchingClassification.MC2;
                 }
-                
+
                 // Log the auto-fill action
-                const timestamp = new Date().toLocaleTimeString('nl-NL');
-                console.log(`${timestamp} ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.MC1} / ${matchingClassification.MC2 || 'n.v.t.'} / ${matchingClassification.MC3}`);
+                const timestamp = new Date().toLocaleTimeString("nl-NL");
+                console.log(
+                  `${timestamp} ✅ MC1/MC2 automatisch ingevuld bij MC3 selectie: ${matchingClassification.MC1} / ${matchingClassification.MC2 || "n.v.t."} / ${matchingClassification.MC3}`,
+                );
               }
             }
-            
+
             updatePriorityFromClassification();
           });
         }
@@ -2950,256 +3423,384 @@ export default function Dashboard() {
 
       // Load incident data if available
       const loadIncidentData = () => {
-        const currentIncidentData = localStorage.getItem('currentGmsIncident');
-        console.log('🔍 Checking for incident data in localStorage:', currentIncidentData);
-        
+        const currentIncidentData = localStorage.getItem("currentGmsIncident");
+        console.log(
+          "🔍 Checking for incident data in localStorage:",
+          currentIncidentData,
+        );
+
         if (currentIncidentData) {
           try {
             const incidentData = JSON.parse(currentIncidentData);
-            console.log('📋 Loading incident data into GMS:', incidentData);
-            
+            console.log("📋 Loading incident data into GMS:", incidentData);
+
             // Pre-fill form fields with incident data
-            const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
-            const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
-            const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
-            const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
-            const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
-            const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
-            const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
-            const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
-            const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
-            const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
-            const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-            const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-            const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-            const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-            const kladblokField = document.getElementById("gmsKladblok") as HTMLElement;
-            
-            console.log('🔍 Found form fields:', {
+            const melderNaamField = document.getElementById(
+              "gmsMeldernaam",
+            ) as HTMLInputElement;
+            const melderAdresField = document.getElementById(
+              "gmsMelderadres",
+            ) as HTMLInputElement;
+            const telefoonnummerField = document.getElementById(
+              "gmsTelefoonnummer",
+            ) as HTMLInputElement;
+            const straatnaamField = document.getElementById(
+              "gmsStraatnaam",
+            ) as HTMLInputElement;
+            const huisnummerField = document.getElementById(
+              "gmsHuisnummer",
+            ) as HTMLInputElement;
+            const toevoegingField = document.getElementById(
+              "gmsToevoeging",
+            ) as HTMLInputElement;
+            const postcodeField = document.getElementById(
+              "gmsPostcode",
+            ) as HTMLInputElement;
+            const plaatsnaamField = document.getElementById(
+              "gmsPlaatsnaam",
+            ) as HTMLInputElement;
+            const gemeenteField = document.getElementById(
+              "gmsGemeente",
+            ) as HTMLInputElement;
+            const tijdstipField = document.getElementById(
+              "gmsTijdstip",
+            ) as HTMLInputElement;
+            const prioriteitField = document.getElementById(
+              "gmsPrioriteit",
+            ) as HTMLSelectElement;
+            const mc1Field = document.getElementById(
+              "gmsClassificatie1",
+            ) as HTMLSelectElement;
+            const mc2Field = document.getElementById(
+              "gmsClassificatie2",
+            ) as HTMLSelectElement;
+            const mc3Field = document.getElementById(
+              "gmsClassificatie3",
+            ) as HTMLSelectElement;
+            const kladblokField = document.getElementById(
+              "gmsKladblok",
+            ) as HTMLElement;
+
+            console.log("🔍 Found form fields:", {
               straatnaam: !!straatnaamField,
               tijdstip: !!tijdstipField,
               prioriteit: !!prioriteitField,
-              mc1: !!mc1Field
+              mc1: !!mc1Field,
             });
-            
+
             // Fill in the fields with stored data and log each action
             if (melderNaamField && incidentData.melderNaam) {
               melderNaamField.value = incidentData.melderNaam;
-              console.log('✅ Set melder naam:', incidentData.melderNaam);
+              console.log("✅ Set melder naam:", incidentData.melderNaam);
             }
             if (melderAdresField && incidentData.melderAdres) {
               melderAdresField.value = incidentData.melderAdres;
-              console.log('✅ Set melder adres:', incidentData.melderAdres);
+              console.log("✅ Set melder adres:", incidentData.melderAdres);
             }
             if (telefoonnummerField && incidentData.telefoonnummer) {
               telefoonnummerField.value = incidentData.telefoonnummer;
-              console.log('✅ Set telefoonnummer:', incidentData.telefoonnummer);
+              console.log(
+                "✅ Set telefoonnummer:",
+                incidentData.telefoonnummer,
+              );
             }
             if (straatnaamField && incidentData.straatnaam) {
               straatnaamField.value = incidentData.straatnaam;
-              console.log('✅ Set straatnaam:', incidentData.straatnaam);
+              console.log("✅ Set straatnaam:", incidentData.straatnaam);
             }
             if (huisnummerField && incidentData.huisnummer) {
               huisnummerField.value = incidentData.huisnummer;
-              console.log('✅ Set huisnummer:', incidentData.huisnummer);
+              console.log("✅ Set huisnummer:", incidentData.huisnummer);
             }
             if (toevoegingField && incidentData.toevoeging) {
               toevoegingField.value = incidentData.toevoeging;
-              console.log('✅ Set toevoeging:', incidentData.toevoeging);
+              console.log("✅ Set toevoeging:", incidentData.toevoeging);
             }
             if (postcodeField && incidentData.postcode) {
               postcodeField.value = incidentData.postcode;
-              console.log('✅ Set postcode:', incidentData.postcode);
+              console.log("✅ Set postcode:", incidentData.postcode);
             }
             if (plaatsnaamField && incidentData.plaatsnaam) {
               plaatsnaamField.value = incidentData.plaatsnaam;
-              console.log('✅ Set plaatsnaam:', incidentData.plaatsnaam);
+              console.log("✅ Set plaatsnaam:", incidentData.plaatsnaam);
             }
             if (gemeenteField && incidentData.gemeente) {
               gemeenteField.value = incidentData.gemeente;
-              console.log('✅ Set gemeente:', incidentData.gemeente);
+              console.log("✅ Set gemeente:", incidentData.gemeente);
             }
             if (tijdstipField && incidentData.tijdstip) {
               tijdstipField.value = incidentData.tijdstip;
-              console.log('✅ Set tijdstip:', incidentData.tijdstip);
+              console.log("✅ Set tijdstip:", incidentData.tijdstip);
             } else if (tijdstipField && incidentData.timestamp) {
               tijdstipField.value = incidentData.timestamp;
-              console.log('✅ Set tijdstip from timestamp:', incidentData.timestamp);
+              console.log(
+                "✅ Set tijdstip from timestamp:",
+                incidentData.timestamp,
+              );
             }
-            
+
             // Set priority field properly
             if (prioriteitField) {
-              let priorityValue = '3'; // default
+              let priorityValue = "3"; // default
               if (incidentData.prioriteit) {
                 priorityValue = incidentData.prioriteit.toString();
               } else if (incidentData.priority) {
                 // Convert string priority to number
-                if (incidentData.priority === 'high') priorityValue = '1';
-                else if (incidentData.priority === 'medium') priorityValue = '2';
-                else priorityValue = '3';
+                if (incidentData.priority === "high") priorityValue = "1";
+                else if (incidentData.priority === "medium")
+                  priorityValue = "2";
+                else priorityValue = "3";
               }
               prioriteitField.value = priorityValue;
-              console.log('✅ Set prioriteit:', priorityValue);
+              console.log("✅ Set prioriteit:", priorityValue);
             }
-            
+
             // Restore classification dropdowns with proper cascading
             const restoreClassifications = () => {
               if (mc1Field && incidentData.mc1) {
                 // First populate MC1 dropdown
                 mc1Field.innerHTML = '<option value="">Selecteer...</option>';
                 const mc1Options = getUniqueClassificationsByLevel("MC1");
-                mc1Options.forEach(mc1 => {
-                  const option = document.createElement('option');
+                mc1Options.forEach((mc1) => {
+                  const option = document.createElement("option");
                   option.value = mc1;
                   option.textContent = mc1;
                   mc1Field.appendChild(option);
                 });
                 mc1Field.value = incidentData.mc1;
-                console.log('✅ Restored MC1:', incidentData.mc1);
-                
+                console.log("✅ Restored MC1:", incidentData.mc1);
+
                 // Then populate and set MC2 if available
                 if (mc2Field && incidentData.mc2) {
                   mc2Field.innerHTML = '<option value="">Selecteer...</option>';
-                  const mc2Options = getUniqueClassificationsByLevel("MC2", incidentData.mc1);
-                  mc2Options.forEach(mc2 => {
-                    const option = document.createElement('option');
+                  const mc2Options = getUniqueClassificationsByLevel(
+                    "MC2",
+                    incidentData.mc1,
+                  );
+                  mc2Options.forEach((mc2) => {
+                    const option = document.createElement("option");
                     option.value = mc2;
                     option.textContent = mc2;
                     mc2Field.appendChild(option);
                   });
                   mc2Field.value = incidentData.mc2;
-                  console.log('✅ Restored MC2:', incidentData.mc2);
-                  
+                  console.log("✅ Restored MC2:", incidentData.mc2);
+
                   // Finally populate and set MC3 if available
                   if (mc3Field && incidentData.mc3) {
-                    mc3Field.innerHTML = '<option value="">Selecteer...</option>';
-                    const mc3Options = getUniqueClassificationsByLevel("MC3", incidentData.mc2);
-                    mc3Options.forEach(mc3 => {
-                      const option = document.createElement('option');
+                    mc3Field.innerHTML =
+                      '<option value="">Selecteer...</option>';
+                    const mc3Options = getUniqueClassificationsByLevel(
+                      "MC3",
+                      incidentData.mc2,
+                    );
+                    mc3Options.forEach((mc3) => {
+                      const option = document.createElement("option");
                       option.value = mc3;
                       option.textContent = mc3;
                       mc3Field.appendChild(option);
                     });
                     mc3Field.value = incidentData.mc3;
-                    console.log('✅ Restored MC3:', incidentData.mc3);
+                    console.log("✅ Restored MC3:", incidentData.mc3);
                   }
                 }
               }
             };
-            
+
             // Restore classifications after a brief delay to ensure dropdown setup is complete
             setTimeout(restoreClassifications, 100);
-            
+
             // Note: Do NOT prefill the kladblok when reopening incidents
             // The notepad should always start empty for new notes
             if (kladblokField) {
-              kladblokField.textContent = '';
-              console.log('✅ Kladblok kept empty for new notes');
+              kladblokField.textContent = "";
+              console.log("✅ Kladblok kept empty for new notes");
             }
-            
+
             // If no specific location data, use the incident location
-            if (straatnaamField && !incidentData.straatnaam && incidentData.location) {
+            if (
+              straatnaamField &&
+              !incidentData.straatnaam &&
+              incidentData.location
+            ) {
               straatnaamField.value = incidentData.location;
-              console.log('✅ Set straatnaam from location:', incidentData.location);
+              console.log(
+                "✅ Set straatnaam from location:",
+                incidentData.location,
+              );
             }
-            
-            console.log('🎯 GMS form pre-filled with incident data successfully');
+
+            console.log(
+              "🎯 GMS form pre-filled with incident data successfully",
+            );
           } catch (error) {
-            console.error('❌ Failed to load incident data:', error);
+            console.error("❌ Failed to load incident data:", error);
           }
         } else {
-          console.log('❌ No incident data found in localStorage');
+          console.log("❌ No incident data found in localStorage");
         }
       };
 
       // Load current incident data into GMS form if available
       const loadCurrentIncidentData = () => {
         if (currentGmsIncident) {
-          console.log('Loading incident data into GMS form:', currentGmsIncident);
-          
+          console.log(
+            "Loading incident data into GMS form:",
+            currentGmsIncident,
+          );
+
           // Get all form field references
-          const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
-          const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
-          const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
-          const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
-          const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
-          const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
-          const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
-          const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
-          const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
-          const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
-          const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-          const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-          const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-          const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
-          const meldingLoggingField = document.getElementById("gmsMeldingLogging");
+          const melderNaamField = document.getElementById(
+            "gmsMeldernaam",
+          ) as HTMLInputElement;
+          const melderAdresField = document.getElementById(
+            "gmsMelderadres",
+          ) as HTMLInputElement;
+          const telefoonnummerField = document.getElementById(
+            "gmsTelefoonnummer",
+          ) as HTMLInputElement;
+          const straatnaamField = document.getElementById(
+            "gmsStraatnaam",
+          ) as HTMLInputElement;
+          const huisnummerField = document.getElementById(
+            "gmsHuisnummer",
+          ) as HTMLInputElement;
+          const toevoegingField = document.getElementById(
+            "gmsToevoeging",
+          ) as HTMLInputElement;
+          const postcodeField = document.getElementById(
+            "gmsPostcode",
+          ) as HTMLInputElement;
+          const plaatsnaamField = document.getElementById(
+            "gmsPlaatsnaam",
+          ) as HTMLInputElement;
+          const gemeenteField = document.getElementById(
+            "gmsGemeente",
+          ) as HTMLInputElement;
+          const tijdstipField = document.getElementById(
+            "gmsTijdstip",
+          ) as HTMLInputElement;
+          const prioriteitField = document.getElementById(
+            "gmsPrioriteit",
+          ) as HTMLSelectElement;
+          const mc1Field = document.getElementById(
+            "gmsClassificatie1",
+          ) as HTMLSelectElement;
+          const mc2Field = document.getElementById(
+            "gmsClassificatie2",
+          ) as HTMLSelectElement;
+          const mc3Field = document.getElementById(
+            "gmsClassificatie3",
+          ) as HTMLSelectElement;
+          const meldingLoggingField =
+            document.getElementById("gmsMeldingLogging");
           const kladblokField = document.getElementById("gmsKladblok");
-          
-          console.log('Found form fields, populating with data...');
-          
+
+          console.log("Found form fields, populating with data...");
+
           // Fill meldergegevens
-          if (melderNaamField) melderNaamField.value = currentGmsIncident.melderNaam || '';
-          if (melderAdresField) melderAdresField.value = currentGmsIncident.melderAdres || '';
-          if (telefoonnummerField) telefoonnummerField.value = currentGmsIncident.telefoonnummer || '';
-          
+          if (melderNaamField)
+            melderNaamField.value = currentGmsIncident.melderNaam || "";
+          if (melderAdresField)
+            melderAdresField.value = currentGmsIncident.melderAdres || "";
+          if (telefoonnummerField)
+            telefoonnummerField.value = currentGmsIncident.telefoonnummer || "";
+
           // Fill meldingslocatie
-          if (straatnaamField) straatnaamField.value = currentGmsIncident.straatnaam || '';
-          if (huisnummerField) huisnummerField.value = currentGmsIncident.huisnummer || '';
-          if (toevoegingField) toevoegingField.value = currentGmsIncident.toevoeging || '';
-          if (postcodeField) postcodeField.value = currentGmsIncident.postcode || '';
-          if (plaatsnaamField) plaatsnaamField.value = currentGmsIncident.plaatsnaam || '';
-          if (gemeenteField) gemeenteField.value = currentGmsIncident.gemeente || '';
-          
+          if (straatnaamField)
+            straatnaamField.value = currentGmsIncident.straatnaam || "";
+          if (huisnummerField)
+            huisnummerField.value = currentGmsIncident.huisnummer || "";
+          if (toevoegingField)
+            toevoegingField.value = currentGmsIncident.toevoeging || "";
+          if (postcodeField)
+            postcodeField.value = currentGmsIncident.postcode || "";
+          if (plaatsnaamField)
+            plaatsnaamField.value = currentGmsIncident.plaatsnaam || "";
+          if (gemeenteField)
+            gemeenteField.value = currentGmsIncident.gemeente || "";
+
           // Fill tijdstip en prioriteit
-          if (tijdstipField) tijdstipField.value = currentGmsIncident.tijdstip || '';
-          if (prioriteitField) prioriteitField.value = (currentGmsIncident.prioriteit || 3).toString();
-          
+          if (tijdstipField)
+            tijdstipField.value = currentGmsIncident.tijdstip || "";
+          if (prioriteitField)
+            prioriteitField.value = (
+              currentGmsIncident.prioriteit || 3
+            ).toString();
+
           // Restore meldingslogging exactly as it was saved
           if (meldingLoggingField && currentGmsIncident.meldingslogging) {
             meldingLoggingField.innerHTML = currentGmsIncident.meldingslogging;
-            console.log('Restored meldingslogging');
+            console.log("Restored meldingslogging");
           }
-          
+
           // Keep notepad empty for new notes
-          if (kladblokField) kladblokField.textContent = '';
-          
+          if (kladblokField) kladblokField.textContent = "";
+
           // Restore classifications with proper cascading
           setTimeout(() => {
-            const classificationsData = localStorage.getItem("gmsClassifications");
-            const storedClassifications = (classificationsData && classificationsData !== "undefined") ? JSON.parse(classificationsData) : [];
-            
+            const classificationsData =
+              localStorage.getItem("gmsClassifications");
+            const storedClassifications =
+              classificationsData && classificationsData !== "undefined"
+                ? JSON.parse(classificationsData)
+                : [];
+
             if (mc1Field && currentGmsIncident.mc1) {
-              console.log('Restoring classifications:', currentGmsIncident.mc1, currentGmsIncident.mc2, currentGmsIncident.mc3);
-              
+              console.log(
+                "Restoring classifications:",
+                currentGmsIncident.mc1,
+                currentGmsIncident.mc2,
+                currentGmsIncident.mc3,
+              );
+
               // Populate MC1 dropdown
               mc1Field.innerHTML = '<option value="">Selecteer...</option>';
-              const mc1Options = Array.from(new Set(storedClassifications.map((c: any) => c.MC1).filter(Boolean))).sort();
+              const mc1Options = Array.from(
+                new Set(
+                  storedClassifications.map((c: any) => c.MC1).filter(Boolean),
+                ),
+              ).sort();
               mc1Options.forEach((mc1) => {
-                const option = document.createElement('option');
+                const option = document.createElement("option");
                 option.value = String(mc1);
                 option.textContent = String(mc1);
                 mc1Field.appendChild(option);
               });
               mc1Field.value = currentGmsIncident.mc1;
-              
+
               // Populate MC2 if available
               if (mc2Field && currentGmsIncident.mc2) {
                 mc2Field.innerHTML = '<option value="">Selecteer...</option>';
-                const mc2Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC1 === currentGmsIncident.mc1).map((c: any) => c.MC2).filter(Boolean))).sort();
+                const mc2Options = Array.from(
+                  new Set(
+                    storedClassifications
+                      .filter((c: any) => c.MC1 === currentGmsIncident.mc1)
+                      .map((c: any) => c.MC2)
+                      .filter(Boolean),
+                  ),
+                ).sort();
                 mc2Options.forEach((mc2) => {
-                  const option = document.createElement('option');
+                  const option = document.createElement("option");
                   option.value = String(mc2);
                   option.textContent = String(mc2);
                   mc2Field.appendChild(option);
                 });
                 mc2Field.value = currentGmsIncident.mc2;
-                
+
                 // Populate MC3 if available
                 if (mc3Field && currentGmsIncident.mc3) {
                   mc3Field.innerHTML = '<option value="">Selecteer...</option>';
-                  const mc3Options = Array.from(new Set(storedClassifications.filter((c: any) => c.MC2 === currentGmsIncident.mc2).map((c: any) => c.MC3).filter(Boolean))).sort();
+                  const mc3Options = Array.from(
+                    new Set(
+                      storedClassifications
+                        .filter((c: any) => c.MC2 === currentGmsIncident.mc2)
+                        .map((c: any) => c.MC3)
+                        .filter(Boolean),
+                    ),
+                  ).sort();
                   mc3Options.forEach((mc3) => {
-                    const option = document.createElement('option');
+                    const option = document.createElement("option");
                     option.value = String(mc3);
                     option.textContent = String(mc3);
                     mc3Field.appendChild(option);
@@ -3207,14 +3808,14 @@ export default function Dashboard() {
                   mc3Field.value = currentGmsIncident.mc3;
                 }
               }
-              
-              console.log('Classifications restored successfully');
+
+              console.log("Classifications restored successfully");
             }
           }, 200);
-          
-          console.log('Incident data loaded into GMS form successfully');
+
+          console.log("Incident data loaded into GMS form successfully");
         } else {
-          console.log('No current incident to load');
+          console.log("No current incident to load");
         }
       };
 
@@ -3234,10 +3835,14 @@ export default function Dashboard() {
           uitgifteButton.removeEventListener("click", handleUitgifte);
         }
         if (sluitAfButton) {
-          sluitAfButton.removeEventListener("click", () => handleIncidentClosure('close'));
+          sluitAfButton.removeEventListener("click", () =>
+            handleIncidentClosure("close"),
+          );
         }
         if (eindrapportButton) {
-          eindrapportButton.removeEventListener("click", () => handleIncidentClosure('finalize'));
+          eindrapportButton.removeEventListener("click", () =>
+            handleIncidentClosure("finalize"),
+          );
         }
       };
     };
@@ -3425,8 +4030,9 @@ export default function Dashboard() {
             const mc1 = incident.classificatie1 || "";
             const mc2 = incident.classificatie2 || "";
             const mc3 = incident.classificatie3 || "";
-            const combinedMC = [mc1, mc2, mc3].filter(Boolean).join(" / ") || "-";
-            
+            const combinedMC =
+              [mc1, mc2, mc3].filter(Boolean).join(" / ") || "-";
+
             // Get assigned units (placeholder for now)
             const assignedUnits = incident.toegewezenEenheden || "Geen";
 
@@ -3448,22 +4054,26 @@ export default function Dashboard() {
 
         // Make redirectToGMS globally accessible
         (window as any).redirectToGMS = (incidentId: number) => {
-          console.log('Redirecting incident to GMS:', incidentId);
-          
+          console.log("Redirecting incident to GMS:", incidentId);
+
           // Get fresh incident data from localStorage
-          const storedIncidenten = JSON.parse(localStorage.getItem("incidenten") || "[]");
-          const incident = storedIncidenten.find((inc: any) => (inc.id || inc.incidentId) === incidentId);
-          
+          const storedIncidenten = JSON.parse(
+            localStorage.getItem("incidenten") || "[]",
+          );
+          const incident = storedIncidenten.find(
+            (inc: any) => (inc.id || inc.incidentId) === incidentId,
+          );
+
           if (!incident) {
-            console.error('Incident not found in storage:', incidentId);
+            console.error("Incident not found in storage:", incidentId);
             return;
           }
 
-          console.log('Found incident data:', incident);
-          
+          console.log("Found incident data:", incident);
+
           // Switch to GMS tab first
-          setActiveSection('gms');
-          
+          setActiveSection("gms");
+
           // Load the complete incident data into GMS form
           setTimeout(() => {
             loadIncidentIntoGMS(incident);
@@ -3497,19 +4107,19 @@ export default function Dashboard() {
       // Auto-log operator acceptance when any field is first clicked
       const logOperatorAcceptance = () => {
         if (operatorAcceptanceLogged) return;
-        
+
         const meldingLogging = document.getElementById("gmsMeldingLogging");
         if (!meldingLogging) return;
 
         const now = new Date();
         const dateStr = now.toLocaleDateString("nl-NL", {
           day: "2-digit",
-          month: "2-digit", 
-          year: "numeric"
+          month: "2-digit",
+          year: "numeric",
         });
         const timeStr = now.toLocaleTimeString("nl-NL", {
           hour: "2-digit",
-          minute: "2-digit"
+          minute: "2-digit",
         });
 
         // Determine active discipline (default to Politie)
@@ -3537,16 +4147,20 @@ export default function Dashboard() {
       const setupFieldInteractionLogging = () => {
         const fieldSelectors = [
           'input[id^="gms"]',
-          'select[id^="gms"]', 
+          'select[id^="gms"]',
           'textarea[id^="gms"]',
-          '#gmsKladblok'
+          "#gmsKladblok",
         ];
 
-        fieldSelectors.forEach(selector => {
+        fieldSelectors.forEach((selector) => {
           const fields = document.querySelectorAll(selector);
-          fields.forEach(field => {
-            field.addEventListener('focus', logOperatorAcceptance, { once: false });
-            field.addEventListener('click', logOperatorAcceptance, { once: false });
+          fields.forEach((field) => {
+            field.addEventListener("focus", logOperatorAcceptance, {
+              once: false,
+            });
+            field.addEventListener("click", logOperatorAcceptance, {
+              once: false,
+            });
           });
         });
       };
@@ -4155,17 +4769,19 @@ export default function Dashboard() {
           id: incidentId,
           timestamp: currentGmsIncident?.timestamp || now.toISOString(),
           status: "Afgesloten",
-          afgesloten: now.toISOString()
+          afgesloten: now.toISOString(),
         };
 
         // Save to incidents tab
         saveIncidentToStorage(incidentData);
-        
+
         // Update GMS incidents database
-        setGmsIncidents(prev => {
-          const existing = prev.find(inc => inc.id === incidentId);
+        setGmsIncidents((prev) => {
+          const existing = prev.find((inc) => inc.id === incidentId);
           if (existing) {
-            return prev.map(inc => inc.id === incidentId ? { ...inc, ...incidentData } : inc);
+            return prev.map((inc) =>
+              inc.id === incidentId ? { ...inc, ...incidentData } : inc,
+            );
           } else {
             return [...prev, incidentData];
           }
@@ -4183,8 +4799,6 @@ export default function Dashboard() {
           kladblok.textContent = "";
         }
       };
-
-
 
       const handleSluitAf = () => {
         resetGMSForm();
@@ -4206,10 +4820,10 @@ export default function Dashboard() {
       const handleUitgifte = () => {
         const formData = collectGMSFormData();
         if (!formData) return;
-        
+
         const now = new Date();
         const incidentId = currentGmsIncident?.id || Date.now();
-        
+
         const incidentData = {
           ...formData,
           id: incidentId,
@@ -4218,22 +4832,28 @@ export default function Dashboard() {
         };
 
         // Save to localStorage for persistence
-        const existingIncidenten = JSON.parse(localStorage.getItem("incidenten") || "[]");
-        const existingIndex = existingIncidenten.findIndex((inc: any) => (inc.id || inc.incidentId) === incidentId);
-        
+        const existingIncidenten = JSON.parse(
+          localStorage.getItem("incidenten") || "[]",
+        );
+        const existingIndex = existingIncidenten.findIndex(
+          (inc: any) => (inc.id || inc.incidentId) === incidentId,
+        );
+
         if (existingIndex >= 0) {
           existingIncidenten[existingIndex] = incidentData;
         } else {
           existingIncidenten.push(incidentData);
         }
-        
+
         localStorage.setItem("incidenten", JSON.stringify(existingIncidenten));
 
         // Update GMS incidents database
-        setGmsIncidents(prev => {
-          const existing = prev.find(inc => inc.id === incidentId);
+        setGmsIncidents((prev) => {
+          const existing = prev.find((inc) => inc.id === incidentId);
           if (existing) {
-            return prev.map(inc => inc.id === incidentId ? { ...inc, ...incidentData } : inc);
+            return prev.map((inc) =>
+              inc.id === incidentId ? { ...inc, ...incidentData } : inc,
+            );
           } else {
             return [...prev, incidentData];
           }
@@ -4242,7 +4862,9 @@ export default function Dashboard() {
         // Set as current incident to maintain form state
         setCurrentGmsIncident(incidentData);
 
-        showNotificationMessage("Incident uitgegeven en naar Incidenten verzonden");
+        showNotificationMessage(
+          "Incident uitgegeven en naar Incidenten verzonden",
+        );
 
         // Clear the notepad for new notes
         const kladblok = document.getElementById("gmsKladblok");
@@ -4715,24 +5337,24 @@ export default function Dashboard() {
         inc.id === id ? { ...inc, status: "closed" as const } : inc,
       ),
     );
-    
+
     // Remove GMS data for closed incident
     localStorage.removeItem(`gmsData_${id}`);
-    
+
     // Clear current GMS incident if it matches the closed incident
-    const currentIncident = localStorage.getItem('currentGmsIncident');
+    const currentIncident = localStorage.getItem("currentGmsIncident");
     if (currentIncident) {
       try {
         const parsedIncident = JSON.parse(currentIncident);
         if (parsedIncident.incidentId === id) {
-          localStorage.removeItem('currentGmsIncident');
+          localStorage.removeItem("currentGmsIncident");
           console.log(`Cleared GMS data for closed incident ${id}`);
         }
       } catch (error) {
-        console.error('Error clearing GMS data:', error);
+        console.error("Error clearing GMS data:", error);
       }
     }
-    
+
     showNotificationMessage("Incident gesloten");
   };
 
@@ -4745,9 +5367,15 @@ export default function Dashboard() {
 
   // Helper function for updating dynamic header
   const updateDynamicHeader = () => {
-    const mc1Select = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-    const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
-    const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
+    const mc1Select = document.getElementById(
+      "gmsClassificatie1",
+    ) as HTMLSelectElement;
+    const straatnaamField = document.getElementById(
+      "gmsStraatnaam",
+    ) as HTMLInputElement;
+    const plaatsnaamField = document.getElementById(
+      "gmsPlaatsnaam",
+    ) as HTMLInputElement;
     const dynamicHeader = document.getElementById("gmsDynamicHeader");
 
     if (!dynamicHeader) return;
@@ -4761,50 +5389,89 @@ export default function Dashboard() {
 
   // Enhanced helper function to load incident data into GMS form with full persistence
   const loadIncidentIntoGMS = (incidentData: any) => {
-    console.log('Loading comprehensive incident data into GMS form:', incidentData);
-    
+    console.log(
+      "Loading comprehensive incident data into GMS form:",
+      incidentData,
+    );
+
     // Set current incident
     setCurrentGmsIncident(incidentData);
-    
+
     // Use setTimeout to ensure DOM elements are available
     setTimeout(() => {
       // Get all form field references
-      const melderNaamField = document.getElementById("gmsMeldernaam") as HTMLInputElement;
-      const melderAdresField = document.getElementById("gmsMelderadres") as HTMLInputElement;
-      const telefoonnummerField = document.getElementById("gmsTelefoonnummer") as HTMLInputElement;
-      const straatnaamField = document.getElementById("gmsStraatnaam") as HTMLInputElement;
-      const huisnummerField = document.getElementById("gmsHuisnummer") as HTMLInputElement;
-      const toevoegingField = document.getElementById("gmsToevoeging") as HTMLInputElement;
-      const postcodeField = document.getElementById("gmsPostcode") as HTMLInputElement;
-      const plaatsnaamField = document.getElementById("gmsPlaatsnaam") as HTMLInputElement;
-      const gemeenteField = document.getElementById("gmsGemeente") as HTMLInputElement;
-      const tijdstipField = document.getElementById("gmsTijdstip") as HTMLInputElement;
-      const prioriteitField = document.getElementById("gmsPrioriteit") as HTMLSelectElement;
-      const mc1Field = document.getElementById("gmsClassificatie1") as HTMLSelectElement;
-      const mc2Field = document.getElementById("gmsClassificatie2") as HTMLSelectElement;
-      const mc3Field = document.getElementById("gmsClassificatie3") as HTMLSelectElement;
+      const melderNaamField = document.getElementById(
+        "gmsMeldernaam",
+      ) as HTMLInputElement;
+      const melderAdresField = document.getElementById(
+        "gmsMelderadres",
+      ) as HTMLInputElement;
+      const telefoonnummerField = document.getElementById(
+        "gmsTelefoonnummer",
+      ) as HTMLInputElement;
+      const straatnaamField = document.getElementById(
+        "gmsStraatnaam",
+      ) as HTMLInputElement;
+      const huisnummerField = document.getElementById(
+        "gmsHuisnummer",
+      ) as HTMLInputElement;
+      const toevoegingField = document.getElementById(
+        "gmsToevoeging",
+      ) as HTMLInputElement;
+      const postcodeField = document.getElementById(
+        "gmsPostcode",
+      ) as HTMLInputElement;
+      const plaatsnaamField = document.getElementById(
+        "gmsPlaatsnaam",
+      ) as HTMLInputElement;
+      const gemeenteField = document.getElementById(
+        "gmsGemeente",
+      ) as HTMLInputElement;
+      const tijdstipField = document.getElementById(
+        "gmsTijdstip",
+      ) as HTMLInputElement;
+      const prioriteitField = document.getElementById(
+        "gmsPrioriteit",
+      ) as HTMLSelectElement;
+      const mc1Field = document.getElementById(
+        "gmsClassificatie1",
+      ) as HTMLSelectElement;
+      const mc2Field = document.getElementById(
+        "gmsClassificatie2",
+      ) as HTMLSelectElement;
+      const mc3Field = document.getElementById(
+        "gmsClassificatie3",
+      ) as HTMLSelectElement;
       const meldingLoggingField = document.getElementById("gmsMeldingLogging");
       const kladblokField = document.getElementById("gmsKladblok");
-      
+
       // Fill meldergegevens (support both naming conventions)
       if (melderNaamField) {
-        melderNaamField.value = incidentData.melderNaam || incidentData.meldernaam || '';
+        melderNaamField.value =
+          incidentData.melderNaam || incidentData.meldernaam || "";
       }
       if (melderAdresField) {
-        melderAdresField.value = incidentData.melderAdres || incidentData.melderadres || '';
+        melderAdresField.value =
+          incidentData.melderAdres || incidentData.melderadres || "";
       }
       if (telefoonnummerField && incidentData.telefoonnummer) {
         telefoonnummerField.value = incidentData.telefoonnummer;
       }
-      
+
       // Fill locatie gegevens
-      if (straatnaamField && incidentData.straatnaam) straatnaamField.value = incidentData.straatnaam;
-      if (huisnummerField && incidentData.huisnummer) huisnummerField.value = incidentData.huisnummer;
-      if (toevoegingField && incidentData.toevoeging) toevoegingField.value = incidentData.toevoeging;
-      if (postcodeField && incidentData.postcode) postcodeField.value = incidentData.postcode;
-      if (plaatsnaamField && incidentData.plaatsnaam) plaatsnaamField.value = incidentData.plaatsnaam;
-      if (gemeenteField && incidentData.gemeente) gemeenteField.value = incidentData.gemeente;
-      
+      if (straatnaamField && incidentData.straatnaam)
+        straatnaamField.value = incidentData.straatnaam;
+      if (huisnummerField && incidentData.huisnummer)
+        huisnummerField.value = incidentData.huisnummer;
+      if (toevoegingField && incidentData.toevoeging)
+        toevoegingField.value = incidentData.toevoeging;
+      if (postcodeField && incidentData.postcode)
+        postcodeField.value = incidentData.postcode;
+      if (plaatsnaamField && incidentData.plaatsnaam)
+        plaatsnaamField.value = incidentData.plaatsnaam;
+      if (gemeenteField && incidentData.gemeente)
+        gemeenteField.value = incidentData.gemeente;
+
       // Fill operationele gegevens
       if (tijdstipField && incidentData.tijdstip) {
         tijdstipField.value = incidentData.tijdstip;
@@ -4812,42 +5479,45 @@ export default function Dashboard() {
       if (prioriteitField && incidentData.prioriteit) {
         prioriteitField.value = incidentData.prioriteit.toString();
       }
-      
+
       // Restore melding logging with full HTML content
       if (meldingLoggingField && incidentData.meldingslogging) {
-        console.log('Restoring melding logging data:', incidentData.meldingslogging);
+        console.log(
+          "Restoring melding logging data:",
+          incidentData.meldingslogging,
+        );
         meldingLoggingField.innerHTML = incidentData.meldingslogging;
         // Scroll to bottom to show latest entries
         meldingLoggingField.scrollTop = meldingLoggingField.scrollHeight;
       } else {
-        console.log('No melding logging data to restore or element not found');
+        console.log("No melding logging data to restore or element not found");
       }
-      
+
       // Only clear notepad for new notes, keep existing data
       if (kladblokField && !incidentData.preserveNotepad) {
-        kladblokField.textContent = '';
+        kladblokField.textContent = "";
       }
-      
+
       // Restore classificaties with proper cascading (delayed for dropdown population)
       setTimeout(() => {
-        const mc1Value = incidentData.mc1 || incidentData.classificatie1 || '';
-        const mc2Value = incidentData.mc2 || incidentData.classificatie2 || '';
-        const mc3Value = incidentData.mc3 || incidentData.classificatie3 || '';
-        
+        const mc1Value = incidentData.mc1 || incidentData.classificatie1 || "";
+        const mc2Value = incidentData.mc2 || incidentData.classificatie2 || "";
+        const mc3Value = incidentData.mc3 || incidentData.classificatie3 || "";
+
         if (mc1Field && mc1Value) {
           mc1Field.value = mc1Value;
           // Trigger change event to populate cascading dropdowns
-          mc1Field.dispatchEvent(new Event('change', { bubbles: true }));
-          
+          mc1Field.dispatchEvent(new Event("change", { bubbles: true }));
+
           setTimeout(() => {
             if (mc2Field && mc2Value) {
               mc2Field.value = mc2Value;
-              mc2Field.dispatchEvent(new Event('change', { bubbles: true }));
-              
+              mc2Field.dispatchEvent(new Event("change", { bubbles: true }));
+
               setTimeout(() => {
                 if (mc3Field && mc3Value) {
                   mc3Field.value = mc3Value;
-              }
+                }
                 // Update dynamic header after all fields are populated
                 updateDynamicHeader();
               }, 100);
@@ -4858,116 +5528,131 @@ export default function Dashboard() {
           updateDynamicHeader();
         }
       }, 200);
-      
-      console.log('Full incident data loaded into GMS form with persistence');
+
+      console.log("Full incident data loaded into GMS form with persistence");
     }, 50);
   };
 
   // Handle new incident creation in GMS
   const handleNewIncident = () => {
-    console.log('Creating new incident in GMS');
+    console.log("Creating new incident in GMS");
     setCurrentGmsIncident(null);
-    setActiveSection('gms');
-    showNotificationMessage('Nieuw incident gestart in GMS');
+    setActiveSection("gms");
+    showNotificationMessage("Nieuw incident gestart in GMS");
   };
 
   // Enhanced incident click handler with comprehensive data loading
   const handleIncidentClick = (incident: Incident) => {
-    console.log('Opening incident in GMS with full data persistence:', incident.id);
-    
+    console.log(
+      "Opening incident in GMS with full data persistence:",
+      incident.id,
+    );
+
     // Find the complete incident data in GMS database
-    const gmsIncident = gmsIncidents.find(gmsInc => gmsInc.id === incident.id);
-    
+    const gmsIncident = gmsIncidents.find(
+      (gmsInc) => gmsInc.id === incident.id,
+    );
+
     if (gmsIncident) {
-      console.log('Found complete GMS incident data, loading all fields:', gmsIncident);
-      
+      console.log(
+        "Found complete GMS incident data, loading all fields:",
+        gmsIncident,
+      );
+
       // Switch to GMS tab first
-      setActiveSection('gms');
-      
+      setActiveSection("gms");
+
       // Use a timeout to ensure the GMS tab has loaded before populating fields
       setTimeout(() => {
         loadIncidentIntoGMS(gmsIncident);
       }, 100);
-      
-      showNotificationMessage(`Incident ${incident.id} volledig geladen in GMS`);
+
+      showNotificationMessage(
+        `Incident ${incident.id} volledig geladen in GMS`,
+      );
     } else {
-      console.log('No GMS data found, reconstructing from incident data');
-      
+      console.log("No GMS data found, reconstructing from incident data");
+
       // Parse location from incident data with better handling
-      let straatnaam = '';
-      let huisnummer = '';
-      let plaatsnaam = '';
-      
+      let straatnaam = "";
+      let huisnummer = "";
+      let plaatsnaam = "";
+
       // Split location by comma to separate street from city
-      const locationParts = incident.location.split(',');
+      const locationParts = incident.location.split(",");
       if (locationParts.length >= 2) {
         const streetPart = locationParts[0].trim();
         plaatsnaam = locationParts[1].trim();
-        
+
         // Extract house number from street part
-        const streetWords = streetPart.split(' ');
+        const streetWords = streetPart.split(" ");
         const lastWord = streetWords[streetWords.length - 1];
         if (/^\d+/.test(lastWord)) {
           huisnummer = lastWord;
-          straatnaam = streetWords.slice(0, -1).join(' ');
+          straatnaam = streetWords.slice(0, -1).join(" ");
         } else {
           straatnaam = streetPart;
         }
       } else {
         straatnaam = incident.location;
-        plaatsnaam = 'Rotterdam';
+        plaatsnaam = "Rotterdam";
       }
-      
+
       // Create comprehensive incident with all available data
       const reconstructedIncident = {
         id: incident.id,
-        melderNaam: '',
-        meldernaam: '',
-        melderAdres: '',
-        melderadres: '',
-        telefoonnummer: '',
+        melderNaam: "",
+        meldernaam: "",
+        melderAdres: "",
+        melderadres: "",
+        telefoonnummer: "",
         straatnaam: straatnaam,
         huisnummer: huisnummer,
-        toevoeging: '',
-        postcode: '',
+        toevoeging: "",
+        postcode: "",
         plaatsnaam: plaatsnaam,
         gemeente: plaatsnaam,
         location: incident.location,
-        mc1: incident.type || '',
-        mc2: '',
-        mc3: '',
-        classificatie1: incident.type || '',
-        classificatie2: '',
-        classificatie3: '',
-        type: incident.type || 'Onbekend incident',
+        mc1: incident.type || "",
+        mc2: "",
+        mc3: "",
+        classificatie1: incident.type || "",
+        classificatie2: "",
+        classificatie3: "",
+        type: incident.type || "Onbekend incident",
         tijdstip: incident.timestamp,
-        prioriteit: incident.priority === 'high' ? 1 : incident.priority === 'medium' ? 2 : 3,
+        prioriteit:
+          incident.priority === "high"
+            ? 1
+            : incident.priority === "medium"
+              ? 2
+              : 3,
         priority: incident.priority,
-        status: 'Bestaand',
-        meldingslogging: '',
-        notities: '',
+        status: "Bestaand",
+        meldingslogging: "",
+        notities: "",
         timeAgo: incident.timeAgo,
         unitsAssigned: incident.unitsAssigned,
-        aangemaaktOp: incident.timestamp
+        aangemaaktOp: incident.timestamp,
       };
-      
+
       // Switch to GMS tab first
-      setActiveSection('gms');
-      
+      setActiveSection("gms");
+
       // Save to GMS incidents for future persistence
-      setGmsIncidents(prev => {
-        const existing = prev.find(inc => inc.id === incident.id);
+      setGmsIncidents((prev) => {
+        const existing = prev.find((inc) => inc.id === incident.id);
         if (!existing) {
           return [...prev, reconstructedIncident];
         }
         return prev;
       });
-      
+
       // Use a timeout to ensure the GMS tab has loaded before populating fields
       setTimeout(() => {
         loadIncidentIntoGMS(reconstructedIncident);
       }, 100);
-      
+
       showNotificationMessage(`Incident ${incident.id} gereconstrueerd in GMS`);
     }
   };
@@ -5049,7 +5734,13 @@ export default function Dashboard() {
                 <div className="section-header">
                   <h3 className="section-title">Dashboard Overzicht</h3>
                 </div>
-                <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                <div
+                  style={{
+                    padding: "40px",
+                    textAlign: "center",
+                    color: "#666",
+                  }}
+                >
                   <p>Welkom bij het Meldkamer Dashboard</p>
                   <p>Gebruik de navigatie om naar specifieke secties te gaan</p>
                 </div>
@@ -5076,7 +5767,9 @@ export default function Dashboard() {
                   <div className="legacy-table-header">
                     <div className="legacy-col-prio">Prio</div>
                     <div className="legacy-col-mc">MC1 / MC2 / MC3</div>
-                    <div className="legacy-col-locatie">Straatnaam + Huisnummer</div>
+                    <div className="legacy-col-locatie">
+                      Straatnaam + Huisnummer
+                    </div>
                     <div className="legacy-col-plaats">Plaatsnaam</div>
                     <div className="legacy-col-id">Incident Nummer</div>
                     <div className="legacy-col-units">Toegewezen Eenheden</div>
@@ -5090,8 +5783,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-
-
 
               {/* Delete Confirmation Modal */}
               {showDeleteConfirmModal && (
@@ -5131,17 +5822,19 @@ export default function Dashboard() {
             <div className="telefoon-dashboard">
               {/* Header */}
               <div className="telefoon-header">
-                <h2 className="telefoon-title">Telefoon Dashboard - Meldkamer Rotterdam</h2>
+                <h2 className="telefoon-title">
+                  Telefoon Dashboard - Meldkamer Rotterdam
+                </h2>
                 <div className="telefoon-header-buttons">
-                  <button 
+                  <button
                     className="telefoon-header-btn gms-btn"
-                    onClick={() => setActiveSection('gms')}
+                    onClick={() => setActiveSection("gms")}
                   >
                     Naar GMS
                   </button>
-                  <button 
+                  <button
                     className="telefoon-header-btn new-tab-btn"
-                    onClick={() => window.open(window.location.href, '_blank')}
+                    onClick={() => window.open(window.location.href, "_blank")}
                   >
                     Nieuw Tabblad
                   </button>
@@ -5150,24 +5843,23 @@ export default function Dashboard() {
 
               {/* Main Content Grid */}
               <div className="telefoon-main-grid">
-                
                 {/* Left Column - Chat Section */}
                 <div className="telefoon-chat-section">
                   <div className="chat-tabs">
-                    <button 
-                      className={`chat-tab ${activeChatTab === "burgers" ? "active" : ""}`} 
+                    <button
+                      className={`chat-tab ${activeChatTab === "burgers" ? "active" : ""}`}
                       onClick={() => setActiveChatTab("burgers")}
                     >
                       Burgers
                     </button>
-                    <button 
-                      className={`chat-tab ${activeChatTab === "collega" ? "active" : ""}`} 
+                    <button
+                      className={`chat-tab ${activeChatTab === "collega" ? "active" : ""}`}
                       onClick={() => setActiveChatTab("collega")}
                     >
                       Collega's
                     </button>
-                    <button 
-                      className={`chat-tab ${activeChatTab === "partners" ? "active" : ""}`} 
+                    <button
+                      className={`chat-tab ${activeChatTab === "partners" ? "active" : ""}`}
                       onClick={() => setActiveChatTab("partners")}
                     >
                       Ketenpartners
@@ -5179,80 +5871,118 @@ export default function Dashboard() {
                       {activeChatTab === "burgers" && (
                         <>
                           <div className="chat-message incoming">
-                            <div className="message-sender">Melder - 06-12345678</div>
-                            <div className="message-content">Er is een verkeersongeval op de A20 richting Den Haag, ter hoogte van afslag Vlaardingen.</div>
+                            <div className="message-sender">
+                              Melder - 06-12345678
+                            </div>
+                            <div className="message-content">
+                              Er is een verkeersongeval op de A20 richting Den
+                              Haag, ter hoogte van afslag Vlaardingen.
+                            </div>
                             <div className="message-time">14:23</div>
                           </div>
                           <div className="chat-message outgoing">
                             <div className="message-sender">Meldkamer</div>
-                            <div className="message-content">Dank u voor de melding. Zijn er gewonden? En kunt u de exacte locatie bevestigen?</div>
+                            <div className="message-content">
+                              Dank u voor de melding. Zijn er gewonden? En kunt
+                              u de exacte locatie bevestigen?
+                            </div>
                             <div className="message-time">14:24</div>
                           </div>
                         </>
                       )}
-                      
+
                       {activeChatTab === "collega" && (
                         <>
                           {currentConversation && (
                             <div className="conversation-header">
-                              <strong>Gesprek met: {currentConversation.functie}</strong>
-                              <span className="conversation-phone">{currentConversation.telefoonnummer}</span>
+                              <strong>
+                                Gesprek met: {currentConversation.functie}
+                              </strong>
+                              <span className="conversation-phone">
+                                {currentConversation.telefoonnummer}
+                              </span>
                             </div>
                           )}
-                          
-                          {chatMessages.length === 0 && !currentConversation && (
-                            <div className="no-conversation">
-                              <p>Geen actief gesprek. Klik op een collega rechts om een gesprek te starten.</p>
-                            </div>
-                          )}
-                          
+
+                          {chatMessages.length === 0 &&
+                            !currentConversation && (
+                              <div className="no-conversation">
+                                <p>
+                                  Geen actief gesprek. Klik op een collega
+                                  rechts om een gesprek te starten.
+                                </p>
+                              </div>
+                            )}
+
                           {chatMessages.map((message) => (
-                            <div key={message.id} className={`chat-message ${message.type}`}>
-                              <div className="message-sender">{message.sender}</div>
-                              <div className="message-content">{message.content}</div>
-                              <div className="message-time">{message.timestamp}</div>
+                            <div
+                              key={message.id}
+                              className={`chat-message ${message.type}`}
+                            >
+                              <div className="message-sender">
+                                {message.sender}
+                              </div>
+                              <div className="message-content">
+                                {message.content}
+                              </div>
+                              <div className="message-time">
+                                {message.timestamp}
+                              </div>
                             </div>
                           ))}
                         </>
                       )}
-                      
+
                       {activeChatTab === "partners" && (
                         <div className="chat-message incoming">
-                          <div className="message-sender">Rijkswaterstaat - 0800-8002</div>
-                          <div className="message-content">We hebben het incident ontvangen. Wegbeheer is onderweg naar de locatie.</div>
+                          <div className="message-sender">
+                            Rijkswaterstaat - 0800-8002
+                          </div>
+                          <div className="message-content">
+                            We hebben het incident ontvangen. Wegbeheer is
+                            onderweg naar de locatie.
+                          </div>
                           <div className="message-time">14:26</div>
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="chat-input-section">
-                      <input 
-                        type="text" 
-                        className="chat-input" 
+                      <input
+                        type="text"
+                        className="chat-input"
                         placeholder={
-                          activeChatTab === "collega" && currentConversation 
+                          activeChatTab === "collega" && currentConversation
                             ? `Bericht naar ${currentConversation.functie}...`
                             : "Typ uw bericht..."
                         }
                         id="chatInput"
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             const input = e.target as HTMLInputElement;
-                            if (activeChatTab === "collega" && input.value.trim()) {
+                            if (
+                              activeChatTab === "collega" &&
+                              input.value.trim()
+                            ) {
                               sendMessageToColleague(input.value);
-                              input.value = '';
+                              input.value = "";
                             }
                           }
                         }}
                       />
-                      <button 
-                        className="chat-send-btn" 
+                      <button
+                        className="chat-send-btn"
                         id="chatSendBtn"
                         onClick={() => {
-                          const input = document.getElementById('chatInput') as HTMLInputElement;
-                          if (activeChatTab === "collega" && input?.value.trim()) {
+                          const input = document.getElementById(
+                            "chatInput",
+                          ) as HTMLInputElement;
+                          if (
+                            activeChatTab === "collega" &&
+                            input?.value.trim()
+                          ) {
                             sendMessageToColleague(input.value);
-                            input.value = '';
+                            input.value = "";
                           }
                         }}
                       >
@@ -5264,20 +5994,30 @@ export default function Dashboard() {
 
                 {/* Right Column - Contact Panels */}
                 <div className="telefoon-contact-section">
-                  
                   {/* AI Telephone Conversations - Placeholder */}
                   <div className="contact-panel ai-conversations-panel">
                     <h3 className="panel-title">AI Telefoonconversaties</h3>
                     <div className="ai-placeholder-content">
                       <div className="placeholder-message">
                         <strong>Toekomstige functionaliteit:</strong>
-                        <p>Hier komen dynamische AI-gestuurde telefoongesprekken met noodmelders via 112 en andere emergency services.</p>
+                        <p>
+                          Hier komen dynamische AI-gestuurde telefoongesprekken
+                          met noodmelders via 112 en andere emergency services.
+                        </p>
                       </div>
                       <div className="placeholder-features">
-                        <div className="feature-item">• Realtime conversatie simulatie</div>
-                        <div className="feature-item">• Intelligente respons generatie</div>
-                        <div className="feature-item">• Automatische incident classificatie</div>
-                        <div className="feature-item">• Geïntegreerde GMS koppeling</div>
+                        <div className="feature-item">
+                          • Realtime conversatie simulatie
+                        </div>
+                        <div className="feature-item">
+                          • Intelligente respons generatie
+                        </div>
+                        <div className="feature-item">
+                          • Automatische incident classificatie
+                        </div>
+                        <div className="feature-item">
+                          • Geïntegreerde GMS koppeling
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -5286,35 +6026,49 @@ export default function Dashboard() {
                   <div className="contact-panel colleague-panel">
                     <h3 className="panel-title">Collega's</h3>
                     <div className="contact-grid">
-                      <button className="contact-btn colleague" data-colleague="supervisor">
+                      <button
+                        className="contact-btn colleague"
+                        data-colleague="supervisor"
+                      >
                         Dienstchef
                         <span className="contact-status online">Online</span>
                       </button>
-                      <button className="contact-btn colleague" data-colleague="coordinator">
+                      <button
+                        className="contact-btn colleague"
+                        data-colleague="coordinator"
+                      >
                         Coördinator
                         <span className="contact-status online">Online</span>
                       </button>
-                      <button className="contact-btn colleague" data-colleague="teamleader">
+                      <button
+                        className="contact-btn colleague"
+                        data-colleague="teamleader"
+                      >
                         Teamleider
                         <span className="contact-status away">Afwezig</span>
                       </button>
-                      <button className="contact-btn colleague" data-colleague="backup">
+                      <button
+                        className="contact-btn colleague"
+                        data-colleague="backup"
+                      >
                         Back-up Centralist
                         <span className="contact-status online">Online</span>
                       </button>
-                      
+
                       {/* Dynamic phone numbers from Telefoonlijst */}
                       {phoneNumbersArray.map((phone) => (
-                        <button 
-                          key={phone.id} 
-                          className="contact-btn colleague phone-contact" 
+                        <button
+                          key={phone.id}
+                          className="contact-btn colleague phone-contact"
                           data-colleague={phone.functie}
                           data-phone={phone.telefoonnummer}
                           title={`${phone.omschrijving} - ${phone.telefoonnummer}`}
                           onClick={() => startConversationWithContact(phone)}
                         >
                           {phone.functie}
-                          <span className="contact-number">{phone.telefoonnummer}</span>
+                          <span className="contact-number">
+                            {phone.telefoonnummer}
+                          </span>
                           {phone.bereikbaar24u ? (
                             <span className="contact-status online">24/7</span>
                           ) : (
@@ -5322,10 +6076,13 @@ export default function Dashboard() {
                           )}
                         </button>
                       ))}
-                      
+
                       {phoneNumbersArray.length === 0 && (
                         <div className="no-phone-contacts">
-                          <small>Geen extra contacten. Voeg nummers toe via Instellingen → Telefoonlijst</small>
+                          <small>
+                            Geen extra contacten. Voeg nummers toe via
+                            Instellingen → Telefoonlijst
+                          </small>
                         </div>
                       )}
                     </div>
@@ -5335,11 +6092,17 @@ export default function Dashboard() {
                   <div className="contact-panel partner-panel">
                     <h3 className="panel-title">Externe Partners</h3>
                     <div className="contact-grid">
-                      <button className="contact-btn partner" data-partner="rijkswaterstaat">
+                      <button
+                        className="contact-btn partner"
+                        data-partner="rijkswaterstaat"
+                      >
                         Rijkswaterstaat
                         <span className="contact-number">0800-8002</span>
                       </button>
-                      <button className="contact-btn partner" data-partner="gemeente">
+                      <button
+                        className="contact-btn partner"
+                        data-partner="gemeente"
+                      >
                         Gemeente Rotterdam
                         <span className="contact-number">14010</span>
                       </button>
@@ -5347,7 +6110,10 @@ export default function Dashboard() {
                         OV Controle
                         <span className="contact-number">0900-9292</span>
                       </button>
-                      <button className="contact-btn partner" data-partner="defensie">
+                      <button
+                        className="contact-btn partner"
+                        data-partner="defensie"
+                      >
                         Koninklijke Marechaussee
                         <span className="contact-number">0900-0141</span>
                       </button>
@@ -5853,7 +6619,6 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-
                         </div>
                       </div>
                     </div>
@@ -5895,9 +6660,7 @@ export default function Dashboard() {
                 </div>
               </div>
               {/* GMS Timestamp at bottom left */}
-              <div className="gms-timestamp">
-                {formatTime(currentTime)}
-              </div>
+              <div className="gms-timestamp">{formatTime(currentTime)}</div>
             </div>
           </div>
         )}
@@ -5947,16 +6710,16 @@ export default function Dashboard() {
               <div className="section-header">
                 <h3 className="section-title">Instellingen</h3>
               </div>
-              
+
               {/* Settings Subtabs */}
               <div className="gms-subtabs">
-                <button 
+                <button
                   className={`gms-subtab ${activeSettingsTab === "basisteams" ? "active" : ""}`}
                   onClick={() => setActiveSettingsTab("basisteams")}
                 >
                   Basisteams
                 </button>
-                <button 
+                <button
                   className={`gms-subtab ${activeSettingsTab === "telefoonlijst" ? "active" : ""}`}
                   onClick={() => setActiveSettingsTab("telefoonlijst")}
                 >
@@ -6021,7 +6784,9 @@ export default function Dashboard() {
               {activeSettingsTab === "telefoonlijst" && (
                 <div className="telefoonlijst-content">
                   <div className="telefoonlijst-header">
-                    <h4 className="telefoonlijst-title">Telefoonlijst Beheer</h4>
+                    <h4 className="telefoonlijst-title">
+                      Telefoonlijst Beheer
+                    </h4>
                     <button
                       className="btn btn-primary"
                       onClick={() => setShowPhoneForm(!showPhoneForm)}
@@ -6035,7 +6800,7 @@ export default function Dashboard() {
                     <div className="telefoon-form-container">
                       <div className="telefoon-form">
                         <h5>Nieuw Telefoonnummer Toevoegen</h5>
-                        
+
                         <div className="gms-form-row">
                           <div className="gms-field-group">
                             <label>Functie *</label>
@@ -6043,7 +6808,12 @@ export default function Dashboard() {
                               type="text"
                               className="gms-field"
                               value={newPhoneNumber.functie}
-                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, functie: e.target.value}))}
+                              onChange={(e) =>
+                                setNewPhoneNumber((prev) => ({
+                                  ...prev,
+                                  functie: e.target.value,
+                                }))
+                              }
                               placeholder="Bijv. Dienstchef, Teamleider"
                             />
                           </div>
@@ -6053,7 +6823,12 @@ export default function Dashboard() {
                               type="text"
                               className="gms-field"
                               value={newPhoneNumber.omschrijving}
-                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, omschrijving: e.target.value}))}
+                              onChange={(e) =>
+                                setNewPhoneNumber((prev) => ({
+                                  ...prev,
+                                  omschrijving: e.target.value,
+                                }))
+                              }
                               placeholder="Korte beschrijving van de functie"
                             />
                           </div>
@@ -6066,7 +6841,12 @@ export default function Dashboard() {
                               type="tel"
                               className="gms-field"
                               value={newPhoneNumber.telefoonnummer}
-                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, telefoonnummer: e.target.value}))}
+                              onChange={(e) =>
+                                setNewPhoneNumber((prev) => ({
+                                  ...prev,
+                                  telefoonnummer: e.target.value,
+                                }))
+                              }
                               placeholder="06-12345678"
                             />
                           </div>
@@ -6075,7 +6855,12 @@ export default function Dashboard() {
                               <input
                                 type="checkbox"
                                 checked={newPhoneNumber.bereikbaar24u}
-                                onChange={(e) => setNewPhoneNumber(prev => ({...prev, bereikbaar24u: e.target.checked}))}
+                                onChange={(e) =>
+                                  setNewPhoneNumber((prev) => ({
+                                    ...prev,
+                                    bereikbaar24u: e.target.checked,
+                                  }))
+                                }
                               />
                               24 uur bereikbaar
                             </label>
@@ -6090,7 +6875,12 @@ export default function Dashboard() {
                                 type="time"
                                 className="gms-field"
                                 value={newPhoneNumber.beginDienst}
-                                onChange={(e) => setNewPhoneNumber(prev => ({...prev, beginDienst: e.target.value}))}
+                                onChange={(e) =>
+                                  setNewPhoneNumber((prev) => ({
+                                    ...prev,
+                                    beginDienst: e.target.value,
+                                  }))
+                                }
                               />
                             </div>
                             <div className="gms-field-group">
@@ -6099,7 +6889,12 @@ export default function Dashboard() {
                                 type="time"
                                 className="gms-field"
                                 value={newPhoneNumber.eindeDienst}
-                                onChange={(e) => setNewPhoneNumber(prev => ({...prev, eindeDienst: e.target.value}))}
+                                onChange={(e) =>
+                                  setNewPhoneNumber((prev) => ({
+                                    ...prev,
+                                    eindeDienst: e.target.value,
+                                  }))
+                                }
                               />
                             </div>
                           </div>
@@ -6112,7 +6907,12 @@ export default function Dashboard() {
                               className="gms-field"
                               rows={3}
                               value={newPhoneNumber.opmerkingen}
-                              onChange={(e) => setNewPhoneNumber(prev => ({...prev, opmerkingen: e.target.value}))}
+                              onChange={(e) =>
+                                setNewPhoneNumber((prev) => ({
+                                  ...prev,
+                                  opmerkingen: e.target.value,
+                                }))
+                              }
                               placeholder="Extra informatie of opmerkingen..."
                             />
                           </div>
@@ -6122,7 +6922,11 @@ export default function Dashboard() {
                           <button
                             className="btn btn-primary"
                             onClick={() => {
-                              if (!newPhoneNumber.functie || !newPhoneNumber.omschrijving || !newPhoneNumber.telefoonnummer) {
+                              if (
+                                !newPhoneNumber.functie ||
+                                !newPhoneNumber.omschrijving ||
+                                !newPhoneNumber.telefoonnummer
+                              ) {
                                 alert("Vul alle verplichte velden in");
                                 return;
                               }
@@ -6130,26 +6934,47 @@ export default function Dashboard() {
                               const savedPhoneNumber = {
                                 ...newPhoneNumber,
                                 id: Date.now() + Math.random(), // Generate unique ID
-                                createdAt: new Date().toISOString()
+                                createdAt: new Date().toISOString(),
                               };
 
-                              console.log('Saving phone number:', savedPhoneNumber);
-                              console.log('Current phoneNumbers before save:', phoneNumbersArray);
-                              
-                              setPhoneNumbers(prev => {
-                                const prevArray = Array.isArray(prev) ? prev : [];
-                                const updated = [...prevArray, savedPhoneNumber];
-                                console.log('Updated phoneNumbers:', updated);
+                              console.log(
+                                "Saving phone number:",
+                                savedPhoneNumber,
+                              );
+                              console.log(
+                                "Current phoneNumbers before save:",
+                                phoneNumbersArray,
+                              );
+
+                              setPhoneNumbers((prev) => {
+                                const prevArray = Array.isArray(prev)
+                                  ? prev
+                                  : [];
+                                const updated = [
+                                  ...prevArray,
+                                  savedPhoneNumber,
+                                ];
+                                console.log("Updated phoneNumbers:", updated);
                                 return updated;
                               });
                               setNewPhoneNumber({
-                                functie: "", omschrijving: "", telefoonnummer: "",
-                                beginDienst: "", eindeDienst: "", bereikbaar24u: false, opmerkingen: ""
+                                functie: "",
+                                omschrijving: "",
+                                telefoonnummer: "",
+                                beginDienst: "",
+                                eindeDienst: "",
+                                bereikbaar24u: false,
+                                opmerkingen: "",
                               });
                               setShowPhoneForm(false);
-                              setNotification("Telefoonnummer succesvol toegevoegd");
+                              setNotification(
+                                "Telefoonnummer succesvol toegevoegd",
+                              );
                               setShowNotification(true);
-                              setTimeout(() => setShowNotification(false), 3000);
+                              setTimeout(
+                                () => setShowNotification(false),
+                                3000,
+                              );
                             }}
                           >
                             Opslaan
@@ -6181,25 +7006,48 @@ export default function Dashboard() {
                       <tbody>
                         {phoneNumbersArray.map((phone) => (
                           <tr key={phone.id} className="telefoon-row">
-                            <td className="telefoon-functie"><strong>{phone.functie}</strong></td>
-                            <td className="telefoon-omschrijving">{phone.omschrijving}</td>
-                            <td className="telefoon-nummer">{phone.telefoonnummer}</td>
-                            <td className="telefoon-dienst">
-                              {phone.bereikbaar24u ? "24/7" : `${phone.beginDienst || "?"} - ${phone.eindeDienst || "?"}`}
+                            <td className="telefoon-functie">
+                              <strong>{phone.functie}</strong>
                             </td>
-                            <td className="telefoon-opmerkingen">{phone.opmerkingen || "-"}</td>
+                            <td className="telefoon-omschrijving">
+                              {phone.omschrijving}
+                            </td>
+                            <td className="telefoon-nummer">
+                              {phone.telefoonnummer}
+                            </td>
+                            <td className="telefoon-dienst">
+                              {phone.bereikbaar24u
+                                ? "24/7"
+                                : `${phone.beginDienst || "?"} - ${phone.eindeDienst || "?"}`}
+                            </td>
+                            <td className="telefoon-opmerkingen">
+                              {phone.opmerkingen || "-"}
+                            </td>
                             <td className="telefoon-acties">
                               <button
                                 className="btn btn-danger btn-small"
                                 onClick={() => {
-                                  if (confirm("Weet u zeker dat u dit telefoonnummer wilt verwijderen?")) {
-                                    setPhoneNumbers(prev => {
-                                      const prevArray = Array.isArray(prev) ? prev : [];
-                                      return prevArray.filter(p => p.id !== phone.id);
+                                  if (
+                                    confirm(
+                                      "Weet u zeker dat u dit telefoonnummer wilt verwijderen?",
+                                    )
+                                  ) {
+                                    setPhoneNumbers((prev) => {
+                                      const prevArray = Array.isArray(prev)
+                                        ? prev
+                                        : [];
+                                      return prevArray.filter(
+                                        (p) => p.id !== phone.id,
+                                      );
                                     });
-                                    setNotification("Telefoonnummer verwijderd");
+                                    setNotification(
+                                      "Telefoonnummer verwijderd",
+                                    );
                                     setShowNotification(true);
-                                    setTimeout(() => setShowNotification(false), 3000);
+                                    setTimeout(
+                                      () => setShowNotification(false),
+                                      3000,
+                                    );
                                   }
                                 }}
                               >
@@ -6211,7 +7059,9 @@ export default function Dashboard() {
                         {phoneNumbersArray.length === 0 && (
                           <tr>
                             <td colSpan={6} className="no-data">
-                              Geen telefoonnummers gevonden. Klik op "Telefoonnummer toevoegen" om een nummer toe te voegen.
+                              Geen telefoonnummers gevonden. Klik op
+                              "Telefoonnummer toevoegen" om een nummer toe te
+                              voegen.
                             </td>
                           </tr>
                         )}
