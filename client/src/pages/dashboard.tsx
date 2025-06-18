@@ -1976,11 +1976,48 @@ export default function Dashboard() {
                 // 3. Special mappings for common abbreviations
                 if (!matchedClassification) {
                   const specialMappings: Record<string, string> = {
+                    // Traffic violations
                     "wegverkeer onder invloed": "vkweoi",
                     "onder invloed": "vkweoi",
-                    bz: "bzdsap", // Default to first bz code
-                    brgb: "brgb01", // Default to first brgb code
-                    vkwebz: "vkwebz", // Direct mapping for vkwebz
+                    "vkweoi": "vkweoi",
+                    
+                    // Violence incidents
+                    "steekpartij": "vogwst",
+                    "steek": "vogwst",
+                    "steken": "vogwst",
+                    
+                    // Fire incidents
+                    "brand wegvervoer": "brwevo",
+                    "brand voertuig": "brwevo",
+                    "voertuigbrand": "brwevo",
+                    
+                    // Service requests - Police
+                    "politie afstemverzoek": "dvpoav",
+                    "afstemverzoek politie": "dvpoav",
+                    
+                    // Service requests - Fire
+                    "brandweer afstemverzoek": "dvbwav",
+                    "afstemverzoek brandweer": "dvbwav",
+                    
+                    // Service requests - Ambulance
+                    "ambulance afstemverzoek": "dvabav",
+                    "afstemverzoek ambulance": "dvabav",
+                    
+                    // Accidents with disambiguation
+                    "ongeval wegvervoer letsel": "ogwevo",
+                    "ongeval spoorvervoer letsel": "ogsevo",
+                    "wegongeval letsel": "ogwevo",
+                    "spoorwegongeval letsel": "ogsevo",
+                    
+                    // Property crimes
+                    "bz": "bzdsap",
+                    "bzdsbr": "bzdsbr",
+                    "beroving": "bzdsbr",
+                    
+                    // Other mappings
+                    "brgb": "brgb01",
+                    "vkwebz": "vkwebz",
+                    "lmcf": "lmcf"
                   };
 
                   const mappedCode = specialMappings[searchQuery.toLowerCase()];
