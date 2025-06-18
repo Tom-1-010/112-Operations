@@ -7331,10 +7331,8 @@ export default function Dashboard() {
                   <div className="stat-item">
                     <span className="stat-label">Totaal Eenheden:</span>
                     <span className="stat-value">{filteredUnits.length}</span>
-                  </div></div>
-              </div>
-
-              <div className="stat-item">
+                  </div>
+                  <div className="stat-item">
                     <span className="stat-label">Vrij:</span>
                     <span className="stat-value stat-vrij">
                       {filteredUnits.filter(u => u.status === 'Vrij').length}
