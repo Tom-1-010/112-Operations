@@ -2740,26 +2740,26 @@ export default function Dashboard() {
                 // 1. Try exact code match first
                 matchedClassification = storedClassifications.find(
                   (c) =>
-                    typeof c.Code === "string" &&
-                    c.Code.toLowerCase() === searchQuery.toLowerCase(),
+                    typeof c.code === "string" &&
+                    c.code.toLowerCase() === searchQuery.toLowerCase(),
                 );
                 console.log(
                   "🔍 1. Exact code match result:",
                   matchedClassification
-                    ? `Found: ${matchedClassification.Code}`
+                    ? `Found: ${matchedClassification.code}`
                     : "Not found",
                 );
 
                 // 2. Try partial code match (e.g., -bz matches bzdsap, bzdsbr, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find((c) =>
-                    typeof c.Code === "string" &&
-                    c.Code.toLowerCase().startsWith(searchQuery.toLowerCase()),
+                    typeof c.code === "string" &&
+                    c.code.toLowerCase().startsWith(searchQuery.toLowerCase()),
                   );
                   console.log(
                     "🔍 2. Partial code match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.Code}`
+                      ? `Found: ${matchedClassification.code}`
                       : "Not found",
                   );
                 }
@@ -2767,20 +2767,25 @@ export default function Dashboard() {
                 // 3. Special mappings for common abbreviations
                 if (!matchedClassification) {
                   const specialMappings: Record<string, string> = {
+                    // Violence incidents
+                    "schietpartij": "vogwsi",
+                    "steekpartij": "vogwst",
+                    "steek": "vogwst",
+                    "steken": "vogwst",
+                    "schieten": "vogwsi",
+                    "schiet": "vogwsi",
+                    
                     // Traffic violations
                     "wegverkeer onder invloed": "vkweoi",
                     "onder invloed": "vkweoi",
                     "vkweoi": "vkweoi",
                     
-                    // Violence incidents
-                    "steekpartij": "vogwst",
-                    "steek": "vogwst",
-                    "steken": "vogwst",
-                    
                     // Fire incidents
-                    "brand wegvervoer": "brwevo",
-                    "brand voertuig": "brwevo",
-                    "voertuigbrand": "brwevo",
+                    "brand wegvervoer": "brwe",
+                    "brand voertuig": "brwe",
+                    "voertuigbrand": "brwe",
+                    "brand gebouw": "brgb",
+                    "woningbrand": "brgb01",
                     
                     // Service requests - Police
                     "politie afstemverzoek": "dvpoav",
@@ -2795,15 +2800,23 @@ export default function Dashboard() {
                     "afstemverzoek ambulance": "dvabav",
                     
                     // Accidents with disambiguation
-                    "ongeval wegvervoer letsel": "ogwevo",
-                    "ongeval spoorvervoer letsel": "ogsevo",
-                    "wegongeval letsel": "ogwevo",
-                    "spoorwegongeval letsel": "ogsevo",
+                    "ongeval wegvervoer letsel": "ogwels",
+                    "ongeval spoorvervoer letsel": "ogspls",
+                    "wegongeval letsel": "ogwels",
+                    "spoorwegongeval letsel": "ogspls",
                     
                     // Property crimes
                     "bz": "bzdsap",
                     "bzdsbr": "bzdsbr",
                     "beroving": "bzdsbr",
+                    "inbraak": "bzib",
+                    "diefstal": "bzds",
+                    
+                    // Violence/security
+                    "geweld": "vogw",
+                    "mishandeling": "vogwmh",
+                    "bedreiging": "vogwbd",
+                    "vechtpartij": "vogwve",
                     
                     // Other mappings
                     "brgb": "brgb01",
@@ -2814,12 +2827,12 @@ export default function Dashboard() {
                   const mappedCode = specialMappings[searchQuery.toLowerCase()];
                   if (mappedCode) {
                     matchedClassification = storedClassifications.find(
-                      (c) => typeof c.Code === "string" && c.Code.toLowerCase() === mappedCode.toLowerCase(),
+                      (c) => typeof c.code === "string" && c.code.toLowerCase() === mappedCode.toLowerCase(),
                     );
                     console.log(
                       "🔍 3. Special mapping result:",
                       matchedClassification
-                        ? `Found: ${matchedClassification.Code}`
+                        ? `Found: ${matchedClassification.code}`
                         : "Not found",
                     );
                   } else {
@@ -2858,7 +2871,7 @@ export default function Dashboard() {
                   console.log(
                     "🔍 4. Multi-word match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.Code}`
+                      ? `Found: ${matchedClassification.code}`
                       : "Not found",
                   );
                 }
@@ -2872,14 +2885,14 @@ export default function Dashboard() {
                       (c.MC1 || '').toLowerCase().includes(searchQuery.toLowerCase()),
                   );
                   console.log(
-                    "🔍 4. Individual text match result:",
+                    "🔍 5. Individual text match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.Code}`
+                      ? `Found: ${matchedClassification.code}`
                       : "Not found",
                   );
                 }
 
-                // 5. Try fuzzy matching for partial matches
+                // 6. Try fuzzy matching for partial matches
                 if (!matchedClassification && searchQuery.length > 3) {
                   matchedClassification = storedClassifications.find((c) => {
                     const searchLower = searchQuery.toLowerCase();
@@ -2898,9 +2911,9 @@ export default function Dashboard() {
                     );
                   });
                   console.log(
-                    "🔍 5. Fuzzy match result:",
+                    "🔍 6. Fuzzy match result:",
                     matchedClassification
-                      ? `Found: ${matchedClassification.Code}`
+                      ? `Found: ${matchedClassification.code}`
                       : "Not found",
                   );
                 }
@@ -3053,8 +3066,8 @@ export default function Dashboard() {
               }
 
               // Step 4: Set priority
-              if (prioriteitSelect && matchedClassification.PRIO) {
-                prioriteitSelect.value = matchedClassification.PRIO.toString();
+              if (prioriteitSelect && matchedClassification.prio) {
+                prioriteitSelect.value = matchedClassification.prio.toString();
                 console.log("✅ Priority set to:", prioriteitSelect.value);
               }
 
