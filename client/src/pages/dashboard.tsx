@@ -6174,8 +6174,323 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-        {activeSection === "units" &&
-          renderPlaceholderSection("Eenheden Beheer", "truck")}
+        {activeSection === "units" && (
+          <div className="content-section active">
+            <div className="section">
+              <div className="section-header">
+                <h3 className="section-title">Eenheden Beheer</h3>
+                <div className="units-header-actions">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowAddUnitForm(true)}
+                  >
+                    <i className="bi bi-plus-lg"></i>
+                    Nieuwe Eenheid
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      // Refresh units data
+                      const refreshedUnits = [...policeUnits];
+                      setPoliceUnits(refreshedUnits);
+                      showNotificationMessage("Eenheden overzicht vernieuwd");
+                    }}
+                  >
+                    <i className="bi bi-arrow-clockwise"></i>
+                    Vernieuwen
+                  </button>
+                </div>
+              </div>
+
+              {/* Units Filter Section */}
+              <div className="units-filter-section">
+                <label htmlFor="unitsFilter" className="filter-label">
+                  Filter eenheden
+                </label>
+                <input
+                  type="text"
+                  id="unitsFilter"
+                  className="filter-input"
+                  placeholder="Zoek op roepnaam, rol, voertuig of status..."
+                />
+              </div>
+
+              {/* Add Unit Form */}
+              {showAddUnitForm && (
+                <div className="add-unit-form-container">
+                  <div className="add-unit-form">
+                    <h4>Nieuwe Eenheid Toevoegen</h4>
+                    
+                    <div className="gms-form-row">
+                      <div className="gms-field-group">
+                        <label>Roepnaam *</label>
+                        <input
+                          type="text"
+                          className="gms-field"
+                          value={newUnit.roepnaam}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, roepnaam: e.target.value }))}
+                          placeholder="RT11-01"
+                        />
+                      </div>
+                      <div className="gms-field-group">
+                        <label>Aantal Mensen *</label>
+                        <input
+                          type="number"
+                          className="gms-field"
+                          min="1"
+                          max="10"
+                          value={newUnit.mensen}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, mensen: parseInt(e.target.value) || 1 }))}
+                        />
+                      </div>
+                      <div className="gms-field-group">
+                        <label>Status *</label>
+                        <select
+                          className="gms-field"
+                          value={newUnit.status}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, status: e.target.value }))}
+                        >
+                          {npStatuses.map(status => (
+                            <option key={status} value={status}>{status}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="gms-form-row">
+                      <div className="gms-field-group gms-field-full">
+                        <label>Voertuigtype *</label>
+                        <select
+                          className="gms-field"
+                          value={newUnit.voertuigtype}
+                          onChange={(e) => setNewUnit(prev => ({ ...prev, voertuigtype: e.target.value }))}
+                        >
+                          <option value="">Selecteer voertuigtype...</option>
+                          {vehicleTypes.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="gms-form-row">
+                      <div className="gms-field-group gms-field-full">
+                        <label>Rollen * (maximaal 3)</label>
+                        <div className="roles-checkbox-grid">
+                          {inzetRollen.map(rol => (
+                            <label key={rol} className="role-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={newUnit.rollen.includes(rol)}
+                                onChange={() => toggleRole(rol)}
+                                disabled={!newUnit.rollen.includes(rol) && newUnit.rollen.length >= 3}
+                              />
+                              {rol}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="unit-form-buttons">
+                      <button className="btn btn-primary" onClick={addNewUnit}>
+                        Toevoegen
+                      </button>
+                      <button 
+                        className="btn btn-secondary" 
+                        onClick={() => setShowAddUnitForm(false)}
+                      >
+                        Annuleren
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Units Table */}
+              <div className="units-table-container">
+                <table className="units-table">
+                  <thead>
+                    <tr>
+                      <th>Roepnaam</th>
+                      <th>Status</th>
+                      <th>Mensen</th>
+                      <th>Rollen</th>
+                      <th>Voertuigtype</th>
+                      <th>Locatie</th>
+                      <th>Incident</th>
+                      <th>Laatste Update</th>
+                      <th>Acties</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {policeUnits.map((unit) => (
+                      <tr 
+                        key={unit.id} 
+                        className="unit-row" 
+                        data-unit={JSON.stringify(unit)}
+                      >
+                        <td className="unit-roepnaam">
+                          <strong>{unit.roepnaam}</strong>
+                        </td>
+                        <td>
+                          <select
+                            className={`status-select status-${unit.status.toLowerCase()}`}
+                            value={unit.status}
+                            onChange={(e) => {
+                              const newStatus = e.target.value;
+                              setPoliceUnits(prev => prev.map(u => 
+                                u.id === unit.id ? { ...u, status: newStatus } : u
+                              ));
+                              showNotificationMessage(`Status ${unit.roepnaam} gewijzigd naar ${newStatus}`);
+                            }}
+                          >
+                            {npStatuses.map(status => (
+                              <option key={status} value={status}>{status}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="unit-mensen">
+                          <input
+                            type="number"
+                            className="mensen-input"
+                            min="1"
+                            max="10"
+                            value={unit.mensen}
+                            onChange={(e) => {
+                              const newMensen = parseInt(e.target.value) || 1;
+                              setPoliceUnits(prev => prev.map(u => 
+                                u.id === unit.id ? { ...u, mensen: newMensen } : u
+                              ));
+                            }}
+                          />
+                        </td>
+                        <td className="unit-rollen">
+                          {unit.rollen.map((rol, index) => (
+                            <span key={rol} className="role-tag">
+                              {rol}
+                              {index < unit.rollen.length - 1 && ', '}
+                            </span>
+                          ))}
+                        </td>
+                        <td className="unit-voertuig" title={unit.voertuigtype}>
+                          {unit.voertuigtype.length > 30 
+                            ? `${unit.voertuigtype.substring(0, 30)}...` 
+                            : unit.voertuigtype
+                          }
+                        </td>
+                        <td className="unit-location">
+                          <input
+                            type="text"
+                            className="location-input"
+                            placeholder="Voer locatie in..."
+                            defaultValue=""
+                            onBlur={(e) => {
+                              // Update unit location when input loses focus
+                              const location = e.target.value;
+                              if (location) {
+                                console.log(`${unit.roepnaam} locatie: ${location}`);
+                              }
+                            }}
+                          />
+                        </td>
+                        <td className="unit-incident">
+                          <select
+                            className="incident-select"
+                            defaultValue=""
+                            onChange={(e) => {
+                              const incidentId = e.target.value;
+                              if (incidentId) {
+                                showNotificationMessage(`${unit.roepnaam} toegewezen aan incident ${incidentId}`);
+                              }
+                            }}
+                          >
+                            <option value="">Geen incident</option>
+                            {incidents.filter(inc => inc.status === 'active').map(incident => (
+                              <option key={incident.id} value={incident.id}>
+                                {incident.type} - {incident.location.substring(0, 20)}...
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="unit-timestamp">
+                          {new Date().toLocaleTimeString('nl-NL', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </td>
+                        <td className="unit-actions">
+                          <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={() => {
+                              // Edit unit functionality
+                              console.log('Edit unit:', unit.roepnaam);
+                            }}
+                            title="Bewerk eenheid"
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={() => {
+                              if (confirm(`Weet u zeker dat u eenheid ${unit.roepnaam} wilt verwijderen?`)) {
+                                setPoliceUnits(prev => prev.filter(u => u.id !== unit.id));
+                                showNotificationMessage(`Eenheid ${unit.roepnaam} verwijderd`);
+                              }
+                            }}
+                            title="Verwijder eenheid"
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {policeUnits.length === 0 && (
+                  <div className="no-units-message">
+                    <p>Geen eenheden gevonden. Klik op "Nieuwe Eenheid" om een eenheid toe te voegen.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Units Summary */}
+              <div className="units-summary">
+                <div className="summary-stats">
+                  <div className="stat-item">
+                    <span className="stat-label">Totaal Eenheden:</span>
+                    <span className="stat-value">{policeUnits.length}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Beschikbaar:</span>
+                    <span className="stat-value stat-available">
+                      {policeUnits.filter(u => u.status === 'Beschikbaar').length}
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Onderweg:</span>
+                    <span className="stat-value stat-onderweg">
+                      {policeUnits.filter(u => u.status === 'Onderweg').length}
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Bezig:</span>
+                    <span className="stat-value stat-bezig">
+                      {policeUnits.filter(u => u.status === 'Bezig').length}
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Onderhoud:</span>
+                    <span className="stat-value stat-onderhoud">
+                      {policeUnits.filter(u => u.status === 'Onderhoud').length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeSection === "gms" && (
           <div className="content-section active gms-fullscreen">
             <div id="gms" className="gms-wrapper">
