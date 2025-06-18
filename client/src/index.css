@@ -1770,7 +1770,7 @@ body {
 .gms-content {
   padding: 0;
   background: #e8e8e8;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 60px);
   overflow: hidden;
 }
 
@@ -1780,7 +1780,7 @@ body {
   height: 100%;
   background: #e8e8e8;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 /* Header Bar */
@@ -1814,8 +1814,8 @@ body {
 .gms-main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 8px;
+  gap: 4px;
+  padding: 4px;
   flex: 1;
   overflow: hidden;
 }
@@ -1823,37 +1823,37 @@ body {
 .gms-left-column {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .gms-right-column {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 /* Block Styling */
 .gms-block {
   background: #f0f0f0;
   border: 2px inset #e8e8e8;
-  padding: 8px;
-  font-size: 11px;
+  padding: 4px;
+  font-size: 10px;
 }
 
 .gms-block-title {
   background: #c0c0c0;
-  margin: -8px -8px 8px -8px;
-  padding: 4px 8px;
+  margin: -4px -4px 4px -4px;
+  padding: 2px 4px;
   font-weight: bold;
   border-bottom: 1px solid #808080;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 /* Form Elements */
 .gms-form-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 4px;
+  margin-bottom: 4px;
   align-items: flex-end;
 }
 
@@ -1904,17 +1904,18 @@ body {
 }
 
 .gms-field-group label {
-  font-size: 10px;
-  margin-bottom: 2px;
+  font-size: 9px;
+  margin-bottom: 1px;
   color: #333;
 }
 
 .gms-field {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 2px 4px;
-  font-size: 11px;
+  padding: 1px 3px;
+  font-size: 10px;
   font-family: inherit;
+  height: 18px;
 }
 
 .gms-field-small {
@@ -2044,24 +2045,24 @@ body {
 }
 
 .gms-text-block-compact {
-  flex: 0.35; /* Further reduced to 50% of original size for compact notes field */
+  flex: 0.4;
 }
 
 .gms-text-area {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 4px;
-  font-size: 11px;
+  padding: 2px;
+  font-size: 10px;
   font-family: 'Courier New', monospace;
   flex: 1;
   overflow-y: auto;
-  min-height: 150px;
+  min-height: 80px;
 }
 
 .gms-text-area-compact {
-  min-height: 160px;
-  max-height: 160px;
-  width: 200px;
+  min-height: 100px;
+  max-height: 100px;
+  width: 160px;
   resize: none;
 }
 
@@ -2424,12 +2425,15 @@ body {
 .gms-priority-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .gms-priority-input {
   flex: 1;
-  max-width: 80px !important;
+  max-width: 40px !important;
+  height: 18px !important;
+  padding: 1px 3px !important;
+  font-size: 10px !important;
 }
 
 .gms-priority-indicator {

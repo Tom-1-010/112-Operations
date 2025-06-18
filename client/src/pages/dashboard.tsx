@@ -5482,10 +5482,8 @@ export default function Dashboard() {
         const classificatie3 =
           (document.getElementById("gmsClassificatie3") as HTMLSelectElement)
             ?.value || "";
-        const prioriteit = parseInt(
-          (document.getElementById("gmsPrioriteit") as HTMLInputElement)
-            ?.value || "3",
-        );
+        const prioriteitInput = document.getElementById("gmsPrioriteit") as HTMLInputElement;
+        const prioriteit = prioriteitInput ? parseInt(prioriteitInput.value) || 3 : 3;
         const tijdstip =
           (document.getElementById("gmsTijdstip") as HTMLInputElement)?.value ||
           "";
