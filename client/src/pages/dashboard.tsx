@@ -2225,8 +2225,8 @@ export default function Dashboard() {
               }
 
               // Step 4: Set priority
-              if (prioriteitSelect && matchedClassification.prio) {
-                prioriteitSelect.value = matchedClassification.prio.toString();
+              if (prioriteitSelect && matchedClassification.PRIO) {
+                prioriteitSelect.value = matchedClassification.PRIO.toString();
                 console.log("✅ Priority set to:", prioriteitSelect.value);
               }
 
@@ -2242,7 +2242,7 @@ export default function Dashboard() {
               // Log the automatic classification to console
               const timestamp = new Date().toLocaleTimeString("nl-NL");
               console.log(
-                `${timestamp} ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? " / " + matchedClassification.MC2 : ""}${matchedClassification.MC3 ? " / " + matchedClassification.MC3 : ""} (Prio ${matchedClassification.prio})`,
+                `${timestamp} ✅ Classificatie toegepast: ${matchedClassification.MC1}${matchedClassification.MC2 ? " / " + matchedClassification.MC2 : ""}${matchedClassification.MC3 ? " / " + matchedClassification.MC3 : ""} (Prio ${matchedClassification.PRIO})`,
               );
             } else {
               console.log("❌ No classification matched for input");
