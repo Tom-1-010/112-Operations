@@ -19,10 +19,24 @@ export default function Dashboard() {
   );
 
   // GMS Incidents database for complete incident lifecycle
-  const [gmsIncidents, setGmsIncidents] = useLocalStorage<any[]>(
-    "gmsIncidentsDB",
-    [],
-  );
+  const [gmsIncidents, setGmsIncidents] = useState<any[]>([]);
+  
+  // Load GMS incidents from database on component mount
+  useEffect(() => {
+    const loadGmsIncidents = async () => {
+      try {
+        const response = await fetch('/api/gms-incidents');
+        if (response.ok) {
+          const incidents = await response.json();
+          setGmsIncidents(incidents);
+        }
+      } catch (error) {
+        console.error('Failed to load GMS incidents:', error);
+      }
+    };
+    
+    loadGmsIncidents();
+  }, []);
 
   // Current active incident in GMS
   const [currentGmsIncident, setCurrentGmsIncident] = useState<any>(null);
@@ -3512,19 +3526,15 @@ export default function Dashboard() {
       };
 
       // Handle "Uitgifte" button - dispatch incident to central database
-      const handleUitgifte = () => {
+      const handleUitgifte = async () => {
         console.log("Uitgifte button clicked - Dispatching incident");
 
         // Collect all form data including current logging
         const formData = collectGMSFormData();
         if (!formData) return;
 
-        // Create or update incident in central database
-        const incidentId = currentGmsIncident?.id || Date.now();
-
         // Create complete incident object with all data
         const completeIncident = {
-          id: incidentId,
           // Meldergegevens
           melderNaam: formData.melderNaam,
           melderAdres: formData.melderAdres,
@@ -3547,92 +3557,130 @@ export default function Dashboard() {
           status: "Uitgegeven",
           meldingslogging: formData.meldingslogging,
           notities: formData.notities,
-          // Metadata
-          aangemaaktOp:
-            currentGmsIncident?.aangemaaktOp || new Date().toISOString(),
-          uitgegeven: new Date().toISOString(),
         };
 
-        console.log("Saving complete incident:", completeIncident);
+        console.log("Saving complete incident to database:", completeIncident);
 
-        // Save to GMS incidents database
-        setGmsIncidents((prev) => {
-          const existing = prev.find((inc) => inc.id === incidentId);
-          if (existing) {
-            return prev.map((inc) =>
-              inc.id === incidentId ? completeIncident : inc,
-            );
+        try {
+          let savedIncident;
+          
+          if (currentGmsIncident?.id) {
+            // Update existing incident
+            const response = await fetch(`/api/gms-incidents/${currentGmsIncident.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(completeIncident),
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to update incident');
+            }
+            
+            savedIncident = await response.json();
+            console.log("Updated incident in database:", savedIncident);
           } else {
-            return [...prev, completeIncident];
+            // Create new incident
+            const response = await fetch('/api/gms-incidents', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(completeIncident),
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to save incident');
+            }
+            
+            savedIncident = await response.json();
+            console.log("Saved new incident to database:", savedIncident);
           }
-        });
 
-        // Create simplified incident for main incidents list
-        const mainIncident: Incident = {
-          id: incidentId,
-          type: formData.mc1 || "Melding",
-          location:
-            `${formData.straatnaam} ${formData.huisnummer || ""}`.trim() +
-            (formData.plaatsnaam ? `, ${formData.plaatsnaam}` : ""),
-          timestamp: formData.tijdstip,
-          timeAgo: calculateTimeAgo(new Date(formData.tijdstip)),
-          unitsAssigned: 0,
-          priority:
-            formData.prioriteit === 1
-              ? "high"
-              : formData.prioriteit === 2
-                ? "medium"
-                : "low",
-          status: "active",
-        };
+          // Update local GMS incidents state
+          setGmsIncidents((prev) => {
+            const existing = prev.find((inc) => inc.id === savedIncident.id);
+            if (existing) {
+              return prev.map((inc) =>
+                inc.id === savedIncident.id ? savedIncident : inc,
+              );
+            } else {
+              return [savedIncident, ...prev];
+            }
+          });
 
-        setIncidents((prev) => {
-          const existing = prev.find((inc) => inc.id === incidentId);
-          if (existing) {
-            return prev.map((inc) =>
-              inc.id === incidentId ? mainIncident : inc,
-            );
+          // Create simplified incident for main incidents list
+          const mainIncident: Incident = {
+            id: savedIncident.id,
+            type: formData.mc1 || "Melding",
+            location:
+              `${formData.straatnaam} ${formData.huisnummer || ""}`.trim() +
+              (formData.plaatsnaam ? `, ${formData.plaatsnaam}` : ""),
+            timestamp: formData.tijdstip,
+            timeAgo: calculateTimeAgo(new Date(formData.tijdstip)),
+            unitsAssigned: 0,
+            priority:
+              formData.prioriteit === 1
+                ? "high"
+                : formData.prioriteit === 2
+                  ? "medium"
+                  : "low",
+            status: "active",
+          };
+
+          setIncidents((prev) => {
+            const existing = prev.find((inc) => inc.id === savedIncident.id);
+            if (existing) {
+              return prev.map((inc) =>
+                inc.id === savedIncident.id ? mainIncident : inc,
+              );
+            } else {
+              return [mainIncident, ...prev];
+            }
+          });
+
+          // Also save to localStorage for backward compatibility
+          const storageIncident = {
+            ...savedIncident,
+            // Support legacy field names for compatibility
+            meldernaam: formData.melderNaam,
+            melderadres: formData.melderAdres,
+            classificatie1: formData.mc1,
+            classificatie2: formData.mc2,
+            classificatie3: formData.mc3,
+            timestamp: formData.tijdstip,
+          };
+
+          const existingIncidenten = JSON.parse(
+            localStorage.getItem("incidenten") || "[]",
+          );
+          const existingIndex = existingIncidenten.findIndex(
+            (inc: any) => (inc.id || inc.incidentId) === savedIncident.id,
+          );
+
+          if (existingIndex >= 0) {
+            existingIncidenten[existingIndex] = storageIncident;
           } else {
-            return [...prev, mainIncident];
+            existingIncidenten.push(storageIncident);
           }
-        });
 
-        // Save to localStorage for persistence (using both naming conventions)
-        const storageIncident = {
-          ...completeIncident,
-          // Support legacy field names for compatibility
-          meldernaam: formData.melderNaam,
-          melderadres: formData.melderAdres,
-          classificatie1: formData.mc1,
-          classificatie2: formData.mc2,
-          classificatie3: formData.mc3,
-          timestamp: formData.tijdstip,
-        };
+          localStorage.setItem("incidenten", JSON.stringify(existingIncidenten));
 
-        const existingIncidenten = JSON.parse(
-          localStorage.getItem("incidenten") || "[]",
-        );
-        const existingIndex = existingIncidenten.findIndex(
-          (inc: any) => (inc.id || inc.incidentId) === incidentId,
-        );
+          // Update current incident state but stay on GMS
+          setCurrentGmsIncident(savedIncident);
 
-        if (existingIndex >= 0) {
-          existingIncidenten[existingIndex] = storageIncident;
-        } else {
-          existingIncidenten.push(storageIncident);
+          showNotificationMessage(
+            "Incident succesvol uitgegeven en opgeslagen in database",
+          );
+          console.log(
+            "Incident dispatched and saved to database successfully",
+          );
+          
+        } catch (error) {
+          console.error("Failed to save incident to database:", error);
+          showNotificationMessage("Fout bij opslaan incident in database");
         }
-
-        localStorage.setItem("incidenten", JSON.stringify(existingIncidenten));
-
-        // Update current incident state but stay on GMS
-        setCurrentGmsIncident(completeIncident);
-
-        showNotificationMessage(
-          "Incident uitgegeven en toegevoegd aan overzicht",
-        );
-        console.log(
-          "Incident dispatched and saved to database and localStorage",
-        );
       };
 
       // Telefoon Dashboard Interactive Functionality
@@ -4797,14 +4845,29 @@ export default function Dashboard() {
 
   // Incidents page functionality
   useEffect(() => {
-    const loadIncidentsFromStorage = () => {
+    const loadIncidentsFromStorage = async () => {
       const incidentsList = document.getElementById("allIncidentsLegacyList");
       if (!incidentsList) return;
 
       try {
-        const storedIncidenten = JSON.parse(
-          localStorage.getItem("incidenten") || "[]",
-        );
+        // Try to load from database first
+        let storedIncidenten = [];
+        try {
+          const response = await fetch('/api/gms-incidents');
+          if (response.ok) {
+            storedIncidenten = await response.json();
+            console.log('Loaded incidents from database:', storedIncidenten.length);
+          }
+        } catch (error) {
+          console.error('Failed to load from database, falling back to localStorage');
+        }
+
+        // Fallback to localStorage if database is empty
+        if (storedIncidenten.length === 0) {
+          storedIncidenten = JSON.parse(
+            localStorage.getItem("incidenten") || "[]",
+          );
+        }
 
         if (storedIncidenten.length === 0) {
           incidentsList.innerHTML = `
@@ -4815,24 +4878,27 @@ export default function Dashboard() {
           return;
         }
 
-        // Sort by timestamp (newest first)
+        // Sort by timestamp (newest first) - handle both database and localStorage formats
         const sortedIncidenten = storedIncidenten.sort(
-          (a: any, b: any) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+          (a: any, b: any) => {
+            const dateA = new Date(a.aangemaaktOp || a.timestamp);
+            const dateB = new Date(b.aangemaaktOp || b.timestamp);
+            return dateB.getTime() - dateA.getTime();
+          }
         );
 
         incidentsList.innerHTML = sortedIncidenten
           .map((incident: any, index: number) => {
             const incidentNumber = `I${String(incident.id || index + 1).padStart(6, "0")}`;
             const formattedTime = new Date(
-              incident.timestamp,
+              incident.aangemaaktOp || incident.timestamp,
             ).toLocaleTimeString("nl-NL", {
               hour: "2-digit",
               minute: "2-digit",
             });
 
-            const mc = incident.classificatie1
-              ? incident.classificatie1.substring(0, 12)
+            const mc = incident.mc1 || incident.classificatie1
+              ? (incident.mc1 || incident.classificatie1).substring(0, 12)
               : "-";
 
             // Parse location - street name and house number only
@@ -4855,10 +4921,10 @@ export default function Dashboard() {
 
             const statusClass = `legacy-status-${status.toLowerCase()}`;
 
-            // Combine MC1, MC2, MC3 classifications
-            const mc1 = incident.classificatie1 || "";
-            const mc2 = incident.classificatie2 || "";
-            const mc3 = incident.classificatie3 || "";
+            // Combine MC1, MC2, MC3 classifications - support both database and localStorage formats
+            const mc1 = incident.mc1 || incident.classificatie1 || "";
+            const mc2 = incident.mc2 || incident.classificatie2 || "";
+            const mc3 = incident.mc3 || incident.classificatie3 || "";
             const combinedMC =
               [mc1, mc2, mc3].filter(Boolean).join(" / ") || "-";
 
@@ -6370,21 +6436,49 @@ export default function Dashboard() {
     showNotificationMessage("Nieuw incident gestart in GMS");
   };
 
-  // Enhanced incident click handler with comprehensive data loading
-  const handleIncidentClick = (incident: Incident) => {
+  // Enhanced incident click handler with database loading
+  const handleIncidentClick = async (incident: Incident) => {
     console.log(
-      "Opening incident in GMS with full data persistence:",
+      "Opening incident in GMS with database lookup:",
       incident.id,
     );
 
-    // Find the complete incident data in GMS database
+    try {
+      // Try to fetch complete incident data from database
+      const response = await fetch(`/api/gms-incidents/${incident.id}`);
+      
+      if (response.ok) {
+        const gmsIncident = await response.json();
+        console.log(
+          "Found complete GMS incident data in database, loading all fields:",
+          gmsIncident,
+        );
+
+        // Switch to GMS tab first
+        setActiveSection("gms");
+
+        // Use a timeout to ensure the GMS tab has loaded before populating fields
+        setTimeout(() => {
+          loadIncidentIntoGMS(gmsIncident);
+        }, 100);
+
+        showNotificationMessage(
+          `Incident ${incident.id} volledig geladen vanuit database`,
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Failed to fetch incident from database:", error);
+    }
+
+    // Fallback: check local state or reconstruct
     const gmsIncident = gmsIncidents.find(
       (gmsInc) => gmsInc.id === incident.id,
     );
 
     if (gmsIncident) {
       console.log(
-        "Found complete GMS incident data, loading all fields:",
+        "Found complete GMS incident data in local state, loading all fields:",
         gmsIncident,
       );
 
@@ -6397,7 +6491,7 @@ export default function Dashboard() {
       }, 100);
 
       showNotificationMessage(
-        `Incident ${incident.id} volledig geladen in GMS`,
+        `Incident ${incident.id} geladen vanuit lokale data`,
       );
     } else {
       console.log("No GMS data found, reconstructing from incident data");
@@ -6467,15 +6561,6 @@ export default function Dashboard() {
 
       // Switch to GMS tab first
       setActiveSection("gms");
-
-      // Save to GMS incidents for future persistence
-      setGmsIncidents((prev) => {
-        const existing = prev.find((inc) => inc.id === incident.id);
-        if (!existing) {
-          return [...prev, reconstructedIncident];
-        }
-        return prev;
-      });
 
       // Use a timeout to ensure the GMS tab has loaded before populating fields
       setTimeout(() => {
