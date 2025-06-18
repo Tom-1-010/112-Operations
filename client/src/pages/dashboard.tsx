@@ -2740,7 +2740,7 @@ export default function Dashboard() {
                 // 1. Try exact code match first
                 matchedClassification = storedClassifications.find(
                   (c) =>
-                    typeof c.Code === "string" &&
+                    c.Code && 
                     c.Code.toLowerCase() === searchQuery.toLowerCase(),
                 );
                 console.log(
@@ -2753,7 +2753,7 @@ export default function Dashboard() {
                 // 2. Try partial code match (e.g., -bz matches bzdsap, bzdsbr, etc.)
                 if (!matchedClassification) {
                   matchedClassification = storedClassifications.find((c) =>
-                    typeof c.Code === "string" &&
+                    c.Code &&
                     c.Code.toLowerCase().startsWith(searchQuery.toLowerCase()),
                   );
                   console.log(
@@ -2828,7 +2828,7 @@ export default function Dashboard() {
                   const mappedCode = specialMappings[searchQuery.toLowerCase()];
                   if (mappedCode) {
                     matchedClassification = storedClassifications.find(
-                      (c) => typeof c.Code === "string" && c.Code.toLowerCase() === mappedCode.toLowerCase(),
+                      (c) => c.Code && c.Code.toLowerCase() === mappedCode.toLowerCase(),
                     );
                     console.log(
                       "🔍 3. Special mapping result:",
