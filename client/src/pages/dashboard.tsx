@@ -1463,6 +1463,11 @@ export default function Dashboard() {
     defaultPoliceUnitsData
   );
 
+  // Pagination state for Eenheden tab
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredUnits, setFilteredUnits] = useState<PoliceUnit[]>([]);
+  const unitsPerPage = 10;
+
   // Keep old units for compatibility with existing incident system
   const [units, setUnits] = useLocalStorage<Unit[]>("policeUnits", [
     { id: "PC01", type: "patrol", status: "active", name: "5901" },
@@ -4663,7 +4668,7 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
-  // Units filter functionality
+  // Units filter functionality with pagination support
   useEffect(() => {
     const initializeUnitsFilter = () => {
       const filterInput = document.getElementById(
@@ -4673,36 +4678,28 @@ export default function Dashboard() {
 
       const handleFilterChange = () => {
         const filterValue = filterInput.value.toLowerCase();
-        const unitRows = document.querySelectorAll(".unit-row");
+        
+        // Filter all units, not just visible ones
+        const filtered = policeUnits.filter((unit) => {
+          const roepnaam = unit.roepnummer.toLowerCase();
+          const rollen = unit.rollen
+            .map((rol: string) => rol.toLowerCase())
+            .join(" ");
+          const voertuig = unit.soort_auto.toLowerCase();
+          const status = unit.status.toLowerCase();
+          const team = unit.team.toLowerCase();
 
-        unitRows.forEach((row) => {
-          const unitData = row.getAttribute("data-unit");
-          if (unitData) {
-            try {
-              const unit = JSON.parse(unitData);
-              const roepnaam = unit.roepnaam.toLowerCase();
-              const rollen = unit.rollen
-                .map((rol: string) => rol.toLowerCase())
-                .join(" ");
-              const voertuig = unit.voertuigtype.toLowerCase();
-              const status = unit.status.toLowerCase();
-
-              const matchesFilter =
-                roepnaam.includes(filterValue) ||
-                rollen.includes(filterValue) ||
-                voertuig.includes(filterValue) ||
-                status.includes(filterValue);
-
-              if (matchesFilter) {
-                (row as HTMLElement).style.display = "table-row";
-              } else {
-                (row as HTMLElement).style.display = "none";
-              }
-            } catch (error) {
-              console.error("Error parsing unit data:", error);
-            }
-          }
+          return (
+            roepnaam.includes(filterValue) ||
+            rollen.includes(filterValue) ||
+            voertuig.includes(filterValue) ||
+            status.includes(filterValue) ||
+            team.includes(filterValue)
+          );
         });
+
+        setFilteredUnits(filtered);
+        setCurrentPage(1); // Reset to first page when filtering
       };
 
       filterInput.addEventListener("input", handleFilterChange);
@@ -4712,12 +4709,35 @@ export default function Dashboard() {
       };
     };
 
+    // Initialize filtered units
+    setFilteredUnits(policeUnits);
+
     // Only initialize if units section is active
     if (activeSection === "units") {
       const cleanup = initializeUnitsFilter();
       return cleanup;
     }
-  }, [activeSection]);
+  }, [activeSection, policeUnits]);
+
+  // Keyboard navigation for pagination
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (activeSection === "units") {
+        const totalPages = Math.ceil(filteredUnits.length / unitsPerPage);
+        
+        if (event.key === "ArrowLeft" && currentPage > 1) {
+          event.preventDefault();
+          setCurrentPage(currentPage - 1);
+        } else if (event.key === "ArrowRight" && currentPage < totalPages) {
+          event.preventDefault();
+          setCurrentPage(currentPage + 1);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [activeSection, currentPage, filteredUnits.length, unitsPerPage]);
 
   // Basisteams filter functionality
   useEffect(() => {
@@ -7107,7 +7127,12 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {policeUnits.map((unit) => (
+                    {(() => {
+                      const startIndex = (currentPage - 1) * unitsPerPage;
+                      const endIndex = startIndex + unitsPerPage;
+                      const currentUnits = filteredUnits.slice(startIndex, endIndex);
+                      
+                      return currentUnits.map((unit) => (
                       <tr 
                         key={unit.roepnummer} 
                         className="unit-row" 
@@ -7241,46 +7266,102 @@ export default function Dashboard() {
                           </button>
                         </td>
                       </tr>
-                    ))}
+                      ));
+                    })()}
                   </tbody>
                 </table>
 
-                {policeUnits.length === 0 && (
+                {filteredUnits.length === 0 && (
                   <div className="no-units-message">
-                    <p>Geen eenheden gevonden. Klik op "Nieuwe Eenheid" om een eenheid toe te voegen.</p>
+                    <p>Geen eenheden gevonden. Pas het filter aan of voeg nieuwe eenheden toe.</p>
                   </div>
                 )}
               </div>
 
-              {/* Units Summary */}
+              {/* Pagination Controls */}
+              {filteredUnits.length > unitsPerPage && (
+                <div className="pagination-container">
+                  <div className="pagination-info">
+                    Pagina {currentPage} van {Math.ceil(filteredUnits.length / unitsPerPage)} 
+                    ({filteredUnits.length} eenheden totaal)
+                  </div>
+                  <div className="pagination-controls">
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      ← Vorige
+                    </button>
+                    
+                    {(() => {
+                      const totalPages = Math.ceil(filteredUnits.length / unitsPerPage);
+                      const pageNumbers = [];
+                      const startPage = Math.max(1, currentPage - 2);
+                      const endPage = Math.min(totalPages, currentPage + 2);
+                      
+                      for (let i = startPage; i <= endPage; i++) {
+                        pageNumbers.push(
+                          <button
+                            key={i}
+                            className={`pagination-number ${i === currentPage ? 'active' : ''}`}
+                            onClick={() => setCurrentPage(i)}
+                          >
+                            {i}
+                          </button>
+                        );
+                      }
+                      
+                      return pageNumbers;
+                    })()}
+                    
+                    <button
+                      className="pagination-btn"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === Math.ceil(filteredUnits.length / unitsPerPage)}
+                    >
+                      Volgende →
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="units-summary">
                 <div className="summary-stats">
                   <div className="stat-item">
                     <span className="stat-label">Totaal Eenheden:</span>
-                    <span className="stat-value">{policeUnits.length}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">Beschikbaar:</span>
-                    <span className="stat-value stat-available">
-                      {policeUnits.filter(u => u.status === 'Beschikbaar').length}
+                    <span className="stat-value">{filteredUnits.length}</span>
+                  </div></div>
+              </div>
+
+              <div className="stat-item">
+                    <span className="stat-label">Vrij:</span>
+                    <span className="stat-value stat-vrij">
+                      {filteredUnits.filter(u => u.status === 'Vrij').length}
                     </span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Onderweg:</span>
-                    <span className="stat-value stat-onderweg">
-                      {policeUnits.filter(u => u.status === 'Onderweg').length}
+                    <span className="stat-label">Aanrijding:</span>
+                    <span className="stat-value stat-aanrijding">
+                      {filteredUnits.filter(u => u.status === 'Aanrijding').length}
                     </span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Bezig:</span>
-                    <span className="stat-value stat-bezig">
-                      {policeUnits.filter(u => u.status === 'Bezig').length}
+                    <span className="stat-label">Ter plaatse:</span>
+                    <span className="stat-value stat-ter-plaatse">
+                      {filteredUnits.filter(u => u.status === 'Ter plaatse').length}
                     </span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Onderhoud:</span>
-                    <span className="stat-value stat-onderhoud">
-                      {policeUnits.filter(u => u.status === 'Onderhoud').length}
+                    <span className="stat-label">Niet inzetbaar:</span>
+                    <span className="stat-value stat-niet-inzetbaar">
+                      {filteredUnits.filter(u => u.status === 'Niet inzetbaar').length}
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Afmelden:</span>
+                    <span className="stat-value stat-afmelden">
+                      {filteredUnits.filter(u => u.status === 'Afmelden').length}
                     </span>
                   </div>
                 </div>

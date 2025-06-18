@@ -3016,6 +3016,81 @@ body {
   color: hsl(0, 80%, 35%); /* Dark red for emergency call */
 }
 
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 16px 0;
+  border-top: 1px solid hsl(214, 13%, 91%);
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: hsl(220, 9%, 40%);
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1px solid hsl(214, 13%, 91%);
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: hsl(213, 22%, 24%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: hsl(210, 40%, 98%);
+  border-color: hsl(214, 13%, 85%);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: hsl(210, 40%, 98%);
+}
+
+.pagination-number {
+  padding: 8px 12px;
+  border: 1px solid hsl(214, 13%, 91%);
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: hsl(213, 22%, 24%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  text-align: center;
+}
+
+.pagination-number:hover {
+  background: hsl(210, 40%, 98%);
+  border-color: hsl(214, 13%, 85%);
+}
+
+.pagination-number.active {
+  background: hsl(217, 91%, 60%);
+  border-color: hsl(217, 91%, 60%);
+  color: white;
+}
+
+.pagination-number.active:hover {
+  background: hsl(217, 91%, 55%);
+  border-color: hsl(217, 91%, 55%);
+}
+
 /* Status select dropdown styles */
 .status-select.status-vrij {
   background-color: hsla(123, 38%, 44%, 0.1);
