@@ -2369,16 +2369,16 @@ body {
 }
 
 .gms-melding-logging {
-  min-height: 200px;
-  max-height: 400px;
+  min-height: 300px;
+  max-height: 500px;
   border: 2px solid hsl(214, 13%, 91%);
   border-radius: 8px;
   padding: 12px;
   background: hsl(210, 14%, 98%);
   color: hsl(213, 22%, 24%);
   font-family: 'Courier New', monospace;
-  font-size: 11px;
-  line-height: 1.3;
+  font-size: 9px;
+  line-height: 1.2;
   overflow-y: auto;
   white-space: pre-wrap;
 }
@@ -2585,14 +2585,14 @@ body {
 }
 
 #gmsMeldingLogging {
-  min-height: 200px;
-  max-height: 400px;
+  min-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid hsl(214, 13%, 91%);
   border-radius: 6px;
   padding: 4px;
   background: white;
-  font-size: 11px;
+  font-size: 9px;
 }
 
 #gmsMeldingLogging:empty::before {
