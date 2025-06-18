@@ -1919,6 +1919,13 @@ body {
   height: 24px;
 }
 
+.gms-field#gmsTijdstip {
+  font-size: 16px;
+  padding: 6px 8px;
+  height: 32px;
+  font-weight: 600;
+}
+
 .gms-field-small {
   max-width: 80px;
 }
