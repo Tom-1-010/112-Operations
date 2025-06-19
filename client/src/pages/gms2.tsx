@@ -158,11 +158,14 @@ export default function GMS2() {
   };
 
   const handleIncidentSelect = (incident: GmsIncident) => {
+    console.log(`📋 Selecting incident ${incident.nr} for editing`);
+    
+    // Set selected incident first
     setSelectedIncident(incident);
 
     // Load all incident data into form fields
     if (incident) {
-      setFormData({
+      const incidentFormData = {
         melderNaam: incident.melderNaam || "",
         telefoonnummer: incident.telefoonnummer || "",
         melderAdres: incident.melderAdres || "",
@@ -174,7 +177,10 @@ export default function GMS2() {
         plaatsnaam: incident.plaatsnaam || "",
         functie: incident.functie || "",
         roepnummer: incident.roepnr || ""
-      });
+      };
+      
+      console.log(`📋 Loading incident data into form:`, incidentFormData);
+      setFormData(incidentFormData);
 
       // Set MC classifications
       if (incident.mc1) setSelectedMC1(incident.mc1);
@@ -187,14 +193,18 @@ export default function GMS2() {
       // Set notes if available
       if (incident.notities) setNotitiesText(incident.notities);
 
-      // Load logging history if available
+      // Load logging history if available - IMPORTANT: Clear first, then load
+      setLoggingEntries([]); // Clear any existing entries first
+      
       if (incident.meldingslogging) {
         const loggingLines = incident.meldingslogging.split('\n').filter(line => line.trim());
         const parsedEntries = loggingLines.map((line, index) => ({
-          id: Date.now() + index,
+          id: Date.now() + index + Math.random(), // Ensure unique IDs
           timestamp: line.substring(0, 20),
           message: line.substring(21)
         }));
+        
+        console.log(`📋 Loading ${parsedEntries.length} logging entries for incident ${incident.nr}`);
         setLoggingEntries(parsedEntries);
       }
 
@@ -223,7 +233,10 @@ export default function GMS2() {
         }
       }, 200);
 
-      addLoggingEntry(`📋 Melding ${incident.nr} geopend voor bewerking`);
+      // Add logging entry for opening incident (this will be added to existing entries)
+      setTimeout(() => {
+        addLoggingEntry(`📋 Melding ${incident.nr} geopend voor bewerking`);
+      }, 300);
     }
   };
 
@@ -406,13 +419,18 @@ export default function GMS2() {
     }
   };
 
-  // Handle "Nieuw" button click
+  // Handle "Nieuw" button click - Complete reset for new incident
   const handleNieuw = () => {
-    // Clear selected incident FIRST to ensure clean state
+    // Generate a unique session ID for this new incident to prevent data mixing
+    const newSessionId = `new_incident_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    console.log(`🆕 Starting completely new incident with session ID: ${newSessionId}`);
+
+    // STEP 1: Immediately clear selected incident to break all connections
     setSelectedIncident(null);
 
-    // Clear all form fields completely
-    setFormData({
+    // STEP 2: Complete form data reset with empty object
+    const cleanFormData = {
       melderNaam: "",
       telefoonnummer: "",
       melderAdres: "",
@@ -424,63 +442,75 @@ export default function GMS2() {
       plaatsnaam: "",
       functie: "",
       roepnummer: ""
-    });
+    };
+    setFormData(cleanFormData);
 
-    // Reset ALL classification states
+    // STEP 3: Reset ALL classification states immediately
     setSelectedMC1("");
     setSelectedMC2("");
     setSelectedMC3("");
     setPriorityValue(2);
     setNotitiesText("");
 
-    // Clear kladblok completely
+    // STEP 4: Clear kladblok and logging IMMEDIATELY
     setKladblokText("");
+    setLoggingEntries([]); // Complete immediate reset
 
-    // IMMEDIATELY clear ALL logging entries - no delays
-    setLoggingEntries([]);
+    // STEP 5: Force DOM elements to reset without delays
+    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
-    // Reset dropdowns to initial state and reinitialize them
-    setTimeout(() => {
-      const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
-      const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
-      const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+    // Clear all dropdowns immediately
+    if (mc1Select) {
+      mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
+      mc1Select.value = "";
+    }
+    if (mc2Select) {
+      mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+      mc2Select.value = "";
+    }
+    if (mc3Select) {
+      mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+      mc3Select.value = "";
+    }
 
-      if (mc1Select) {
-        mc1Select.value = "";
-        mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
-      }
-      if (mc2Select) {
-        mc2Select.value = "";
-        mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
-      }
-      if (mc3Select) {
-        mc3Select.value = "";
-        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-      }
-
-      // Reinitialize dropdowns to ensure proper event handlers
-      if (lmcClassifications.length > 0) {
+    // STEP 6: Reinitialize dropdowns completely
+    if (lmcClassifications.length > 0) {
+      // Use setTimeout only for dropdown reinitialization, not for data clearing
+      setTimeout(() => {
         initializeLMCDropdowns();
-      }
+      }, 50);
+    }
+
+    // STEP 7: Add clean logging entry after minimal delay
+    setTimeout(() => {
+      // Double-check that logging is still empty (prevent race conditions)
+      setLoggingEntries(prev => {
+        // If there's anything in logging, clear it first
+        if (prev.length > 0) {
+          console.warn('⚠️ Race condition detected - clearing logging again');
+          return [];
+        }
+        
+        const now = new Date();
+        const dateStr = String(now.getDate()).padStart(2, '0');
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        const yearStr = now.getFullYear();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
+
+        const cleanEntry = {
+          id: Date.now() + Math.random(), // Ensure unique ID
+          timestamp,
+          message: `📋 Nieuwe melding gestart [${newSessionId.slice(-8)}] - alle snelcodes actief`
+        };
+
+        return [cleanEntry];
+      });
     }, 100);
 
-    // Add single clean logging entry after everything is reset
-    setTimeout(() => {
-      const now = new Date();
-      const dateStr = String(now.getDate()).padStart(2, '0');
-      const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-      const yearStr = now.getFullYear();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
-
-      const newEntry = {
-        id: Date.now(),
-        timestamp,
-        message: "📋 Nieuwe melding gestart - alle snelcodes beschikbaar"
-      };
-
-      setLoggingEntries([newEntry]);
-    }, 200);
+    console.log(`✅ New incident reset complete - session: ${newSessionId}`);
   };
 
   const addLoggingEntry = (message: string) => {
@@ -581,21 +611,29 @@ export default function GMS2() {
     const lines = text.split('\n');
     const lastLine = lines[lines.length - 1].trim();
 
+    console.log(`🔍 Shortcode detection for: "${lastLine}" | Selected incident: ${selectedIncident ? selectedIncident.nr : 'NONE (NEW)'}`);
+
     // Address shortcode: =[stad]/[straatnaam] [huisnummer]
     if (lastLine.startsWith('=')) {
       const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)\s+(\d+)$/i);
       if (addressMatch) {
         const [, stad, straatnaam, huisnummer] = addressMatch;
 
-        // Fill address fields in state
-        setFormData(prev => ({
-          ...prev,
-          straatnaam: straatnaam.trim(),
-          huisnummer: huisnummer.trim(),
-          plaatsnaam: stad.trim()
-        }));
+        console.log(`📍 Address shortcode detected: ${stad} / ${straatnaam} ${huisnummer}`);
 
-        // Update selected incident only if one exists and is being edited
+        // ALWAYS update form data regardless of incident selection
+        setFormData(prev => {
+          const updated = {
+            ...prev,
+            straatnaam: straatnaam.trim(),
+            huisnummer: huisnummer.trim(),
+            plaatsnaam: stad.trim()
+          };
+          console.log(`📍 Form data updated:`, updated);
+          return updated;
+        });
+
+        // Only update selected incident if one exists (editing mode)
         if (selectedIncident) {
           const updatedIncident = {
             ...selectedIncident,
@@ -604,6 +642,9 @@ export default function GMS2() {
             plaatsnaam: stad.trim()
           };
           setSelectedIncident(updatedIncident);
+          console.log(`📍 Existing incident updated: ${selectedIncident.nr}`);
+        } else {
+          console.log(`📍 New incident mode - only form data updated`);
         }
 
         addLoggingEntry(`📍 Adres automatisch ingevuld: ${straatnaam.trim()} ${huisnummer.trim()}, ${stad.trim()}`);
@@ -617,14 +658,20 @@ export default function GMS2() {
       if (callerMatch) {
         const [, meldernaam, telefoonnummer] = callerMatch;
 
-        // Fill caller fields in state
-        setFormData(prev => ({
-          ...prev,
-          melderNaam: meldernaam.trim(),
-          telefoonnummer: telefoonnummer.trim()
-        }));
+        console.log(`👤 Caller shortcode detected: ${meldernaam} / ${telefoonnummer}`);
 
-        // Update selected incident only if one exists and is being edited
+        // ALWAYS update form data regardless of incident selection
+        setFormData(prev => {
+          const updated = {
+            ...prev,
+            melderNaam: meldernaam.trim(),
+            telefoonnummer: telefoonnummer.trim()
+          };
+          console.log(`👤 Form data updated:`, updated);
+          return updated;
+        });
+
+        // Only update selected incident if one exists (editing mode)
         if (selectedIncident) {
           const updatedIncident = {
             ...selectedIncident,
@@ -632,6 +679,9 @@ export default function GMS2() {
             telefoonnummer: telefoonnummer.trim()
           };
           setSelectedIncident(updatedIncident);
+          console.log(`👤 Existing incident updated: ${selectedIncident.nr}`);
+        } else {
+          console.log(`👤 New incident mode - only form data updated`);
         }
 
         addLoggingEntry(`👤 Meldergegevens automatisch ingevuld: ${meldernaam.trim()}, ${telefoonnummer.trim()}`);
