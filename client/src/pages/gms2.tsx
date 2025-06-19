@@ -650,6 +650,109 @@ export default function GMS2() {
     '-spookrijder': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' }
   };
 
+  // State for BAG API address search
+  const [bagSearchResults, setBagSearchResults] = useState<any[]>([]);
+  const [isSearchingBag, setIsSearchingBag] = useState(false);
+  const [showBagResults, setShowBagResults] = useState(false);
+
+  // BAG API functions
+  const searchBagAddress = async (query: string) => {
+    if (query.length < 3) {
+      setBagSearchResults([]);
+      setShowBagResults(false);
+      return;
+    }
+
+    setIsSearchingBag(true);
+    
+    try {
+      // Use BAG API for address search
+      const response = await fetch(
+        `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodeURIComponent(query)}&limit=10`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setBagSearchResults(data.features || []);
+        setShowBagResults(true);
+        
+        // Switch to locatietreffers tab automatically
+        setActiveLoggingTab("locatietreffers");
+      }
+    } catch (error) {
+      console.error('BAG API search error:', error);
+      setBagSearchResults([]);
+    } finally {
+      setIsSearchingBag(false);
+    }
+  };
+
+  const selectBagAddress = (address: any) => {
+    const properties = address.properties;
+    
+    const newFormData = {
+      straatnaam: properties.straatnaam || '',
+      huisnummer: properties.huisnummer?.toString() || '',
+      toevoeging: properties.huisletter || properties.huisnummertoevoeging || '',
+      postcode: properties.postcode || '',
+      plaatsnaam: properties.woonplaatsnaam || '',
+      gemeente: properties.gemeentenaam || ''
+    };
+
+    console.log('📍 BAG address selected:', newFormData);
+
+    setFormData(prev => ({
+      ...prev,
+      ...newFormData
+    }));
+
+    if (selectedIncident) {
+      setSelectedIncident(prev => ({
+        ...prev,
+        ...newFormData
+      }));
+    }
+
+    // Clear search results and hide
+    setBagSearchResults([]);
+    setShowBagResults(false);
+  };
+
+  const lookupPostcodeOnly = async (straatnaam: string, huisnummer: string, plaatsnaam: string) => {
+    try {
+      const query = `${straatnaam} ${huisnummer} ${plaatsnaam}`;
+      const response = await fetch(
+        `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodeURIComponent(query)}&limit=1`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.features && data.features.length > 0) {
+          const address = data.features[0].properties;
+          
+          // Only update postcode and gemeente if found
+          setFormData(prev => ({
+            ...prev,
+            postcode: address.postcode || prev.postcode,
+            gemeente: address.gemeentenaam || prev.gemeente
+          }));
+
+          if (selectedIncident) {
+            setSelectedIncident(prev => ({
+              ...prev,
+              postcode: address.postcode || prev.postcode,
+              gemeente: address.gemeentenaam || prev.gemeente
+            }));
+          }
+
+          console.log('📍 Postcode automatically filled:', address.postcode);
+        }
+      }
+    } catch (error) {
+      console.error('BAG API postcode lookup error:', error);
+    }
+  };
+
   // Enhanced function to detect and apply shortcodes for classification, address, and caller info
   const detectAndApplyShortcodes = (text: string) => {
     const lines = text.split('\n');
@@ -660,13 +763,20 @@ export default function GMS2() {
 
     // Address shortcode: =[stad]/[straatnaam] [huisnummer]
     if (lastLine.startsWith('=')) {
-      const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)\s+(\d+)$/i);
+      const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)\s+(\d+\w*)$/i);
       if (addressMatch) {
         const [, stad, straatnaam, huisnummer] = addressMatch;
 
         console.log(`📍 Address shortcode detected: ${stad} / ${straatnaam} ${huisnummer}`);
 
-        // ALWAYS update form data regardless of incident selection
+        // Switch to locatietreffers tab immediately
+        setActiveLoggingTab("locatietreffers");
+
+        // Search BAG API for this specific address
+        const searchQuery = `${straatnaam} ${huisnummer} ${stad}`;
+        searchBagAddress(searchQuery);
+
+        // Fill basic form data immediately
         const newFormData = {
           straatnaam: straatnaam.trim(),
           huisnummer: huisnummer.trim(),
@@ -681,6 +791,9 @@ export default function GMS2() {
           console.log(`📍 Form data updated for ${incidentContext}:`, updated);
           return updated;
         });
+
+        // Lookup postcode automatically
+        lookupPostcodeOnly(straatnaam.trim(), huisnummer.trim(), stad.trim());
 
         // Only update selected incident if one exists (editing mode)
         if (selectedIncident) {
@@ -1411,9 +1524,48 @@ export default function GMS2() {
                   )}
                   
                   {activeLoggingTab === 'locatietreffers' && (
-                    <div className="gms2-tab-content">
-                      <div className="gms2-content-placeholder">
-                        Locatietreffers - Inhoud volgt later
+                    <div className="gms2-locatietreffers-content">
+                      <div className="gms2-search-input-container">
+                        <input
+                          type="text"
+                          placeholder="Zoek adres (typ om te zoeken)..."
+                          className="gms2-search-input"
+                          onChange={(e) => searchBagAddress(e.target.value)}
+                        />
+                        {isSearchingBag && (
+                          <div className="gms2-search-loading">Zoeken...</div>
+                        )}
+                      </div>
+                      
+                      <div className="gms2-search-results">
+                        {bagSearchResults.length > 0 && (
+                          <div className="gms2-results-list">
+                            <div className="gms2-results-header">
+                              Gevonden adressen ({bagSearchResults.length}):
+                            </div>
+                            {bagSearchResults.map((result, index) => {
+                              const props = result.properties;
+                              const fullAddress = `${props.straatnaam} ${props.huisnummer}${props.huisletter || ''}${props.huisnummertoevoeging || ''}, ${props.postcode} ${props.woonplaatsnaam}`;
+                              
+                              return (
+                                <div 
+                                  key={index}
+                                  className="gms2-result-item"
+                                  onClick={() => selectBagAddress(result)}
+                                >
+                                  <div className="gms2-result-address">{fullAddress}</div>
+                                  <div className="gms2-result-gemeente">{props.gemeentenaam}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        
+                        {bagSearchResults.length === 0 && !isSearchingBag && showBagResults && (
+                          <div className="gms2-no-results">
+                            Geen adressen gevonden. Probeer een andere zoekopdracht.
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
