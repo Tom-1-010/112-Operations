@@ -905,33 +905,64 @@ export default function GMS2() {
       );
     }
 
-    // If still not found, try matching by name parts (more flexible)
+    // Smart matching: combine code and value for better context
     if (!matchingKarakteristiek) {
-      // Split the input code into words for better matching
-      const codeWords = code.toLowerCase().split(/\s+/);
-      matchingKarakteristiek = karakteristiekenDatabase.find(k => {
-        const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/);
-        return codeWords.some(codeWord => 
-          nameWords.some(nameWord => 
-            nameWord.includes(codeWord) || codeWord.includes(nameWord)
-          )
-        );
-      });
+      const fullInput = `${code} ${value}`.toLowerCase();
+      const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
+      
+      // Find best match by counting word overlaps
+      let bestMatch = null;
+      let bestScore = 0;
+      
+      for (const k of karakteristiekenDatabase) {
+        const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
+        const codeWords = (k.ktCode || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
+        const allKarakteristiekWords = [...nameWords, ...codeWords];
+        
+        let score = 0;
+        for (const inputWord of inputWords) {
+          for (const karWord of allKarakteristiekWords) {
+            if (inputWord === karWord) {
+              score += 3; // Exact match
+            } else if (inputWord.includes(karWord) || karWord.includes(inputWord)) {
+              score += 2; // Partial match
+            } else if (inputWord.substring(0, 3) === karWord.substring(0, 3)) {
+              score += 1; // Similar start
+            }
+          }
+        }
+        
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = k;
+        }
+      }
+      
+      // Only use best match if it has a reasonable score
+      if (bestScore >= 3) {
+        matchingKarakteristiek = bestMatch;
+      }
     }
 
-    // Try specific common patterns
+    // Fallback: try specific common patterns
     if (!matchingKarakteristiek) {
-      const codePatterns = {
-        'aantal': ['aantal'],
-        'aanhoudingen': ['aanhouding'],
-        'gewonden': ['gewond'],
+      const specificPatterns = {
+        'aantal doden': ['aantal doden'],
+        'aantal gewonden': ['aantal gewonden'], 
+        'aantal aanhoudingen': ['aantal aanhoudingen'],
+        'aantal daders': ['aantal daders'],
+        'aantal personen': ['aantal personen'],
         'doden': ['doden', 'dood'],
+        'gewonden': ['gewond'],
+        'aanhoudingen': ['aanhouding'],
         'daders': ['dader'],
         'personen': ['persoon', 'pers']
       };
       
-      for (const [pattern, variants] of Object.entries(codePatterns)) {
-        if (code.toLowerCase().includes(pattern)) {
+      const fullInput = `${code} ${value}`.toLowerCase();
+      
+      for (const [pattern, variants] of Object.entries(specificPatterns)) {
+        if (fullInput.includes(pattern)) {
           matchingKarakteristiek = karakteristiekenDatabase.find(k => 
             variants.some(variant => 
               (k.ktNaam || '').toLowerCase().includes(variant)
