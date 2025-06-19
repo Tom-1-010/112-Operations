@@ -656,17 +656,19 @@ export default function GMS2() {
   const searchBAGAddress = async (query: string) => {
     try {
       const encodedQuery = encodeURIComponent(query);
-      const response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=10`);
+      const response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=20`);
       const data = await response.json();
       
       if (data.features && data.features.length > 0) {
         return data.features.map((feature: any) => ({
-          straatnaam: feature.properties.straatnaam,
-          huisnummer: feature.properties.huisnummer,
-          postcode: feature.properties.postcode,
-          plaatsnaam: feature.properties.plaatsnaam,
-          gemeente: feature.properties.gemeentenaam,
-          volledigAdres: `${feature.properties.straatnaam} ${feature.properties.huisnummer}, ${feature.properties.postcode} ${feature.properties.plaatsnaam}`
+          straatnaam: feature.properties.straatnaam || '',
+          huisnummer: feature.properties.huisnummer || '',
+          huisletter: feature.properties.huisletter || '',
+          huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
+          postcode: feature.properties.postcode || '',
+          plaatsnaam: feature.properties.plaatsnaam || '',
+          gemeente: feature.properties.gemeentenaam || '',
+          volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
         }));
       }
       return [];
@@ -676,19 +678,76 @@ export default function GMS2() {
     }
   };
 
+  // Enhanced BAG search for specific address parts
+  const searchBAGSpecific = async (stad: string, straat: string, huisnummer: string) => {
+    try {
+      // Try exact match first
+      let query = `${straat} ${huisnummer} ${stad}`;
+      let encodedQuery = encodeURIComponent(query);
+      let response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=5`);
+      let data = await response.json();
+      
+      if (data.features && data.features.length > 0) {
+        return data.features.map((feature: any) => ({
+          straatnaam: feature.properties.straatnaam || '',
+          huisnummer: feature.properties.huisnummer || '',
+          huisletter: feature.properties.huisletter || '',
+          huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
+          postcode: feature.properties.postcode || '',
+          plaatsnaam: feature.properties.plaatsnaam || '',
+          gemeente: feature.properties.gemeentenaam || '',
+          volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
+        }));
+      }
+      
+      // If no exact match, try broader search
+      query = `${straat} ${stad}`;
+      encodedQuery = encodeURIComponent(query);
+      response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=10`);
+      data = await response.json();
+      
+      if (data.features && data.features.length > 0) {
+        return data.features
+          .filter((feature: any) => feature.properties.huisnummer == huisnummer || !huisnummer)
+          .map((feature: any) => ({
+            straatnaam: feature.properties.straatnaam || '',
+            huisnummer: feature.properties.huisnummer || '',
+            huisletter: feature.properties.huisletter || '',
+            huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
+            postcode: feature.properties.postcode || '',
+            plaatsnaam: feature.properties.plaatsnaam || '',
+            gemeente: feature.properties.gemeentenaam || '',
+            volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
+          }));
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('BAG API error:', error);
+      return [];
+    }
+  };
+
   const fillAddressFromBAG = async (stad: string, straatnaam: string, huisnummer: string) => {
-    const query = `${straatnaam} ${huisnummer} ${stad}`;
-    const results = await searchBAGAddress(query);
+    console.log(`🔍 Zoeken naar adres: ${straatnaam} ${huisnummer}, ${stad}`);
+    
+    const results = await searchBAGSpecific(stad, straatnaam, huisnummer);
     
     if (results.length > 0) {
       const bestMatch = results[0];
+      
+      // Combine number and additions properly
+      const fullHuisnummer = `${bestMatch.huisnummer}${bestMatch.huisletter || ''}${bestMatch.huisnummertoevoeging ? '-' + bestMatch.huisnummertoevoeging : ''}`;
+      
       const completeAddressData = {
         straatnaam: bestMatch.straatnaam,
-        huisnummer: bestMatch.huisnummer,
+        huisnummer: fullHuisnummer,
         postcode: bestMatch.postcode,
         plaatsnaam: bestMatch.plaatsnaam,
         gemeente: bestMatch.gemeente
       };
+
+      console.log(`✅ Adres gevonden via BAG API:`, completeAddressData);
 
       setFormData(prev => ({
         ...prev,
@@ -704,12 +763,17 @@ export default function GMS2() {
 
       addLoggingEntry(`📍 Adres automatisch aangevuld via BAG API: ${bestMatch.volledigAdres}`);
       
-      // Switch to Locatietreffers tab
+      // Switch to Locatietreffers tab and clear search
       setActiveLoggingTab('locatietreffers');
+      setBagSearchQuery("");
+      setBagSearchResults([]);
       
       return completeAddressData;
+    } else {
+      console.log(`❌ Geen adres gevonden voor: ${straatnaam} ${huisnummer}, ${stad}`);
+      addLoggingEntry(`❌ Geen adres gevonden in BAG API voor: ${straatnaam} ${huisnummer}, ${stad}`);
+      return null;
     }
-    return null;
   };
 
   // Enhanced function to detect and apply shortcodes for classification, address, and caller info
@@ -968,6 +1032,45 @@ export default function GMS2() {
         // Always add user input to log, regardless of shortcode detection
         addLoggingEntry(message);
         setKladblokText("");
+      }
+    }
+  };
+
+  // Handle kladblok text changes for real-time BAG API integration
+  const handleKladblokChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value;
+    setKladblokText(newText);
+
+    // Check if user is typing an address query (starts with =)
+    if (newText.startsWith('=')) {
+      // Switch to Locatietreffers tab immediately
+      setActiveLoggingTab('locatietreffers');
+      
+      // Extract the search query (remove the = prefix)
+      const searchQuery = newText.substring(1);
+      
+      if (searchQuery.length >= 2) {
+        console.log(`🔍 Real-time BAG search for: "${searchQuery}"`);
+        
+        // Update the search input and trigger search
+        setBagSearchQuery(searchQuery);
+        
+        try {
+          const results = await searchBAGAddress(searchQuery);
+          setBagSearchResults(results);
+          console.log(`📍 Found ${results.length} addresses for "${searchQuery}"`);
+        } catch (error) {
+          console.error('Error during real-time BAG search:', error);
+          setBagSearchResults([]);
+        }
+      } else {
+        // Clear results if query is too short
+        setBagSearchResults([]);
+      }
+    } else {
+      // If not an address query, clear BAG search results
+      if (bagSearchResults.length > 0) {
+        setBagSearchResults([]);
       }
     }
   };
@@ -1458,13 +1561,14 @@ export default function GMS2() {
                         <input
                           type="text"
                           className="gms2-search-input"
-                          placeholder="Zoek adres via BAG API..."
+                          placeholder="Zoek adres via BAG API... (bijv. Rotterdam Kleiweg 12)"
                           value={bagSearchQuery}
                           onChange={async (e) => {
                             const query = e.target.value;
                             setBagSearchQuery(query);
                             
-                            if (query.length > 3) {
+                            if (query.length >= 2) {
+                              console.log(`🔍 Manual search for: "${query}"`);
                               const results = await searchBAGAddress(query);
                               setBagSearchResults(results);
                             } else {
@@ -1476,9 +1580,11 @@ export default function GMS2() {
                               if (bagSearchResults.length === 1) {
                                 // Auto-select if only one result
                                 const result = bagSearchResults[0];
+                                const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
+                                
                                 const addressData = {
                                   straatnaam: result.straatnaam,
-                                  huisnummer: result.huisnummer,
+                                  huisnummer: fullHuisnummer,
                                   postcode: result.postcode,
                                   plaatsnaam: result.plaatsnaam,
                                   gemeente: result.gemeente
@@ -1493,12 +1599,14 @@ export default function GMS2() {
                                 setBagSearchQuery("");
                                 setBagSearchResults([]);
                               } else if (bagSearchResults.length === 0) {
-                                // Try to fetch postcode if no results
+                                // Try fallback search
                                 const fallbackResults = await searchBAGAddress(bagSearchQuery);
                                 if (fallbackResults.length > 0) {
                                   const result = fallbackResults[0];
                                   setFormData(prev => ({ ...prev, postcode: result.postcode }));
                                   addLoggingEntry(`📍 Postcode automatisch ingevuld: ${result.postcode}`);
+                                } else {
+                                  addLoggingEntry(`❌ Geen adres gevonden voor: "${bagSearchQuery}"`);
                                 }
                               }
                             }
@@ -1506,40 +1614,66 @@ export default function GMS2() {
                         />
                       </div>
                       
+                      <div className="gms2-search-help">
+                        💡 Tip: Begin te typen met = in het kladblok voor automatisch zoeken
+                      </div>
+                      
                       <div className="gms2-search-results">
-                        {bagSearchResults.map((result, index) => (
-                          <div
-                            key={index}
-                            className="gms2-address-result"
-                            onClick={() => {
-                              const addressData = {
-                                straatnaam: result.straatnaam,
-                                huisnummer: result.huisnummer,
-                                postcode: result.postcode,
-                                plaatsnaam: result.plaatsnaam,
-                                gemeente: result.gemeente
-                              };
-                              
-                              setFormData(prev => ({ ...prev, ...addressData }));
-                              if (selectedIncident) {
-                                setSelectedIncident({ ...selectedIncident, ...addressData });
-                              }
-                              
-                              addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
-                              setBagSearchQuery("");
-                              setBagSearchResults([]);
-                            }}
-                          >
-                            <div className="gms2-address-main">{result.volledigAdres}</div>
-                            <div className="gms2-address-details">
-                              {result.gemeente} | Postcode: {result.postcode}
+                        {bagSearchResults.map((result, index) => {
+                          const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
+                          return (
+                            <div
+                              key={index}
+                              className="gms2-address-result"
+                              onClick={() => {
+                                const addressData = {
+                                  straatnaam: result.straatnaam,
+                                  huisnummer: fullHuisnummer,
+                                  postcode: result.postcode,
+                                  plaatsnaam: result.plaatsnaam,
+                                  gemeente: result.gemeente
+                                };
+                                
+                                setFormData(prev => ({ ...prev, ...addressData }));
+                                if (selectedIncident) {
+                                  setSelectedIncident({ ...selectedIncident, ...addressData });
+                                }
+                                
+                                addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
+                                setBagSearchQuery("");
+                                setBagSearchResults([]);
+                                
+                                // Clear any =address query from kladblok
+                                if (kladblokText.startsWith('=')) {
+                                  setKladblokText('');
+                                }
+                              }}
+                            >
+                              <div className="gms2-address-main">{result.volledigAdres}</div>
+                              <div className="gms2-address-details">
+                                {result.gemeente} | {result.postcode}
+                              </div>
+                            </div>
+                          );
+                        })}
+                        
+                        {bagSearchQuery.length >= 2 && bagSearchResults.length === 0 && (
+                          <div className="gms2-no-results">
+                            <div>Geen adressen gevonden voor "{bagSearchQuery}"</div>
+                            <div style={{ fontSize: '10px', marginTop: '4px', color: '#999' }}>
+                              Probeer een andere zoekterm of gebruik de volledige syntax
                             </div>
                           </div>
-                        ))}
+                        )}
                         
-                        {bagSearchQuery.length > 3 && bagSearchResults.length === 0 && (
-                          <div className="gms2-no-results">
-                            Geen adressen gevonden voor "{bagSearchQuery}"
+                        {bagSearchQuery.length < 2 && bagSearchResults.length === 0 && (
+                          <div className="gms2-search-instructions">
+                            <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Hoe te gebruiken:</div>
+                            <div style={{ fontSize: '10px', lineHeight: '1.4' }}>
+                              • Type in het kladblok: <strong>=Rotterdam/Kleiweg 12</strong><br/>
+                              • Of zoek direct hier: <strong>Rotterdam Kleiweg</strong><br/>
+                              • Klik op een resultaat om automatisch in te vullen
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1690,10 +1824,10 @@ export default function GMS2() {
                   <div className="gms2-kladblok-modern">
                     <textarea 
                       value={kladblokText}
-                      onChange={(e) => setKladblokText(e.target.value)}
+                      onChange={handleKladblokChange}
                       onKeyPress={handleKladblokKeyPress}
                       className="gms2-kladblok-textarea"
-                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Adres: =Stad/Straat 123 | Melder: m/Naam;0612345678 (Enter om uit te voeren)"
+                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Adres: =Rotterdam/Kleiweg 12 | Melder: m/Naam;0612345678 (Enter om uit te voeren)"
                     />
                   </div>
                 </div>

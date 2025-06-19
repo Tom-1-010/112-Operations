@@ -3004,10 +3004,11 @@ body {
   display: flex;
   flex-direction: column;
   padding: 8px;
+  background: white;
 }
 
 .gms2-search-container {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .gms2-search-input {
@@ -3016,6 +3017,23 @@ body {
   border: 1px solid #999;
   font-size: 11px;
   font-family: inherit;
+  background: white;
+}
+
+.gms2-search-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 3px rgba(0, 102, 204, 0.3);
+}
+
+.gms2-search-help {
+  background: #f0f8ff;
+  border: 1px solid #cce7ff;
+  padding: 4px 6px;
+  font-size: 10px;
+  color: #0066cc;
+  margin-bottom: 6px;
+  border-radius: 2px;
 }
 
 .gms2-search-results {
@@ -3023,7 +3041,7 @@ body {
   overflow-y: auto;
   border: 1px solid #999;
   background: white;
-  max-height: 200px;
+  max-height: 180px;
 }
 
 .gms2-address-result {
@@ -3031,10 +3049,15 @@ body {
   border-bottom: 1px solid #eee;
   cursor: pointer;
   font-size: 11px;
+  transition: background-color 0.1s ease;
 }
 
 .gms2-address-result:hover {
   background: #e6f3ff;
+}
+
+.gms2-address-result:active {
+  background: #cce7ff;
 }
 
 .gms2-address-main {
@@ -3054,6 +3077,14 @@ body {
   color: #666;
   font-style: italic;
   font-size: 11px;
+}
+
+.gms2-search-instructions {
+  padding: 12px 8px;
+  color: #333;
+  font-size: 11px;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
 }
 
   flex: 1;
