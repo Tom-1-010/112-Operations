@@ -182,10 +182,16 @@ export default function GMS2() {
       console.log(`📋 Loading incident data into form:`, incidentFormData);
       setFormData(incidentFormData);
 
-      // Set MC classifications
-      if (incident.mc1) setSelectedMC1(incident.mc1);
-      if (incident.mc2) setSelectedMC2(incident.mc2);
-      if (incident.mc3) setSelectedMC3(incident.mc3);
+      // Set MC classifications immediately and ensure they persist
+      const mc1Value = incident.mc1 || "";
+      const mc2Value = incident.mc2 || "";
+      const mc3Value = incident.mc3 || "";
+      
+      console.log(`📋 Setting MC values: MC1="${mc1Value}", MC2="${mc2Value}", MC3="${mc3Value}"`);
+      
+      setSelectedMC1(mc1Value);
+      setSelectedMC2(mc2Value);
+      setSelectedMC3(mc3Value);
 
       // Set priority
       if (incident.prio) setPriorityValue(incident.prio);
@@ -226,12 +232,14 @@ export default function GMS2() {
               setTimeout(() => {
                 if (mc3Select && incident.mc3) {
                   mc3Select.value = incident.mc3;
+                  // Don't trigger change event for MC3 to avoid overwriting the state
+                  console.log(`📋 Restored MC3 dropdown to: "${incident.mc3}"`);
                 }
-              }, 100);
+              }, 150);
             }
-          }, 100);
+          }, 150);
         }
-      }, 200);
+      }, 250);
 
       // Add logging entry for opening incident (this will be added to existing entries)
       setTimeout(() => {
@@ -254,11 +262,29 @@ export default function GMS2() {
       const now = new Date();
       const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
+      // Get current values from the UI dropdowns to ensure we have the latest state
+      const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+      const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+      const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+
+      const currentMC1 = mc1Select?.value || selectedMC1 || selectedIncident.mc1 || "";
+      const currentMC2 = mc2Select?.value || selectedMC2 || selectedIncident.mc2 || "";
+      const currentMC3 = mc3Select?.value || selectedMC3 || selectedIncident.mc3 || "";
+
+      console.log(`📝 Update - MC values: MC1="${currentMC1}", MC2="${currentMC2}", MC3="${currentMC3}"`);
+
       // Determine MC code based on selected classification
       let mcCode = selectedIncident.mc;
-      if (selectedMC3 && selectedMC2 && selectedMC1) {
+      if (currentMC3 && currentMC2 && currentMC1) {
         const matchingClassification = lmcClassifications.find(c => 
-          c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
+          c.MC1 === currentMC1 && c.MC2 === currentMC2 && c.MC3 === currentMC3
+        );
+        if (matchingClassification) {
+          mcCode = matchingClassification.Code.toUpperCase();
+        }
+      } else if (currentMC2 && currentMC1) {
+        const matchingClassification = lmcClassifications.find(c => 
+          c.MC1 === currentMC1 && c.MC2 === currentMC2
         );
         if (matchingClassification) {
           mcCode = matchingClassification.Code.toUpperCase();
@@ -286,13 +312,18 @@ export default function GMS2() {
         plaatsnaam: formData.plaatsnaam,
         gemeente: formData.gemeente,
         functie: formData.functie,
-        mc1: selectedMC1,
-        mc2: selectedMC2,
-        mc3: selectedMC3,
+        mc1: currentMC1,
+        mc2: currentMC2,
+        mc3: currentMC3,
         notities: notitiesText,
         meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
         prioriteit: priorityValue
       };
+
+      // Update state variables to match what we just saved
+      setSelectedMC1(currentMC1);
+      setSelectedMC2(currentMC2);
+      setSelectedMC3(currentMC3);
 
       // Update incident in list
       setIncidents(prev => prev.map(inc => 
@@ -302,7 +333,11 @@ export default function GMS2() {
       // Update selected incident
       setSelectedIncident(updatedIncident);
 
-      addLoggingEntry(`📝 Melding ${selectedIncident.nr} bijgewerkt`);
+      const classificationText = currentMC3 ? `${currentMC1} > ${currentMC2} > ${currentMC3}` : 
+                                currentMC2 ? `${currentMC1} > ${currentMC2}` : 
+                                currentMC1 || "Geen classificatie";
+      
+      addLoggingEntry(`📝 Melding ${selectedIncident.nr} bijgewerkt - ${classificationText}`);
     }
   };
 
