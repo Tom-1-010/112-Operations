@@ -324,17 +324,17 @@ export default function GMS2() {
                     </select>
                   </div>
                   <div className="gms2-tab-group">
-                    <select className="gms2-dropdown" style={{ backgroundColor: '#90EE90' }}>
+                    <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
                       <option>Dienstverlening</option>
                     </select>
                   </div>
                   <div className="gms2-tab-group">
-                    <select className="gms2-dropdown" style={{ backgroundColor: '#90EE90' }}>
+                    <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
                       <option>Scenario</option>
                     </select>
                   </div>
                   <div className="gms2-tab-group">
-                    <select className="gms2-dropdown" style={{ backgroundColor: '#90EE90' }}>
+                    <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
                       <option>Testmelding</option>
                     </select>
                   </div>
