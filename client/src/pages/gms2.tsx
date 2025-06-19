@@ -330,7 +330,7 @@ export default function GMS2() {
                 {/* Tab Row */}
                 <div className="gms2-button-row">
                   <button className="gms2-btn tab-btn">Hist. Meldblok</button>
-                  <button className="gms2-btn tab-btn">Locatietreffpte</button>
+                  <button className="gms2-btn tab-btn">Locatietreffers</button>
                   <button className="gms2-btn tab-btn">Statusoverzicht</button>
                   <button className="gms2-btn tab-btn">Overige inzet</button>
                 </div>
