@@ -345,41 +345,17 @@ export default function GMS2() {
     // Add to incidents list (at the beginning for newest first)
     setIncidents(prev => [newIncident, ...prev]);
     
-    // Select the new incident
-    setSelectedIncident(newIncident);
+    // Don't select the new incident - keep it as null so "Uitgifte" button stays for next incident
+    // setSelectedIncident(newIncident); // Removed this line
 
     // Add logging entry
     addLoggingEntry(`📋 Melding ${newIncidentNumber} uitgegeven - ${mcCode} ${location}`);
 
-    // Clear form for next incident
-    setFormData({
-      melderNaam: "",
-      telefoonnummer: "",
-      melderAdres: "",
-      huisnummer: "",
-      toevoeging: "",
-      gemeente: "",
-      straatnaam: "",
-      postcode: "",
-      plaatsnaam: "",
-      functie: "",
-      roepnummer: ""
-    });
-    
-    // Reset classifications
-    setSelectedMC1("");
-    setSelectedMC2("");
-    setSelectedMC3("");
-    setPriorityValue(2);
-
-    // Clear dropdowns
-    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
-    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
-    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
-    
-    if (mc1Select) mc1Select.value = "";
-    if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
-    if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+    // Clear form for next incident - call handleNieuw to ensure complete reset
+    setTimeout(() => {
+      handleNieuw();
+      addLoggingEntry(`📋 Formulier gereset voor nieuwe melding`);
+    }, 100);
   };
 
   // Handle "Archiveer" button click
