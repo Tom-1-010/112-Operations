@@ -900,40 +900,77 @@ export default function GMS2() {
       index === self.findIndex(t => t.ktCode === k.ktCode)
     );
     
-    // Step 1: Try exact specific patterns first (highest priority)
-    const specificPatterns = {
-      'aantal doden': 'dd',
-      'aantal gewonden': 'gew', 
-      'aantal aanhoudingen': 'aanh',
-      'aantal daders': 'ddrs',
-      'aantal personen': 'pers',
-      'aantal vermisten': 'verm',
-      'aantal te water': 'tewt',
-      'aantal niet zelfredz': 'nzrz',
-      'aantal in object': 'iobj',
-      'aantal dieren': 'dier',
-      'overval diefstal': 'ovdp',
-      'ovdp': 'ovdp',
-      'afkruisen': 'afkr',
-      'afkr': 'afkr'
-    };
-    
     let matchingKarakteristiek = null;
+    let finalValue = value;
     
-    // Check for specific exact matches first
-    for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
-      if (fullInput.includes(pattern)) {
-        matchingKarakteristiek = uniqueKarakteristieken.find(k => 
-          k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
-        );
-        if (matchingKarakteristiek) {
-          console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
-          break;
+    // Step 1: Handle "aantal [type] [getal]" patterns specifically
+    if (code === 'aantal') {
+      const aantalMatch = fullInput.match(/aantal\s+(\w+)\s+(\d+)/);
+      if (aantalMatch) {
+        const [, type, number] = aantalMatch;
+        finalValue = number; // Extract the number
+        
+        const typeToCodeMap = {
+          'doden': 'dd',
+          'dood': 'dd',
+          'gewonden': 'gew',
+          'gewond': 'gew',
+          'aanhoudingen': 'aanh',
+          'aanhouding': 'aanh',
+          'daders': 'ddrs',
+          'dader': 'ddrs',
+          'personen': 'pers',
+          'persoon': 'pers',
+          'vermisten': 'verm',
+          'vermist': 'verm'
+        };
+        
+        const targetCode = typeToCodeMap[type];
+        if (targetCode) {
+          matchingKarakteristiek = uniqueKarakteristieken.find(k => 
+            k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
+          );
+          if (matchingKarakteristiek) {
+            console.log(`✅ Found "aantal [type] [number]" match: "${type}" -> "${targetCode}" with value "${finalValue}"`);
+          }
         }
       }
     }
     
-    // Step 2: Try exact code match (most reliable)
+    // Step 2: Try exact specific patterns (if not already matched)
+    if (!matchingKarakteristiek) {
+      const specificPatterns = {
+        'aantal doden': 'dd',
+        'aantal gewonden': 'gew', 
+        'aantal aanhoudingen': 'aanh',
+        'aantal daders': 'ddrs',
+        'aantal personen': 'pers',
+        'aantal vermisten': 'verm',
+        'aantal te water': 'tewt',
+        'aantal niet zelfredz': 'nzrz',
+        'aantal in object': 'iobj',
+        'aantal dieren': 'dier',
+        'overval diefstal': 'ovdp',
+        'ovdp': 'ovdp',
+        'afkruisen': 'afkr',
+        'afkr': 'afkr'
+      };
+      
+      // Check for specific exact matches
+      for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
+        if (fullInput.includes(pattern)) {
+          matchingKarakteristiek = uniqueKarakteristieken.find(k => 
+            k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
+          );
+          if (matchingKarakteristiek) {
+            console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
+            break;
+          }
+        }
+      }
+    }
+    
+    // Step 3: Try exact code match (most reliable)
     if (!matchingKarakteristiek) {
       matchingKarakteristiek = uniqueKarakteristieken.find(k => 
         k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
@@ -943,7 +980,7 @@ export default function GMS2() {
       }
     }
 
-    // Step 3: Try value-based matching for "aantal" + specific word
+    // Step 4: Try value-based matching for "aantal" + specific word (fallback)
     if (!matchingKarakteristiek && code === 'aantal' && value) {
       const valueWords = value.toLowerCase().split(/\s+/);
       const firstValueWord = valueWords[0];
@@ -971,11 +1008,16 @@ export default function GMS2() {
         );
         if (matchingKarakteristiek) {
           console.log(`✅ Found value-based match: "aantal ${firstValueWord}" -> "${expectedCode}"`);
+          // Extract number from remaining words for value
+          const numberMatch = value.match(/\d+/);
+          if (numberMatch) {
+            finalValue = numberMatch[0];
+          }
         }
       }
     }
 
-    // Step 4: Enhanced fuzzy matching by name content (improved scoring)
+    // Step 5: Enhanced fuzzy matching by name content (improved scoring)
     if (!matchingKarakteristiek) {
       const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
       
@@ -1045,25 +1087,25 @@ export default function GMS2() {
 
     console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
     
-    // Determine the final value based on type
-    let finalValue = '';
-    
+    // Final value is already determined above, but refine based on type if needed
     if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
-      // For "Vrije tekst" and "Getal" types, use the user-provided value
-      finalValue = value || '';
-      console.log(`📝 Using user input for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
+      // For "Vrije tekst" and "Getal" types, use the determined final value
+      if (!finalValue) {
+        finalValue = value || '';
+      }
+      console.log(`📝 Using determined value for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
     } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
       // For Ja/Nee types, use the provided value or default from database
-      finalValue = value || matchingKarakteristiek.ktWaarde || 'Ja';
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || 'Ja';
     } else if (matchingKarakteristiek.ktType === 'Enkelvoudige opsom') {
       // For single choice, use provided value or database default
-      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
     } else if (matchingKarakteristiek.ktType === 'Meervoudige opsom') {
       // For multiple choice, use provided value or database default
-      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
     } else {
       // Fallback
-      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
     }
     
     // Check if this karakteristiek already exists in selected list
