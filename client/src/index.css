@@ -2653,33 +2653,43 @@ body {
   flex-direction: column;
 }
 
-.gms2-char-row-1,
-.gms2-char-row-2 {
-  display: flex;
+.gms2-char-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #c0c0c0;
   border-bottom: 1px solid #808080;
   font-size: 10px;
-}
-
-.gms2-char-row-1 {
-  background: #c0c0c0;
   font-weight: bold;
 }
 
-.gms2-char-row-2 {
+.gms2-char-header span {
+  padding: 3px 6px;
+  border-right: 1px solid #808080;
+}
+
+.gms2-char-header span:last-child {
+  border-right: none;
+}
+
+.gms2-char-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #d0d0d0;
+  font-size: 10px;
   background: white;
 }
 
-.gms2-char-row-1 span,
-.gms2-char-row-2 span {
-  padding: 2px 4px;
-  border-right: 1px solid #808080;
-  flex: 1;
+.gms2-char-row:nth-child(even) {
+  background: #f8f8f8;
 }
 
-.gms2-char-row-1 span:first-child,
-.gms2-char-row-2 span:first-child {
-  flex: 0 0 100px;
-  font-weight: bold;
+.gms2-char-row span {
+  padding: 3px 6px;
+  border-right: 1px solid #d0d0d0;
+}
+
+.gms2-char-row span:last-child {
+  border-right: none;
 }
 
 .gms2-table-header {

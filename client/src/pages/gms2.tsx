@@ -374,21 +374,29 @@ export default function GMS2() {
                 {/* Main characteristics layout */}
                 <div className="gms2-characteristics-layout">
                   <div className="gms2-characteristics-table">
-                    <div className="gms2-char-row-1">
-                      <span>Karakteristieken:</span>
-                      <span>RTIC</span>
-                      <span>Meldercontact</span>
-                      <span>Delaycode pol</span>
-                      <span>Instantie</span>
-                      <span>Soort voertuig</span>
+                    <div className="gms2-char-header">
+                      <span>Karakteristieken</span>
+                      <span>Waarde</span>
                     </div>
-                    <div className="gms2-char-row-2">
-                      <span>Waarde:</span>
-                      <span>nee</span>
-                      <span>teruggebeld</span>
-                      <span>geen eenheid</span>
-                      <span>cent meldg bp</span>
+                    <div className="gms2-char-row">
+                      <span>Soort voertuig</span>
                       <span>Personenauto</span>
+                    </div>
+                    <div className="gms2-char-row">
+                      <span>RTIC</span>
+                      <span>nee</span>
+                    </div>
+                    <div className="gms2-char-row">
+                      <span>Meldercontact</span>
+                      <span>teruggebeld</span>
+                    </div>
+                    <div className="gms2-char-row">
+                      <span>Delaycode pol</span>
+                      <span>geen eenheid</span>
+                    </div>
+                    <div className="gms2-char-row">
+                      <span>Instantie</span>
+                      <span>cent meldg bp</span>
                     </div>
                   </div>
 
