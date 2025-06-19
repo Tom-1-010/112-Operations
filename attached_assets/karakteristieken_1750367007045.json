@@ -6982,7 +6982,7 @@
     "kt_naam": "Optisch & geluidsign",
     "kt_type": "Meervoudige opsom",
     "kt_waarde": "Politie",
-    "kt_code": "ogs",
+    "kt_code": "-opgelp",
     "kt_parser": "-optisch-geluidsign politie"
   },
   {
