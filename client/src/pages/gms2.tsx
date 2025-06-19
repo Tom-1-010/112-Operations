@@ -342,17 +342,30 @@ export default function GMS2() {
     // Add to incidents list (at the beginning for newest first)
     setIncidents(prev => [newIncident, ...prev]);
 
-    // Don't select the new incident - keep it as null so "Uitgifte" button stays for next incident
-    // setSelectedIncident(newIncident); // Removed this line
+    // Clear selected incident so "Uitgifte" button stays for next incident
+    setSelectedIncident(null);
 
-    // Add logging entry
+    // Add logging entry for successful dispatch
     addLoggingEntry(`📋 Melding ${newIncidentNumber} uitgegeven - ${mcCode} ${location}`);
 
-    // Clear form for next incident - call handleNieuw to ensure complete reset
-    setTimeout(() => {
-      handleNieuw();
-      addLoggingEntry(`📋 Formulier gereset voor nieuwe melding`);
-    }, 100);
+    // Only clear classifications and notes, keep address data intact
+    setSelectedMC1("");
+    setSelectedMC2("");
+    setSelectedMC3("");
+    setPriorityValue(2);
+    setNotitiesText("");
+
+    // Clear classification dropdowns only
+    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+
+    if (mc1Select) mc1Select.value = "";
+    if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+    if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+
+    // DO NOT clear address data - keep formData intact for next similar incident
+    addLoggingEntry(`✅ Melding uitgegeven - klaar voor volgende melding op zelfde locatie`);
   };
 
   // Handle "Archiveer" button click
@@ -415,24 +428,26 @@ export default function GMS2() {
     if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
     if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
 
-    // Completely clear logging entries and start fresh
+    // COMPLETELY clear ALL logging entries for fresh start
     setLoggingEntries([]);
 
-    // Add fresh logging entry for new incident
-    const now = new Date();
-    const dateStr = String(now.getDate()).padStart(2, '0');
-    const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-    const yearStr = now.getFullYear();
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
+    // Add single fresh logging entry for new incident after a brief delay
+    setTimeout(() => {
+      const now = new Date();
+      const dateStr = String(now.getDate()).padStart(2, '0');
+      const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+      const yearStr = now.getFullYear();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
 
-    const newEntry = {
-      id: Date.now(),
-      timestamp,
-      message: "📋 Nieuwe melding voorbereid"
-    };
+      const newEntry = {
+        id: Date.now(),
+        timestamp,
+        message: "📋 Nieuwe melding gestart"
+      };
 
-    setLoggingEntries([newEntry]);
+      setLoggingEntries([newEntry]);
+    }, 50);
   };
 
   const addLoggingEntry = (message: string) => {
