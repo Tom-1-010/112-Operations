@@ -421,23 +421,7 @@ export default function GMS2() {
 
                 {/* Bottom action section */}
                 <div className="gms2-bottom-actions">
-                  <div className="gms2-service-options">
-                    <div className="gms2-service-col">
-                      <input type="checkbox" />
-                      <span>P</span>
-                      <input type="checkbox" />
-                    </div>
-                    <div className="gms2-service-col">
-                      <input type="checkbox" />
-                      <span>B</span>
-                      <input type="checkbox" />
-                    </div>
-                    <div className="gms2-service-col">
-                      <input type="checkbox" />
-                      <span>A</span>
-                      <input type="checkbox" />
-                    </div>
-                  </div>
+                  
 
                   <div className="gms2-action-buttons">
                     <select className="gms2-dropdown">
