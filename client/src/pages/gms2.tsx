@@ -749,7 +749,7 @@ export default function GMS2() {
                   <button className="gms2-btn small">Anoniem</button>
                 </div>
 
-                {/* Adres Row */}
+                {/* Melder Adres Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Adres:</span>
                   <input 
@@ -757,6 +757,36 @@ export default function GMS2() {
                     className="gms2-input wide" 
                     value={formData.melderAdres}
                     onChange={(e) => handleFormChange('melderAdres', e.target.value)}
+                  />
+                  <span className="gms2-field-label">Gem:</span>
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.gemeente}
+                    onChange={(e) => handleFormChange('gemeente', e.target.value)}
+                  />
+                </div>
+
+                {/* Visual separator between melder and location sections */}
+                <div className="gms2-section-separator"></div>
+
+                {/* Location Details Row 1 - Postcode en Straatnaam */}
+                <div className="gms2-form-row">
+                  <span className="gms2-field-label">PC:</span>
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.postcode}
+                    onChange={(e) => handleFormChange('postcode', e.target.value)}
+                    placeholder="1234AB"
+                  />
+                  <span className="gms2-field-label">Straat:</span>
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.straatnaam}
+                    onChange={(e) => handleFormChange('straatnaam', e.target.value)}
+                    placeholder="Straatnaam"
                   />
                   <span className="gms2-field-label">Nr:</span>
                   <input 
@@ -771,41 +801,6 @@ export default function GMS2() {
                     className="gms2-input small" 
                     value={formData.toevoeging}
                     onChange={(e) => handleFormChange('toevoeging', e.target.value)}
-                  />
-                  <span className="gms2-field-label">Gem:</span>
-                  <input 
-                    type="text" 
-                    className="gms2-input small" 
-                    value={formData.gemeente}
-                    onChange={(e) => handleFormChange('gemeente', e.target.value)}
-                  />
-                </div>
-
-                {/* Visual separator between melder and location sections */}
-                <div className="gms2-section-separator"></div>
-
-                {/* Location Details Row 1 */}
-                <div className="gms2-form-row">
-                  <input 
-                    type="text" 
-                    className="gms2-input small" 
-                    value={formData.postcode}
-                    onChange={(e) => handleFormChange('postcode', e.target.value)}
-                    placeholder="Postcode"
-                  />
-                  <input 
-                    type="text" 
-                    className="gms2-input wide" 
-                    value={formData.straatnaam}
-                    onChange={(e) => handleFormChange('straatnaam', e.target.value)}
-                    placeholder="Straatnaam"
-                  />
-                  <span className="gms2-field-label">Nr:</span>
-                  <input 
-                    type="text" 
-                    className="gms2-input small" 
-                    value={formData.huisnummer}
-                    onChange={(e) => handleFormChange('huisnummer', e.target.value)}
                   />
                 </div>
 
