@@ -28,10 +28,10 @@ interface GmsIncident {
 export default function GMS2() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedIncident, setSelectedIncident] = useState<GmsIncident | null>(null);
-  const [kladblokText, setKladblokText] = useState("Inbrekers zijn nog binnen");
+  const [kladblokText, setKladblokText] = useState("");
   const [mc1Value, setMc1Value] = useState("Bezitsaantasting");
   const [mc2Value, setMc2Value] = useState("Inbraak");
-  const [notitiesText, setNotitiesText] = useState("Zitten vast in schoorstee");
+  const [notitiesText, setNotitiesText] = useState("");
   
   // Sample incidents data matching the interface
   const [incidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
@@ -53,7 +53,7 @@ export default function GMS2() {
       plaatsnaam: "EINDHOVEN",
       mc1: "Bezitsaantasting",
       mc2: "Inbraak",
-      notities: "Zitten vast in schoorstee",
+      notities: "",
       karakteristieken: [],
       status: "Openstaand"
     }
