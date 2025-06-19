@@ -100,12 +100,8 @@ export default function GMS2() {
     return () => clearInterval(timer);
   }, []);
 
-  // Set initial selected incident
-  useEffect(() => {
-    if (incidents.length > 0 && !selectedIncident) {
-      setSelectedIncident(incidents[0]);
-    }
-  }, [incidents, selectedIncident]);
+  // Auto-selection disabled to ensure "Nieuw" workflow works correctly
+  // No automatic incident selection - user must manually select incidents
 
   // Load LMC classifications
   useEffect(() => {
@@ -148,7 +144,7 @@ export default function GMS2() {
 
   const handleIncidentSelect = (incident: GmsIncident) => {
     setSelectedIncident(incident);
-    
+
     // Load all incident data into form fields
     if (incident) {
       setFormData({
@@ -169,13 +165,13 @@ export default function GMS2() {
       if (incident.mc1) setSelectedMC1(incident.mc1);
       if (incident.mc2) setSelectedMC2(incident.mc2);
       if (incident.mc3) setSelectedMC3(incident.mc3);
-      
+
       // Set priority
       if (incident.prio) setPriorityValue(incident.prio);
-      
+
       // Set notes if available
       if (incident.notities) setNotitiesText(incident.notities);
-      
+
       // Load logging history if available
       if (incident.meldingslogging) {
         const loggingLines = incident.meldingslogging.split('\n').filter(line => line.trim());
@@ -196,12 +192,12 @@ export default function GMS2() {
         if (mc1Select && incident.mc1) {
           mc1Select.value = incident.mc1;
           mc1Select.dispatchEvent(new Event('change'));
-          
+
           setTimeout(() => {
             if (mc2Select && incident.mc2) {
               mc2Select.value = incident.mc2;
               mc2Select.dispatchEvent(new Event('change'));
-              
+
               setTimeout(() => {
                 if (mc3Select && incident.mc3) {
                   mc3Select.value = incident.mc3;
@@ -274,7 +270,7 @@ export default function GMS2() {
       setIncidents(prev => prev.map(inc => 
         inc.id === selectedIncident.id ? updatedIncident : inc
       ));
-      
+
       // Update selected incident
       setSelectedIncident(updatedIncident);
 
@@ -344,7 +340,7 @@ export default function GMS2() {
 
     // Add to incidents list (at the beginning for newest first)
     setIncidents(prev => [newIncident, ...prev]);
-    
+
     // Don't select the new incident - keep it as null so "Uitgifte" button stays for next incident
     // setSelectedIncident(newIncident); // Removed this line
 
@@ -365,17 +361,17 @@ export default function GMS2() {
         ...selectedIncident,
         status: "Gearchiveerd"
       };
-      
+
       // Update incident in list
       setIncidents(prev => prev.map(inc => 
         inc.id === selectedIncident.id ? updatedIncident : inc
       ));
-      
+
       // Remove from openstaande incidenten by filtering out archived ones
       setIncidents(prev => prev.filter(inc => inc.id !== selectedIncident.id));
-      
+
       addLoggingEntry(`📁 Melding ${selectedIncident.nr} gearchiveerd`);
-      
+
       // Select first remaining incident or clear selection
       const remainingIncidents = incidents.filter(inc => inc.id !== selectedIncident.id);
       setSelectedIncident(remainingIncidents.length > 0 ? remainingIncidents[0] : null);
@@ -386,7 +382,7 @@ export default function GMS2() {
   const handleNieuw = () => {
     // Clear selected incident FIRST
     setSelectedIncident(null);
-    
+
     // Clear all form fields for new incident
     setFormData({
       melderNaam: "",
@@ -401,26 +397,26 @@ export default function GMS2() {
       functie: "",
       roepnummer: ""
     });
-    
+
     // Reset classifications
     setSelectedMC1("");
     setSelectedMC2("");
     setSelectedMC3("");
     setPriorityValue(2);
     setNotitiesText("");
-    
+
     // Clear dropdowns
     const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
     const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
     const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
-    
+
     if (mc1Select) mc1Select.value = "";
     if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
     if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-    
+
     // Completely clear logging entries and start fresh
     setLoggingEntries([]);
-    
+
     // Add fresh logging entry for new incident
     const now = new Date();
     const dateStr = String(now.getDate()).padStart(2, '0');
@@ -428,13 +424,13 @@ export default function GMS2() {
     const yearStr = now.getFullYear();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
-    
+
     const newEntry = {
       id: Date.now(),
       timestamp,
       message: "📋 Nieuwe melding voorbereid"
     };
-    
+
     setLoggingEntries([newEntry]);
   };
 
@@ -496,7 +492,7 @@ export default function GMS2() {
       const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)(\d+)$/i);
       if (addressMatch) {
         const [, stad, straatnaam, huisnummer] = addressMatch;
-        
+
         // Fill address fields
         setFormData(prev => ({
           ...prev,
@@ -515,7 +511,7 @@ export default function GMS2() {
       const callerMatch = lastLine.match(/^m\/([^;]+);(.+)$/i);
       if (callerMatch) {
         const [, meldernaam, telefoonnummer] = callerMatch;
-        
+
         // Fill caller fields
         setFormData(prev => ({
           ...prev,
@@ -1005,7 +1001,7 @@ export default function GMS2() {
                   />
                 </div>
 
-                
+
 
                 {/* Action Buttons Row */}
                 <div className="gms2-button-row">
