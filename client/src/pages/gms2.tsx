@@ -2000,7 +2000,7 @@ export default function GMS2() {
                     {selectedKarakteristieken.map((kar, index) => (
                       <div key={kar.id || index} className="gms2-char-row">
                         <span title={kar.ktCode ? `Code: ${kar.ktCode}` : ''}>{kar.ktNaam}</span>
-                        <span>{kar.waarde}</span>
+                        <span>{kar.waarde || ''}</span>
                       </div>
                     ))}
                     {/* Fill remaining rows */}
