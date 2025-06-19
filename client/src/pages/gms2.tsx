@@ -878,55 +878,55 @@ export default function GMS2() {
   const processKarakteristiekCode = (code: string, value: string) => {
     // Find matching karakteristiek in database - try multiple matching strategies
     let matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-      k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
+      k.kt_code && k.kt_code.toLowerCase() === code.toLowerCase()
     );
 
     // If not found by exact code match, try partial matching
     if (!matchingKarakteristiek) {
       matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-        k.ktCode && k.ktCode.toLowerCase().includes(code.toLowerCase())
+        k.kt_code && k.kt_code.toLowerCase().includes(code.toLowerCase())
       );
     }
 
     // If still not found, try matching by name parts
     if (!matchingKarakteristiek) {
       matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-        k.ktNaam && k.ktNaam.toLowerCase().includes(code.toLowerCase())
+        k.kt_naam && k.kt_naam.toLowerCase().includes(code.toLowerCase())
       );
     }
 
     if (!matchingKarakteristiek) {
       console.log(`❌ No karakteristiek found for code: ${code}`);
-      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 5).map(k => ({ code: k.ktCode, naam: k.ktNaam })));
+      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 5).map(k => ({ code: k.kt_code, naam: k.kt_naam })));
       return false;
     }
 
-    console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
+    console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.kt_naam} for code: ${code} (type: ${matchingKarakteristiek.kt_type})`);
     
     // Determine the final value based on type
     let finalValue = '';
     
-    if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
+    if (matchingKarakteristiek.kt_type === 'Vrije tekst' || matchingKarakteristiek.kt_type === 'Getal') {
       // For "Vrije tekst" and "Getal" types, use the user-provided value
       finalValue = value || '';
-      console.log(`📝 Using user input for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
-    } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
+      console.log(`📝 Using user input for ${matchingKarakteristiek.kt_type}: "${finalValue}"`);
+    } else if (matchingKarakteristiek.kt_type === 'Ja/Nee') {
       // For Ja/Nee types, use the provided value or default from database
-      finalValue = value || matchingKarakteristiek.ktWaarde || 'Ja';
-    } else if (matchingKarakteristiek.ktType === 'Enkelvoudige opsom') {
+      finalValue = value || matchingKarakteristiek.kt_waarde || 'Ja';
+    } else if (matchingKarakteristiek.kt_type === 'Enkelvoudige opsom') {
       // For single choice, use provided value or database default
-      finalValue = value || matchingKarakteristiek.ktWaarde || '';
-    } else if (matchingKarakteristiek.ktType === 'Meervoudige opsom') {
+      finalValue = value || matchingKarakteristiek.kt_waarde || '';
+    } else if (matchingKarakteristiek.kt_type === 'Meervoudige opsom') {
       // For multiple choice, use provided value or database default
-      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+      finalValue = value || matchingKarakteristiek.kt_waarde || '';
     } else {
       // Fallback
-      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+      finalValue = value || matchingKarakteristiek.kt_waarde || '';
     }
     
     // Check if this karakteristiek already exists in selected list
     const existingIndex = selectedKarakteristieken.findIndex(k => 
-      k.ktNaam === matchingKarakteristiek.ktNaam
+      k.ktNaam === matchingKarakteristiek.kt_naam
     );
 
     if (existingIndex !== -1) {
@@ -936,7 +936,7 @@ export default function GMS2() {
         const existing = updated[existingIndex];
         
         // For meervoudige types, append values; for others, replace
-        if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
+        if (matchingKarakteristiek.kt_type === 'Meervoudige opsom' && 
             finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
           updated[existingIndex] = {
             ...existing,
@@ -957,10 +957,10 @@ export default function GMS2() {
       // Add new karakteristiek
       const newKarakteristiek = {
         id: Date.now() + Math.random(),
-        ktNaam: matchingKarakteristiek.ktNaam,
-        ktType: matchingKarakteristiek.ktType,
+        ktNaam: matchingKarakteristiek.kt_naam,
+        ktType: matchingKarakteristiek.kt_type,
         waarde: finalValue,
-        ktCode: matchingKarakteristiek.ktCode
+        ktCode: matchingKarakteristiek.kt_code
       };
 
       console.log(`📝 Added new karakteristiek:`, newKarakteristiek);
