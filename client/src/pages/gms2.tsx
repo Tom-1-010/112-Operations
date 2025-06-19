@@ -304,8 +304,7 @@ export default function GMS2() {
         }
       }
       
-      // Log the automatic classification
-      addLoggingEntry(`Automatische classificatie toegepast via "${detectedCode}": ${mc1}${mc2 ? ' > ' + mc2 : ''}${mc3 ? ' > ' + mc3 : ''}`);
+      // Classification applied silently
     }
   };
 
@@ -319,13 +318,6 @@ export default function GMS2() {
         
         addLoggingEntry(message);
         setKladblokText("");
-        
-        if (classificationDetected) {
-          // Add a small delay to show the classification was applied
-          setTimeout(() => {
-            addLoggingEntry("💡 Classificatie automatisch toegepast");
-          }, 500);
-        }
       }
     }
   };
@@ -422,8 +414,7 @@ export default function GMS2() {
             };
             setSelectedIncident(updatedIncident);
             
-            // Log the classification
-            addLoggingEntry(`Classificatie toegepast: ${matchingClassification.Code.toUpperCase()} - ${selectedMC1}/${selectedMC2}/${selectedMC3} (Prio: ${matchingClassification.PRIO})`);
+            // Classification applied silently
           }
         }
       });
