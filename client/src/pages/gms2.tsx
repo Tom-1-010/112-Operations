@@ -780,16 +780,8 @@ export default function GMS2() {
                   <span className="gms2-section-title">Incidentlocatie</span>
                 </div>
 
-                {/* Location Details Row 1 - Postcode en Straatnaam */}
+                {/* Adres Row - Straat, Nr, PC, Pts, Gem */}
                 <div className="gms2-form-row">
-                  <span className="gms2-field-label">PC:</span>
-                  <input 
-                    type="text" 
-                    className="gms2-input small" 
-                    value={formData.postcode}
-                    onChange={(e) => handleFormChange('postcode', e.target.value)}
-                    placeholder="1234AB"
-                  />
                   <span className="gms2-field-label">Straat:</span>
                   <input 
                     type="text" 
@@ -805,17 +797,15 @@ export default function GMS2() {
                     value={formData.huisnummer}
                     onChange={(e) => handleFormChange('huisnummer', e.target.value)}
                   />
-                  <span className="gms2-field-label">L/C:</span>
+                  <span className="gms2-field-label">PC:</span>
                   <input 
                     type="text" 
                     className="gms2-input small" 
-                    value={formData.toevoeging}
-                    onChange={(e) => handleFormChange('toevoeging', e.target.value)}
+                    value={formData.postcode}
+                    onChange={(e) => handleFormChange('postcode', e.target.value)}
+                    placeholder="1234AB"
                   />
-                </div>
-
-                {/* Location Details Row 2 */}
-                <div className="gms2-form-row">
+                  <span className="gms2-field-label">Pts:</span>
                   <input 
                     type="text" 
                     className="gms2-input small" 
@@ -823,32 +813,28 @@ export default function GMS2() {
                     onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
                     placeholder="Plaats"
                   />
-                  <span className="gms2-field-label">Pts:</span>
-                  <input 
-                    type="text" 
-                    className="gms2-input wide" 
-                    value={formData.plaatsnaam}
-                    onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
-                  />
                   <span className="gms2-field-label">Gem:</span>
                   <input 
                     type="text" 
-                    className="gms2-input wide" 
+                    className="gms2-input small" 
                     value={formData.gemeente}
                     onChange={(e) => handleFormChange('gemeente', e.target.value)}
                   />
                 </div>
 
-                {/* Function Row */}
+                {/* Object Row */}
                 <div className="gms2-form-row">
-                  <span className="gms2-field-label">Func:</span>
+                  <span className="gms2-field-label">Object:</span>
                   <input 
                     type="text" 
                     className="gms2-input wide" 
                     value={formData.functie}
                     onChange={(e) => handleFormChange('functie', e.target.value)}
+                    placeholder="Object/gebouw"
                   />
                 </div>
+
+                
 
                 {/* Action Buttons Row */}
                 <div className="gms2-button-row">
