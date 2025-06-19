@@ -822,91 +822,117 @@ export default function GMS2() {
       return false;
     }
 
-    // Parse the line for karakteristieken codes
-    const parts = lastLine.split(',').map(part => part.trim());
+    // Parse the line for karakteristieken codes - support both comma and space separation
+    const parts = lastLine.split(/[,\s]+/).map(part => part.trim()).filter(part => part.length > 0);
     let processed = false;
+    let currentCode = '';
+    let currentValue = '';
 
-    parts.forEach(part => {
-      if (!part.startsWith('-')) return;
-
-      // Extract code and value
-      const match = part.match(/^-([a-zA-Z]+)(?:\s+(.+))?$/);
-      if (!match) return;
-
-      const [, code, value] = match;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
       
-      // Find matching karakteristiek in database
-      const matchingKarakteristiek = Array.isArray(karakteristiekenDatabase) 
-        ? karakteristiekenDatabase.find(k => 
-            k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
-          )
-        : null;
-
-      if (matchingKarakteristiek) {
-        console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
-        
-        // Determine the final value based on type
-        let finalValue = '';
-        
-        if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
-          // For "Vrije tekst" and "Getal" types, use the user-provided value
-          finalValue = value || '';
-          console.log(`📝 Using user input for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
-        } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
-          // For Ja/Nee types, use the provided value or default from database
-          finalValue = value || matchingKarakteristiek.ktWaarde || '';
-        } else {
-          // For other types (Enkelvoudige opsom, Meervoudige opsom), use database value or user input
-          finalValue = value || matchingKarakteristiek.ktWaarde || '';
+      if (part.startsWith('-')) {
+        // Process previous code if exists
+        if (currentCode) {
+          processed = processKarakteristiekCode(currentCode, currentValue) || processed;
         }
         
-        // Check if this karakteristiek already exists in selected list
-        const existingIndex = selectedKarakteristieken.findIndex(k => 
-          k.ktNaam === matchingKarakteristiek.ktNaam
-        );
-
-        if (existingIndex !== -1) {
-          // Update existing karakteristiek 
-          setSelectedKarakteristieken(prev => {
-            const updated = [...prev];
-            const existing = updated[existingIndex];
-            
-            // For meervoudige types, append values; for others, replace
-            if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
-                finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
-              updated[existingIndex] = {
-                ...existing,
-                waarde: `${existing.waarde}, ${finalValue}`
-              };
-            } else if (finalValue) {
-              updated[existingIndex] = {
-                ...existing,
-                waarde: finalValue
-              };
-            }
-            
-            return updated;
-          });
-        } else {
-          // Add new karakteristiek
-          const newKarakteristiek = {
-            id: Date.now() + Math.random(),
-            ktNaam: matchingKarakteristiek.ktNaam,
-            ktType: matchingKarakteristiek.ktType,
-            waarde: finalValue,
-            ktCode: matchingKarakteristiek.ktCode
-          };
-
-          setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
-        }
-
-        processed = true;
-      } else {
-        console.log(`❌ No karakteristiek found for code: ${code}`);
+        // Start new code
+        currentCode = part.substring(1); // Remove the -
+        currentValue = '';
+      } else if (currentCode) {
+        // Add to current value
+        currentValue = currentValue ? `${currentValue} ${part}` : part;
       }
-    });
+    }
+    
+    // Process the last code
+    if (currentCode) {
+      processed = processKarakteristiekCode(currentCode, currentValue) || processed;
+    }
 
     return processed;
+  };
+
+  // Helper function to process individual karakteristiek code
+  const processKarakteristiekCode = (code: string, value: string) => {
+    // Find matching karakteristiek in database
+    const matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+      k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
+    );
+
+    if (!matchingKarakteristiek) {
+      console.log(`❌ No karakteristiek found for code: ${code}`);
+      return false;
+    }
+
+    console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
+    
+    // Determine the final value based on type
+    let finalValue = '';
+    
+    if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
+      // For "Vrije tekst" and "Getal" types, use the user-provided value
+      finalValue = value || '';
+      console.log(`📝 Using user input for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
+    } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
+      // For Ja/Nee types, use the provided value or default from database
+      finalValue = value || matchingKarakteristiek.ktWaarde || 'Ja';
+    } else if (matchingKarakteristiek.ktType === 'Enkelvoudige opsom') {
+      // For single choice, use provided value or database default
+      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+    } else if (matchingKarakteristiek.ktType === 'Meervoudige opsom') {
+      // For multiple choice, use provided value or database default
+      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+    } else {
+      // Fallback
+      finalValue = value || matchingKarakteristiek.ktWaarde || '';
+    }
+    
+    // Check if this karakteristiek already exists in selected list
+    const existingIndex = selectedKarakteristieken.findIndex(k => 
+      k.ktNaam === matchingKarakteristiek.ktNaam
+    );
+
+    if (existingIndex !== -1) {
+      // Update existing karakteristiek 
+      setSelectedKarakteristieken(prev => {
+        const updated = [...prev];
+        const existing = updated[existingIndex];
+        
+        // For meervoudige types, append values; for others, replace
+        if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
+            finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
+          updated[existingIndex] = {
+            ...existing,
+            waarde: `${existing.waarde}, ${finalValue}`
+          };
+          console.log(`📝 Appended value to existing karakteristiek: ${existing.waarde} + ${finalValue}`);
+        } else if (finalValue) {
+          updated[existingIndex] = {
+            ...existing,
+            waarde: finalValue
+          };
+          console.log(`📝 Updated existing karakteristiek with new value: ${finalValue}`);
+        }
+        
+        return updated;
+      });
+    } else {
+      // Add new karakteristiek
+      const newKarakteristiek = {
+        id: Date.now() + Math.random(),
+        ktNaam: matchingKarakteristiek.ktNaam,
+        ktType: matchingKarakteristiek.ktType,
+        waarde: finalValue,
+        ktCode: matchingKarakteristiek.ktCode
+      };
+
+      console.log(`📝 Added new karakteristiek:`, newKarakteristiek);
+      setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
+    }
+
+    return true;
   };
 
   // Enhanced function to detect and apply shortcodes for classification, address, and caller info
@@ -1159,6 +1185,8 @@ export default function GMS2() {
       e.preventDefault();
       const message = kladblokText.trim();
       if (message) {
+        console.log(`🎯 Processing kladblok input: "${message}"`);
+        
         // First try to process karakteristieken
         const karakteristiekProcessed = processKarakteristieken(message);
         
@@ -1171,6 +1199,17 @@ export default function GMS2() {
         // Add feedback for karakteristieken processing
         if (karakteristiekProcessed) {
           addLoggingEntry("🏷️ Karakteristieken verwerkt en toegevoegd");
+          console.log(`✅ Karakteristieken successfully processed for: "${message}"`);
+        }
+        
+        // Add feedback for shortcode detection
+        if (shortcodeDetected && !karakteristiekProcessed) {
+          console.log(`✅ Shortcode successfully processed for: "${message}"`);
+        }
+        
+        // If nothing was processed, log it
+        if (!karakteristiekProcessed && !shortcodeDetected) {
+          console.log(`ℹ️ No processing applied to: "${message}" - added to logging only`);
         }
         
         setKladblokText("");
