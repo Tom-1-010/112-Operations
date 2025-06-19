@@ -835,7 +835,22 @@ export default function GMS2() {
       );
 
       if (matchingKarakteristiek) {
-        console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code}`);
+        console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
+        
+        // Determine the final value based on type
+        let finalValue = '';
+        
+        if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
+          // For "Vrije tekst" and "Getal" types, use the user-provided value
+          finalValue = value || '';
+          console.log(`📝 Using user input for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
+        } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
+          // For Ja/Nee types, use the provided value or default from database
+          finalValue = value || matchingKarakteristiek.ktWaarde || '';
+        } else {
+          // For other types (Enkelvoudige opsom, Meervoudige opsom), use database value or user input
+          finalValue = value || matchingKarakteristiek.ktWaarde || '';
+        }
         
         // Check if this karakteristiek already exists in selected list
         const existingIndex = selectedKarakteristieken.findIndex(k => 
@@ -843,20 +858,22 @@ export default function GMS2() {
         );
 
         if (existingIndex !== -1) {
-          // Update existing karakteristiek - append value if different
+          // Update existing karakteristiek 
           setSelectedKarakteristieken(prev => {
             const updated = [...prev];
             const existing = updated[existingIndex];
             
-            if (value && existing.waarde && !existing.waarde.includes(value)) {
+            // For meervoudige types, append values; for others, replace
+            if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
+                finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
               updated[existingIndex] = {
                 ...existing,
-                waarde: `${existing.waarde}, ${value}`
+                waarde: `${existing.waarde}, ${finalValue}`
               };
-            } else if (value && !existing.waarde) {
+            } else if (finalValue) {
               updated[existingIndex] = {
                 ...existing,
-                waarde: value
+                waarde: finalValue
               };
             }
             
@@ -868,7 +885,7 @@ export default function GMS2() {
             id: Date.now() + Math.random(),
             ktNaam: matchingKarakteristiek.ktNaam,
             ktType: matchingKarakteristiek.ktType,
-            waarde: value || matchingKarakteristiek.ktWaarde || '',
+            waarde: finalValue,
             ktCode: matchingKarakteristiek.ktCode
           };
 
