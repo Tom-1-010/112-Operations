@@ -777,7 +777,7 @@ export default function GMS2() {
   };
 
   // Enhanced function to detect and apply shortcodes for classification, address, and caller info
-  const detectAndApplyShortcodes = (text: string) => {
+  const detectAndApplyShortcodes = async (text: string) => {
     const lines = text.split('\n');
     const lastLine = lines[lines.length - 1].trim();
 
@@ -796,7 +796,7 @@ export default function GMS2() {
         setActiveLoggingTab('locatietreffers');
 
         // Fill address data from BAG API
-        fillAddressFromBAG(stad, straatnaam, huisnummer);
+        await fillAddressFromBAG(stad, straatnaam, huisnummer);
 
         return true;
       }
@@ -1021,17 +1021,22 @@ export default function GMS2() {
       }
   };
 
-  const handleKladblokKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKladblokKeyPress = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const message = kladblokText.trim();
       if (message) {
         // Try to detect and apply shortcodes (address, caller info, or classification)
-        const shortcodeDetected = detectAndApplyShortcodes(message);
+        const shortcodeDetected = await detectAndApplyShortcodes(message);
 
         // Always add user input to log, regardless of shortcode detection
         addLoggingEntry(message);
         setKladblokText("");
+
+        // Clear any search results if we processed an address
+        if (bagSearchResults.length > 0) {
+          setBagSearchResults([]);
+        }
       }
     }
   };

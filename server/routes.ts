@@ -158,7 +158,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const encodedQuery = encodeURIComponent(query);
-      const url = `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=${limit}`;
+      // Use the correct PDOK Locatieserver endpoint for address search
+      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodedQuery}&rows=${limit}&fq=type:adres`;
 
       console.log(`[BAG API] Searching for: "${query}" - URL: ${url}`);
 
@@ -183,9 +184,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const data = await response.json();
 
-      console.log(`[BAG API] Found ${data.features?.length || 0} results`);
+      console.log(`[BAG API] Found ${data.response?.docs?.length || 0} results`);
 
-      res.json(data);
+      // Transform PDOK response to match expected format
+      const transformedData = {
+        features: (data.response?.docs || []).map((doc: any) => ({
+          properties: {
+            straatnaam: doc.straatnaam,
+            huisnummer: doc.huisnummer,
+            huisletter: doc.huisletter || '',
+            huisnummertoevoeging: doc.huisnummertoevoeging || '',
+            postcode: doc.postcode,
+            plaatsnaam: doc.woonplaatsnaam,
+            gemeentenaam: doc.gemeentenaam
+          }
+        }))
+      };
+
+      res.json(transformedData);
     } catch (error) {
       console.error('[BAG API] Error:', error);
       return res.status(500).json({ error: 'Failed to fetch from BAG API' });
@@ -196,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/bag/test', async (req, res) => {
     try {
       const testQuery = 'Rotterdam Kleiweg';
-      const url = `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodeURIComponent(testQuery)}&limit=5`;
+      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(testQuery)}&rows=5&fq=type:adres`;
       
       console.log(`[BAG API TEST] Testing with URL: ${url}`);
       
