@@ -82,30 +82,7 @@ export default function GMS2() {
   }, []);
 
   // Incidents state management with proper loading and saving
-  const [incidents, setIncidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
-    {
-      id: 1,
-      nr: 20250001,
-      prio: 2,
-      tijd: "08:28",
-      mc: "BZIBBWN",
-      locatie: "CANADASTRAAT 3",
-      plaats: "EIN",
-      roepnr: "5802",
-      positie: "218",
-      melderNaam: "Janssen",
-      melderAdres: "",
-      telefoonnummer: "",
-      straatnaam: "CANADASTRAAT",
-      huisnummer: "3",
-      plaatsnaam: "EINDHOVEN",
-      mc1: "Bezitsaantasting",
-      mc2: "Inbraak",
-      notities: "",
-      karakteristieken: [],
-      status: "Openstaand"
-    }
-  ]);
+  const [incidents, setIncidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", []);
 
   // Update time every second
   useEffect(() => {
