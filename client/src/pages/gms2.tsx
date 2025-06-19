@@ -408,10 +408,10 @@ export default function GMS2() {
 
   // Handle "Nieuw" button click
   const handleNieuw = () => {
-    // Clear selected incident FIRST
+    // Clear selected incident FIRST to ensure clean state
     setSelectedIncident(null);
 
-    // Clear all form fields for new incident
+    // Clear all form fields completely
     setFormData({
       melderNaam: "",
       telefoonnummer: "",
@@ -426,26 +426,45 @@ export default function GMS2() {
       roepnummer: ""
     });
 
-    // Reset classifications
+    // Reset ALL classification states
     setSelectedMC1("");
     setSelectedMC2("");
     setSelectedMC3("");
     setPriorityValue(2);
     setNotitiesText("");
 
-    // Clear dropdowns
-    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
-    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
-    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+    // Clear kladblok completely
+    setKladblokText("");
 
-    if (mc1Select) mc1Select.value = "";
-    if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
-    if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-
-    // COMPLETELY clear ALL logging entries for fresh start
+    // IMMEDIATELY clear ALL logging entries - no delays
     setLoggingEntries([]);
 
-    // Add single fresh logging entry for new incident after a brief delay
+    // Reset dropdowns to initial state and reinitialize them
+    setTimeout(() => {
+      const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+      const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+      const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+
+      if (mc1Select) {
+        mc1Select.value = "";
+        mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
+      }
+      if (mc2Select) {
+        mc2Select.value = "";
+        mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+      }
+      if (mc3Select) {
+        mc3Select.value = "";
+        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+      }
+
+      // Reinitialize dropdowns to ensure proper event handlers
+      if (lmcClassifications.length > 0) {
+        initializeLMCDropdowns();
+      }
+    }, 100);
+
+    // Add single clean logging entry after everything is reset
     setTimeout(() => {
       const now = new Date();
       const dateStr = String(now.getDate()).padStart(2, '0');
@@ -457,11 +476,11 @@ export default function GMS2() {
       const newEntry = {
         id: Date.now(),
         timestamp,
-        message: "📋 Nieuwe melding gestart"
+        message: "📋 Nieuwe melding gestart - alle snelcodes beschikbaar"
       };
 
       setLoggingEntries([newEntry]);
-    }, 50);
+    }, 200);
   };
 
   const addLoggingEntry = (message: string) => {
@@ -486,7 +505,6 @@ export default function GMS2() {
   const shortcodeMappings = {
     // Officiële LMC codes
     '-vkweoi': { MC1: 'Verkeer', MC2: 'Wegvervoer', MC3: 'Onder invloed', code: 'vkweoi' },
-    '-brgb01': { MC1: 'Brand', MC2: 'Gebouw', MC3: '01 Woning/Woongebouw', code: 'brgb01' },
     '-ogovls': { MC1: 'Ongeval', MC2: 'Overig', MC3: 'Letsel', code: 'ogovls' },
     '-ogwels': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: 'Letsel', code: 'ogwels' },
     '-ogspls': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: 'Letsel', code: 'ogspls' },
@@ -577,7 +595,7 @@ export default function GMS2() {
           plaatsnaam: stad.trim()
         }));
 
-        // Update selected incident if exists
+        // Update selected incident only if one exists and is being edited
         if (selectedIncident) {
           const updatedIncident = {
             ...selectedIncident,
@@ -606,7 +624,7 @@ export default function GMS2() {
           telefoonnummer: telefoonnummer.trim()
         }));
 
-        // Update selected incident if exists
+        // Update selected incident only if one exists and is being edited
         if (selectedIncident) {
           const updatedIncident = {
             ...selectedIncident,
