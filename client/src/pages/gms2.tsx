@@ -892,8 +892,13 @@ export default function GMS2() {
   const processKarakteristiekCode = (code: string, value: string) => {
     console.log(`🔍 Looking for karakteristiek with code: "${code}", value: "${value}"`);
     
-    const fullInput = `${code} ${value}`.toLowerCase();
+    const fullInput = `${code} ${value}`.toLowerCase().trim();
     console.log(`🔍 Full input: "${fullInput}"`);
+    
+    // Filter to unique karakteristieken by code to avoid duplicates
+    const uniqueKarakteristieken = karakteristiekenDatabase.filter((k, index, self) => 
+      index === self.findIndex(t => t.ktCode === k.ktCode)
+    );
     
     // Step 1: Try exact specific patterns first (highest priority)
     const specificPatterns = {
@@ -906,7 +911,11 @@ export default function GMS2() {
       'aantal te water': 'tewt',
       'aantal niet zelfredz': 'nzrz',
       'aantal in object': 'iobj',
-      'aantal dieren': 'dier'
+      'aantal dieren': 'dier',
+      'overval diefstal': 'ovdp',
+      'ovdp': 'ovdp',
+      'afkruisen': 'afkr',
+      'afkr': 'afkr'
     };
     
     let matchingKarakteristiek = null;
@@ -914,7 +923,7 @@ export default function GMS2() {
     // Check for specific exact matches first
     for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
       if (fullInput.includes(pattern)) {
-        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+        matchingKarakteristiek = uniqueKarakteristieken.find(k => 
           k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
         );
         if (matchingKarakteristiek) {
@@ -924,13 +933,13 @@ export default function GMS2() {
       }
     }
     
-    // Step 2: Try exact code match
+    // Step 2: Try exact code match (most reliable)
     if (!matchingKarakteristiek) {
-      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+      matchingKarakteristiek = uniqueKarakteristieken.find(k => 
         k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
       );
       if (matchingKarakteristiek) {
-        console.log(`✅ Found exact code match: "${code}"`);
+        console.log(`✅ Found exact code match: "${code}" -> "${matchingKarakteristiek.ktNaam}"`);
       }
     }
 
@@ -957,7 +966,7 @@ export default function GMS2() {
       
       const expectedCode = valueToCodeMap[firstValueWord];
       if (expectedCode) {
-        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+        matchingKarakteristiek = uniqueKarakteristieken.find(k => 
           k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
         );
         if (matchingKarakteristiek) {
@@ -966,26 +975,39 @@ export default function GMS2() {
       }
     }
 
-    // Step 4: Smart matching by name content (fallback)
+    // Step 4: Enhanced fuzzy matching by name content (improved scoring)
     if (!matchingKarakteristiek) {
       const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
       
       let bestMatch = null;
       let bestScore = 0;
       
-      for (const k of karakteristiekenDatabase) {
+      for (const k of uniqueKarakteristieken) {
         const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
+        const fullName = (k.ktNaam || '').toLowerCase();
         
         let score = 0;
+        
+        // Check for full phrase match in name
+        if (fullName.includes(fullInput)) {
+          score += 15; // High score for full phrase match
+        }
+        
+        // Check individual word matches
         for (const inputWord of inputWords) {
           for (const nameWord of nameWords) {
             if (inputWord === nameWord) {
-              score += 5; // Exact word match
+              score += 8; // Exact word match
             } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
-              score += 3; // Partial match
+              score += 4; // Partial match
             } else if (inputWord.includes(nameWord) && nameWord.length > 3) {
-              score += 2; // Reverse partial match
+              score += 3; // Reverse partial match
             }
+          }
+          
+          // Bonus for matching against the full name
+          if (fullName.includes(inputWord) && inputWord.length > 3) {
+            score += 2;
           }
         }
         
@@ -995,10 +1017,10 @@ export default function GMS2() {
         }
       }
       
-      // Only use if we have a strong match
-      if (bestScore >= 5) {
+      // Use match if we have a strong enough score
+      if (bestScore >= 8) {
         matchingKarakteristiek = bestMatch;
-        console.log(`✅ Found smart match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}"`);
+        console.log(`✅ Found fuzzy match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}" for input "${fullInput}"`);
       }
     }
 
@@ -1641,7 +1663,7 @@ export default function GMS2() {
               {/* Empty rows for lopende incidenten */}
               <div className="gms2-empty-rows">
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <div key={`empty-lopend-row-${index}`} className="gms2-table-row">
+                  <div key={`empty-lopend-${Date.now()}-${index}-${Math.random()}`} className="gms2-table-row">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -1693,7 +1715,7 @@ export default function GMS2() {
               })}
               {/* Fill remaining rows */}
               {Array.from({ length: Math.max(0, 15 - incidents.length) }).map((_, index) => (
-                <div key={`empty-openstaand-row-${index}`} className="gms2-table-row">
+                <div key={`empty-openstaand-${Date.now()}-${index}-${Math.random()}`} className="gms2-table-row">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -2153,14 +2175,14 @@ export default function GMS2() {
                     </div>
                     {/* Dynamic karakteristieken rows */}
                     {selectedKarakteristieken.map((kar, index) => (
-                      <div key={kar.id || index} className="gms2-char-row">
+                      <div key={`kar-${kar.id || Date.now()}-${index}-${kar.ktCode || 'nocode'}-${Math.random()}`} className="gms2-char-row">
                         <span title={kar.ktCode ? `Code: ${kar.ktCode}` : ''}>{kar.ktNaam}</span>
                         <span>{kar.waarde || ''}</span>
                       </div>
                     ))}
                     {/* Fill remaining rows */}
                     {Array.from({ length: Math.max(0, 8 - selectedKarakteristieken.length) }).map((_, index) => (
-                      <div key={`empty-char-row-${index}`} className="gms2-char-row">
+                      <div key={`empty-char-${Date.now()}-${index}-${Math.random()}`} className="gms2-char-row">
                         <span></span>
                         <span></span>
                       </div>
