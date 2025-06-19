@@ -933,7 +933,7 @@ export default function GMS2() {
                     onChange={(e) => handleFormChange('postcode', e.target.value)}
                     placeholder="1234AB"
                   />
-                  <span className="gms2-field-label">Pts:</span>
+                  <span className="gms2-field-label compact">Pts:</span>
                   <input 
                     type="text" 
                     className="gms2-input place-wide" 
