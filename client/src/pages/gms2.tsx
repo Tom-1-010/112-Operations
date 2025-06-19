@@ -895,11 +895,7 @@ export default function GMS2() {
     const fullInput = `${code} ${value}`.toLowerCase().trim();
     console.log(`🔍 Full input: "${fullInput}"`);
     
-    // Filter to unique karakteristieken by code to avoid duplicates
-    const uniqueKarakteristieken = karakteristiekenDatabase.filter((k, index, self) => 
-      index === self.findIndex(t => t.ktCode === k.ktCode)
-    );
-    
+    // Use all karakteristieken from database, not just unique ones
     let matchingKarakteristiek = null;
     let finalValue = value;
     
@@ -927,7 +923,7 @@ export default function GMS2() {
         
         const targetCode = typeToCodeMap[type];
         if (targetCode) {
-          matchingKarakteristiek = uniqueKarakteristieken.find(k => 
+          matchingKarakteristiek = karakteristiekenDatabase.find(k => 
             k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
           );
           if (matchingKarakteristiek) {
@@ -959,7 +955,7 @@ export default function GMS2() {
       // Check for specific exact matches
       for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
         if (fullInput.includes(pattern)) {
-          matchingKarakteristiek = uniqueKarakteristieken.find(k => 
+          matchingKarakteristiek = karakteristiekenDatabase.find(k => 
             k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
           );
           if (matchingKarakteristiek) {
@@ -972,7 +968,7 @@ export default function GMS2() {
     
     // Step 3: Try exact code match (most reliable)
     if (!matchingKarakteristiek) {
-      matchingKarakteristiek = uniqueKarakteristieken.find(k => 
+      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
         k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
       );
       if (matchingKarakteristiek) {
@@ -1003,7 +999,7 @@ export default function GMS2() {
       
       const expectedCode = valueToCodeMap[firstValueWord];
       if (expectedCode) {
-        matchingKarakteristiek = uniqueKarakteristieken.find(k => 
+        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
           k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
         );
         if (matchingKarakteristiek) {
@@ -1024,7 +1020,7 @@ export default function GMS2() {
       let bestMatch = null;
       let bestScore = 0;
       
-      for (const k of uniqueKarakteristieken) {
+      for (const k of karakteristiekenDatabase) {
         const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
         const fullName = (k.ktNaam || '').toLowerCase();
         
@@ -1108,9 +1104,9 @@ export default function GMS2() {
       finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
     }
     
-    // Check if this karakteristiek already exists in selected list
+    // Check if this exact karakteristiek already exists (by code AND name to allow multiples)
     const existingIndex = selectedKarakteristieken.findIndex(k => 
-      k.ktNaam === matchingKarakteristiek.ktNaam
+      k.ktCode === matchingKarakteristiek.ktCode && k.ktNaam === matchingKarakteristiek.ktNaam
     );
 
     if (existingIndex !== -1) {
