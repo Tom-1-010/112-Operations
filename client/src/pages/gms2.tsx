@@ -565,17 +565,28 @@ export default function GMS2() {
 
     // Address shortcode: =[stad]/[straatnaam] [huisnummer]
     if (lastLine.startsWith('=')) {
-      const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)(\d+)$/i);
+      const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)\s+(\d+)$/i);
       if (addressMatch) {
         const [, stad, straatnaam, huisnummer] = addressMatch;
 
-        // Fill address fields
+        // Fill address fields in state
         setFormData(prev => ({
           ...prev,
           straatnaam: straatnaam.trim(),
           huisnummer: huisnummer.trim(),
           plaatsnaam: stad.trim()
         }));
+
+        // Update selected incident if exists
+        if (selectedIncident) {
+          const updatedIncident = {
+            ...selectedIncident,
+            straatnaam: straatnaam.trim(),
+            huisnummer: huisnummer.trim(),
+            plaatsnaam: stad.trim()
+          };
+          setSelectedIncident(updatedIncident);
+        }
 
         addLoggingEntry(`📍 Adres automatisch ingevuld: ${straatnaam.trim()} ${huisnummer.trim()}, ${stad.trim()}`);
         return true;
@@ -588,12 +599,22 @@ export default function GMS2() {
       if (callerMatch) {
         const [, meldernaam, telefoonnummer] = callerMatch;
 
-        // Fill caller fields
+        // Fill caller fields in state
         setFormData(prev => ({
           ...prev,
           melderNaam: meldernaam.trim(),
           telefoonnummer: telefoonnummer.trim()
         }));
+
+        // Update selected incident if exists
+        if (selectedIncident) {
+          const updatedIncident = {
+            ...selectedIncident,
+            melderNaam: meldernaam.trim(),
+            telefoonnummer: telefoonnummer.trim()
+          };
+          setSelectedIncident(updatedIncident);
+        }
 
         addLoggingEntry(`👤 Meldergegevens automatisch ingevuld: ${meldernaam.trim()}, ${telefoonnummer.trim()}`);
         return true;
