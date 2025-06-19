@@ -214,30 +214,67 @@ export default function GMS2() {
         setLoggingEntries(parsedEntries);
       }
 
-      // Restore MC classifications in dropdowns
+      // Restore MC classifications in dropdowns with proper MC3 preservation
       setTimeout(() => {
         const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
         const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
         const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
         if (mc1Select && incident.mc1) {
+          // First populate MC1 dropdown if not already populated
+          if (mc1Select.options.length <= 1) {
+            const mc1Options = Array.from(new Set(lmcClassifications.map(c => c.MC1).filter(Boolean))).sort();
+            mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
+            mc1Options.forEach(mc1 => {
+              const option = document.createElement('option');
+              option.value = mc1;
+              option.textContent = mc1;
+              mc1Select.appendChild(option);
+            });
+          }
           mc1Select.value = incident.mc1;
-          mc1Select.dispatchEvent(new Event('change'));
 
           setTimeout(() => {
             if (mc2Select && incident.mc2) {
+              // Populate MC2 dropdown based on selected MC1
+              const mc2Options = Array.from(new Set(
+                lmcClassifications
+                  .filter(c => c.MC1 === incident.mc1 && c.MC2 && c.MC2.trim() !== "")
+                  .map(c => c.MC2)
+              )).sort();
+              
+              mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+              mc2Options.forEach(mc2 => {
+                const option = document.createElement('option');
+                option.value = mc2;
+                option.textContent = mc2;
+                mc2Select.appendChild(option);
+              });
               mc2Select.value = incident.mc2;
-              mc2Select.dispatchEvent(new Event('change'));
 
               setTimeout(() => {
                 if (mc3Select && incident.mc3) {
+                  // Populate MC3 dropdown based on selected MC1 and MC2
+                  const mc3Options = Array.from(new Set(
+                    lmcClassifications
+                      .filter(c => c.MC1 === incident.mc1 && c.MC2 === incident.mc2 && c.MC3 && c.MC3.trim() !== "")
+                      .map(c => c.MC3)
+                  )).sort();
+                  
+                  mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+                  mc3Options.forEach(mc3 => {
+                    const option = document.createElement('option');
+                    option.value = mc3;
+                    option.textContent = mc3;
+                    mc3Select.appendChild(option);
+                  });
                   mc3Select.value = incident.mc3;
-                  // Don't trigger change event for MC3 to avoid overwriting the state
-                  console.log(`📋 Restored MC3 dropdown to: "${incident.mc3}"`);
+                  
+                  console.log(`📋 Restored complete classification: MC1="${incident.mc1}", MC2="${incident.mc2}", MC3="${incident.mc3}"`);
                 }
-              }, 150);
+              }, 100);
             }
-          }, 150);
+          }, 100);
         }
       }, 250);
 
@@ -267,11 +304,12 @@ export default function GMS2() {
       const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
       const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
+      // Priority order: dropdown value > state value > original incident value > empty string
       const currentMC1 = mc1Select?.value || selectedMC1 || selectedIncident.mc1 || "";
       const currentMC2 = mc2Select?.value || selectedMC2 || selectedIncident.mc2 || "";
       const currentMC3 = mc3Select?.value || selectedMC3 || selectedIncident.mc3 || "";
 
-      console.log(`📝 Update - MC values: MC1="${currentMC1}", MC2="${currentMC2}", MC3="${currentMC3}"`);
+      console.log(`📝 Update - Preserving MC values: MC1="${currentMC1}", MC2="${currentMC2}", MC3="${currentMC3}"`);
 
       // Determine MC code based on selected classification
       let mcCode = selectedIncident.mc;
@@ -1052,6 +1090,7 @@ export default function GMS2() {
     // Only restore previously selected values if we're editing an existing incident
     if (selectedIncident && currentMC1) {
       setTimeout(() => {
+        // First populate all dropdowns properly
         freshMC1Select.value = currentMC1;
         freshMC1Select.dispatchEvent(new Event('change'));
         
@@ -1063,7 +1102,9 @@ export default function GMS2() {
             setTimeout(() => {
               if (currentMC3) {
                 freshMC3Select.value = currentMC3;
-                freshMC3Select.dispatchEvent(new Event('change'));
+                // Update state to ensure MC3 is preserved
+                setSelectedMC3(currentMC3);
+                console.log(`🔧 Dropdown initialization: MC3 restored and state updated to "${currentMC3}"`);
               }
             }, 100);
           }
