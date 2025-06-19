@@ -302,8 +302,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🔄 Starting karakteristieken import via GET API...');
 
-      // Use the newest karakteristieken file
-      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750369362301.json');
+      // Use the newest complete karakteristieken file
+      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_volledig_1750370790422.json');
 
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Karakteristieken file not found' });
@@ -322,13 +322,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Transform data to match schema
       const transformedData = karakteristiekenData.map(item => ({
-        ktNaam: item['kt-naam'],
-        ktType: item['kt-type'],
-        ktWaarde: item['kt-waarde'] === null || item['kt-waarde'] === undefined || 
-                   (typeof item['kt-waarde'] === 'number' && isNaN(item['kt-waarde'])) ? null : String(item['kt-waarde']),
-        ktCode: item['kt-code'] === null || item['kt-code'] === undefined || 
-                (typeof item['kt-code'] === 'number' && isNaN(item['kt-code'])) ? null : String(item['kt-code']),
-        ktPaser: item['kt-paser']
+        ktNaam: item['kt_naam'] || item['kt-naam'],
+        ktType: item['kt_type'] || item['kt-type'],
+        ktWaarde: item['kt_waarde'] === null || item['kt_waarde'] === undefined || 
+                   (typeof item['kt_waarde'] === 'number' && isNaN(item['kt_waarde'])) ? null : String(item['kt_waarde']),
+        ktCode: item['kt_code'] === null || item['kt_code'] === undefined || 
+                (typeof item['kt_code'] === 'number' && isNaN(item['kt_code'])) ? null : String(item['kt_code']),
+        ktPaser: item['kt_parser'] || item['kt-paser']
       }));
 
       // Insert new data in batches
@@ -365,8 +365,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🔄 Starting karakteristieken import via POST API...');
 
-      // Use the newest karakteristieken file
-      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750369362301.json');
+      // Use the newest complete karakteristieken file
+      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_volledig_1750370790422.json');
 
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Karakteristieken file not found' });
@@ -385,13 +385,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Transform data to match schema
       const transformedData = karakteristiekenData.map(item => ({
-        ktNaam: item['kt-naam'],
-        ktType: item['kt-type'],
-        ktWaarde: item['kt-waarde'] === null || item['kt-waarde'] === undefined || 
-                   (typeof item['kt-waarde'] === 'number' && isNaN(item['kt-waarde'])) ? null : String(item['kt-waarde']),
-        ktCode: item['kt-code'] === null || item['kt-code'] === undefined || 
-                (typeof item['kt-code'] === 'number' && isNaN(item['kt-code'])) ? null : String(item['kt-code']),
-        ktPaser: item['kt-paser']
+        ktNaam: item['kt_naam'] || item['kt-naam'],
+        ktType: item['kt_type'] || item['kt-type'],
+        ktWaarde: item['kt_waarde'] === null || item['kt_waarde'] === undefined || 
+                   (typeof item['kt_waarde'] === 'number' && isNaN(item['kt_waarde'])) ? null : String(item['kt_waarde']),
+        ktCode: item['kt_code'] === null || item['kt_code'] === undefined || 
+                (typeof item['kt_code'] === 'number' && isNaN(item['kt_code'])) ? null : String(item['kt_code']),
+        ktPaser: item['kt_parser'] || item['kt-paser']
       }));
 
       // Insert new data in batches
