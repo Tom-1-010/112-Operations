@@ -1,0 +1,106 @@
+📘 Uitgebreid Script: Gebruik van Snelcodes, Afkortingen en MC-classificaties in het Kladblok
+🔹 1. Doel
+Het meldkamersysteem ondersteunt snelle en correcte selectie van meldingclassificaties (MC) via codes, afkortingen en tekstherkenning. De gekozen MC’s worden gekoppeld aan het GMS-formulier.
+
+🔹 2. Structuur van Classificaties (MC)
+De landelijke set LMC bestaat uit drie hiërarchische niveaus:
+
+Niveau	Benaming	Voorbeeld
+MC1	Hoofdclassificatie	Ongeval, Brand, Gezondheid
+MC2	Subclassificatie 1	Wegvervoer, Spoorvervoer
+MC3	Subclassificatie 2	Letsel, Brand, Afstemverzoek
+
+🔁 Verplichte structuur:
+MC1 is altijd verplicht.
+
+MC2 is alleen toegestaan als deze binnen de juiste MC1 valt.
+
+MC3 moet geldig zijn binnen de gekozen MC2.
+
+🧩 Bijvoorbeeld:
+
+"Ongeval > Wegvervoer > Letsel" is geldig
+
+"Ongeval > Spoorvervoer > Letsel" is ook geldig
+
+Maar "Brand > Wegvervoer > Letsel" is niet logisch.
+
+🔹 3. Gebruik van snelcodes en afkortingen
+Je typt in het kladblok een snelcode of afkorting zoals:
+
+plaintext
+Kopiëren
+Bewerken
+-steekpartij
+-ogovls
+-wegvervoer letsel
+En het systeem vult automatisch in:
+
+Code	MC1	MC2	MC3
+-ogovls	Ongeval	Wegvervoer	Letsel
+-osvls	Ongeval	Spoorvervoer	Letsel
+
+🔁 Bij meerdere routes (zoals letsel op meerdere vervoerstypen):
+Het systeem bekijkt:
+
+Of het exacte code herkent (-ogovls)
+
+Of het een combinatie van woorden herkent in uitleg en classificatie (-spoorvervoer letsel → Ongeval / Spoorvervoer / Letsel)
+
+🔹 4. Automatische MC-koppeling in kladblok
+✅ Werking
+Elke regel die begint met - wordt geanalyseerd.
+
+Als die regel een bestaande code of combinatie van MC-namen bevat, worden MC1, MC2, MC3 automatisch ingevuld.
+
+🔒 Validatie
+De relatie wordt eerst gecontroleerd:
+
+Is deze MC2 toegestaan binnen de gekozen MC1?
+
+Is deze MC3 geldig binnen MC2?
+
+🔍 Voorbeeld logica (vereenvoudigd):
+ts
+Kopiëren
+Bewerken
+const selectedMC1 = "Ongeval";
+const selectedMC2 = "Wegvervoer";
+
+if (classificaties.some(c => c.MC1 === selectedMC1 && c.MC2 === selectedMC2)) {
+   // OK
+}
+🔹 5. Synoniemen & alternatieve codes
+Sommige meldingen komen voor met meerdere termen:
+
+json
+Kopiëren
+Bewerken
+{
+  "code": ["-steekpartij", "-mesaanval"],
+  "MC1": "Veiligheid & Openbare Orde",
+  "MC2": "Geweld",
+  "MC3": "Lichamelijk letsel"
+}
+🔹 6. Overrulen van MC's
+Gebruikers mogen altijd handmatig een andere MC kiezen. Daarbij gelden:
+
+Alleen geldige combinaties volgens de hiërarchie zijn toegestaan.
+
+Systeem waarschuwt bij conflicten of onlogische keuzes.
+
+🔹 7. Toepassing in AI
+AI-assistenten gebruiken dezelfde logica:
+
+Bij automatisch gegenereerde meldingen wordt ook gecontroleerd op geldige MC-hiërarchie.
+
+AI controleert op synoniemen, snelcodes, context (zoals "spoor", "vervoer", "letsel").
+
+🔹 8. Voorbeeldregels in kladblok
+makefile
+Kopiëren
+Bewerken
+08:33 -ogovls Auto op fietser, gewond persoon op straat
+08:34 -spoorvervoer letsel Station Rotterdam Centraal
+08:35 -afstemverzoek ambulance ivm sportevenement
+→ Herkent automatisch:
