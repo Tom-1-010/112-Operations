@@ -338,11 +338,49 @@ export default function GMS2() {
     '-afstemverzoek': { MC1: 'Dienstverlening', MC2: 'Afstemverzoek', MC3: 'Ambulance' }
   };
 
-  // Function to detect and apply classification from shortcodes
-  const detectAndApplyClassification = (text: string) => {
+  // Function to detect and apply shortcodes for classification, address, and caller info
+  const detectAndApplyShortcodes = (text: string) => {
     const lines = text.split('\n');
-    const lastLine = lines[lines.length - 1].trim().toLowerCase();
+    const lastLine = lines[lines.length - 1].trim();
 
+    // Address shortcode: =[stad]/[straatnaam] [huisnummer]
+    if (lastLine.startsWith('=')) {
+      const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)(\d+)$/i);
+      if (addressMatch) {
+        const [, stad, straatnaam, huisnummer] = addressMatch;
+        
+        // Fill address fields
+        setFormData(prev => ({
+          ...prev,
+          straatnaam: straatnaam.trim(),
+          huisnummer: huisnummer.trim(),
+          plaatsnaam: stad.trim()
+        }));
+
+        addLoggingEntry(`📍 Adres automatisch ingevuld: ${straatnaam.trim()} ${huisnummer.trim()}, ${stad.trim()}`);
+        return true;
+      }
+    }
+
+    // Caller info shortcode: m/[meldernaam];[telefoonnummer]
+    if (lastLine.startsWith('m/')) {
+      const callerMatch = lastLine.match(/^m\/([^;]+);(.+)$/i);
+      if (callerMatch) {
+        const [, meldernaam, telefoonnummer] = callerMatch;
+        
+        // Fill caller fields
+        setFormData(prev => ({
+          ...prev,
+          melderNaam: meldernaam.trim(),
+          telefoonnummer: telefoonnummer.trim()
+        }));
+
+        addLoggingEntry(`👤 Meldergegevens automatisch ingevuld: ${meldernaam.trim()}, ${telefoonnummer.trim()}`);
+        return true;
+      }
+    }
+
+    // Classification shortcode: -[code]
     if (lastLine.startsWith('-')) {
       // Direct shortcode match
       const shortcode = lastLine.split(' ')[0];
@@ -467,10 +505,13 @@ export default function GMS2() {
       e.preventDefault();
       const message = kladblokText.trim();
       if (message) {
-        // Try to detect and apply classification before adding to log
-        const classificationDetected = detectAndApplyClassification(message);
+        // Try to detect and apply shortcodes (address, caller info, or classification)
+        const shortcodeDetected = detectAndApplyShortcodes(message);
 
-        addLoggingEntry(message);
+        // Only add to log if it's not a shortcode, or if it is a classification shortcode
+        if (!shortcodeDetected || message.startsWith('-')) {
+          addLoggingEntry(message);
+        }
         setKladblokText("");
       }
     }
@@ -920,7 +961,7 @@ export default function GMS2() {
                       onChange={(e) => setKladblokText(e.target.value)}
                       onKeyPress={handleKladblokKeyPress}
                       className="gms2-kladblok-textarea"
-                      placeholder="Kladblok - Gebruik snelcodes zoals: -inbraak, -steekpartij, -woningbrand, -ogovls (Enter om toe te voegen aan logging)"
+                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Adres: =Stad/Straat 123 | Melder: m/Naam;0612345678 (Enter om uit te voeren)"
                     />
                   </div>
                 </div>
