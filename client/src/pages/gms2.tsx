@@ -75,6 +75,9 @@ export default function GMS2() {
   const [activeLoggingTab, setActiveLoggingTab] = useState("hist-meldblok");
   const [bagSearchResults, setBagSearchResults] = useState<any[]>([]);
   const [bagSearchQuery, setBagSearchQuery] = useState("");
+  const [karakteristieken, setKarakteristieken] = useState<any[]>([]);
+  const [karakteristiekenDatabase, setKarakteristiekenDatabase] = useState<any[]>([]);
+  const [selectedKarakteristieken, setSelectedKarakteristieken] = useState<any[]>([]);
 
   // Form state for new incidents
   const [formData, setFormData] = useState({
@@ -134,6 +137,22 @@ export default function GMS2() {
     };
 
     loadLMCClassifications();
+  }, []);
+
+  // Load karakteristieken database
+  useEffect(() => {
+    const loadKarakteristieken = async () => {
+      try {
+        const response = await fetch('/api/karakteristieken');
+        const data = await response.json();
+        setKarakteristiekenDatabase(data);
+        console.log('Loaded karakteristieken database:', data.length, 'entries');
+      } catch (error) {
+        console.error('Error loading karakteristieken:', error);
+      }
+    };
+
+    loadKarakteristieken();
   }, []);
 
   // Initialize dropdowns when classifications are loaded
@@ -200,6 +219,13 @@ export default function GMS2() {
 
       // Set notes if available
       if (incident.notities) setNotitiesText(incident.notities);
+
+      // Load karakteristieken if available
+      if (incident.karakteristieken && Array.isArray(incident.karakteristieken)) {
+        setSelectedKarakteristieken(incident.karakteristieken);
+      } else {
+        setSelectedKarakteristieken([]);
+      }
 
       // Load logging history if available - IMPORTANT: Clear first, then load
       setLoggingEntries([]); // Clear any existing entries first
@@ -353,6 +379,7 @@ export default function GMS2() {
         mc2: currentMC2,
         mc3: currentMC3,
         notities: notitiesText,
+        karakteristieken: selectedKarakteristieken,
         meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
         prioriteit: priorityValue
       };
@@ -427,7 +454,7 @@ export default function GMS2() {
       mc2: selectedMC2,
       mc3: selectedMC3,
       notities: notitiesText,
-      karakteristieken: [],
+      karakteristieken: selectedKarakteristieken,
       status: "Openstaand",
       meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
       tijdstip: new Date().toISOString(),
@@ -513,6 +540,7 @@ export default function GMS2() {
     setSelectedMC3("");
     setPriorityValue(2);
     setNotitiesText("");
+    setSelectedKarakteristieken([]);
 
     // STEP 4: Clear kladblok and logging IMMEDIATELY - NO ADDING ENTRIES
     setKladblokText(""); // Keep kladblok completely empty
@@ -776,6 +804,86 @@ export default function GMS2() {
     }
   };
 
+  // Function to process karakteristieken from kladblok text
+  const processKarakteristieken = (text: string) => {
+    const lines = text.split('\n');
+    const lastLine = lines[lines.length - 1].trim();
+
+    console.log(`🏷️ Processing karakteristieken for: "${lastLine}"`);
+
+    // Check if line contains karakteristieken codes (starts with -)
+    if (!lastLine.startsWith('-')) {
+      return false;
+    }
+
+    // Parse the line for karakteristieken codes
+    const parts = lastLine.split(',').map(part => part.trim());
+    let processed = false;
+
+    parts.forEach(part => {
+      if (!part.startsWith('-')) return;
+
+      // Extract code and value
+      const match = part.match(/^-([a-zA-Z]+)(?:\s+(.+))?$/);
+      if (!match) return;
+
+      const [, code, value] = match;
+      
+      // Find matching karakteristiek in database
+      const matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+        k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
+      );
+
+      if (matchingKarakteristiek) {
+        console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code}`);
+        
+        // Check if this karakteristiek already exists in selected list
+        const existingIndex = selectedKarakteristieken.findIndex(k => 
+          k.ktNaam === matchingKarakteristiek.ktNaam
+        );
+
+        if (existingIndex !== -1) {
+          // Update existing karakteristiek - append value if different
+          setSelectedKarakteristieken(prev => {
+            const updated = [...prev];
+            const existing = updated[existingIndex];
+            
+            if (value && existing.waarde && !existing.waarde.includes(value)) {
+              updated[existingIndex] = {
+                ...existing,
+                waarde: `${existing.waarde}, ${value}`
+              };
+            } else if (value && !existing.waarde) {
+              updated[existingIndex] = {
+                ...existing,
+                waarde: value
+              };
+            }
+            
+            return updated;
+          });
+        } else {
+          // Add new karakteristiek
+          const newKarakteristiek = {
+            id: Date.now() + Math.random(),
+            ktNaam: matchingKarakteristiek.ktNaam,
+            ktType: matchingKarakteristiek.ktType,
+            waarde: value || matchingKarakteristiek.ktWaarde || '',
+            ktCode: matchingKarakteristiek.ktCode
+          };
+
+          setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
+        }
+
+        processed = true;
+      } else {
+        console.log(`❌ No karakteristiek found for code: ${code}`);
+      }
+    });
+
+    return processed;
+  };
+
   // Enhanced function to detect and apply shortcodes for classification, address, and caller info
   const detectAndApplyShortcodes = async (text: string) => {
     const lines = text.split('\n');
@@ -1026,11 +1134,20 @@ export default function GMS2() {
       e.preventDefault();
       const message = kladblokText.trim();
       if (message) {
-        // Try to detect and apply shortcodes (address, caller info, or classification)
+        // First try to process karakteristieken
+        const karakteristiekProcessed = processKarakteristieken(message);
+        
+        // Then try to detect and apply other shortcodes (address, caller info, or classification)
         const shortcodeDetected = await detectAndApplyShortcodes(message);
 
-        // Always add user input to log, regardless of shortcode detection
+        // Always add user input to log, regardless of processing
         addLoggingEntry(message);
+        
+        // Add feedback for karakteristieken processing
+        if (karakteristiekProcessed) {
+          addLoggingEntry("🏷️ Karakteristieken verwerkt en toegevoegd");
+        }
+        
         setKladblokText("");
 
         // Clear any search results if we processed an address
@@ -1815,9 +1932,16 @@ export default function GMS2() {
                       <span>Karakteristieken</span>
                       <span>Waarde</span>
                     </div>
-                    {/* Empty table ready for data input */}
-                    {Array.from({ length: 8 }).map((_, index) => (
-                      <div key={`char-row-${index}`} className="gms2-char-row">
+                    {/* Dynamic karakteristieken rows */}
+                    {selectedKarakteristieken.map((kar, index) => (
+                      <div key={kar.id || index} className="gms2-char-row">
+                        <span title={kar.ktCode ? `Code: ${kar.ktCode}` : ''}>{kar.ktNaam}</span>
+                        <span>{kar.waarde}</span>
+                      </div>
+                    ))}
+                    {/* Fill remaining rows */}
+                    {Array.from({ length: Math.max(0, 8 - selectedKarakteristieken.length) }).map((_, index) => (
+                      <div key={`empty-char-row-${index}`} className="gms2-char-row">
                         <span></span>
                         <span></span>
                       </div>
@@ -1832,7 +1956,7 @@ export default function GMS2() {
                       onChange={handleKladblokChange}
                       onKeyPress={handleKladblokKeyPress}
                       className="gms2-kladblok-textarea"
-                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Adres: =Rotterdam/Kleiweg 12 | Melder: m/Naam;0612345678 (Enter om uit te voeren)"
+                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Karakteristieken: -aanh 1, -ovdp, -afkruisen rijstrook 1 | Adres: =Rotterdam/Kleiweg 12 | Melder: m/Naam;0612345678 (Enter om uit te voeren)"
                     />
                   </div>
                 </div>
