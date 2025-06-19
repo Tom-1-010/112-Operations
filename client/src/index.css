@@ -4811,7 +4811,7 @@ body {
 
 .gms2-table-row {
   display: grid;
-  grid-template-columns: 30px 40px 40px 120px 100px 50px 40px 30px;
+  grid-template-columns: 40px 140px 80px 100px 50px 40px 40px 30px;
   font-size: 10px;
   border-bottom: 1px solid #e0e0e0;
 }

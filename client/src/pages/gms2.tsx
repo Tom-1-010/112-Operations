@@ -1122,31 +1122,36 @@ export default function GMS2() {
             <div className="gms2-section-header">Openstaande incidenten</div>
             <div className="gms2-incidents-table">
               <div className="gms2-table-header">
-                <span>Nr</span>
-                <span>Pri</span>
-                <span>Tijd</span>
-                <span>MC</span>
+                <span>Prio</span>
                 <span>Locatie (Object - Straat)</span>
                 <span>Plaats</span>
+                <span>Classificatie</span>
                 <span>Roepnr</span>
+                <span>Nr</span>
+                <span>Tijd</span>
                 <span>Pos</span>
               </div>
-              {incidents.map((incident) => (
-                <div 
-                  key={incident.id} 
-                  className={`gms2-table-row ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
-                  onClick={() => handleIncidentSelect(incident)}
-                >
-                  <span>{incident.nr}</span>
-                  <span>{incident.prio}</span>
-                  <span>{incident.tijd}</span>
-                  <span className="gms2-mc-cell">{incident.mc}</span>
-                  <span>{incident.locatie}</span>
-                  <span>{incident.plaats}</span>
-                  <span>{incident.roepnr}</span>
-                  <span>{incident.positie}</span>
-                </div>
-              ))}
+              {incidents.map((incident) => {
+                // Determine the most specific MC classification
+                const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || '';
+                
+                return (
+                  <div 
+                    key={incident.id} 
+                    className={`gms2-table-row ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
+                    onClick={() => handleIncidentSelect(incident)}
+                  >
+                    <span>{incident.prio}</span>
+                    <span>{incident.locatie}</span>
+                    <span>{incident.plaats}</span>
+                    <span className="gms2-mc-cell">{mcClassification}</span>
+                    <span>{incident.roepnr}</span>
+                    <span>{incident.nr}</span>
+                    <span>{incident.tijd}</span>
+                    <span>{incident.positie}</span>
+                  </div>
+                );
+              })}
               {/* Fill remaining rows */}
               {Array.from({ length: Math.max(0, 15 - incidents.length) }).map((_, index) => (
                 <div key={`empty-openstaand-row-${index}`} className="gms2-table-row">
