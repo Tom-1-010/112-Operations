@@ -1998,6 +1998,365 @@ body {
   font-size: 10px;
 }
 
+/* GMS2 Classic Interface Styles */
+.gms2-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #c0c0c0;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+}
+
+/* Menu Bar */
+.gms2-menu-bar {
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+  font-size: 11px;
+}
+
+.gms2-menu-left {
+  display: flex;
+  gap: 0;
+}
+
+.gms2-menu-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  border: 1px transparent solid;
+}
+
+.gms2-menu-item:hover {
+  background: #316ac5;
+  color: white;
+}
+
+.gms2-menu-right {
+  display: flex;
+  gap: 0;
+}
+
+/* Tab Bar */
+.gms2-tab-bar {
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  padding: 0 4px;
+}
+
+.gms2-tab {
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  border-bottom: none;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  margin-right: 2px;
+}
+
+.gms2-tab.active {
+  background: #ff99cc;
+  border: 1px inset #c0c0c0;
+  border-bottom: 1px solid #ff99cc;
+}
+
+/* Main Content */
+.gms2-main-content {
+  display: flex;
+  flex: 1;
+  background: #c0c0c0;
+  overflow: hidden;
+}
+
+.gms2-left-panel {
+  width: 50%;
+  border-right: 1px solid #808080;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.gms2-right-panel {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  background: #c0c0c0;
+}
+
+/* Sections */
+.gms2-section {
+  border-bottom: 1px solid #808080;
+}
+
+.gms2-section-header {
+  background: #c0c0c0;
+  padding: 2px 4px;
+  font-weight: bold;
+  font-size: 11px;
+  border-bottom: 1px solid #808080;
+}
+
+/* Incidents Table */
+.gms2-incidents-table {
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.gms2-table-header {
+  background: #c0c0c0;
+  display: grid;
+  grid-template-columns: 30px 40px 40px 120px 100px 50px 40px 30px;
+  border-bottom: 1px solid #808080;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.gms2-table-header span {
+  padding: 2px 4px;
+  border-right: 1px solid #808080;
+}
+
+.gms2-table-row {
+  display: grid;
+  grid-template-columns: 30px 40px 40px 120px 100px 50px 40px 30px;
+  font-size: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+  min-height: 16px;
+}
+
+.gms2-table-row span {
+  padding: 2px 4px;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+}
+
+.gms2-table-row:hover {
+  background: #e0e0ff;
+}
+
+.gms2-table-row.selected {
+  background: #316ac5;
+  color: white;
+}
+
+.gms2-mc-cell {
+  background: #ff6666 !important;
+  color: black !important;
+  font-weight: bold;
+}
+
+.gms2-empty-rows {
+  height: 150px;
+}
+
+/* Incident Details */
+.gms2-incident-header {
+  background: #ff99cc;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  border-bottom: 1px solid #808080;
+}
+
+.gms2-incident-form {
+  padding: 4px;
+  background: #c0c0c0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+}
+
+.gms2-form-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.gms2-input {
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 1px 4px;
+  font-size: 11px;
+  height: 18px;
+}
+
+.gms2-input.wide {
+  flex: 1;
+}
+
+.gms2-input.small {
+  width: 40px;
+}
+
+.gms2-select {
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 1px 4px;
+  font-size: 11px;
+  height: 20px;
+}
+
+.gms2-select.small {
+  width: 60px;
+}
+
+.gms2-btn {
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  color: black;
+}
+
+.gms2-btn:hover {
+  background: #e0e0e0;
+}
+
+.gms2-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.gms2-btn.small {
+  padding: 1px 4px;
+  font-size: 10px;
+}
+
+.gms2-button-row {
+  display: flex;
+  gap: 2px;
+  margin: 2px 0;
+  flex-wrap: wrap;
+}
+
+/* Kladblok */
+.gms2-kladblok {
+  background: #c0c0c0;
+  border: 1px inset #c0c0c0;
+  height: 120px;
+  margin: 4px 0;
+}
+
+.gms2-kladblok-text {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border: none;
+  padding: 4px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  resize: none;
+  outline: none;
+}
+
+/* Karakteristieken */
+.gms2-karakteristieken-row {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.gms2-karakteristieken-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gms2-karakteristieken-textarea {
+  background: white;
+  border: 1px inset #c0c0c0;
+  height: 60px;
+  width: 100%;
+  font-size: 11px;
+  padding: 2px;
+  resize: none;
+}
+
+.gms2-karakteristieken-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gms2-notities-area {
+  flex: 1;
+}
+
+.gms2-notities-textarea {
+  background: #c0ffff;
+  border: 1px inset #c0c0c0;
+  height: 60px;
+  width: 100%;
+  font-size: 11px;
+  padding: 2px;
+  resize: none;
+}
+
+/* Bottom Actions */
+.gms2-bottom-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding: 4px 0;
+}
+
+.gms2-bottom-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gms2-bottom-right {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+/* Status Bar */
+.gms2-status-bar {
+  background: #c0c0c0;
+  border-top: 1px solid #808080;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 4px;
+  font-size: 11px;
+  min-height: 24px;
+}
+
+.gms2-status-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.gms2-status-center {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+}
+
+.gms2-status-right {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+
 .gms-karakteristieken-header {
   display: grid;
   grid-template-columns: 1fr 1fr;
