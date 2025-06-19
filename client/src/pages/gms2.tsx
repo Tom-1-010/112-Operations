@@ -51,11 +51,26 @@ export default function GMS2() {
   const [selectedMC2, setSelectedMC2] = useState("");
   const [selectedMC3, setSelectedMC3] = useState("");
 
+  // Get next incident number from localStorage, starting from 20250001
+  const getNextIncidentNumber = () => {
+    const lastNumber = localStorage.getItem("lastIncidentNumber");
+    let nextNumber = lastNumber ? parseInt(lastNumber) + 1 : 20250001;
+    localStorage.setItem("lastIncidentNumber", nextNumber.toString());
+    return nextNumber;
+  };
+
+  // Initialize incident number if not exists
+  useEffect(() => {
+    if (!localStorage.getItem("lastIncidentNumber")) {
+      localStorage.setItem("lastIncidentNumber", "20250000");
+    }
+  }, []);
+
   // Sample incidents data matching the interface
   const [incidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
     {
       id: 1,
-      nr: 161,
+      nr: 20250001,
       prio: 2,
       tijd: "08:28",
       mc: "BZIBBWN",
@@ -546,7 +561,7 @@ export default function GMS2() {
                 {/* Title Row */}
                 <div className="gms2-title-section">
                   <span className="gms2-title-text">P: Inbraak woning</span>
-                  <span className="gms2-incident-id">161</span>
+                  <span className="gms2-incident-id">{selectedIncident.nr}</span>
                 </div>
 
                 {/* Time Row */}
