@@ -453,37 +453,83 @@ export default function GMS2() {
     setLoggingEntries(prev => [newEntry, ...prev]);
   };
 
-  // Shortcode mapping for quick classification
+  // Enhanced shortcode mapping with official LMC codes
   const shortcodeMappings = {
-    // Ongeval codes
-    '-ogovls': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: 'Letsel' },
-    '-osvls': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: 'Letsel' },
-    '-wegvervoer': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: '' },
-    '-spoorvervoer': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: '' },
-
+    // Officiële LMC codes
+    '-vkweoi': { MC1: 'Verkeer', MC2: 'Wegvervoer', MC3: 'Onder invloed', code: 'vkweoi' },
+    '-brgb01': { MC1: 'Brand', MC2: 'Gebouw', MC3: '01 Woning/Woongebouw', code: 'brgb01' },
+    '-ogovls': { MC1: 'Ongeval', MC2: 'Overig', MC3: 'Letsel', code: 'ogovls' },
+    '-ogwels': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: 'Letsel', code: 'ogwels' },
+    '-ogspls': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: 'Letsel', code: 'ogspls' },
+    '-ogwtls': { MC1: 'Ongeval', MC2: 'Water', MC3: 'Letsel', code: 'ogwtls' },
+    
     // Geweld & Veiligheid codes
-    '-steekpartij': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Lichamelijk letsel' },
-    '-mesaanval': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Lichamelijk letsel' },
-    '-vechtpartij': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Vechtpartij' },
-    '-bedreiging': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Bedreiging' },
-
+    '-steekpartij': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Steekpartij', code: 'vogwst' },
+    '-vogwst': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Steekpartij', code: 'vogwst' },
+    '-schietpartij': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Schietpartij', code: 'vogwsi' },
+    '-vogwsi': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Schietpartij', code: 'vogwsi' },
+    '-mishandeling': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Mishandeling', code: 'vogwmh' },
+    '-vechtpartij': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Vechtpartij', code: 'vogwve' },
+    '-bedreiging': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Bedreiging', code: 'vogwbd' },
+    '-gijzeling': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Gijzeling', code: 'vogwgz' },
+    '-ontvoering': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Ontvoering', code: 'vogwon' },
+    
     // Brand codes
-    '-woningbrand': { MC1: 'Brand', MC2: 'Gebouwbrand', MC3: 'Woningbrand' },
-    '-autobrand': { MC1: 'Brand', MC2: 'Voertuigbrand', MC3: 'Personenauto' },
-    '-buitenbrand': { MC1: 'Brand', MC2: 'Buitenbrand', MC3: 'Natuurbrand' },
-
-    // Bezitsaantasting codes
-    '-inbraak': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning' },
-    '-diefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Eenvoudige diefstal' },
-    '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Diefstal motorvoertuig' },
-
+    '-brgb01': { MC1: 'Brand', MC2: 'Gebouw', MC3: '01 Woning/Woongebouw', code: 'brgb01' },
+    '-brwe': { MC1: 'Brand', MC2: 'Wegvervoer', MC3: '', code: 'brwe' },
+    '-brsp': { MC1: 'Brand', MC2: 'Spoorvervoer', MC3: '', code: 'brsp' },
+    '-brsh': { MC1: 'Brand', MC2: 'Scheepvaart', MC3: '', code: 'brsh' },
+    '-brnt': { MC1: 'Brand', MC2: 'Natuur', MC3: '', code: 'brnt' },
+    '-brbt': { MC1: 'Brand', MC2: 'Buiten', MC3: '', code: 'brbt' },
+    
+    // Bezitsaantasting codes  
+    '-bzibwn': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning', code: 'bzibwn' },
+    '-bzibbi': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Bedrijf/Instelling', code: 'bzibbi' },
+    '-bzibvo': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Voertuig', code: 'bzibvo' },
+    '-bzdsbr': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Beroving', code: 'bzdsbr' },
+    '-bzdsvo': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Voertuig', code: 'bzdsvo' },
+    '-bzdswk': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Winkeldiefstal', code: 'bzdswk' },
+    '-bzovbi': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Bedrijf/Instelling', code: 'bzovbi' },
+    '-bzovwn': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Woning', code: 'bzovwn' },
+    
+    // Verkeer codes
+    '-vkweav': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Achtervolging', code: 'vkweav' },
+    '-vkwesr': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' },
+    '-vkweps': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Persoon o/b rijbaan', code: 'vkweps' },
+    '-vkwest': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Verkeersstremming', code: 'vkwest' },
+    
     // Gezondheid codes
-    '-ambulance': { MC1: 'Gezondheid', MC2: 'Ambulancevervoer', MC3: 'Spoed' },
-    '-reanimatie': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: 'Hartstilstand' },
-    '-afstemverzoek': { MC1: 'Dienstverlening', MC2: 'Afstemverzoek', MC3: 'Ambulance' }
+    '-gzra': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: '', code: 'gzra' },
+    '-gzpz': { MC1: 'Gezondheid', MC2: 'Poging zelfdoding', MC3: '', code: 'gzpz' },
+    '-gzsp': { MC1: 'Gezondheid', MC2: 'Suicidaal persoon', MC3: '', code: 'gzsp' },
+    '-gzoz': { MC1: 'Gezondheid', MC2: 'Onwel/Ziekte', MC3: '', code: 'gzoz' },
+    
+    // Alarm codes
+    '-alraib': { MC1: 'Alarm', MC2: 'RAC alarm', MC3: 'Inbraakalarm', code: 'alraib' },
+    '-alraov': { MC1: 'Alarm', MC2: 'RAC alarm', MC3: 'Overvalalarm', code: 'alraov' },
+    '-alabab': { MC1: 'Alarm', MC2: 'Autom. brand', MC3: 'Autom. brand OMS', code: 'alabab' },
+    
+    // Dienstverlening
+    '-dvpoav': { MC1: 'Dienstverlening', MC2: 'Politie', MC3: 'Aantreffen van', code: 'dvpoav' },
+    '-dvpovm': { MC1: 'Dienstverlening', MC2: 'Politie', MC3: 'Vermissing', code: 'dvpovm' },
+    
+    // Leefmilieu
+    '-lmol': { MC1: 'Leefmilieu', MC2: 'Overlast van/door', MC3: '', code: 'lmol' },
+    '-lmolje': { MC1: 'Leefmilieu', MC2: 'Overlast van/door', MC3: 'Jeugd', code: 'lmolje' },
+    '-lmolps': { MC1: 'Leefmilieu', MC2: 'Overlast van/door', MC3: 'Persoon', code: 'lmolps' },
+    
+    // Gemakkelijke synoniemen/alternatieve namen
+    '-inbraak': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning', code: 'bzibwn' },
+    '-woningbrand': { MC1: 'Brand', MC2: 'Gebouw', MC3: '01 Woning/Woongebouw', code: 'brgb01' },
+    '-autobrand': { MC1: 'Brand', MC2: 'Wegvervoer', MC3: '', code: 'brwe' },
+    '-reanimatie': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: '', code: 'gzra' },
+    '-ambulance': { MC1: 'Gezondheid', MC2: 'Onwel/Ziekte', MC3: '', code: 'gzoz' },
+    '-overval': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Bedrijf/Instelling', code: 'bzovbi' },
+    '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Voertuig', code: 'bzdsvo' },
+    '-spookrijder': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' }
   };
 
-  // Function to detect and apply shortcodes for classification, address, and caller info
+  // Enhanced function to detect and apply shortcodes for classification, address, and caller info
   const detectAndApplyShortcodes = (text: string) => {
     const lines = text.split('\n');
     const lastLine = lines[lines.length - 1].trim();
@@ -527,21 +573,49 @@ export default function GMS2() {
 
     // Classification shortcode: -[code]
     if (lastLine.startsWith('-')) {
-      // Direct shortcode match
-      const shortcode = lastLine.split(' ')[0];
-      if (shortcodeMappings[shortcode]) {
-        const classification = shortcodeMappings[shortcode];
-        applyClassification(classification.MC1, classification.MC2, classification.MC3, shortcode);
+      const inputCode = lastLine.split(' ')[0].toLowerCase(); // Normalize to lowercase
+      
+      console.log(`🔍 Zoeken naar shortcode: ${inputCode}`);
+      
+      // Direct shortcode match (case-insensitive)
+      let matchedMapping = null;
+      for (const [code, mapping] of Object.entries(shortcodeMappings)) {
+        if (code.toLowerCase() === inputCode) {
+          matchedMapping = mapping;
+          break;
+        }
+      }
+
+      if (matchedMapping) {
+        console.log(`✅ Shortcode gevonden:`, matchedMapping);
+        applyClassification(matchedMapping.MC1, matchedMapping.MC2, matchedMapping.MC3, inputCode);
         return true;
       }
 
-      // Keyword combination detection
+      // Try to find by LMC code directly
+      const directCodeMatch = lmcClassifications.find(c => 
+        c.Code.toLowerCase() === inputCode.substring(1) // Remove the '-' prefix
+      );
+
+      if (directCodeMatch) {
+        console.log(`✅ Directe LMC code gevonden:`, directCodeMatch);
+        applyClassification(directCodeMatch.MC1, directCodeMatch.MC2, directCodeMatch.MC3, inputCode);
+        return true;
+      }
+
+      // Fallback: keyword combination detection
       const keywords = lastLine.substring(1).split(' ').filter(word => word.length > 2);
       const possibleMatch = findClassificationByKeywords(keywords);
       if (possibleMatch) {
+        console.log(`✅ Keyword match gevonden:`, possibleMatch);
         applyClassification(possibleMatch.MC1, possibleMatch.MC2, possibleMatch.MC3, lastLine);
         return true;
       }
+
+      // No match found
+      console.warn(`❌ Geen match gevonden voor: ${inputCode}`);
+      addLoggingEntry(`❌ Onbekende code: ${inputCode}`);
+      return false;
     }
 
     return false;
@@ -568,21 +642,54 @@ export default function GMS2() {
     return null;
   };
 
-  // Function to apply classification to dropdowns
+  // Enhanced function to apply classification to dropdowns with persistence
   const applyClassification = (mc1: string, mc2: string, mc3: string, detectedCode: string) => {
     const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
     const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
     const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
-    if (mc1Select && mc2Select && mc3Select && lmcClassifications.length > 0) {
-      console.log(`Applying classification: ${mc1} > ${mc2} > ${mc3}`);
+    if (!mc1Select || !mc2Select || !mc3Select || lmcClassifications.length === 0) {
+      console.warn('❌ Classification dropdowns not found or no classifications loaded');
+      return;
+    }
 
-      // Set MC1
-      mc1Select.value = mc1;
-      setSelectedMC1(mc1);
+    console.log(`🔧 Applying classification: ${mc1} > ${mc2} > ${mc3} (code: ${detectedCode})`);
 
-      // Manually populate MC2 dropdown
-      mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+    // Step 1: Validate and find exact match in classifications
+    const exactMatch = lmcClassifications.find(c => 
+      c.MC1 === mc1 && 
+      (mc2 === '' || c.MC2 === mc2) && 
+      (mc3 === '' || c.MC3 === mc3)
+    );
+
+    if (!exactMatch) {
+      console.warn(`❌ No exact match found for ${mc1} > ${mc2} > ${mc3}`);
+      addLoggingEntry(`⚠️ Onbekende classificatie: ${detectedCode}`);
+      return;
+    }
+
+    // Step 2: Update state immediately to prevent race conditions
+    setSelectedMC1(mc1);
+    if (mc2) setSelectedMC2(mc2);
+    if (mc3) setSelectedMC3(mc3);
+
+    // Step 3: Populate MC1 dropdown and set value
+    const mc1Options = Array.from(new Set(
+      lmcClassifications.map(c => c.MC1).filter(Boolean)
+    )).sort();
+
+    mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
+    mc1Options.forEach(mc1Option => {
+      const option = document.createElement('option');
+      option.value = mc1Option;
+      option.textContent = mc1Option;
+      mc1Select.appendChild(option);
+    });
+    mc1Select.value = mc1;
+
+    // Step 4: Populate MC2 dropdown if MC1 is set
+    mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+    if (mc1) {
       const mc2Options = Array.from(new Set(
         lmcClassifications
           .filter(c => c.MC1 === mc1 && c.MC2 && c.MC2.trim() !== "")
@@ -598,50 +705,56 @@ export default function GMS2() {
 
       if (mc2) {
         mc2Select.value = mc2;
-        setSelectedMC2(mc2);
+      }
+    }
 
-        // Manually populate MC3 dropdown
-        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-        const mc3Options = Array.from(new Set(
-          lmcClassifications
-            .filter(c => c.MC1 === mc1 && c.MC2 === mc2 && c.MC3 && c.MC3.trim() !== "")
-            .map(c => c.MC3)
-        )).sort();
+    // Step 5: Populate MC3 dropdown if MC2 is set
+    mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+    if (mc1 && mc2) {
+      const mc3Options = Array.from(new Set(
+        lmcClassifications
+          .filter(c => c.MC1 === mc1 && c.MC2 === mc2 && c.MC3 && c.MC3.trim() !== "")
+          .map(c => c.MC3)
+      )).sort();
 
-        console.log(`MC3 options found: ${mc3Options.length}`, mc3Options);
+      mc3Options.forEach(mc3Option => {
+        const option = document.createElement('option');
+        option.value = mc3Option;
+        option.textContent = mc3Option;
+        mc3Select.appendChild(option);
+      });
 
-        mc3Options.forEach(mc3Option => {
-          const option = document.createElement('option');
-          option.value = mc3Option;
-          option.textContent = mc3Option;
-          mc3Select.appendChild(option);
-        });
+      if (mc3) {
+        mc3Select.value = mc3;
+      }
+    }
 
-        if (mc3) {
-          setTimeout(() => {
-            mc3Select.value = mc3;
-            setSelectedMC3(mc3);
+    // Step 6: Apply priority from classification
+    const finalClassification = lmcClassifications.find(c => 
+      c.MC1 === mc1 && 
+      c.MC2 === (mc2 || '') && 
+      c.MC3 === (mc3 || '')
+    );
 
-            // Find and apply the matching classification
-            const matchingClassification = lmcClassifications.find(c => 
-              c.MC1 === mc1 && c.MC2 === mc2 && c.MC3 === mc3
-            );
-
-            if (matchingClassification && selectedIncident) {
-              const updatedIncident = {
-                ...selectedIncident,
-                mc: matchingClassification.Code.toUpperCase(),
-                mc1: mc1,
-                mc2: mc2,
-                mc3: mc3
-              };
-              setSelectedIncident(updatedIncident);
-            }
-          }, 50);
-        }
+    if (finalClassification) {
+      setPriorityValue(finalClassification.PRIO);
+      
+      // Update incident if one is selected
+      if (selectedIncident) {
+        const updatedIncident = {
+          ...selectedIncident,
+          mc: finalClassification.Code.toUpperCase(),
+          mc1: mc1,
+          mc2: mc2 || '',
+          mc3: mc3 || '',
+          prio: finalClassification.PRIO
+        };
+        setSelectedIncident(updatedIncident);
       }
 
-      // Classification applied silently
+      // Log successful classification
+      const classificatieTekst = mc3 ? `${mc1} > ${mc2} > ${mc3}` : mc2 ? `${mc1} > ${mc2}` : mc1;
+      addLoggingEntry(`✅ ${detectedCode.toUpperCase()} → ${classificatieTekst} (P${finalClassification.PRIO})`);
     }
   };
 
@@ -662,102 +775,173 @@ export default function GMS2() {
     }
   };
 
+  // Improved dropdown initialization with stable event handlers and persistent values
   const initializeLMCDropdowns = () => {
     const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
     const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
     const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
-    if (mc1Select && mc2Select && mc3Select) {
-      // Populate MC1 dropdown
-      const mc1Options = Array.from(new Set(lmcClassifications.map(c => c.MC1).filter(Boolean))).sort();
-      mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
-      mc1Options.forEach(mc1 => {
-        const option = document.createElement('option');
-        option.value = mc1;
-        option.textContent = mc1;
-        mc1Select.appendChild(option);
-      });
+    if (!mc1Select || !mc2Select || !mc3Select) {
+      console.warn('❌ MC dropdowns not found in DOM');
+      return;
+    }
 
-      // MC1 change handler
-      mc1Select.addEventListener('change', (e) => {
-        const selectedMC1 = (e.target as HTMLSelectElement).value;
-        setSelectedMC1(selectedMC1);
+    console.log('🔧 Initializing LMC dropdowns with', lmcClassifications.length, 'classifications');
 
-        // Clear and populate MC2
-        mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
-        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-        setSelectedMC2("");
-        setSelectedMC3("");
+    // Remove existing event listeners to prevent duplicates
+    mc1Select.replaceWith(mc1Select.cloneNode(true));
+    mc2Select.replaceWith(mc2Select.cloneNode(true));
+    mc3Select.replaceWith(mc3Select.cloneNode(true));
 
-        if (selectedMC1) {
-          const mc2Options = Array.from(new Set(
-            lmcClassifications
-              .filter(c => c.MC1 === selectedMC1 && c.MC2)
-              .map(c => c.MC2)
-          )).sort();
+    // Get fresh references after replacement
+    const freshMC1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const freshMC2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const freshMC3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
-          mc2Options.forEach(mc2 => {
-            const option = document.createElement('option');
-            option.value = mc2;
-            option.textContent = mc2;
-            mc2Select.appendChild(option);
-          });
-        }
-      });
+    // Store current values before reinitializing
+    const currentMC1 = selectedMC1;
+    const currentMC2 = selectedMC2;
+    const currentMC3 = selectedMC3;
 
-      // MC2 change handler
-      mc2Select.addEventListener('change', (e) => {
-        const selectedMC2 = (e.target as HTMLSelectElement).value;
-        setSelectedMC2(selectedMC2);
+    // Populate MC1 dropdown
+    const mc1Options = Array.from(new Set(lmcClassifications.map(c => c.MC1).filter(Boolean))).sort();
+    freshMC1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
+    mc1Options.forEach(mc1 => {
+      const option = document.createElement('option');
+      option.value = mc1;
+      option.textContent = mc1;
+      freshMC1Select.appendChild(option);
+    });
 
-        // Clear and populate MC3
-        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-        setSelectedMC3("");
+    // Restore MC1 value if it was previously set
+    if (currentMC1) {
+      freshMC1Select.value = currentMC1;
+    }
 
-        if (selectedMC2 && selectedMC1) {
-          const mc3Options = Array.from(new Set(
-            lmcClassifications
-              .filter(c => c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 && c.MC3.trim() !== "")
-              .map(c => c.MC3)
-          )).sort();
+    // MC1 change handler with persistence
+    freshMC1Select.addEventListener('change', (e) => {
+      const selectedMC1Value = (e.target as HTMLSelectElement).value;
+      setSelectedMC1(selectedMC1Value);
 
-          console.log(`MC3 options for ${selectedMC1}/${selectedMC2}:`, mc3Options);
+      // Clear and populate MC2
+      freshMC2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+      freshMC3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+      setSelectedMC2("");
+      setSelectedMC3("");
 
-          mc3Options.forEach(mc3 => {
-            const option = document.createElement('option');
-            option.value = mc3;
-            option.textContent = mc3;
-            mc3Select.appendChild(option);
-          });
-        }
-      });
+      if (selectedMC1Value) {
+        const mc2Options = Array.from(new Set(
+          lmcClassifications
+            .filter(c => c.MC1 === selectedMC1Value && c.MC2)
+            .map(c => c.MC2)
+        )).sort();
 
-      // MC3 change handler
-      mc3Select.addEventListener('change', (e) => {
-        const selectedMC3 = (e.target as HTMLSelectElement).value;
-        setSelectedMC3(selectedMC3);
+        mc2Options.forEach(mc2 => {
+          const option = document.createElement('option');
+          option.value = mc2;
+          option.textContent = mc2;
+          freshMC2Select.appendChild(option);
+        });
 
-        // Find matching classification and update incident
-        if (selectedMC3 && selectedMC2 && selectedMC1) {
-          const matchingClassification = lmcClassifications.find(c => 
-            c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
-          );
+        // Update priority based on MC1
+        updatePriorityFromClassification(selectedMC1Value, "", "");
+      }
+    });
 
-          if (matchingClassification && selectedIncident) {
-            // Update incident with classification
+    // MC2 change handler with persistence
+    freshMC2Select.addEventListener('change', (e) => {
+      const selectedMC2Value = (e.target as HTMLSelectElement).value;
+      setSelectedMC2(selectedMC2Value);
+
+      // Clear and populate MC3
+      freshMC3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+      setSelectedMC3("");
+
+      if (selectedMC2Value && selectedMC1) {
+        const mc3Options = Array.from(new Set(
+          lmcClassifications
+            .filter(c => c.MC1 === selectedMC1 && c.MC2 === selectedMC2Value && c.MC3 && c.MC3.trim() !== "")
+            .map(c => c.MC3)
+        )).sort();
+
+        mc3Options.forEach(mc3 => {
+          const option = document.createElement('option');
+          option.value = mc3;
+          option.textContent = mc3;
+          freshMC3Select.appendChild(option);
+        });
+
+        // Update priority based on MC1 + MC2
+        updatePriorityFromClassification(selectedMC1, selectedMC2Value, "");
+      }
+    });
+
+    // MC3 change handler with persistence
+    freshMC3Select.addEventListener('change', (e) => {
+      const selectedMC3Value = (e.target as HTMLSelectElement).value;
+      setSelectedMC3(selectedMC3Value);
+
+      // Update priority and incident with full classification
+      if (selectedMC3Value && selectedMC2 && selectedMC1) {
+        updatePriorityFromClassification(selectedMC1, selectedMC2, selectedMC3Value);
+        
+        const matchingClassification = lmcClassifications.find(c => 
+          c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3Value
+        );
+
+        if (matchingClassification) {
+          setPriorityValue(matchingClassification.PRIO);
+          
+          if (selectedIncident) {
             const updatedIncident = {
               ...selectedIncident,
               mc: matchingClassification.Code.toUpperCase(),
               mc1: selectedMC1,
               mc2: selectedMC2,
-              mc3: selectedMC3
+              mc3: selectedMC3Value,
+              prio: matchingClassification.PRIO
             };
             setSelectedIncident(updatedIncident);
-
-            // Classification applied silently
           }
+
+          addLoggingEntry(`📋 Classificatie compleet: ${selectedMC1} > ${selectedMC2} > ${selectedMC3Value} (P${matchingClassification.PRIO})`);
         }
-      });
+      }
+    });
+
+    // Restore previously selected values after initialization
+    setTimeout(() => {
+      if (currentMC1) {
+        freshMC1Select.value = currentMC1;
+        freshMC1Select.dispatchEvent(new Event('change'));
+        
+        setTimeout(() => {
+          if (currentMC2) {
+            freshMC2Select.value = currentMC2;
+            freshMC2Select.dispatchEvent(new Event('change'));
+            
+            setTimeout(() => {
+              if (currentMC3) {
+                freshMC3Select.value = currentMC3;
+                freshMC3Select.dispatchEvent(new Event('change'));
+              }
+            }, 100);
+          }
+        }, 100);
+      }
+    }, 100);
+  };
+
+  // Helper function to update priority from classification
+  const updatePriorityFromClassification = (mc1: string, mc2: string, mc3: string) => {
+    const matchingClassification = lmcClassifications.find(c => 
+      c.MC1 === mc1 && 
+      (mc2 === "" || c.MC2 === mc2) && 
+      (mc3 === "" || c.MC3 === mc3)
+    );
+
+    if (matchingClassification) {
+      setPriorityValue(matchingClassification.PRIO);
     }
   };
 
