@@ -1,7 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { db } from "./db";
-import { phoneNumbers, insertPhoneNumberSchema, gmsIncidents, insertGmsIncidentSchema } from "@shared/schema";
+import { 
+  incidents, 
+  insertIncidentSchema, 
+  gmsIncidents, 
+  insertGmsIncidentSchema,
+  phoneNumbers,
+  insertPhoneNumberSchema,
+  karakteristieken,
+  insertKarakteristiekSchema
+} from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -213,9 +222,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const testQuery = 'Rotterdam Kleiweg';
       const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(testQuery)}&rows=5&fq=type:adres`;
-      
+
       console.log(`[BAG API TEST] Testing with URL: ${url}`);
-      
+
       const response = await fetch(url, {
         headers: {
           'Accept': 'application/json',
@@ -251,6 +260,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'fetch_error',
         error: error.message
       });
+    }
+  });
+
+  // Karakteristieken endpoints
+  app.get("/api/karakteristieken", async (req, res) => {
+    try {
+      const karakteristiekenList = await db.select().from(karakteristieken);
+      res.json(karakteristiekenList);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch karakteristieken" });
+    }
+  });
+
+  app.post("/api/karakteristieken", async (req, res) => {
+    try {
+      const karakteristiekData = insertKarakteristiekSchema.parse(req.body);
+      const [newKarakteristiek] = await db.insert(karakteristieken).values(karakteristiekData).returning();
+      res.json(newKarakteristiek);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid karakteristiek data" });
+    }
+  });
+
+  app.post("/api/karakteristieken/bulk", async (req, res) => {
+    try {
+      const karakteristiekenData = req.body;
+      const newKarakteristieken = await db.insert(karakteristieken).values(karakteristiekenData).returning();
+      res.json(newKarakteristieken);
+    } catch (error) {
+      console.error("Error creating karakteristieken:", error);
+      res.status(400).json({ error: "Failed to create karakteristieken" });
     }
   });
 

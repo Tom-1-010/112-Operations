@@ -93,5 +93,24 @@ export type InsertUnit = z.infer<typeof insertUnitSchema>;
 export type Unit = typeof units.$inferSelect;
 export type InsertGmsIncident = z.infer<typeof insertGmsIncidentSchema>;
 export type GmsIncident = typeof gmsIncidents.$inferSelect;
+export const karakteristieken = pgTable("karakteristieken", {
+  id: serial("id").primaryKey(),
+  ktNaam: text("kt_naam").notNull(),
+  ktType: text("kt_type").notNull(),
+  ktWaarde: text("kt_waarde"),
+  ktCode: text("kt_code"),
+  ktPaser: text("kt_paser"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertKarakteristiekSchema = createInsertSchema(karakteristieken).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertPhoneNumber = z.infer<typeof insertPhoneNumberSchema>;
 export type PhoneNumber = typeof phoneNumbers.$inferSelect;
+export type InsertKarakteristiek = z.infer<typeof insertKarakteristiekSchema>;
+export type Karakteristiek = typeof karakteristieken.$inferSelect;
