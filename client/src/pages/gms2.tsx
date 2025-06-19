@@ -1159,7 +1159,7 @@ export default function GMS2() {
                     </div>
                   </div>
 
-                  <div className="gms2-action-buttons">
+                  <div className="gms2-action-buttons" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <select className="gms2-dropdown" style={{ minWidth: '100px' }}>
                       <option>Testmelding</option>
                     </select>
