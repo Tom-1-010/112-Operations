@@ -295,6 +295,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/import-karakteristieken", async (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      console.log('🔄 Starting karakteristieken import via API...');
+      
+      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750367007045.json');
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'Karakteristieken file not found' });
+      }
+      
+      const jsonData = fs.readFileSync(filePath, 'utf8');
+      const karakteristiekenData = JSON.parse(jsonData);
+      
+      console.log(`📊 Found ${karakteristiekenData.length} karakteristieken to import`);
+      
+      // Clear existing data
+      await db.delete(karakteristieken);
+      console.log('🗑️ Cleared existing karakteristieken');
+      
+      // Transform data to match schema
+      const transformedData = karakteristiekenData.map(item => ({
+        ktNaam: item['kt-naam'],
+        ktType: item['kt-type'],
+        ktWaarde: item['kt-waarde'],
+        ktCode: item['kt-code'],
+        ktPaser: item['kt-paser']
+      }));
+      
+      // Insert new data in batches
+      const batchSize = 100;
+      let imported = 0;
+      
+      for (let i = 0; i < transformedData.length; i += batchSize) {
+        const batch = transformedData.slice(i, i + batchSize);
+        await db.insert(karakteristieken).values(batch);
+        imported += batch.length;
+        console.log(`📥 Imported ${imported}/${transformedData.length} karakteristieken`);
+      }
+      
+      // Verify import
+      const count = await db.select().from(karakteristieken);
+      console.log(`✅ Successfully imported ${count.length} karakteristieken to database`);
+      
+      res.json({ 
+        success: true, 
+        imported: count.length,
+        message: `Successfully imported ${count.length} karakteristieken` 
+      });
+      
+    } catch (error) {
+      console.error('❌ Error importing karakteristieken:', error);
+      res.status(500).json({ error: 'Failed to import karakteristieken' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
