@@ -892,42 +892,99 @@ export default function GMS2() {
   const processKarakteristiekCode = (code: string, value: string) => {
     console.log(`🔍 Looking for karakteristiek with code: "${code}", value: "${value}"`);
     
-    // Find matching karakteristiek in database - try multiple matching strategies
-    // Use ktCode (camelCase) as that's what comes from the API
-    let matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-      k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
-    );
-
-    // If not found by exact code match, try partial matching
+    const fullInput = `${code} ${value}`.toLowerCase();
+    console.log(`🔍 Full input: "${fullInput}"`);
+    
+    // Step 1: Try exact specific patterns first (highest priority)
+    const specificPatterns = {
+      'aantal doden': 'dd',
+      'aantal gewonden': 'gew', 
+      'aantal aanhoudingen': 'aanh',
+      'aantal daders': 'ddrs',
+      'aantal personen': 'pers',
+      'aantal vermisten': 'verm',
+      'aantal te water': 'tewt',
+      'aantal niet zelfredz': 'nzrz',
+      'aantal in object': 'iobj',
+      'aantal dieren': 'dier'
+    };
+    
+    let matchingKarakteristiek = null;
+    
+    // Check for specific exact matches first
+    for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
+      if (fullInput.includes(pattern)) {
+        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+          k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
+        );
+        if (matchingKarakteristiek) {
+          console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
+          break;
+        }
+      }
+    }
+    
+    // Step 2: Try exact code match
     if (!matchingKarakteristiek) {
       matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-        k.ktCode && k.ktCode.toLowerCase().includes(code.toLowerCase())
+        k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
       );
+      if (matchingKarakteristiek) {
+        console.log(`✅ Found exact code match: "${code}"`);
+      }
     }
 
-    // Smart matching: combine code and value for better context
+    // Step 3: Try value-based matching for "aantal" + specific word
+    if (!matchingKarakteristiek && code === 'aantal' && value) {
+      const valueWords = value.toLowerCase().split(/\s+/);
+      const firstValueWord = valueWords[0];
+      
+      // Map value words to expected codes
+      const valueToCodeMap = {
+        'doden': 'dd',
+        'dood': 'dd',
+        'gewonden': 'gew',
+        'gewond': 'gew',
+        'aanhoudingen': 'aanh',
+        'aanhouding': 'aanh',
+        'daders': 'ddrs',
+        'dader': 'ddrs',
+        'personen': 'pers',
+        'persoon': 'pers',
+        'vermisten': 'verm',
+        'vermist': 'verm'
+      };
+      
+      const expectedCode = valueToCodeMap[firstValueWord];
+      if (expectedCode) {
+        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+          k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
+        );
+        if (matchingKarakteristiek) {
+          console.log(`✅ Found value-based match: "aantal ${firstValueWord}" -> "${expectedCode}"`);
+        }
+      }
+    }
+
+    // Step 4: Smart matching by name content (fallback)
     if (!matchingKarakteristiek) {
-      const fullInput = `${code} ${value}`.toLowerCase();
       const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
       
-      // Find best match by counting word overlaps
       let bestMatch = null;
       let bestScore = 0;
       
       for (const k of karakteristiekenDatabase) {
         const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
-        const codeWords = (k.ktCode || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
-        const allKarakteristiekWords = [...nameWords, ...codeWords];
         
         let score = 0;
         for (const inputWord of inputWords) {
-          for (const karWord of allKarakteristiekWords) {
-            if (inputWord === karWord) {
-              score += 3; // Exact match
-            } else if (inputWord.includes(karWord) || karWord.includes(inputWord)) {
-              score += 2; // Partial match
-            } else if (inputWord.substring(0, 3) === karWord.substring(0, 3)) {
-              score += 1; // Similar start
+          for (const nameWord of nameWords) {
+            if (inputWord === nameWord) {
+              score += 5; // Exact word match
+            } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
+              score += 3; // Partial match
+            } else if (inputWord.includes(nameWord) && nameWord.length > 3) {
+              score += 2; // Reverse partial match
             }
           }
         }
@@ -938,38 +995,10 @@ export default function GMS2() {
         }
       }
       
-      // Only use best match if it has a reasonable score
-      if (bestScore >= 3) {
+      // Only use if we have a strong match
+      if (bestScore >= 5) {
         matchingKarakteristiek = bestMatch;
-      }
-    }
-
-    // Fallback: try specific common patterns
-    if (!matchingKarakteristiek) {
-      const specificPatterns = {
-        'aantal doden': ['aantal doden'],
-        'aantal gewonden': ['aantal gewonden'], 
-        'aantal aanhoudingen': ['aantal aanhoudingen'],
-        'aantal daders': ['aantal daders'],
-        'aantal personen': ['aantal personen'],
-        'doden': ['doden', 'dood'],
-        'gewonden': ['gewond'],
-        'aanhoudingen': ['aanhouding'],
-        'daders': ['dader'],
-        'personen': ['persoon', 'pers']
-      };
-      
-      const fullInput = `${code} ${value}`.toLowerCase();
-      
-      for (const [pattern, variants] of Object.entries(specificPatterns)) {
-        if (fullInput.includes(pattern)) {
-          matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-            variants.some(variant => 
-              (k.ktNaam || '').toLowerCase().includes(variant)
-            )
-          );
-          if (matchingKarakteristiek) break;
-        }
+        console.log(`✅ Found smart match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}"`);
       }
     }
 
