@@ -156,13 +156,13 @@ export default function GMS2() {
         telefoonnummer: incident.telefoonnummer || "",
         melderAdres: incident.melderAdres || "",
         huisnummer: incident.huisnummer || "",
-        toevoeging: "",
+        toevoeging: incident.toevoeging || "",
         gemeente: incident.gemeente || "",
         straatnaam: incident.straatnaam || "",
-        postcode: "",
+        postcode: incident.postcode || "",
         plaatsnaam: incident.plaatsnaam || "",
-        functie: "",
-        roepnummer: ""
+        functie: incident.functie || "",
+        roepnummer: incident.roepnr || ""
       });
 
       // Set MC classifications
@@ -175,6 +175,17 @@ export default function GMS2() {
       
       // Set notes if available
       if (incident.notities) setNotitiesText(incident.notities);
+      
+      // Load logging history if available
+      if (incident.meldingslogging) {
+        const loggingLines = incident.meldingslogging.split('\n').filter(line => line.trim());
+        const parsedEntries = loggingLines.map((line, index) => ({
+          id: Date.now() + index,
+          timestamp: line.substring(0, 20),
+          message: line.substring(21)
+        }));
+        setLoggingEntries(parsedEntries);
+      }
 
       // Restore MC classifications in dropdowns
       setTimeout(() => {
