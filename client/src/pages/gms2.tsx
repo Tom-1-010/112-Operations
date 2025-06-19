@@ -375,9 +375,7 @@ export default function GMS2() {
                     </div>
                   </div>
 
-                  <div className="gms2-time-display">
-                    <strong>**11:00**</strong>
-                  </div>
+                  
 
                   <div className="gms2-kladblok-modern">
                     <textarea 
