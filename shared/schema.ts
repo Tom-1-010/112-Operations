@@ -99,7 +99,7 @@ export const karakteristieken = pgTable("karakteristieken", {
   ktType: text("kt_type").notNull(),
   ktWaarde: text("kt_waarde"),
   ktCode: text("kt_code"),
-  ktParser: text("kt_parser"),
+  ktParsers: text("kt_parsers"), // JSON array stored as text
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
