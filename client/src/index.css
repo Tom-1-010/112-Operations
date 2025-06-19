@@ -2588,25 +2588,140 @@ body {
   resize: none;
 }
 
-/* Bottom Actions */
-.gms2-bottom-actions {
+/* Classic GMS Bottom Layout */
+.gms2-classic-bottom {
+  margin-top: 8px;
+  border-top: 1px solid #808080;
+  padding-top: 4px;
+}
+
+.gms2-mc-row {
   display: flex;
+  align-items: center;
   gap: 8px;
-  margin-top: auto;
-  padding: 4px 0;
+  margin-bottom: 4px;
+}
+
+.gms2-mc-row .gms2-field-label {
+  font-weight: bold;
+  min-width: 40px;
+}
+
+.gms2-bottom-layout {
+  display: flex;
+  gap: 2px;
+  height: 100px;
+  margin-bottom: 4px;
 }
 
 .gms2-bottom-left {
   flex: 1;
+  border: 1px inset #c0c0c0;
+  background: #c0c0c0;
+  padding: 2px;
+}
+
+.gms2-bottom-center {
+  width: 100px;
+  border: 1px inset #c0c0c0;
+  background: #c0c0c0;
+  padding: 2px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .gms2-bottom-right {
+  flex: 1;
+  border: 1px inset #c0c0c0;
+  background: #c0c0c0;
+  padding: 2px;
+}
+
+.gms2-section-title {
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.gms2-karakteristieken-textarea {
+  width: 100%;
+  height: calc(100% - 16px);
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 2px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  resize: none;
+}
+
+.gms2-waarde-display {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.gms2-notities-textarea {
+  width: 100%;
+  height: calc(100% - 4px);
+  background: #c0ffff;
+  border: 1px inset #c0c0c0;
+  padding: 2px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  resize: none;
+}
+
+.gms2-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  border-top: 1px solid #808080;
+}
+
+.gms2-priority-section {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.gms2-service-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gms2-checkbox-group {
+  display: flex;
+  gap: 8px;
+}
+
+.gms2-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+}
+
+.gms2-checkbox-row input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+}
+
+.gms2-dec-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.gms2-final-actions {
+  margin-left: auto;
   display: flex;
   gap: 4px;
-  align-items: flex-end;
+  align-items: center;
 }
 
 /* Status Bar */

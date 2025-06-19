@@ -313,66 +313,79 @@ export default function GMS2() {
                   />
                 </div>
 
-                {/* MC Row */}
-                <div className="gms2-mc-row">
-                  <span className="gms2-field-label">Hints/Kar:</span>
-                  <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
-                    <option value="Bezitsaantasting">{mc1Value}</option>
-                  </select>
-                  <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
-                    <option value="Inbraak">{mc2Value}</option>
-                  </select>
-                </div>
+                {/* Classic GMS Bottom Layout */}
+                <div className="gms2-classic-bottom">
+                  {/* MC Row with Huis Kar label */}
+                  <div className="gms2-mc-row">
+                    <span className="gms2-field-label">Huis Kar</span>
+                    <span className="gms2-field-label">MC</span>
+                    <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
+                      <option value="Bezitsaantasting">{mc1Value}</option>
+                    </select>
+                    <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
+                      <option value="Inbraak">{mc2Value}</option>
+                    </select>
+                  </div>
 
-                {/* Bottom section with karakteristieken and buttons */}
-                <div className="gms2-bottom-section">
-                  <div className="gms2-karakteristieken-section">
-                    <div className="gms2-karakteristieken-left">
-                      <span className="gms2-field-label">Karakteristieken:</span>
+                  {/* Main bottom layout with three sections */}
+                  <div className="gms2-bottom-layout">
+                    {/* Left section - Karakteristieken */}
+                    <div className="gms2-bottom-left">
+                      <div className="gms2-section-title">Karakteristieken</div>
                       <textarea className="gms2-karakteristieken-textarea" />
                     </div>
-                    <div className="gms2-karakteristieken-right">
-                      <div className="gms2-waarde-section">
-                        <span className="gms2-field-label">Waarde:</span>
-                        <span className="gms2-tijd-waarde">"08:26**"</span>
-                      </div>
+
+                    {/* Center section - Waarde */}
+                    <div className="gms2-bottom-center">
+                      <div className="gms2-section-title">Waarde</div>
+                      <div className="gms2-waarde-display">"08:26"</div>
+                    </div>
+
+                    {/* Right section - Notes with blue background */}
+                    <div className="gms2-bottom-right">
                       <textarea 
                         value={notitiesText}
                         onChange={(e) => setNotitiesText(e.target.value)}
                         className="gms2-notities-textarea"
+                        placeholder="Zitten vast in schoorsteen"
                       />
                     </div>
                   </div>
 
-                  {/* Priority and Service Buttons */}
-                  <div className="gms2-priority-services">
+                  {/* Bottom action row */}
+                  <div className="gms2-action-row">
                     <div className="gms2-priority-section">
-                      <span className="gms2-field-label">P:</span>
+                      <span className="gms2-field-label">P</span>
                       <button className="gms2-btn priority-btn active">2</button>
-                      <button className="gms2-btn priority-btn">3</button>
                       <button className="gms2-btn priority-btn">P</button>
                       <button className="gms2-btn priority-btn">A</button>
                     </div>
                     
-                    <div className="gms2-services-section">
-                      <div className="gms2-service-row">
-                        <input type="checkbox" />
-                        <span className="gms2-service-label">P</span>
-                        <input type="checkbox" />
+                    <div className="gms2-service-checkboxes">
+                      <div className="gms2-checkbox-group">
+                        <div className="gms2-checkbox-row">
+                          <input type="checkbox" />
+                          <span>P</span>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="gms2-checkbox-row">
+                          <input type="checkbox" />
+                          <span>B</span>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="gms2-checkbox-row">
+                          <input type="checkbox" />
+                          <span>A</span>
+                          <input type="checkbox" />
+                        </div>
                       </div>
-                      <div className="gms2-service-row">
+                      <div className="gms2-dec-row">
                         <input type="checkbox" />
-                        <span className="gms2-service-label">B</span>
-                        <input type="checkbox" />
-                      </div>
-                      <div className="gms2-service-row">
-                        <input type="checkbox" />
-                        <span className="gms2-service-label">A</span>
-                        <input type="checkbox" />
+                        <span>DEC</span>
                       </div>
                     </div>
 
-                    <div className="gms2-action-buttons">
+                    <div className="gms2-final-actions">
                       <select className="gms2-select action-select">
                         <option>Eindrapport</option>
                       </select>
