@@ -19,11 +19,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok" });
   });
 
-  // Root health check for webview detection
-  app.get("/health", (req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString(), port: 5000 });
-  });
-
   // Phone numbers routes
   app.get("/api/phone-numbers", async (req, res) => {
     try {

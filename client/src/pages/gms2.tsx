@@ -180,7 +180,7 @@ export default function GMS2() {
 
   const handleIncidentSelect = (incident: GmsIncident) => {
     console.log(`📋 Selecting incident ${incident.nr} for editing`);
-
+    
     // Set selected incident first
     setSelectedIncident(incident);
 
@@ -199,7 +199,7 @@ export default function GMS2() {
         functie: incident.functie || "",
         roepnummer: incident.roepnr || ""
       };
-
+      
       console.log(`📋 Loading incident data into form:`, incidentFormData);
       setFormData(incidentFormData);
 
@@ -207,9 +207,9 @@ export default function GMS2() {
       const mc1Value = incident.mc1 || "";
       const mc2Value = incident.mc2 || "";
       const mc3Value = incident.mc3 || "";
-
+      
       console.log(`📋 Setting MC values: MC1="${mc1Value}", MC2="${mc2Value}", MC3="${mc3Value}"`);
-
+      
       setSelectedMC1(mc1Value);
       setSelectedMC2(mc2Value);
       setSelectedMC3(mc3Value);
@@ -229,7 +229,7 @@ export default function GMS2() {
 
       // Load logging history if available - IMPORTANT: Clear first, then load
       setLoggingEntries([]); // Clear any existing entries first
-
+      
       if (incident.meldingslogging) {
         const loggingLines = incident.meldingslogging.split('\n').filter(line => line.trim());
         const parsedEntries = loggingLines.map((line, index) => ({
@@ -237,7 +237,7 @@ export default function GMS2() {
           timestamp: line.substring(0, 20),
           message: line.substring(21)
         }));
-
+        
         console.log(`📋 Loading ${parsedEntries.length} logging entries for incident ${incident.nr}`);
         setLoggingEntries(parsedEntries);
       }
@@ -270,7 +270,7 @@ export default function GMS2() {
                   .filter(c => c.MC1 === incident.mc1 && c.MC2 && c.MC2.trim() !== "")
                   .map(c => c.MC2)
               )).sort();
-
+              
               mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
               mc2Options.forEach(mc2 => {
                 const option = document.createElement('option');
@@ -288,7 +288,7 @@ export default function GMS2() {
                       .filter(c => c.MC1 === incident.mc1 && c.MC2 === incident.mc2 && c.MC3 && c.MC3.trim() !== "")
                       .map(c => c.MC3)
                   )).sort();
-
+                  
                   mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
                   mc3Options.forEach(mc3 => {
                     const option = document.createElement('option');
@@ -297,7 +297,7 @@ export default function GMS2() {
                     mc3Select.appendChild(option);
                   });
                   mc3Select.value = incident.mc3;
-
+                  
                   console.log(`📋 Restored complete classification: MC1="${incident.mc1}", MC2="${incident.mc2}", MC3="${incident.mc3}"`);
                 }
               }, 100);
@@ -306,7 +306,7 @@ export default function GMS2() {
         }
       }, 250);
 
-
+      
     }
   };
 
@@ -397,7 +397,7 @@ export default function GMS2() {
       // Update selected incident
       setSelectedIncident(updatedIncident);
 
-
+      
     }
   };
 
@@ -500,7 +500,7 @@ export default function GMS2() {
       // Remove from openstaande incidenten by filtering out archived ones
       setIncidents(prev => prev.filter(inc => inc.id !== selectedIncident.id));
 
-
+      
 
       // Select first remaining incident or clear selection
       const remainingIncidents = incidents.filter(inc => inc.id !== selectedIncident.id);
@@ -512,7 +512,7 @@ export default function GMS2() {
   const handleNieuw = () => {
     // Generate a unique session ID for this new incident to prevent data mixing
     const newSessionId = `new_incident_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
+    
     console.log(`🆕 Starting completely new incident with session ID: ${newSessionId}`);
 
     // STEP 1: Immediately clear selected incident to break all connections
@@ -613,7 +613,7 @@ export default function GMS2() {
     '-ogwels': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: 'Letsel', code: 'ogwels' },
     '-ogspls': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: 'Letsel', code: 'ogspls' },
     '-ogwtls': { MC1: 'Ongeval', MC2: 'Water', MC3: 'Letsel', code: 'ogwtls' },
-
+    
     // Geweld & Veiligheid codes
     '-steekpartij': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Steekpartij', code: 'vogwst' },
     '-vogwst': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Steekpartij', code: 'vogwst' },
@@ -624,7 +624,7 @@ export default function GMS2() {
     '-bedreiging': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Bedreiging', code: 'vogwbd' },
     '-gijzeling': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Gijzeling', code: 'vogwgz' },
     '-ontvoering': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Ontvoering', code: 'vogwon' },
-
+    
     // Brand codes
     '-brgb01': { MC1: 'Brand', MC2: 'Gebouw', MC3: '01 Woning/Woongebouw', code: 'brgb01' },
     '-brwe': { MC1: 'Brand', MC2: 'Wegvervoer', MC3: '', code: 'brwe' },
@@ -632,7 +632,7 @@ export default function GMS2() {
     '-brsh': { MC1: 'Brand', MC2: 'Scheepvaart', MC3: '', code: 'brsh' },
     '-brnt': { MC1: 'Brand', MC2: 'Natuur', MC3: '', code: 'brnt' },
     '-brbt': { MC1: 'Brand', MC2: 'Buiten', MC3: '', code: 'brbt' },
-
+    
     // Bezitsaantasting codes  
     '-bzibwn': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning', code: 'bzibwn' },
     '-bzibbi': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Bedrijf/Instelling', code: 'bzibbi' },
@@ -642,33 +642,33 @@ export default function GMS2() {
     '-bzdswk': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Winkeldiefstal', code: 'bzdswk' },
     '-bzovbi': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Bedrijf/Instelling', code: 'bzovbi' },
     '-bzovwn': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Woning', code: 'bzovwn' },
-
+    
     // Verkeer codes
     '-vkweav': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Achtervolging', code: 'vkweav' },
     '-vkwesr': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' },
     '-vkweps': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Persoon o/b rijbaan', code: 'vkweps' },
     '-vkwest': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Verkeersstremming', code: 'vkwest' },
-
+    
     // Gezondheid codes
     '-gzra': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: '', code: 'gzra' },
     '-gzpz': { MC1: 'Gezondheid', MC2: 'Poging zelfdoding', MC3: '', code: 'gzpz' },
     '-gzsp': { MC1: 'Gezondheid', MC2: 'Suicidaal persoon', MC3: '', code: 'gzsp' },
     '-gzoz': { MC1: 'Gezondheid', MC2: 'Onwel/Ziekte', MC3: '', code: 'gzoz' },
-
+    
     // Alarm codes
     '-alraib': { MC1: 'Alarm', MC2: 'RAC alarm', MC3: 'Inbraakalarm', code: 'alraib' },
     '-alraov': { MC1: 'Alarm', MC2: 'RAC alarm', MC3: 'Overvalalarm', code: 'alraov' },
     '-alabab': { MC1: 'Alarm', MC2: 'Autom. brand', MC3: 'Autom. brand OMS', code: 'alabab' },
-
+    
     // Dienstverlening
     '-dvpoav': { MC1: 'Dienstverlening', MC2: 'Politie', MC3: 'Aantreffen van', code: 'dvpoav' },
     '-dvpovm': { MC1: 'Dienstverlening', MC2: 'Politie', MC3: 'Vermissing', code: 'dvpovm' },
-
+    
     // Leefmilieu
     '-lmol': { MC1: 'Leefmilieu', MC2: 'Overlast van/door', MC3: '', code: 'lmol' },
     '-lmolje': { MC1: 'Leefmilieu', MC2: 'Overlast van/door', MC3: 'Jeugd', code: 'lmolje' },
     '-lmolps': { MC1: 'Leefmilieu', MC2: 'Overlast van/door', MC3: 'Persoon', code: 'lmolps' },
-
+    
     // Gemakkelijke synoniemen/alternatieve namen
     '-inbraak': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning', code: 'bzibwn' },
     '-woningbrand': { MC1: 'Brand', MC2: 'Gebouw', MC3: '01 Woning/Woongebouw', code: 'brgb01' },
@@ -686,7 +686,7 @@ export default function GMS2() {
       const encodedQuery = encodeURIComponent(query);
       const response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=20`);
       const data = await response.json();
-
+      
       if (data.features && data.features.length > 0) {
         return data.features.map((feature: any) => ({
           straatnaam: feature.properties.straatnaam || '',
@@ -714,7 +714,7 @@ export default function GMS2() {
       let encodedQuery = encodeURIComponent(query);
       let response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=5`);
       let data = await response.json();
-
+      
       if (data.features && data.features.length > 0) {
         return data.features.map((feature: any) => ({
           straatnaam: feature.properties.straatnaam || '',
@@ -727,13 +727,13 @@ export default function GMS2() {
           volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
         }));
       }
-
+      
       // If no exact match, try broader search
       query = `${straat} ${stad}`;
       encodedQuery = encodeURIComponent(query);
       response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=10`);
       data = await response.json();
-
+      
       if (data.features && data.features.length > 0) {
         return data.features
           .filter((feature: any) => feature.properties.huisnummer == huisnummer || !huisnummer)
@@ -748,7 +748,7 @@ export default function GMS2() {
             volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
           }));
       }
-
+      
       return [];
     } catch (error) {
       console.error('BAG API error:', error);
@@ -758,15 +758,15 @@ export default function GMS2() {
 
   const fillAddressFromBAG = async (stad: string, straatnaam: string, huisnummer: string) => {
     console.log(`🔍 Zoeken naar adres: ${straatnaam} ${huisnummer}, ${stad}`);
-
+    
     const results = await searchBAGSpecific(stad, straatnaam, huisnummer);
-
+    
     if (results.length > 0) {
       const bestMatch = results[0];
-
+      
       // Combine number and additions properly
       const fullHuisnummer = `${bestMatch.huisnummer}${bestMatch.huisletter || ''}${bestMatch.huisnummertoevoeging ? '-' + bestMatch.huisnummertoevoeging : ''}`;
-
+      
       const completeAddressData = {
         straatnaam: bestMatch.straatnaam,
         huisnummer: fullHuisnummer,
@@ -790,12 +790,12 @@ export default function GMS2() {
       }
 
       addLoggingEntry(`📍 Adres automatisch aangevuld via BAG API: ${bestMatch.volledigAdres}`);
-
+      
       // Switch to Locatietreffers tab and clear search
       setActiveLoggingTab('locatietreffers');
       setBagSearchQuery("");
       setBagSearchResults([]);
-
+      
       return completeAddressData;
     } else {
       console.log(`❌ Geen adres gevonden voor: ${straatnaam} ${huisnummer}, ${stad}`);
@@ -805,100 +805,114 @@ export default function GMS2() {
   };
 
   // Function to process karakteristieken from kladblok text
+  const processKarakteristieken = (text: string) => {
+    const lines = text.split('\n');
+    const lastLine = lines[lines.length - 1].trim();
 
-  const processKladblokContent = useCallback((content: string) => {
-    if (!content.trim()) return;
+    console.log(`🏷️ Processing karakteristieken for: "${lastLine}"`);
 
-    const lines = content.split('\n');
-    const newKarakteristieken: any[] = [];
+    // Check if karakteristieken database is loaded
+    if (!Array.isArray(karakteristiekenDatabase) || karakteristiekenDatabase.length === 0) {
+      console.warn('⚠️ Karakteristieken database not loaded yet');
+      return false;
+    }
 
-    lines.forEach(line => {
-      const trimmedLine = line.trim();
-      if (!trimmedLine.startsWith('-')) return;
+    // Check if line contains karakteristieken codes (starts with -)
+    if (!lastLine.startsWith('-')) {
+      return false;
+    }
 
-      // Parse the command
-      const parts = trimmedLine.substring(1).split(' ');
-      const code = parts[0];
-      const value = parts.slice(1).join(' ');
+    // Parse the line for karakteristieken codes
+    const parts = lastLine.split(',').map(part => part.trim());
+    let processed = false;
 
-      if (!karakteristiekenDatabase || !Array.isArray(karakteristiekenDatabase)) {
-        console.warn('Karakteristieken database is not available or not an array');
-        return;
-      }
+    parts.forEach(part => {
+      if (!part.startsWith('-')) return;
 
+      // Extract code and value
+      const match = part.match(/^-([a-zA-Z]+)(?:\s+(.+))?$/);
+      if (!match) return;
+
+      const [, code, value] = match;
+      
       // Find matching karakteristiek in database
-      const matchingKarakteristiek = karakteristiekenDatabase.find((k: any) => 
-        k.ktCode && k.ktCode.toString().toLowerCase() === code.toLowerCase()
-      );
+      const matchingKarakteristiek = Array.isArray(karakteristiekenDatabase) 
+        ? karakteristiekenDatabase.find(k => 
+            k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
+          )
+        : null;
 
       if (matchingKarakteristiek) {
-        // Check if this karakteristiek already exists
-        const existingIndex = newKarakteristieken.findIndex(k => 
+        console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
+        
+        // Determine the final value based on type
+        let finalValue = '';
+        
+        if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
+          // For "Vrije tekst" and "Getal" types, use the user-provided value
+          finalValue = value || '';
+          console.log(`📝 Using user input for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
+        } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
+          // For Ja/Nee types, use the provided value or default from database
+          finalValue = value || matchingKarakteristiek.ktWaarde || '';
+        } else {
+          // For other types (Enkelvoudige opsom, Meervoudige opsom), use database value or user input
+          finalValue = value || matchingKarakteristiek.ktWaarde || '';
+        }
+        
+        // Check if this karakteristiek already exists in selected list
+        const existingIndex = selectedKarakteristieken.findIndex(k => 
           k.ktNaam === matchingKarakteristiek.ktNaam
         );
 
-        let finalValue = value;
-
-        // Handle different types
-        if (matchingKarakteristiek.ktType === 'Vrije tekst' && value) {
-          finalValue = value;
-        } else if (matchingKarakteristiek.ktType === 'Getal' && value) {
-          finalValue = value;
-        } else if (matchingKarakteristiek.ktWaarde) {
-          // For predefined values, try to match
-          const predefinedValues = matchingKarakteristiek.ktWaarde.toString().split(',').map((v: string) => v.trim());
-          const matchedValue = predefinedValues.find((v: string) => 
-            v.toLowerCase().includes(value.toLowerCase()) || 
-            value.toLowerCase().includes(v.toLowerCase())
-          );
-          finalValue = matchedValue || value || '';
+        if (existingIndex !== -1) {
+          // Update existing karakteristiek 
+          setSelectedKarakteristieken(prev => {
+            const updated = [...prev];
+            const existing = updated[existingIndex];
+            
+            // For meervoudige types, append values; for others, replace
+            if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
+                finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
+              updated[existingIndex] = {
+                ...existing,
+                waarde: `${existing.waarde}, ${finalValue}`
+              };
+            } else if (finalValue) {
+              updated[existingIndex] = {
+                ...existing,
+                waarde: finalValue
+              };
+            }
+            
+            return updated;
+          });
         } else {
-          finalValue = value || '';
-        }
-
-        if (existingIndex >= 0) {
-          // Append to existing
-          const existingValue = newKarakteristieken[existingIndex].waarde;
-          if (existingValue && !existingValue.includes(finalValue)) {
-            newKarakteristieken[existingIndex].waarde = `${existingValue}, ${finalValue}`;
-          } else if (!existingValue) {
-            newKarakteristieken[existingIndex].waarde = finalValue;
-          }
-        } else {
-          // Add new
-          newKarakteristieken.push({
+          // Add new karakteristiek
+          const newKarakteristiek = {
             id: Date.now() + Math.random(),
             ktNaam: matchingKarakteristiek.ktNaam,
-            waarde: finalValue
+            ktType: matchingKarakteristiek.ktType,
+            waarde: finalValue,
+            ktCode: matchingKarakteristiek.ktCode
+          };
+
+          setSelectedKarakteristieken(prev => {
+            const updated = [...prev, newKarakteristiek];
+            console.log(`✅ Added karakteristiek: ${newKarakteristiek.ktNaam} = "${newKarakteristiek.waarde}"`);
+            console.log(`📊 Total karakteristieken now: ${updated.length}`);
+            return updated;
           });
         }
+
+        processed = true;
+      } else {
+        console.log(`❌ No karakteristiek found for code: ${code}`);
       }
     });
 
-    if (newKarakteristieken.length > 0) {
-      // Merge with existing karakteristieken, avoiding duplicates
-      setKarakteristieken(prev => {
-        const merged = [...prev];
-
-        newKarakteristieken.forEach(newKar => {
-          const existingIndex = merged.findIndex(k => k.ktNaam === newKar.ktNaam);
-          if (existingIndex >= 0) {
-            // Update existing
-            const existingValue = merged[existingIndex].waarde;
-            if (existingValue && !existingValue.includes(newKar.waarde)) {
-              merged[existingIndex].waarde = `${existingValue}, ${newKar.waarde}`;
-            } else if (!existingValue) {
-              merged[existingIndex].waarde = newKar.waarde;
-            }
-          } else {
-            merged.push(newKar);
-          }
-        });
-
-        return merged;
-      });
-    }
-  }, [karakteristiekenDatabase]);
+    return processed;
+  };
 
   // Enhanced function to detect and apply shortcodes for classification, address, and caller info
   const detectAndApplyShortcodes = async (text: string) => {
@@ -966,9 +980,9 @@ export default function GMS2() {
     // Classification shortcode: -[code]
     if (lastLine.startsWith('-')) {
       const inputCode = lastLine.split(' ')[0].toLowerCase(); // Normalize to lowercase
-
+      
       console.log(`🔍 Zoeken naar classificatie shortcode: ${inputCode} voor ${incidentContext}`);
-
+      
       // Direct shortcode match (case-insensitive)
       let matchedMapping = null;
       for (const [code, mapping] of Object.entries(shortcodeMappings)) {
@@ -1128,7 +1142,7 @@ export default function GMS2() {
 
     if (finalClassification) {
       setPriorityValue(finalClassification.PRIO);
-
+      
       // Update incident if one is selected
       if (selectedIncident) {
         const updatedIncident = {
@@ -1152,18 +1166,18 @@ export default function GMS2() {
       if (message) {
         // First try to process karakteristieken
         const karakteristiekProcessed = processKarakteristieken(message);
-
+        
         // Then try to detect and apply other shortcodes (address, caller info, or classification)
         const shortcodeDetected = await detectAndApplyShortcodes(message);
 
         // Always add user input to log, regardless of processing
         addLoggingEntry(message);
-
+        
         // Add feedback for karakteristieken processing
         if (karakteristiekProcessed) {
           addLoggingEntry("🏷️ Karakteristieken verwerkt en toegevoegd");
         }
-
+        
         setKladblokText("");
 
         // Clear any search results if we processed an address
@@ -1183,16 +1197,16 @@ export default function GMS2() {
     if (newText.startsWith('=')) {
       // Switch to Locatietreffers tab immediately
       setActiveLoggingTab('locatietreffers');
-
+      
       // Extract the search query (remove the = prefix)
       const searchQuery = newText.substring(1);
-
+      
       if (searchQuery.length >= 2) {
         console.log(`🔍 Real-time BAG search for: "${searchQuery}"`);
-
+        
         // Update the search input and trigger search
         setBagSearchQuery(searchQuery);
-
+        
         try {
           const results = await searchBAGAddress(searchQuery);
           setBagSearchResults(results);
@@ -1323,14 +1337,14 @@ export default function GMS2() {
       // Update priority and incident with full classification
       if (selectedMC3Value && selectedMC2 && selectedMC1) {
         updatePriorityFromClassification(selectedMC1, selectedMC2, selectedMC3Value);
-
+        
         const matchingClassification = lmcClassifications.find(c => 
           c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3Value
         );
 
         if (matchingClassification) {
           setPriorityValue(matchingClassification.PRIO);
-
+          
           if (selectedIncident) {
             const updatedIncident = {
               ...selectedIncident,
@@ -1353,12 +1367,12 @@ export default function GMS2() {
         // First populate all dropdowns properly
         freshMC1Select.value = currentMC1;
         freshMC1Select.dispatchEvent(new Event('change'));
-
+        
         setTimeout(() => {
           if (currentMC2) {
             freshMC2Select.value = currentMC2;
             freshMC2Select.dispatchEvent(new Event('change'));
-
+            
             setTimeout(() => {
               if (currentMC3) {
                 freshMC3Select.value = currentMC3;
@@ -1470,10 +1484,10 @@ export default function GMS2() {
               {incidents.map((incident) => {
                 // Determine the most specific MC classification
                 const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || '';
-
+                
                 return (
                   <div 
-                    key={`incident-${incident.id}-${incident.nr}`} 
+                    key={incident.id} 
                     className={`gms2-table-row ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
                     onClick={() => handleIncidentSelect(incident)}
                   >
@@ -1692,7 +1706,7 @@ export default function GMS2() {
                       ))}
                     </div>
                   )}
-
+                  
                   {activeLoggingTab === 'locatietreffers' && (
                     <div className="gms2-locatietreffers">
                       <div className="gms2-search-container">
@@ -1704,7 +1718,7 @@ export default function GMS2() {
                           onChange={async (e) => {
                             const query = e.target.value;
                             setBagSearchQuery(query);
-
+                            
                             if (query.length >= 2) {
                               console.log(`🔍 Manual search for: "${query}"`);
                               const results = await searchBAGAddress(query);
@@ -1719,7 +1733,7 @@ export default function GMS2() {
                                 // Auto-select if only one result
                                 const result = bagSearchResults[0];
                                 const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
-
+                                
                                 const addressData = {
                                   straatnaam: result.straatnaam,
                                   huisnummer: fullHuisnummer,
@@ -1727,12 +1741,12 @@ export default function GMS2() {
                                   plaatsnaam: result.plaatsnaam,
                                   gemeente: result.gemeente
                                 };
-
+                                
                                 setFormData(prev => ({ ...prev, ...addressData }));
                                 if (selectedIncident) {
                                   setSelectedIncident({ ...selectedIncident, ...addressData });
                                 }
-
+                                
                                 addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
                                 setBagSearchQuery("");
                                 setBagSearchResults([]);
@@ -1751,11 +1765,11 @@ export default function GMS2() {
                           }}
                         />
                       </div>
-
+                      
                       <div className="gms2-search-help">
                         💡 Tip: Begin te typen met = in het kladblok voor automatisch zoeken
                       </div>
-
+                      
                       <div className="gms2-search-results">
                         {bagSearchResults.map((result, index) => {
                           const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
@@ -1771,16 +1785,16 @@ export default function GMS2() {
                                   plaatsnaam: result.plaatsnaam,
                                   gemeente: result.gemeente
                                 };
-
+                                
                                 setFormData(prev => ({ ...prev, ...addressData }));
                                 if (selectedIncident) {
                                   setSelectedIncident({ ...selectedIncident, ...addressData });
                                 }
-
+                                
                                 addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
                                 setBagSearchQuery("");
                                 setBagSearchResults([]);
-
+                                
                                 // Clear any =address query from kladblok
                                 if (kladblokText.startsWith('=')) {
                                   setKladblokText('');
@@ -1794,7 +1808,7 @@ export default function GMS2() {
                             </div>
                           );
                         })}
-
+                        
                         {bagSearchQuery.length >= 2 && bagSearchResults.length === 0 && (
                           <div className="gms2-no-results">
                             <div>Geen adressen gevonden voor "{bagSearchQuery}"</div>
@@ -1803,7 +1817,7 @@ export default function GMS2() {
                             </div>
                           </div>
                         )}
-
+                        
                         {bagSearchQuery.length < 2 && bagSearchResults.length === 0 && (
                           <div className="gms2-search-instructions">
                             <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Hoe te gebruiken:</div>
@@ -1817,7 +1831,7 @@ export default function GMS2() {
                       </div>
                     </div>
                   )}
-
+                  
                   {activeLoggingTab === 'statusoverzicht' && (
                     <div className="gms2-status-overview">
                       <div className="gms2-status-table-container">
@@ -1836,7 +1850,7 @@ export default function GMS2() {
                             <div className="gms2-status-cell header-fd">fd</div>
                             <div className="gms2-status-cell header-ga">GA</div>
                           </div>
-
+                          
                           {/* Sample data rows to match the photo */}
                           <div className="gms2-status-data-row">
                             <div className="gms2-status-cell data-dp">P</div>
@@ -1851,7 +1865,7 @@ export default function GMS2() {
                             <div className="gms2-status-cell data-fd"></div>
                             <div className="gms2-status-cell data-ga"></div>
                           </div>
-
+                          
                           <div className="gms2-status-data-row">
                             <div className="gms2-status-cell data-dp">P</div>
                             <div className="gms2-status-cell data-roepnaam">RTB160</div>
@@ -1865,7 +1879,7 @@ export default function GMS2() {
                             <div className="gms2-status-cell data-fd"></div>
                             <div className="gms2-status-cell data-ga"></div>
                           </div>
-
+                          
                           <div className="gms2-status-data-row">
                             <div className="gms2-status-cell data-dp">P</div>
                             <div className="gms2-status-cell data-roepnaam">RTB188</div>
@@ -1879,7 +1893,7 @@ export default function GMS2() {
                             <div className="gms2-status-cell data-fd"></div>
                             <div className="gms2-status-cell data-ga"></div>
                           </div>
-
+                          
                           {/* Dynamic rows for assigned units from selected incident */}
                           {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.map((unit, index) => (
                             <div key={unit.roepnummer} className="gms2-status-data-row">
@@ -1900,7 +1914,7 @@ export default function GMS2() {
                       </div>
                     </div>
                   )}
-
+                  
                   {activeLoggingTab === 'overige-inzet' && (
                     <div className="gms2-tab-content">
                       <div className="gms2-content-placeholder">
