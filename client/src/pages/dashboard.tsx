@@ -3,6 +3,7 @@ import Sidebar from "../components/sidebar";
 import StatsGrid from "../components/stats-grid";
 import IncidentTable from "../components/incident-table";
 import UnitsPanel from "../components/units-panel";
+import GMS2 from "./gms2";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { Incident, Unit, Stats } from "../types";
 
