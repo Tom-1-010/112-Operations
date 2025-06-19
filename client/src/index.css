@@ -2997,6 +2997,65 @@ body {
 }
 
 .gms2-status-center {
+
+/* BAG API Search Styling */
+.gms2-locatietreffers {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.gms2-search-container {
+  margin-bottom: 8px;
+}
+
+.gms2-search-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #999;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.gms2-search-results {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #999;
+  background: white;
+  max-height: 200px;
+}
+
+.gms2-address-result {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.gms2-address-result:hover {
+  background: #e6f3ff;
+}
+
+.gms2-address-main {
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 2px;
+}
+
+.gms2-address-details {
+  font-size: 10px;
+  color: #666;
+}
+
+.gms2-no-results {
+  padding: 12px 8px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 11px;
+}
+
   flex: 1;
   text-align: center;
   font-weight: bold;
