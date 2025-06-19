@@ -2649,6 +2649,37 @@ body {
   border: 1px inset #c0c0c0;
   background: white;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.gms2-char-row-1,
+.gms2-char-row-2 {
+  display: flex;
+  border-bottom: 1px solid #808080;
+  font-size: 10px;
+}
+
+.gms2-char-row-1 {
+  background: #c0c0c0;
+  font-weight: bold;
+}
+
+.gms2-char-row-2 {
+  background: white;
+}
+
+.gms2-char-row-1 span,
+.gms2-char-row-2 span {
+  padding: 2px 4px;
+  border-right: 1px solid #808080;
+  flex: 1;
+}
+
+.gms2-char-row-1 span:first-child,
+.gms2-char-row-2 span:first-child {
+  flex: 0 0 100px;
+  font-weight: bold;
 }
 
 .gms2-table-header {
