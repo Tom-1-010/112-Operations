@@ -452,9 +452,9 @@ export default function GMS2() {
     setPriorityValue(2);
     setNotitiesText("");
 
-    // STEP 4: Clear kladblok and logging IMMEDIATELY
-    setKladblokText("");
-    setLoggingEntries([]); // Complete immediate reset
+    // STEP 4: Clear kladblok and logging IMMEDIATELY - NO ADDING ENTRIES
+    setKladblokText(""); // Keep kladblok completely empty
+    setLoggingEntries([]); // Complete immediate reset - no entries at all
 
     // STEP 5: Force DOM elements to reset without delays
     const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
@@ -491,32 +491,10 @@ export default function GMS2() {
     // STEP 7: Reset activeLoggingTab to ensure clean state
     setActiveLoggingTab("hist-meldblok");
 
-    // STEP 8: Add clean logging entry after brief delay to ensure everything is reset
-    setTimeout(() => {
-      // Force clear logging one more time to prevent any race conditions
-      setLoggingEntries([]);
-      
-      // Add the initial entry for new incident
-      setTimeout(() => {
-        const now = new Date();
-        const dateStr = String(now.getDate()).padStart(2, '0');
-        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-        const yearStr = now.getFullYear();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
+    // NO STEP 8 - Keep logging completely empty for new incident
+    // The user can start fresh without any pre-filled logging entries
 
-        const cleanEntry = {
-          id: Date.now() + Math.random(), // Ensure unique ID
-          timestamp,
-          message: `🆕 Nieuwe melding gestart [${newSessionId.slice(-8)}] - alle snelcodes actief`
-        };
-
-        setLoggingEntries([cleanEntry]);
-        console.log(`✅ New incident ${newSessionId.slice(-8)} initialized with clean logging`);
-      }, 50);
-    }, 150);
-
-    console.log(`✅ New incident reset complete - session: ${newSessionId}`);
+    console.log(`✅ New incident reset complete - session: ${newSessionId} - completely clean state`);
   };
 
   const addLoggingEntry = (message: string) => {
