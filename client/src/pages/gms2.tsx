@@ -722,14 +722,26 @@ export default function GMS2() {
                       <input type="checkbox" />
                     </div>
                     <div className="gms2-service-col">
-                      <input type="checkbox" />
+                      <input 
+                        type="checkbox" 
+                        id="share-brandweer"
+                        onChange={(e) => {
+                          const action = e.target.checked ? "gedeeld met" : "delen beëindigd met";
+                          addLoggingEntry(`🚒 Melding ${action} Brandweer`);
+                        }}
+                      />
                       <span>B</span>
-                      <input type="checkbox" />
                     </div>
                     <div className="gms2-service-col">
-                      <input type="checkbox" />
+                      <input 
+                        type="checkbox" 
+                        id="share-ambulance"
+                        onChange={(e) => {
+                          const action = e.target.checked ? "gedeeld met" : "delen beëindigd met";
+                          addLoggingEntry(`🚑 Melding ${action} Ambulance`);
+                        }}
+                      />
                       <span>A</span>
-                      <input type="checkbox" />
                     </div>
                   </div>
 
