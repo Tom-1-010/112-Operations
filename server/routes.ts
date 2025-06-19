@@ -160,9 +160,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const encodedQuery = encodeURIComponent(query);
       const url = `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=${limit}`;
 
-      console.log(`[BAG API] Searching for: "${query}"`);
+      console.log(`[BAG API] Searching for: "${query}" - URL: ${url}`);
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`[BAG API] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `BAG API returned status ${response.status}` });
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await response.text();
+        console.error(`[BAG API] Non-JSON response: ${textResponse.substring(0, 200)}`);
+        return res.status(500).json({ error: 'BAG API returned non-JSON response' });
+      }
+
       const data = await response.json();
 
       console.log(`[BAG API] Found ${data.features?.length || 0} results`);
@@ -171,6 +189,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[BAG API] Error:', error);
       return res.status(500).json({ error: 'Failed to fetch from BAG API' });
+    }
+  });
+
+  // Test endpoint for BAG API debugging
+  app.get('/api/bag/test', async (req, res) => {
+    try {
+      const testQuery = 'Rotterdam Kleiweg';
+      const url = `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodeURIComponent(testQuery)}&limit=5`;
+      
+      console.log(`[BAG API TEST] Testing with URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+
+      const responseText = await response.text();
+      console.log(`[BAG API TEST] Response status: ${response.status}`);
+      console.log(`[BAG API TEST] Response headers:`, Object.fromEntries(response.headers.entries()));
+      console.log(`[BAG API TEST] Response body (first 500 chars):`, responseText.substring(0, 500));
+
+      try {
+        const data = JSON.parse(responseText);
+        res.json({
+          status: 'success',
+          url: url,
+          responseStatus: response.status,
+          data: data,
+          features: data.features?.length || 0
+        });
+      } catch (parseError) {
+        res.json({
+          status: 'parse_error',
+          url: url,
+          responseStatus: response.status,
+          responseText: responseText.substring(0, 1000),
+          parseError: parseError.message
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: 'fetch_error',
+        error: error.message
+      });
     }
   });
 
