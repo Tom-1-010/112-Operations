@@ -349,12 +349,6 @@ export default function GMS2() {
                 {/* Dropdown tabs row */}
                 <div className="gms2-dropdown-tabs">
                   <div className="gms2-tab-group">
-                    <label>Hints/Kar</label>
-                    <select className="gms2-dropdown">
-                      <option>MC</option>
-                    </select>
-                  </div>
-                  <div className="gms2-tab-group">
                     <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
                       <option>Dienstverlening</option>
                     </select>
