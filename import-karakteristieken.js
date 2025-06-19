@@ -1,44 +1,45 @@
 
+import { db } from './server/db.js';
+import { karakteristieken } from './shared/schema.js';
 import fs from 'fs';
 import path from 'path';
 
-// Read the karakteristieken JSON file
-const karakteristiekenPath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750367007045.json');
-const karakteristiekenData = JSON.parse(fs.readFileSync(karakteristiekenPath, 'utf8'));
-
-// Transform the data to match our database schema
-const transformedData = karakteristiekenData.map(item => ({
-  ktNaam: item['kt-naam'],
-  ktType: item['kt-type'],
-  ktWaarde: item['kt-waarde'] === null || isNaN(item['kt-waarde']) ? null : String(item['kt-waarde']),
-  ktCode: item['kt-code'] === null || isNaN(item['kt-code']) ? null : item['kt-code'],
-  ktPaser: item['kt-paser']
-}));
-
-// Post the data to the API
 async function importKarakteristieken() {
   try {
-    console.log(`Importing ${transformedData.length} karakteristieken...`);
+    console.log('🔄 Starting karakteristieken import...');
     
-    const response = await fetch('http://localhost:5000/api/karakteristieken/bulk', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(transformedData)
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log(`Successfully imported ${result.length} karakteristieken!`);
-    } else {
-      console.error('Failed to import karakteristieken:', response.statusText);
+    // Read the karakteristieken JSON file
+    const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750367007045.json');
+    
+    if (!fs.existsSync(filePath)) {
+      console.error('❌ Karakteristieken file not found:', filePath);
+      return;
     }
+    
+    const jsonData = fs.readFileSync(filePath, 'utf8');
+    const karakteristiekenData = JSON.parse(jsonData);
+    
+    console.log(`📊 Found ${karakteristiekenData.length} karakteristieken to import`);
+    
+    // Clear existing data
+    await db.delete(karakteristieken);
+    console.log('🗑️ Cleared existing karakteristieken');
+    
+    // Insert new data
+    if (karakteristiekenData.length > 0) {
+      await db.insert(karakteristieken).values(karakteristiekenData);
+      console.log(`✅ Successfully imported ${karakteristiekenData.length} karakteristieken`);
+    }
+    
+    // Verify import
+    const count = await db.select().from(karakteristieken);
+    console.log(`🔍 Verification: ${count.length} karakteristieken in database`);
+    
   } catch (error) {
-    console.error('Error importing karakteristieken:', error);
+    console.error('❌ Error importing karakteristieken:', error);
   }
+  
+  process.exit(0);
 }
 
-// Check if server is running and import
-console.log('Starting karakteristieken import...');
 importKarakteristieken();
