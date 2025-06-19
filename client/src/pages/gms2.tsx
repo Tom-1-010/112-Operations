@@ -713,7 +713,6 @@ export default function GMS2() {
                       <option value={3}>3</option>
                       <option value={4}>4</option>
                     </select>
-                    <button className="gms2-btn priority-btn">A ▼</button>
                   </div>
 
                   <div className="gms2-service-options">
