@@ -99,7 +99,7 @@ export const karakteristieken = pgTable("karakteristieken", {
   ktType: text("kt_type").notNull(),
   ktWaarde: text("kt_waarde"),
   ktCode: text("kt_code"),
-  ktPaser: text("kt_paser"),
+  ktParser: text("kt_parser"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
