@@ -381,9 +381,10 @@ export default function GMS2() {
 
                   <div className="gms2-kladblok-modern">
                     <textarea 
-                      value="Kladblok, hierin kan je alle relevante info vermelden"
+                      value={kladblokText}
                       onChange={(e) => setKladblokText(e.target.value)}
                       className="gms2-kladblok-textarea"
+                      placeholder="Kladblok, hierin kan je alle relevante info vermelden"
                     />
                   </div>
                 </div>
