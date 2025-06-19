@@ -461,38 +461,43 @@ export default function GMS2() {
     const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
     const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
-    // Clear all dropdowns immediately
+    // Clear all dropdowns immediately and remove any existing event listeners
     if (mc1Select) {
       mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
       mc1Select.value = "";
+      // Clear any bound data or state
+      mc1Select.removeAttribute('data-current-value');
     }
     if (mc2Select) {
       mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
       mc2Select.value = "";
+      mc2Select.removeAttribute('data-current-value');
     }
     if (mc3Select) {
       mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
       mc3Select.value = "";
+      mc3Select.removeAttribute('data-current-value');
     }
 
-    // STEP 6: Reinitialize dropdowns completely
+    // STEP 6: Force complete reinitialization of dropdown system
     if (lmcClassifications.length > 0) {
-      // Use setTimeout only for dropdown reinitialization, not for data clearing
+      // Immediate reinitialization without delay
       setTimeout(() => {
+        console.log(`🔄 Reinitializing dropdowns for new incident ${newSessionId.slice(-8)}`);
         initializeLMCDropdowns();
-      }, 50);
+      }, 10);
     }
 
-    // STEP 7: Add clean logging entry after minimal delay
+    // STEP 7: Reset activeLoggingTab to ensure clean state
+    setActiveLoggingTab("hist-meldblok");
+
+    // STEP 8: Add clean logging entry after brief delay to ensure everything is reset
     setTimeout(() => {
-      // Double-check that logging is still empty (prevent race conditions)
-      setLoggingEntries(prev => {
-        // If there's anything in logging, clear it first
-        if (prev.length > 0) {
-          console.warn('⚠️ Race condition detected - clearing logging again');
-          return [];
-        }
-        
+      // Force clear logging one more time to prevent any race conditions
+      setLoggingEntries([]);
+      
+      // Add the initial entry for new incident
+      setTimeout(() => {
         const now = new Date();
         const dateStr = String(now.getDate()).padStart(2, '0');
         const monthStr = String(now.getMonth() + 1).padStart(2, '0');
@@ -503,12 +508,13 @@ export default function GMS2() {
         const cleanEntry = {
           id: Date.now() + Math.random(), // Ensure unique ID
           timestamp,
-          message: `📋 Nieuwe melding gestart [${newSessionId.slice(-8)}] - alle snelcodes actief`
+          message: `🆕 Nieuwe melding gestart [${newSessionId.slice(-8)}] - alle snelcodes actief`
         };
 
-        return [cleanEntry];
-      });
-    }, 100);
+        setLoggingEntries([cleanEntry]);
+        console.log(`✅ New incident ${newSessionId.slice(-8)} initialized with clean logging`);
+      }, 50);
+    }, 150);
 
     console.log(`✅ New incident reset complete - session: ${newSessionId}`);
   };
@@ -611,7 +617,8 @@ export default function GMS2() {
     const lines = text.split('\n');
     const lastLine = lines[lines.length - 1].trim();
 
-    console.log(`🔍 Shortcode detection for: "${lastLine}" | Selected incident: ${selectedIncident ? selectedIncident.nr : 'NONE (NEW)'}`);
+    const incidentContext = selectedIncident ? `incident ${selectedIncident.nr}` : 'NIEUWE MELDING';
+    console.log(`🔍 Shortcode detection for: "${lastLine}" | Context: ${incidentContext}`);
 
     // Address shortcode: =[stad]/[straatnaam] [huisnummer]
     if (lastLine.startsWith('=')) {
@@ -622,14 +629,18 @@ export default function GMS2() {
         console.log(`📍 Address shortcode detected: ${stad} / ${straatnaam} ${huisnummer}`);
 
         // ALWAYS update form data regardless of incident selection
+        const newFormData = {
+          straatnaam: straatnaam.trim(),
+          huisnummer: huisnummer.trim(),
+          plaatsnaam: stad.trim()
+        };
+
         setFormData(prev => {
           const updated = {
             ...prev,
-            straatnaam: straatnaam.trim(),
-            huisnummer: huisnummer.trim(),
-            plaatsnaam: stad.trim()
+            ...newFormData
           };
-          console.log(`📍 Form data updated:`, updated);
+          console.log(`📍 Form data updated for ${incidentContext}:`, updated);
           return updated;
         });
 
@@ -637,14 +648,10 @@ export default function GMS2() {
         if (selectedIncident) {
           const updatedIncident = {
             ...selectedIncident,
-            straatnaam: straatnaam.trim(),
-            huisnummer: huisnummer.trim(),
-            plaatsnaam: stad.trim()
+            ...newFormData
           };
           setSelectedIncident(updatedIncident);
           console.log(`📍 Existing incident updated: ${selectedIncident.nr}`);
-        } else {
-          console.log(`📍 New incident mode - only form data updated`);
         }
 
         addLoggingEntry(`📍 Adres automatisch ingevuld: ${straatnaam.trim()} ${huisnummer.trim()}, ${stad.trim()}`);
@@ -661,13 +668,17 @@ export default function GMS2() {
         console.log(`👤 Caller shortcode detected: ${meldernaam} / ${telefoonnummer}`);
 
         // ALWAYS update form data regardless of incident selection
+        const newCallerData = {
+          melderNaam: meldernaam.trim(),
+          telefoonnummer: telefoonnummer.trim()
+        };
+
         setFormData(prev => {
           const updated = {
             ...prev,
-            melderNaam: meldernaam.trim(),
-            telefoonnummer: telefoonnummer.trim()
+            ...newCallerData
           };
-          console.log(`👤 Form data updated:`, updated);
+          console.log(`👤 Form data updated for ${incidentContext}:`, updated);
           return updated;
         });
 
@@ -675,13 +686,10 @@ export default function GMS2() {
         if (selectedIncident) {
           const updatedIncident = {
             ...selectedIncident,
-            melderNaam: meldernaam.trim(),
-            telefoonnummer: telefoonnummer.trim()
+            ...newCallerData
           };
           setSelectedIncident(updatedIncident);
           console.log(`👤 Existing incident updated: ${selectedIncident.nr}`);
-        } else {
-          console.log(`👤 New incident mode - only form data updated`);
         }
 
         addLoggingEntry(`👤 Meldergegevens automatisch ingevuld: ${meldernaam.trim()}, ${telefoonnummer.trim()}`);
@@ -693,7 +701,7 @@ export default function GMS2() {
     if (lastLine.startsWith('-')) {
       const inputCode = lastLine.split(' ')[0].toLowerCase(); // Normalize to lowercase
       
-      console.log(`🔍 Zoeken naar shortcode: ${inputCode}`);
+      console.log(`🔍 Zoeken naar classificatie shortcode: ${inputCode} voor ${incidentContext}`);
       
       // Direct shortcode match (case-insensitive)
       let matchedMapping = null;
@@ -705,7 +713,7 @@ export default function GMS2() {
       }
 
       if (matchedMapping) {
-        console.log(`✅ Shortcode gevonden:`, matchedMapping);
+        console.log(`✅ Shortcode gevonden voor ${incidentContext}:`, matchedMapping);
         applyClassification(matchedMapping.MC1, matchedMapping.MC2, matchedMapping.MC3, inputCode);
         return true;
       }
@@ -716,7 +724,7 @@ export default function GMS2() {
       );
 
       if (directCodeMatch) {
-        console.log(`✅ Directe LMC code gevonden:`, directCodeMatch);
+        console.log(`✅ Directe LMC code gevonden voor ${incidentContext}:`, directCodeMatch);
         applyClassification(directCodeMatch.MC1, directCodeMatch.MC2, directCodeMatch.MC3, inputCode);
         return true;
       }
@@ -725,13 +733,13 @@ export default function GMS2() {
       const keywords = lastLine.substring(1).split(' ').filter(word => word.length > 2);
       const possibleMatch = findClassificationByKeywords(keywords);
       if (possibleMatch) {
-        console.log(`✅ Keyword match gevonden:`, possibleMatch);
+        console.log(`✅ Keyword match gevonden voor ${incidentContext}:`, possibleMatch);
         applyClassification(possibleMatch.MC1, possibleMatch.MC2, possibleMatch.MC3, lastLine);
         return true;
       }
 
       // No match found
-      console.warn(`❌ Geen match gevonden voor: ${inputCode}`);
+      console.warn(`❌ Geen match gevonden voor: ${inputCode} in ${incidentContext}`);
       addLoggingEntry(`❌ Onbekende code: ${inputCode}`);
       return false;
     }
@@ -904,7 +912,8 @@ export default function GMS2() {
       return;
     }
 
-    console.log('🔧 Initializing LMC dropdowns with', lmcClassifications.length, 'classifications');
+    const context = selectedIncident ? `incident ${selectedIncident.nr}` : 'nieuwe melding';
+    console.log(`🔧 Initializing LMC dropdowns for ${context} with ${lmcClassifications.length} classifications`);
 
     // Remove existing event listeners to prevent duplicates
     mc1Select.replaceWith(mc1Select.cloneNode(true));
@@ -916,10 +925,10 @@ export default function GMS2() {
     const freshMC2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
     const freshMC3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
-    // Store current values before reinitializing
-    const currentMC1 = selectedMC1;
-    const currentMC2 = selectedMC2;
-    const currentMC3 = selectedMC3;
+    // Store current values before reinitializing (but only if we're NOT doing a fresh reset)
+    const currentMC1 = selectedIncident ? selectedMC1 : "";
+    const currentMC2 = selectedIncident ? selectedMC2 : "";
+    const currentMC3 = selectedIncident ? selectedMC3 : "";
 
     // Populate MC1 dropdown
     const mc1Options = Array.from(new Set(lmcClassifications.map(c => c.MC1).filter(Boolean))).sort();
@@ -931,8 +940,8 @@ export default function GMS2() {
       freshMC1Select.appendChild(option);
     });
 
-    // Restore MC1 value if it was previously set
-    if (currentMC1) {
+    // Restore MC1 value if it was previously set (only for existing incidents)
+    if (currentMC1 && selectedIncident) {
       freshMC1Select.value = currentMC1;
     }
 
@@ -1027,9 +1036,9 @@ export default function GMS2() {
       }
     });
 
-    // Restore previously selected values after initialization
-    setTimeout(() => {
-      if (currentMC1) {
+    // Only restore previously selected values if we're editing an existing incident
+    if (selectedIncident && currentMC1) {
+      setTimeout(() => {
         freshMC1Select.value = currentMC1;
         freshMC1Select.dispatchEvent(new Event('change'));
         
@@ -1046,8 +1055,10 @@ export default function GMS2() {
             }, 100);
           }
         }, 100);
-      }
-    }, 100);
+      }, 100);
+    }
+
+    console.log(`✅ LMC dropdowns initialized for ${context} - ready for shortcodes`);
   };
 
   // Helper function to update priority from classification
