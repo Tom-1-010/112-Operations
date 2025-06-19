@@ -25,12 +25,20 @@ interface GmsIncident {
   telefoonnummer?: string;
   straatnaam?: string;
   huisnummer?: string;
+  toevoeging?: string;
+  postcode?: string;
   plaatsnaam?: string;
+  gemeente?: string;
   mc1?: string;
   mc2?: string;
+  mc3?: string;
   notities?: string;
   karakteristieken?: any[];
   status?: string;
+  functie?: string;
+  meldingslogging?: string;
+  tijdstip?: string;
+  prioriteit?: number;
 }
 
 export default function GMS2() {
@@ -140,6 +148,61 @@ export default function GMS2() {
 
   const handleIncidentSelect = (incident: GmsIncident) => {
     setSelectedIncident(incident);
+    
+    // Load all incident data into form fields
+    if (incident) {
+      setFormData({
+        melderNaam: incident.melderNaam || "",
+        telefoonnummer: incident.telefoonnummer || "",
+        melderAdres: incident.melderAdres || "",
+        huisnummer: incident.huisnummer || "",
+        toevoeging: "",
+        gemeente: incident.gemeente || "",
+        straatnaam: incident.straatnaam || "",
+        postcode: "",
+        plaatsnaam: incident.plaatsnaam || "",
+        functie: "",
+        roepnummer: ""
+      });
+
+      // Set MC classifications
+      if (incident.mc1) setSelectedMC1(incident.mc1);
+      if (incident.mc2) setSelectedMC2(incident.mc2);
+      if (incident.mc3) setSelectedMC3(incident.mc3);
+      
+      // Set priority
+      if (incident.prio) setPriorityValue(incident.prio);
+      
+      // Set notes if available
+      if (incident.notities) setNotitiesText(incident.notities);
+
+      // Restore MC classifications in dropdowns
+      setTimeout(() => {
+        const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+        const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+        const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+
+        if (mc1Select && incident.mc1) {
+          mc1Select.value = incident.mc1;
+          mc1Select.dispatchEvent(new Event('change'));
+          
+          setTimeout(() => {
+            if (mc2Select && incident.mc2) {
+              mc2Select.value = incident.mc2;
+              mc2Select.dispatchEvent(new Event('change'));
+              
+              setTimeout(() => {
+                if (mc3Select && incident.mc3) {
+                  mc3Select.value = incident.mc3;
+                }
+              }, 100);
+            }
+          }, 100);
+        }
+      }, 200);
+
+      addLoggingEntry(`📋 Melding ${incident.nr} geopend voor bewerking`);
+    }
   };
 
   // Handle form field changes
@@ -148,6 +211,64 @@ export default function GMS2() {
       ...prev,
       [field]: value
     }));
+  };
+
+  // Handle "Update" button click for existing incidents
+  const handleUpdate = () => {
+    if (selectedIncident) {
+      const now = new Date();
+      const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      // Determine MC code based on selected classification
+      let mcCode = selectedIncident.mc;
+      if (selectedMC3 && selectedMC2 && selectedMC1) {
+        const matchingClassification = lmcClassifications.find(c => 
+          c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
+        );
+        if (matchingClassification) {
+          mcCode = matchingClassification.Code.toUpperCase();
+        }
+      }
+
+      // Create location string
+      const location = formData.straatnaam && formData.huisnummer 
+        ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+        : formData.straatnaam?.toUpperCase() || "";
+
+      const updatedIncident: GmsIncident = {
+        ...selectedIncident,
+        prio: priorityValue,
+        mc: mcCode,
+        locatie: location,
+        plaats: formData.plaatsnaam?.substring(0, 3).toUpperCase() || "",
+        melderNaam: formData.melderNaam,
+        melderAdres: formData.melderAdres,  
+        telefoonnummer: formData.telefoonnummer,
+        straatnaam: formData.straatnaam,
+        huisnummer: formData.huisnummer,
+        toevoeging: formData.toevoeging,
+        postcode: formData.postcode,
+        plaatsnaam: formData.plaatsnaam,
+        gemeente: formData.gemeente,
+        functie: formData.functie,
+        mc1: selectedMC1,
+        mc2: selectedMC2,
+        mc3: selectedMC3,
+        notities: notitiesText,
+        meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
+        prioriteit: priorityValue
+      };
+
+      // Update incident in list
+      setIncidents(prev => prev.map(inc => 
+        inc.id === selectedIncident.id ? updatedIncident : inc
+      ));
+      
+      // Update selected incident
+      setSelectedIncident(updatedIncident);
+
+      addLoggingEntry(`📝 Melding ${selectedIncident.nr} bijgewerkt`);
+    }
   };
 
   // Handle "Uitgifte" button click
@@ -194,13 +315,20 @@ export default function GMS2() {
       telefoonnummer: formData.telefoonnummer,
       straatnaam: formData.straatnaam,
       huisnummer: formData.huisnummer,
+      toevoeging: formData.toevoeging,
+      postcode: formData.postcode,
       plaatsnaam: formData.plaatsnaam,
+      gemeente: formData.gemeente,
+      functie: formData.functie,
       mc1: selectedMC1,
       mc2: selectedMC2,
       mc3: selectedMC3,
-      notities: "",
+      notities: notitiesText,
       karakteristieken: [],
-      status: "Openstaand"
+      status: "Openstaand",
+      meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
+      tijdstip: new Date().toISOString(),
+      prioriteit: priorityValue
     };
 
     // Add to incidents list (at the beginning for newest first)
@@ -982,7 +1110,11 @@ export default function GMS2() {
                     <select className="gms2-dropdown">
                       <option>Testmelding</option>
                     </select>
-                    <button className="gms2-btn" onClick={handleUitgifte}>Uitgifte</button>
+                    {selectedIncident && selectedIncident.nr ? (
+                      <button className="gms2-btn" onClick={handleUpdate}>Update</button>
+                    ) : (
+                      <button className="gms2-btn" onClick={handleUitgifte}>Uitgifte</button>
+                    )}
                     <button className="gms2-btn" onClick={handleArchiveer}>Archiveer</button>
                     <button className="gms2-btn">Sluit</button>
                   </div>
