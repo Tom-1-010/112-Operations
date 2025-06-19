@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 
@@ -51,7 +50,7 @@ export default function GMS2() {
   const [selectedMC1, setSelectedMC1] = useState("");
   const [selectedMC2, setSelectedMC2] = useState("");
   const [selectedMC3, setSelectedMC3] = useState("");
-  
+
   // Sample incidents data matching the interface
   const [incidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
     {
@@ -120,7 +119,7 @@ export default function GMS2() {
     const days = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
     const months = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 
                    'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
-    
+
     const dayName = days[date.getDay()];
     const day = String(date.getDate()).padStart(2, '0');
     const month = months[date.getMonth()];
@@ -128,7 +127,7 @@ export default function GMS2() {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    
+
     return `${dayName} ${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
   };
 
@@ -142,9 +141,9 @@ export default function GMS2() {
     const monthStr = String(now.getMonth() + 1).padStart(2, '0');
     const yearStr = now.getFullYear();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
+
     const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
-    
+
     const newEntry = {
       id: Date.now(),
       timestamp,
@@ -161,23 +160,23 @@ export default function GMS2() {
     '-osvls': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: 'Letsel' },
     '-wegvervoer': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: '' },
     '-spoorvervoer': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: '' },
-    
+
     // Geweld & Veiligheid codes
     '-steekpartij': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Lichamelijk letsel' },
     '-mesaanval': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Lichamelijk letsel' },
     '-vechtpartij': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Vechtpartij' },
     '-bedreiging': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Bedreiging' },
-    
+
     // Brand codes
     '-woningbrand': { MC1: 'Brand', MC2: 'Gebouwbrand', MC3: 'Woningbrand' },
     '-autobrand': { MC1: 'Brand', MC2: 'Voertuigbrand', MC3: 'Personenauto' },
     '-buitenbrand': { MC1: 'Brand', MC2: 'Buitenbrand', MC3: 'Natuurbrand' },
-    
+
     // Bezitsaantasting codes
     '-inbraak': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning' },
     '-diefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Eenvoudige diefstal' },
     '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Diefstal motorvoertuig' },
-    
+
     // Gezondheid codes
     '-ambulance': { MC1: 'Gezondheid', MC2: 'Ambulancevervoer', MC3: 'Spoed' },
     '-reanimatie': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: 'Hartstilstand' },
@@ -188,7 +187,7 @@ export default function GMS2() {
   const detectAndApplyClassification = (text: string) => {
     const lines = text.split('\n');
     const lastLine = lines[lines.length - 1].trim().toLowerCase();
-    
+
     if (lastLine.startsWith('-')) {
       // Direct shortcode match
       const shortcode = lastLine.split(' ')[0];
@@ -197,7 +196,7 @@ export default function GMS2() {
         applyClassification(classification.MC1, classification.MC2, classification.MC3, shortcode);
         return true;
       }
-      
+
       // Keyword combination detection
       const keywords = lastLine.substring(1).split(' ').filter(word => word.length > 2);
       const possibleMatch = findClassificationByKeywords(keywords);
@@ -206,7 +205,7 @@ export default function GMS2() {
         return true;
       }
     }
-    
+
     return false;
   };
 
@@ -214,20 +213,20 @@ export default function GMS2() {
   const findClassificationByKeywords = (keywords: string[]) => {
     for (const classification of lmcClassifications) {
       const classificationText = `${classification.MC1} ${classification.MC2} ${classification.MC3} ${classification.DEFINITIE}`.toLowerCase();
-      
+
       let matchCount = 0;
       for (const keyword of keywords) {
         if (classificationText.includes(keyword)) {
           matchCount++;
         }
       }
-      
+
       // If at least 60% of keywords match, consider it a match
       if (matchCount >= Math.ceil(keywords.length * 0.6)) {
         return classification;
       }
     }
-    
+
     return null;
   };
 
@@ -239,11 +238,11 @@ export default function GMS2() {
 
     if (mc1Select && mc2Select && mc3Select && lmcClassifications.length > 0) {
       console.log(`Applying classification: ${mc1} > ${mc2} > ${mc3}`);
-      
+
       // Set MC1
       mc1Select.value = mc1;
       setSelectedMC1(mc1);
-      
+
       // Manually populate MC2 dropdown
       mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
       const mc2Options = Array.from(new Set(
@@ -251,18 +250,18 @@ export default function GMS2() {
           .filter(c => c.MC1 === mc1 && c.MC2 && c.MC2.trim() !== "")
           .map(c => c.MC2)
       )).sort();
-      
+
       mc2Options.forEach(mc2Option => {
         const option = document.createElement('option');
         option.value = mc2Option;
         option.textContent = mc2Option;
         mc2Select.appendChild(option);
       });
-      
+
       if (mc2) {
         mc2Select.value = mc2;
         setSelectedMC2(mc2);
-        
+
         // Manually populate MC3 dropdown
         mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
         const mc3Options = Array.from(new Set(
@@ -270,26 +269,26 @@ export default function GMS2() {
             .filter(c => c.MC1 === mc1 && c.MC2 === mc2 && c.MC3 && c.MC3.trim() !== "")
             .map(c => c.MC3)
         )).sort();
-        
+
         console.log(`MC3 options found: ${mc3Options.length}`, mc3Options);
-        
+
         mc3Options.forEach(mc3Option => {
           const option = document.createElement('option');
           option.value = mc3Option;
           option.textContent = mc3Option;
           mc3Select.appendChild(option);
         });
-        
+
         if (mc3) {
           setTimeout(() => {
             mc3Select.value = mc3;
             setSelectedMC3(mc3);
-            
+
             // Find and apply the matching classification
             const matchingClassification = lmcClassifications.find(c => 
               c.MC1 === mc1 && c.MC2 === mc2 && c.MC3 === mc3
             );
-            
+
             if (matchingClassification && selectedIncident) {
               const updatedIncident = {
                 ...selectedIncident,
@@ -303,7 +302,7 @@ export default function GMS2() {
           }, 50);
         }
       }
-      
+
       // Classification applied silently
     }
   };
@@ -315,7 +314,7 @@ export default function GMS2() {
       if (message) {
         // Try to detect and apply classification before adding to log
         const classificationDetected = detectAndApplyClassification(message);
-        
+
         addLoggingEntry(message);
         setKladblokText("");
       }
@@ -342,7 +341,7 @@ export default function GMS2() {
       mc1Select.addEventListener('change', (e) => {
         const selectedMC1 = (e.target as HTMLSelectElement).value;
         setSelectedMC1(selectedMC1);
-        
+
         // Clear and populate MC2
         mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
         mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
@@ -355,7 +354,7 @@ export default function GMS2() {
               .filter(c => c.MC1 === selectedMC1 && c.MC2)
               .map(c => c.MC2)
           )).sort();
-          
+
           mc2Options.forEach(mc2 => {
             const option = document.createElement('option');
             option.value = mc2;
@@ -369,7 +368,7 @@ export default function GMS2() {
       mc2Select.addEventListener('change', (e) => {
         const selectedMC2 = (e.target as HTMLSelectElement).value;
         setSelectedMC2(selectedMC2);
-        
+
         // Clear and populate MC3
         mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
         setSelectedMC3("");
@@ -380,9 +379,9 @@ export default function GMS2() {
               .filter(c => c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 && c.MC3.trim() !== "")
               .map(c => c.MC3)
           )).sort();
-          
+
           console.log(`MC3 options for ${selectedMC1}/${selectedMC2}:`, mc3Options);
-          
+
           mc3Options.forEach(mc3 => {
             const option = document.createElement('option');
             option.value = mc3;
@@ -396,13 +395,13 @@ export default function GMS2() {
       mc3Select.addEventListener('change', (e) => {
         const selectedMC3 = (e.target as HTMLSelectElement).value;
         setSelectedMC3(selectedMC3);
-        
+
         // Find matching classification and update incident
         if (selectedMC3 && selectedMC2 && selectedMC1) {
           const matchingClassification = lmcClassifications.find(c => 
             c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
           );
-          
+
           if (matchingClassification && selectedIncident) {
             // Update incident with classification
             const updatedIncident = {
@@ -413,7 +412,7 @@ export default function GMS2() {
               mc3: selectedMC3
             };
             setSelectedIncident(updatedIncident);
-            
+
             // Classification applied silently
           }
         }
@@ -572,7 +571,7 @@ export default function GMS2() {
                 {/* Adres Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Adres:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input type="text" className="gms2-input wide" placeholder="Adres melder" />
                   <span className="gms2-field-label">Nr:</span>
                   <input type="text" className="gms2-input small" />
                   <span className="gms2-field-label">L/C:</span>
@@ -603,7 +602,7 @@ export default function GMS2() {
                 {/* Function Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Func:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input type="text" className="gms2-input wide" placeholder="Functie" />
                 </div>
 
                 {/* Action Buttons Row */}
@@ -689,7 +688,7 @@ export default function GMS2() {
                     ))}
                   </div>
 
-                  
+
 
                   <div className="gms2-kladblok-modern">
                     <textarea 
