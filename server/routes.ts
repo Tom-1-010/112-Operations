@@ -147,6 +147,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // BAG API proxy endpoint
+  app.get('/api/bag/search', async (req, res) => {
+    try {
+      const query = req.query.q;
+      const limit = req.query.limit || '20';
+
+      if (!query) {
+        return res.status(400).json({ error: 'Query parameter q is required' });
+      }
+
+      const encodedQuery = encodeURIComponent(query);
+      const url = `https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=${limit}`;
+
+      console.log(`[BAG API] Searching for: "${query}"`);
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      console.log(`[BAG API] Found ${data.features?.length || 0} results`);
+
+      res.json(data);
+    } catch (error) {
+      console.error('[BAG API] Error:', error);
+      return res.status(500).json({ error: 'Failed to fetch from BAG API' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

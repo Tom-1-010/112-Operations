@@ -656,7 +656,7 @@ export default function GMS2() {
   const searchBAGAddress = async (query: string) => {
     try {
       const encodedQuery = encodeURIComponent(query);
-      const response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=20`);
+      const response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=20`);
       const data = await response.json();
       
       if (data.features && data.features.length > 0) {
@@ -684,7 +684,7 @@ export default function GMS2() {
       // Try exact match first
       let query = `${straat} ${huisnummer} ${stad}`;
       let encodedQuery = encodeURIComponent(query);
-      let response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=5`);
+      let response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=5`);
       let data = await response.json();
       
       if (data.features && data.features.length > 0) {
@@ -703,7 +703,7 @@ export default function GMS2() {
       // If no exact match, try broader search
       query = `${straat} ${stad}`;
       encodedQuery = encodeURIComponent(query);
-      response = await fetch(`https://api.pdok.nl/lv/bag/ogc/v1/collections/adres/items?q=${encodedQuery}&limit=10`);
+      response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=10`);
       data = await response.json();
       
       if (data.features && data.features.length > 0) {
