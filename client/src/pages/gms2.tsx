@@ -41,6 +41,7 @@ export default function GMS2() {
   const [mc1Value, setMc1Value] = useState("Bezitsaantasting");
   const [mc2Value, setMc2Value] = useState("Inbraak");
   const [notitiesText, setNotitiesText] = useState("");
+  const [priorityValue, setPriorityValue] = useState(2);
   const [loggingEntries, setLoggingEntries] = useState<Array<{
     id: number;
     timestamp: string;
@@ -709,9 +710,41 @@ export default function GMS2() {
 
                 {/* Bottom action section */}
                 <div className="gms2-bottom-actions">
-                  
+                  <div className="gms2-priority-buttons">
+                    <span>P:</span>
+                    <select 
+                      className="gms2-priority-dropdown" 
+                      value={priorityValue}
+                      onChange={(e) => setPriorityValue(parseInt(e.target.value))}
+                    >
+                      <option value={1}>1</option>
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                      <option value={4}>4</option>
+                    </select>
+                    <button className="gms2-btn priority-btn">P ▼</button>
+                    <button className="gms2-btn priority-btn">A ▼</button>
+                  </div>
 
-                  <div className="gms2-action-buttons" style={{ display: 'flex', flexDirection: 'row', gap: '8px', alignItems: 'center' }}>
+                  <div className="gms2-service-options">
+                    <div className="gms2-service-col">
+                      <input type="checkbox" />
+                      <span>P</span>
+                      <input type="checkbox" />
+                    </div>
+                    <div className="gms2-service-col">
+                      <input type="checkbox" />
+                      <span>B</span>
+                      <input type="checkbox" />
+                    </div>
+                    <div className="gms2-service-col">
+                      <input type="checkbox" />
+                      <span>A</span>
+                      <input type="checkbox" />
+                    </div>
+                  </div>
+
+                  <div className="gms2-action-buttons">
                     <select className="gms2-dropdown">
                       <option>Testmelding</option>
                     </select>
