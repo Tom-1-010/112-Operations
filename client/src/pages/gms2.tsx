@@ -625,6 +625,197 @@ export default function GMS2() {
     setLoggingEntries(prev => [newEntry, ...prev]);
   };
 
+  // Handle Werkplek popup window
+  const handleWerkplekClick = () => {
+    const windowFeatures = "width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no";
+    const popupWindow = window.open("", "GMS2_Werkplek", windowFeatures);
+    
+    if (popupWindow) {
+      // Create a complete HTML document for the popup
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="nl">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>GMS2 Werkplek</title>
+          <style>
+            body { 
+              margin: 0; 
+              padding: 0; 
+              font-family: Arial, sans-serif;
+              background: #f5f5f5;
+            }
+            .popup-header {
+              background: #333;
+              color: white;
+              padding: 10px;
+              font-weight: bold;
+            }
+            .popup-content {
+              padding: 20px;
+            }
+            .data-sync-indicator {
+              background: #4CAF50;
+              color: white;
+              padding: 5px 10px;
+              border-radius: 3px;
+              font-size: 12px;
+              margin-bottom: 10px;
+            }
+            .incident-summary {
+              background: white;
+              padding: 15px;
+              border-radius: 5px;
+              margin-bottom: 15px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .current-incident {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 10px;
+            }
+            .incident-details {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-top: 10px;
+            }
+            .detail-item {
+              padding: 8px;
+              background: #f9f9f9;
+              border-radius: 3px;
+            }
+            .detail-label {
+              font-weight: bold;
+              color: #666;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="popup-header">
+            GMS2 Werkplek - Data Verbonden
+          </div>
+          <div class="popup-content">
+            <div class="data-sync-indicator">
+              🔗 Live data-verbinding actief
+            </div>
+            <div id="incident-data" class="incident-summary">
+              <div class="current-incident">Laden van incident data...</div>
+            </div>
+          </div>
+          
+          <script>
+            // Live data synchronization
+            function updateIncidentData() {
+              const mainWindow = window.opener;
+              if (mainWindow && !mainWindow.closed) {
+                try {
+                  // Access the React state from the main window
+                  const selectedIncident = mainWindow.gms2SelectedIncident;
+                  const incidents = mainWindow.gms2Incidents || [];
+                  
+                  const incidentDataDiv = document.getElementById('incident-data');
+                  
+                  if (selectedIncident) {
+                    incidentDataDiv.innerHTML = \`
+                      <div class="current-incident">
+                        Actief Incident: #\${selectedIncident.nr || 'Nieuw'}
+                      </div>
+                      <div class="incident-details">
+                        <div class="detail-item">
+                          <div class="detail-label">Locatie:</div>
+                          <div>\${selectedIncident.locatie || 'Niet ingevuld'}</div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-label">Classificatie:</div>
+                          <div>\${selectedIncident.mc3 || selectedIncident.mc2 || selectedIncident.mc1 || selectedIncident.mc || 'Niet geclassificeerd'}</div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-label">Prioriteit:</div>
+                          <div>P\${selectedIncident.prio || 'Onbekend'}</div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-label">Tijd:</div>
+                          <div>\${selectedIncident.tijd || 'Niet ingevuld'}</div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-label">Plaats:</div>
+                          <div>\${selectedIncident.plaats || 'Niet ingevuld'}</div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-label">Status:</div>
+                          <div>\${selectedIncident.status || 'Openstaand'}</div>
+                        </div>
+                      </div>
+                      <div style="margin-top: 15px; padding: 10px; background: #e8f4fd; border-radius: 3px;">
+                        <strong>Totaal incidenten:</strong> \${incidents.length}
+                      </div>
+                    \`;
+                  } else {
+                    incidentDataDiv.innerHTML = \`
+                      <div class="current-incident">
+                        Geen incident geselecteerd
+                      </div>
+                      <div style="margin-top: 10px; color: #666;">
+                        Selecteer een incident in het hoofdscherm om details te zien
+                      </div>
+                      <div style="margin-top: 15px; padding: 10px; background: #e8f4fd; border-radius: 3px;">
+                        <strong>Totaal incidenten:</strong> \${incidents.length}
+                      </div>
+                    \`;
+                  }
+                } catch (error) {
+                  console.error('Error syncing data:', error);
+                }
+              } else {
+                document.getElementById('incident-data').innerHTML = \`
+                  <div class="current-incident" style="color: red;">
+                    ❌ Verbinding met hoofdscherm verloren
+                  </div>
+                  <div style="margin-top: 10px; color: #666;">
+                    Het hoofdscherm is gesloten of niet meer beschikbaar
+                  </div>
+                \`;
+              }
+            }
+            
+            // Update every 2 seconds
+            setInterval(updateIncidentData, 2000);
+            
+            // Initial update
+            updateIncidentData();
+            
+            // Handle window close
+            window.addEventListener('beforeunload', function() {
+              if (window.opener && !window.opener.closed) {
+                console.log('Werkplek window closing');
+              }
+            });
+          </script>
+        </body>
+        </html>
+      `;
+      
+      popupWindow.document.write(htmlContent);
+      popupWindow.document.close();
+      
+      // Store references for data sync
+      popupWindow.focus();
+      
+      console.log('🪟 Werkplek window opened with live data connection');
+    } else {
+      console.error('❌ Failed to open popup window - check popup blocker');
+      alert('Kon het Werkplek venster niet openen. Controleer de popup blocker instellingen.');
+    }
+  };
+
+  // Expose state to popup windows for data sync
+  useEffect(() => {
+    (window as any).gms2SelectedIncident = selectedIncident;
+    (window as any).gms2Incidents = incidents;
+  }, [selectedIncident, incidents]);
+
   // Enhanced shortcode mapping with official LMC codes
   const shortcodeMappings = {
     // Officiële LMC codes
@@ -1659,7 +1850,13 @@ export default function GMS2() {
           <span className="gms2-menu-item">Start</span>
           <span className="gms2-menu-item">Beheer</span>
           <span className="gms2-menu-item">Incident</span>
-          <span className="gms2-menu-item">Werkplek</span>
+          <span 
+            className="gms2-menu-item" 
+            onClick={handleWerkplekClick}
+            style={{ cursor: 'pointer' }}
+          >
+            Werkplek
+          </span>
           <span className="gms2-menu-item">Mail</span>
           <span className="gms2-menu-item">Configuratie</span>
           <span className="gms2-menu-item">GIS</span>
