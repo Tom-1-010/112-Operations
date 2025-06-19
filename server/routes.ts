@@ -297,12 +297,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/import-karakteristieken", async (req, res) => {
     try {
-      const fs = require('fs');
-      const path = require('path');
+      const fs = await import('fs');
+      const path = await import('path');
       
       console.log('🔄 Starting karakteristieken import via GET API...');
       
-      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750367007045.json');
+      // Use the newest karakteristieken file
+      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750369362301.json');
       
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Karakteristieken file not found' });
@@ -321,8 +322,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transformedData = karakteristiekenData.map(item => ({
         ktNaam: item['kt-naam'],
         ktType: item['kt-type'],
-        ktWaarde: item['kt-waarde'],
-        ktCode: item['kt-code'],
+        ktWaarde: item['kt-waarde'] === null || item['kt-waarde'] === undefined || 
+                   (typeof item['kt-waarde'] === 'number' && isNaN(item['kt-waarde'])) ? null : String(item['kt-waarde']),
+        ktCode: item['kt-code'] === null || item['kt-code'] === undefined || 
+                (typeof item['kt-code'] === 'number' && isNaN(item['kt-code'])) ? null : String(item['kt-code']),
         ktPaser: item['kt-paser']
       }));
       
@@ -355,12 +358,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/import-karakteristieken", async (req, res) => {
     try {
-      const fs = require('fs');
-      const path = require('path');
+      const fs = await import('fs');
+      const path = await import('path');
       
       console.log('🔄 Starting karakteristieken import via POST API...');
       
-      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750367007045.json');
+      // Use the newest karakteristieken file
+      const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750369362301.json');
       
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Karakteristieken file not found' });
@@ -379,8 +383,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transformedData = karakteristiekenData.map(item => ({
         ktNaam: item['kt-naam'],
         ktType: item['kt-type'],
-        ktWaarde: item['kt-waarde'],
-        ktCode: item['kt-code'],
+        ktWaarde: item['kt-waarde'] === null || item['kt-waarde'] === undefined || 
+                   (typeof item['kt-waarde'] === 'number' && isNaN(item['kt-waarde'])) ? null : String(item['kt-waarde']),
+        ktCode: item['kt-code'] === null || item['kt-code'] === undefined || 
+                (typeof item['kt-code'] === 'number' && isNaN(item['kt-code'])) ? null : String(item['kt-code']),
         ktPaser: item['kt-paser']
       }));
       
