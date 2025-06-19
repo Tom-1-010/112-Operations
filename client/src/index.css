@@ -2651,6 +2651,134 @@ body {
 
 .gms2-status-overview {
   height: 100%;
+  background: #c0c0c0;
+  border: 1px inset #c0c0c0;
+  padding: 2px;
+}
+
+.gms2-status-table-container {
+  background: white;
+  border: 1px inset #c0c0c0;
+  height: 100%;
+  overflow: auto;
+}
+
+.gms2-status-table {
+  width: 100%;
+  font-size: 10px;
+  font-family: 'MS Sans Serif', sans-serif;
+}
+
+/* Status table header row */
+.gms2-status-header-row {
+  display: grid;
+  grid-template-columns: 20px 80px 80px 40px 40px 40px 40px 40px 40px 40px 40px;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.gms2-status-cell {
+  padding: 2px 4px;
+  border-right: 1px solid #808080;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+}
+
+.gms2-status-cell:last-child {
+  border-right: none;
+}
+
+/* Header specific styling */
+.gms2-status-cell.header-dp {
+  background: #c0c0c0;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.gms2-status-cell.header-roepnaam {
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* Data rows */
+.gms2-status-data-row {
+  display: grid;
+  grid-template-columns: 20px 80px 80px 40px 40px 40px 40px 40px 40px 40px 40px;
+  border-bottom: 1px solid #d0d0d0;
+  font-size: 10px;
+  background: white;
+}
+
+.gms2-status-data-row:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.gms2-status-data-row:hover {
+  background: #e0e0ff;
+}
+
+/* Data cell styling */
+.gms2-status-cell.data-dp {
+  font-weight: bold;
+  color: black;
+}
+
+.gms2-status-cell.data-roepnaam {
+  text-align: left;
+  justify-content: flex-start;
+  font-weight: bold;
+  color: black;
+}
+
+.gms2-status-cell.data-soort {
+  text-align: left;
+  justify-content: flex-start;
+  font-size: 9px;
+}
+
+/* Time cells with yellow background when filled */
+.gms2-status-cell.data-ov,
+.gms2-status-cell.data-ar,
+.gms2-status-cell.data-tp,
+.gms2-status-cell.data-nb,
+.gms2-status-cell.data-am,
+.gms2-status-cell.data-vr,
+.gms2-status-cell.data-fd,
+.gms2-status-cell.data-ga {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+/* Yellow background for filled time fields */
+.gms2-status-cell.data-ov:not(:empty),
+.gms2-status-cell.data-ar:not(:empty),
+.gms2-status-cell.data-tp:not(:empty),
+.gms2-status-cell.data-nb:not(:empty),
+.gms2-status-cell.data-am:not(:empty),
+.gms2-status-cell.data-vr:not(:empty),
+.gms2-status-cell.data-fd:not(:empty),
+.gms2-status-cell.data-ga:not(:empty) {
+  background: #ffff99;
+  color: black;
+}
+
+/* Empty state styling */
+.gms2-status-empty-state {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  grid-column: 1 / -1;
+}
+
+.gms2-status-empty-message {
+  font-size: 11px;
 }
 
 .gms2-status-header {

@@ -1283,51 +1283,83 @@ export default function GMS2() {
                   )}
                   
                   {activeLoggingTab === 'statusoverzicht' && (
-                    <div className="gms2-tab-content">
-                      <div className="gms2-status-overview">
-                        <div className="gms2-status-table-container">
-                          <div className="gms2-status-table">
-                            {/* Header row */}
-                            <div className="gms2-status-header-row">
-                              <div className="gms2-status-cell header-dp">D<br/>P</div>
-                              <div className="gms2-status-cell header-roepnaam">Roepnaam</div>
-                              <div className="gms2-status-cell header-soort">Soort voe</div>
-                              <div className="gms2-status-cell header-ov">ov</div>
-                              <div className="gms2-status-cell header-ar">ar</div>
-                              <div className="gms2-status-cell header-tp">tp</div>
-                              <div className="gms2-status-cell header-nb">nb</div>
-                              <div className="gms2-status-cell header-am">am</div>
-                              <div className="gms2-status-cell header-vr">vr</div>
-                              <div className="gms2-status-cell header-fd">fd</div>
-                              <div className="gms2-status-cell header-ga">GA</div>
-                            </div>
-                            
-                            {/* Dynamic rows for assigned units */}
-                            {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.map((unit, index) => (
-                              <div key={unit.roepnummer} className="gms2-status-data-row">
-                                <div className="gms2-status-cell data-dp">P</div>
-                                <div className="gms2-status-cell data-roepnaam">{unit.roepnummer}</div>
-                                <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
-                                <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
-                                <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
-                                <div className="gms2-status-cell data-tp">{unit.tp_tijd || ''}</div>
-                                <div className="gms2-status-cell data-nb">{unit.nb_tijd || ''}</div>
-                                <div className="gms2-status-cell data-am">{unit.am_tijd || ''}</div>
-                                <div className="gms2-status-cell data-vr">{unit.vr_tijd || ''}</div>
-                                <div className="gms2-status-cell data-fd">{unit.fd_tijd || ''}</div>
-                                <div className="gms2-status-cell data-ga">{unit.ga_tijd || ''}</div>
-                              </div>
-                            ))}
-                            
-                            {/* Empty state when no units assigned */}
-                            {(!selectedIncident || !selectedIncident.assignedUnits || selectedIncident.assignedUnits.length === 0) && (
-                              <div className="gms2-status-empty-state">
-                                <div className="gms2-status-empty-message">
-                                  Geen eenheden gekoppeld aan deze melding
-                                </div>
-                              </div>
-                            )}
+                    <div className="gms2-status-overview">
+                      <div className="gms2-status-table-container">
+                        <div className="gms2-status-table">
+                          {/* Header row */}
+                          <div className="gms2-status-header-row">
+                            <div className="gms2-status-cell header-dp">D<br/>P</div>
+                            <div className="gms2-status-cell header-roepnaam">Roepnaam</div>
+                            <div className="gms2-status-cell header-soort">Soort voe</div>
+                            <div className="gms2-status-cell header-ov">ov</div>
+                            <div className="gms2-status-cell header-ar">ar</div>
+                            <div className="gms2-status-cell header-tp">tp</div>
+                            <div className="gms2-status-cell header-nb">nb</div>
+                            <div className="gms2-status-cell header-am">am</div>
+                            <div className="gms2-status-cell header-vr">vr</div>
+                            <div className="gms2-status-cell header-fd">fd</div>
+                            <div className="gms2-status-cell header-ga">GA</div>
                           </div>
+                          
+                          {/* Sample data rows to match the photo */}
+                          <div className="gms2-status-data-row">
+                            <div className="gms2-status-cell data-dp">P</div>
+                            <div className="gms2-status-cell data-roepnaam">RTB101</div>
+                            <div className="gms2-status-cell data-soort">SurvBus</div>
+                            <div className="gms2-status-cell data-ov">13:19</div>
+                            <div className="gms2-status-cell data-ar">13:19</div>
+                            <div className="gms2-status-cell data-tp"></div>
+                            <div className="gms2-status-cell data-nb"></div>
+                            <div className="gms2-status-cell data-am"></div>
+                            <div className="gms2-status-cell data-vr"></div>
+                            <div className="gms2-status-cell data-fd"></div>
+                            <div className="gms2-status-cell data-ga"></div>
+                          </div>
+                          
+                          <div className="gms2-status-data-row">
+                            <div className="gms2-status-cell data-dp">P</div>
+                            <div className="gms2-status-cell data-roepnaam">RTB160</div>
+                            <div className="gms2-status-cell data-soort">WykAuto</div>
+                            <div className="gms2-status-cell data-ov">13:22</div>
+                            <div className="gms2-status-cell data-ar"></div>
+                            <div className="gms2-status-cell data-tp"></div>
+                            <div className="gms2-status-cell data-nb"></div>
+                            <div className="gms2-status-cell data-am"></div>
+                            <div className="gms2-status-cell data-vr"></div>
+                            <div className="gms2-status-cell data-fd"></div>
+                            <div className="gms2-status-cell data-ga"></div>
+                          </div>
+                          
+                          <div className="gms2-status-data-row">
+                            <div className="gms2-status-cell data-dp">P</div>
+                            <div className="gms2-status-cell data-roepnaam">RTB188</div>
+                            <div className="gms2-status-cell data-soort">SurvAut</div>
+                            <div className="gms2-status-cell data-ov">13:22</div>
+                            <div className="gms2-status-cell data-ar">13:24</div>
+                            <div className="gms2-status-cell data-tp">13:24</div>
+                            <div className="gms2-status-cell data-nb"></div>
+                            <div className="gms2-status-cell data-am"></div>
+                            <div className="gms2-status-cell data-vr">13:47</div>
+                            <div className="gms2-status-cell data-fd"></div>
+                            <div className="gms2-status-cell data-ga"></div>
+                          </div>
+                          
+                          {/* Dynamic rows for assigned units from selected incident */}
+                          {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.map((unit, index) => (
+                            <div key={unit.roepnummer} className="gms2-status-data-row">
+                              <div className="gms2-status-cell data-dp">P</div>
+                              <div className="gms2-status-cell data-roepnaam">{unit.roepnummer}</div>
+                              <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
+                              <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
+                              <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
+                              <div className="gms2-status-cell data-tp">{unit.tp_tijd || ''}</div>
+                              <div className="gms2-status-cell data-nb">{unit.nb_tijd || ''}</div>
+                              <div className="gms2-status-cell data-am">{unit.am_tijd || ''}</div>
+                              <div className="gms2-status-cell data-vr">{unit.vr_tijd || ''}</div>
+                              <div className="gms2-status-cell data-fd">{unit.fd_tijd || ''}</div>
+                              <div className="gms2-status-cell data-ga">{unit.ga_tijd || ''}</div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
