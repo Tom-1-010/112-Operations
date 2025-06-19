@@ -198,6 +198,11 @@ body {
   padding: 24px;
 }
 
+/* GMS specific main content with more space */
+.main-content.gms-active {
+  padding: 32px 40px;
+}
+
 /* GMS Full-screen Layout */
 .gms-fullscreen {
   padding: 0 !important;
@@ -1780,7 +1785,8 @@ body {
   height: 100%;
   background: #e8e8e8;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 10px;
+  font-size: 11px;
+  padding: 8px;
 }
 
 /* Header Bar */
@@ -1814,8 +1820,8 @@ body {
 .gms-main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  padding: 4px;
+  gap: 12px;
+  padding: 12px;
   flex: 1;
   overflow: hidden;
 }
@@ -1836,24 +1842,25 @@ body {
 .gms-block {
   background: #f0f0f0;
   border: 2px inset #e8e8e8;
-  padding: 4px;
-  font-size: 10px;
+  padding: 8px;
+  font-size: 11px;
+  margin-bottom: 8px;
 }
 
 .gms-block-title {
   background: #c0c0c0;
-  margin: -4px -4px 4px -4px;
-  padding: 2px 4px;
+  margin: -8px -8px 8px -8px;
+  padding: 4px 8px;
   font-weight: bold;
   border-bottom: 1px solid #808080;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* Form Elements */
 .gms-form-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 12px;
+  margin-bottom: 12px;
   align-items: flex-end;
 }
 
@@ -2695,18 +2702,19 @@ body {
 .gms-text-area {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 6px;
-  font-size: 12px;
+  padding: 12px;
+  font-size: 13px;
   font-family: 'Courier New', monospace;
   flex: 1;
   overflow-y: auto;
-  min-height: 120px;
+  min-height: 180px;
+  line-height: 1.4;
 }
 
 .gms-text-area-compact {
-  min-height: 160px;
-  max-height: 160px;
-  width: 280px;
+  min-height: 200px;
+  max-height: 200px;
+  width: 320px;
   resize: none;
 }
 
@@ -2729,12 +2737,12 @@ body {
 /* Notitieveld horizontal split layout */
 .gms-notitie-container {
   display: flex;
-  gap: 12px;
+  gap: 20px;
   width: 100%;
 }
 
 .gms-notitie-left {
-  width: 280px;
+  width: 360px;
   display: flex;
   flex-direction: column;
 }
@@ -2742,11 +2750,11 @@ body {
 .gms-notitie-right {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   align-items: flex-start;
   justify-content: flex-start;
-  min-width: 100px;
-  margin-left: 25px;
+  min-width: 120px;
+  margin-left: 20px;
 }
 
 .gms-text-controls {
@@ -2822,15 +2830,16 @@ body {
 .gms-logging-area {
   background: white;
   border: 1px inset #c0c0c0;
-  padding: 3px;
-  font-size: 8px;
+  padding: 8px;
+  font-size: 10px;
   font-family: 'Courier New', monospace;
-  height: 120px;
+  height: 160px;
   overflow-y: auto;
+  line-height: 1.3;
 }
 
 .gms-logging-area-tall {
-  height: 140px;
+  height: 180px;
 }
 
 /* Additional Fields */

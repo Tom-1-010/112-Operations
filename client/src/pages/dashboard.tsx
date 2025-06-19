@@ -6643,7 +6643,7 @@ export default function Dashboard() {
         onSectionChange={setActiveSection}
       />
 
-      <main className="main-content">
+      <main className={`main-content ${activeSection === "gms" ? "gms-active" : ""}`}>
         
 
         {activeSection === "dashboard" && (
