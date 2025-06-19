@@ -811,6 +811,12 @@ export default function GMS2() {
 
     console.log(`🏷️ Processing karakteristieken for: "${lastLine}"`);
 
+    // Check if karakteristieken database is loaded
+    if (!Array.isArray(karakteristiekenDatabase) || karakteristiekenDatabase.length === 0) {
+      console.warn('⚠️ Karakteristieken database not loaded yet');
+      return false;
+    }
+
     // Check if line contains karakteristieken codes (starts with -)
     if (!lastLine.startsWith('-')) {
       return false;
@@ -830,9 +836,11 @@ export default function GMS2() {
       const [, code, value] = match;
       
       // Find matching karakteristiek in database
-      const matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-        k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
-      );
+      const matchingKarakteristiek = Array.isArray(karakteristiekenDatabase) 
+        ? karakteristiekenDatabase.find(k => 
+            k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
+          )
+        : null;
 
       if (matchingKarakteristiek) {
         console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
