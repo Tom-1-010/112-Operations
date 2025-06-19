@@ -32,6 +32,11 @@ export default function GMS2() {
   const [mc1Value, setMc1Value] = useState("Bezitsaantasting");
   const [mc2Value, setMc2Value] = useState("Inbraak");
   const [notitiesText, setNotitiesText] = useState("");
+  const [loggingEntries, setLoggingEntries] = useState<Array<{
+    id: number;
+    timestamp: string;
+    message: string;
+  }>>([]);
   
   // Sample incidents data matching the interface
   const [incidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
@@ -92,6 +97,35 @@ export default function GMS2() {
 
   const handleIncidentSelect = (incident: GmsIncident) => {
     setSelectedIncident(incident);
+  };
+
+  const addLoggingEntry = (message: string) => {
+    const now = new Date();
+    const dateStr = String(now.getDate()).padStart(2, '0');
+    const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+    const yearStr = now.getFullYear();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
+    
+    const newEntry = {
+      id: Date.now(),
+      timestamp,
+      message: message.trim()
+    };
+
+    setLoggingEntries(prev => [newEntry, ...prev]);
+  };
+
+  const handleKladblokKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const message = kladblokText.trim();
+      if (message) {
+        addLoggingEntry(message);
+        setKladblokText("");
+      }
+    }
   };
 
   return (
@@ -301,17 +335,19 @@ export default function GMS2() {
                   <button className="gms2-btn tab-btn">Overige inzet</button>
                 </div>
 
-                {/* Historical Data Section */}
+                {/* Logging Section */}
                 <div className="gms2-history-section">
-                  <div className="gms2-history-scrollbox">
-                    <div className="gms2-history-entry">10:19 2018 10:52 wOt919 DPCC DFU Po</div>
-                    <div className="gms2-history-entry">-PCC</div>
-                    <div className="gms2-history-entry">10:19 2018 10:54 GMS13 u1tw1jk3</div>
-                    <div className="gms2-history-entry">-mdcot</div>
-                    <div className="gms2-history-entry">10:19 2018 10:55 GMS13 u1tw1jk3</div>
-                    <div className="gms2-history-entry">-irws</div>
-                    <div className="gms2-history-entry">10:19 2018 10:55 GMS13 u1tw1jk3</div>
-                    <div className="gms2-history-entry">-ilcm</div>
+                  <div className="gms2-history-scrollbox" id="gms2-logging-display">
+                    {loggingEntries.map((entry) => (
+                      <div key={entry.id} className="gms2-history-entry">
+                        {entry.timestamp}
+                      </div>
+                    ))}
+                    {loggingEntries.map((entry) => (
+                      <div key={`msg-${entry.id}`} className="gms2-history-entry">
+                        -{entry.message}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -381,8 +417,9 @@ export default function GMS2() {
                     <textarea 
                       value={kladblokText}
                       onChange={(e) => setKladblokText(e.target.value)}
+                      onKeyPress={handleKladblokKeyPress}
                       className="gms2-kladblok-textarea"
-                      placeholder="Kladblok, hierin kan je alle relevante info vermelden"
+                      placeholder="Kladblok, hierin kan je alle relevante info vermelden (Enter om toe te voegen aan logging)"
                     />
                   </div>
                 </div>
