@@ -562,7 +562,7 @@ export default function GMS2() {
                 {/* Melder Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Melder:</span>
-                  <input type="text" className="gms2-input wide" value="Janssen" readOnly />
+                  <input type="text" className="gms2-input wide" />
                   <span className="gms2-field-label">Tel:</span>
                   <input type="text" className="gms2-input medium" />
                   <button className="gms2-btn small">Anoniem</button>
@@ -571,12 +571,13 @@ export default function GMS2() {
                 {/* Adres Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Adres:</span>
-                  <input type="text" className="gms2-input wide" placeholder="Adres melder" />
+                  <input type="text" className="gms2-input wide" />
                   <span className="gms2-field-label">Nr:</span>
                   <input type="text" className="gms2-input small" />
                   <span className="gms2-field-label">L/C:</span>
                   <input type="text" className="gms2-input small" />
                   <span className="gms2-field-label">Gem:</span>
+                  <input type="text" className="gms2-input small" />
                 </div>
 
                 {/* Visual separator between melder and location sections */}
@@ -584,25 +585,25 @@ export default function GMS2() {
 
                 {/* Location Details Row 1 */}
                 <div className="gms2-form-row">
-                  <span className="gms2-code-field">115</span>
-                  <input type="text" className="gms2-input wide" value="CANADASTRAAT" readOnly />
+                  <input type="text" className="gms2-input small" />
+                  <input type="text" className="gms2-input wide" />
                   <span className="gms2-field-label">Nr:</span>
-                  <input type="text" className="gms2-input small" value="3" readOnly />
+                  <input type="text" className="gms2-input small" />
                 </div>
 
                 {/* Location Details Row 2 */}
                 <div className="gms2-form-row">
-                  <span className="gms2-code-field">5651CE</span>
+                  <input type="text" className="gms2-input small" />
                   <span className="gms2-field-label">Pts:</span>
-                  <input type="text" className="gms2-input wide" value="EINDHOVEN" readOnly />
+                  <input type="text" className="gms2-input wide" />
                   <span className="gms2-field-label">Gem:</span>
-                  <input type="text" className="gms2-input wide" value="EINDHOVEN" readOnly />
+                  <input type="text" className="gms2-input wide" />
                 </div>
 
                 {/* Function Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Func:</span>
-                  <input type="text" className="gms2-input wide" placeholder="Functie" />
+                  <input type="text" className="gms2-input wide" />
                 </div>
 
                 {/* Action Buttons Row */}
