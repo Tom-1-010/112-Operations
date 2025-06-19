@@ -370,11 +370,13 @@ export default function GMS2() {
                   <div className="gms2-characteristics-table">
                     <div className="gms2-char-header">
                       <span>Karakteristieken</span>
+                      <span></span>
                       <span>Waarde</span>
                     </div>
                     {/* Empty table ready for data input */}
                     {Array.from({ length: 8 }).map((_, index) => (
                       <div key={index} className="gms2-char-row">
+                        <span></span>
                         <span></span>
                         <span></span>
                       </div>
