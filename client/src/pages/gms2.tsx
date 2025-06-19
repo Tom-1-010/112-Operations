@@ -39,6 +39,20 @@ interface GmsIncident {
   meldingslogging?: string;
   tijdstip?: string;
   prioriteit?: number;
+  assignedUnits?: AssignedUnit[];
+}
+
+interface AssignedUnit {
+  roepnummer: string;
+  soort_voertuig: string;
+  ov_tijd?: string;
+  ar_tijd?: string;
+  tp_tijd?: string;
+  nb_tijd?: string;
+  am_tijd?: string;
+  vr_tijd?: string;
+  fd_tijd?: string;
+  ga_tijd?: string;
 }
 
 export default function GMS2() {
@@ -1271,9 +1285,49 @@ export default function GMS2() {
                   {activeLoggingTab === 'statusoverzicht' && (
                     <div className="gms2-tab-content">
                       <div className="gms2-status-overview">
-                        <div className="gms2-status-header">Statusoverzicht Eenheden</div>
-                        <div className="gms2-content-placeholder">
-                          Hier komen straks de eenheden te staan
+                        <div className="gms2-status-table-container">
+                          <div className="gms2-status-table">
+                            {/* Header row */}
+                            <div className="gms2-status-header-row">
+                              <div className="gms2-status-cell header-dp">D<br/>P</div>
+                              <div className="gms2-status-cell header-roepnaam">Roepnaam</div>
+                              <div className="gms2-status-cell header-soort">Soort voe</div>
+                              <div className="gms2-status-cell header-ov">ov</div>
+                              <div className="gms2-status-cell header-ar">ar</div>
+                              <div className="gms2-status-cell header-tp">tp</div>
+                              <div className="gms2-status-cell header-nb">nb</div>
+                              <div className="gms2-status-cell header-am">am</div>
+                              <div className="gms2-status-cell header-vr">vr</div>
+                              <div className="gms2-status-cell header-fd">fd</div>
+                              <div className="gms2-status-cell header-ga">GA</div>
+                            </div>
+                            
+                            {/* Dynamic rows for assigned units */}
+                            {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.map((unit, index) => (
+                              <div key={unit.roepnummer} className="gms2-status-data-row">
+                                <div className="gms2-status-cell data-dp">P</div>
+                                <div className="gms2-status-cell data-roepnaam">{unit.roepnummer}</div>
+                                <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
+                                <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
+                                <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
+                                <div className="gms2-status-cell data-tp">{unit.tp_tijd || ''}</div>
+                                <div className="gms2-status-cell data-nb">{unit.nb_tijd || ''}</div>
+                                <div className="gms2-status-cell data-am">{unit.am_tijd || ''}</div>
+                                <div className="gms2-status-cell data-vr">{unit.vr_tijd || ''}</div>
+                                <div className="gms2-status-cell data-fd">{unit.fd_tijd || ''}</div>
+                                <div className="gms2-status-cell data-ga">{unit.ga_tijd || ''}</div>
+                              </div>
+                            ))}
+                            
+                            {/* Empty state when no units assigned */}
+                            {(!selectedIncident || !selectedIncident.assignedUnits || selectedIncident.assignedUnits.length === 0) && (
+                              <div className="gms2-status-empty-state">
+                                <div className="gms2-status-empty-message">
+                                  Geen eenheden gekoppeld aan deze melding
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
