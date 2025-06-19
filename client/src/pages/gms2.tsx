@@ -58,6 +58,7 @@ export default function GMS2() {
   const [selectedMC1, setSelectedMC1] = useState("");
   const [selectedMC2, setSelectedMC2] = useState("");
   const [selectedMC3, setSelectedMC3] = useState("");
+  const [activeLoggingTab, setActiveLoggingTab] = useState("hist-meldblok");
 
   // Form state for new incidents
   const [formData, setFormData] = useState({
@@ -1022,21 +1023,70 @@ export default function GMS2() {
 
                 {/* Tab Row */}
                 <div className="gms2-button-row">
-                  <button className="gms2-btn tab-btn">Hist. Meldblok</button>
-                  <button className="gms2-btn tab-btn">Locatietreffers</button>
-                  <button className="gms2-btn tab-btn">Statusoverzicht</button>
-                  <button className="gms2-btn tab-btn">Overige inzet</button>
+                  <button 
+                    className={`gms2-btn tab-btn ${activeLoggingTab === 'hist-meldblok' ? 'active' : ''}`}
+                    onClick={() => setActiveLoggingTab('hist-meldblok')}
+                  >
+                    Hist. Meldblok
+                  </button>
+                  <button 
+                    className={`gms2-btn tab-btn ${activeLoggingTab === 'locatietreffers' ? 'active' : ''}`}
+                    onClick={() => setActiveLoggingTab('locatietreffers')}
+                  >
+                    Locatietreffers
+                  </button>
+                  <button 
+                    className={`gms2-btn tab-btn ${activeLoggingTab === 'statusoverzicht' ? 'active' : ''}`}
+                    onClick={() => setActiveLoggingTab('statusoverzicht')}
+                  >
+                    Statusoverzicht
+                  </button>
+                  <button 
+                    className={`gms2-btn tab-btn ${activeLoggingTab === 'overige-inzet' ? 'active' : ''}`}
+                    onClick={() => setActiveLoggingTab('overige-inzet')}
+                  >
+                    Overige inzet
+                  </button>
                 </div>
 
-                {/* Logging Section */}
+                {/* Dynamic Tabbed Content */}
                 <div className="gms2-history-section">
-                  <div className="gms2-history-scrollbox" id="gms2-logging-display">
-                    {loggingEntries.map((entry) => (
-                      <div key={entry.id} className="gms2-history-entry">
-                        {entry.timestamp} {entry.message}
+                  {activeLoggingTab === 'hist-meldblok' && (
+                    <div className="gms2-history-scrollbox" id="gms2-logging-display">
+                      {loggingEntries.map((entry) => (
+                        <div key={entry.id} className="gms2-history-entry">
+                          {entry.timestamp} {entry.message}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {activeLoggingTab === 'locatietreffers' && (
+                    <div className="gms2-tab-content">
+                      <div className="gms2-content-placeholder">
+                        Locatietreffers - Inhoud volgt later
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
+                  
+                  {activeLoggingTab === 'statusoverzicht' && (
+                    <div className="gms2-tab-content">
+                      <div className="gms2-status-overview">
+                        <div className="gms2-status-header">Statusoverzicht Eenheden</div>
+                        <div className="gms2-content-placeholder">
+                          Hier komen straks de eenheden te staan
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activeLoggingTab === 'overige-inzet' && (
+                    <div className="gms2-tab-content">
+                      <div className="gms2-content-placeholder">
+                        Overige inzet - Inhoud volgt later
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* LMC Classification dropdowns row */}

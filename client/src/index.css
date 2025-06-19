@@ -2238,6 +2238,13 @@ body {
 .gms2-btn.tab-btn {
   padding: 2px 8px;
   margin-right: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.gms2-btn.tab-btn.active {
+  background: #ff99cc;
+  border-bottom: 2px solid #ff6699;
+  font-weight: bold;
 }
 
 .gms2-button-row {
@@ -2624,6 +2631,33 @@ body {
 .gms2-history-entry {
   padding: 1px 0;
   border-bottom: 1px solid #e0e0e0;
+}
+
+/* GMS2 Tab Content */
+.gms2-tab-content {
+  height: 100%;
+  padding: 4px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  overflow-y: auto;
+}
+
+.gms2-content-placeholder {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+.gms2-status-overview {
+  height: 100%;
+}
+
+.gms2-status-header {
+  font-weight: bold;
+  padding: 4px 0;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 8px;
 }
 
 /* GMS2 Dropdown Tabs */
