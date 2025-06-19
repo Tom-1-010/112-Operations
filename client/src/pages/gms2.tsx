@@ -790,17 +790,17 @@ export default function GMS2() {
                     onChange={(e) => handleFormChange('straatnaam', e.target.value)}
                     placeholder="Straatnaam"
                   />
-                  <span className="gms2-field-label">Nr:</span>
+                  <span className="gms2-field-label compact">Nr:</span>
                   <input 
                     type="text" 
-                    className="gms2-input small" 
+                    className="gms2-input extra-small" 
                     value={formData.huisnummer}
                     onChange={(e) => handleFormChange('huisnummer', e.target.value)}
                   />
-                  <span className="gms2-field-label">PC:</span>
+                  <span className="gms2-field-label compact">PC:</span>
                   <input 
                     type="text" 
-                    className="gms2-input small" 
+                    className="gms2-input postal" 
                     value={formData.postcode}
                     onChange={(e) => handleFormChange('postcode', e.target.value)}
                     placeholder="1234AB"
@@ -808,15 +808,15 @@ export default function GMS2() {
                   <span className="gms2-field-label">Pts:</span>
                   <input 
                     type="text" 
-                    className="gms2-input small" 
+                    className="gms2-input place-wide" 
                     value={formData.plaatsnaam}
                     onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
                     placeholder="Plaats"
                   />
-                  <span className="gms2-field-label">Gem:</span>
+                  <span className="gms2-field-label compact">Gem:</span>
                   <input 
                     type="text" 
-                    className="gms2-input small" 
+                    className="gms2-input extra-small" 
                     value={formData.gemeente}
                     onChange={(e) => handleFormChange('gemeente', e.target.value)}
                   />

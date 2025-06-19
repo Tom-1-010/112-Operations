@@ -2157,6 +2157,11 @@ body {
   color: black;
 }
 
+.gms2-field-label.compact {
+  min-width: auto;
+  margin-right: 4px;
+}
+
 .gms2-time-display {
   font-weight: bold;
   color: black;
@@ -2185,6 +2190,18 @@ body {
 
 .gms2-input.small {
   width: 40px;
+}
+
+.gms2-input.extra-small {
+  width: 35px;
+}
+
+.gms2-input.postal {
+  width: 55px;
+}
+
+.gms2-input.place-wide {
+  width: 100px;
 }
 
 .gms2-input.medium {
