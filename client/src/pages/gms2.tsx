@@ -147,6 +147,26 @@ export default function GMS2() {
         const data = await response.json();
         setKarakteristiekenDatabase(data);
         console.log('Loaded karakteristieken database:', data.length, 'entries');
+        
+        // Debug: Show sample codes
+        if (data.length > 0) {
+          console.log('📋 Sample karakteristieken codes:', data.slice(0, 10).map(k => ({
+            code: k.ktCode,
+            naam: k.ktNaam,
+            type: k.ktType
+          })));
+          
+          // Check specifically for ovdp-related codes
+          const ovdpCodes = data.filter(k => 
+            k.ktCode && k.ktCode.toLowerCase().includes('ovdp') ||
+            k.ktNaam && k.ktNaam.toLowerCase().includes('ovdp')
+          );
+          if (ovdpCodes.length > 0) {
+            console.log('🔍 Found OVDP-related codes:', ovdpCodes);
+          } else {
+            console.log('❌ No OVDP-related codes found in database');
+          }
+        }
       } catch (error) {
         console.error('Error loading karakteristieken:', error);
       }
@@ -856,13 +876,28 @@ export default function GMS2() {
 
   // Helper function to process individual karakteristiek code
   const processKarakteristiekCode = (code: string, value: string) => {
-    // Find matching karakteristiek in database
-    const matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+    // Find matching karakteristiek in database - try multiple matching strategies
+    let matchingKarakteristiek = karakteristiekenDatabase.find(k => 
       k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
     );
 
+    // If not found by exact code match, try partial matching
+    if (!matchingKarakteristiek) {
+      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+        k.ktCode && k.ktCode.toLowerCase().includes(code.toLowerCase())
+      );
+    }
+
+    // If still not found, try matching by name parts
+    if (!matchingKarakteristiek) {
+      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+        k.ktNaam && k.ktNaam.toLowerCase().includes(code.toLowerCase())
+      );
+    }
+
     if (!matchingKarakteristiek) {
       console.log(`❌ No karakteristiek found for code: ${code}`);
+      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 5).map(k => ({ code: k.ktCode, naam: k.ktNaam })));
       return false;
     }
 
