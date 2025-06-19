@@ -278,10 +278,7 @@ export default function GMS2() {
         }
       }, 250);
 
-      // Add logging entry for opening incident (this will be added to existing entries)
-      setTimeout(() => {
-        addLoggingEntry(`📋 Melding ${incident.nr} geopend voor bewerking`);
-      }, 300);
+      
     }
   };
 
@@ -371,11 +368,7 @@ export default function GMS2() {
       // Update selected incident
       setSelectedIncident(updatedIncident);
 
-      const classificationText = currentMC3 ? `${currentMC1} > ${currentMC2} > ${currentMC3}` : 
-                                currentMC2 ? `${currentMC1} > ${currentMC2}` : 
-                                currentMC1 || "Geen classificatie";
       
-      addLoggingEntry(`📝 Melding ${selectedIncident.nr} bijgewerkt - ${classificationText}`);
     }
   };
 
@@ -445,9 +438,6 @@ export default function GMS2() {
     // Clear selected incident so "Uitgifte" button stays for next incident
     setSelectedIncident(null);
 
-    // Add logging entry for successful dispatch
-    addLoggingEntry(`📋 Melding ${newIncidentNumber} uitgegeven - ${mcCode} ${location}`);
-
     // Only clear classifications and notes, keep address data intact
     setSelectedMC1("");
     setSelectedMC2("");
@@ -463,9 +453,6 @@ export default function GMS2() {
     if (mc1Select) mc1Select.value = "";
     if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
     if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
-
-    // DO NOT clear address data - keep formData intact for next similar incident
-    addLoggingEntry(`✅ Melding uitgegeven - klaar voor volgende melding op zelfde locatie`);
   };
 
   // Handle "Archiveer" button click
@@ -484,7 +471,7 @@ export default function GMS2() {
       // Remove from openstaande incidenten by filtering out archived ones
       setIncidents(prev => prev.filter(inc => inc.id !== selectedIncident.id));
 
-      addLoggingEntry(`📁 Melding ${selectedIncident.nr} gearchiveerd`);
+      
 
       // Select first remaining incident or clear selection
       const remainingIncidents = incidents.filter(inc => inc.id !== selectedIncident.id);
@@ -705,7 +692,6 @@ export default function GMS2() {
           console.log(`📍 Existing incident updated: ${selectedIncident.nr}`);
         }
 
-        addLoggingEntry(`📍 Adres automatisch ingevuld: ${straatnaam.trim()} ${huisnummer.trim()}, ${stad.trim()}`);
         return true;
       }
     }
@@ -743,7 +729,6 @@ export default function GMS2() {
           console.log(`👤 Existing incident updated: ${selectedIncident.nr}`);
         }
 
-        addLoggingEntry(`👤 Meldergegevens automatisch ingevuld: ${meldernaam.trim()}, ${telefoonnummer.trim()}`);
         return true;
       }
     }
@@ -791,7 +776,6 @@ export default function GMS2() {
 
       // No match found
       console.warn(`❌ Geen match gevonden voor: ${inputCode} in ${incidentContext}`);
-      addLoggingEntry(`❌ Onbekende code: ${inputCode}`);
       return false;
     }
 
@@ -841,7 +825,6 @@ export default function GMS2() {
 
     if (!exactMatch) {
       console.warn(`❌ No exact match found for ${mc1} > ${mc2} > ${mc3}`);
-      addLoggingEntry(`⚠️ Onbekende classificatie: ${detectedCode}`);
       return;
     }
 
@@ -929,10 +912,7 @@ export default function GMS2() {
         setSelectedIncident(updatedIncident);
       }
 
-      // Log successful classification
-      const classificatieTekst = mc3 ? `${mc1} > ${mc2} > ${mc3}` : mc2 ? `${mc1} > ${mc2}` : mc1;
-      addLoggingEntry(`✅ ${detectedCode.toUpperCase()} → ${classificatieTekst} (P${finalClassification.PRIO})`);
-    }
+      }
   };
 
   const handleKladblokKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -943,10 +923,8 @@ export default function GMS2() {
         // Try to detect and apply shortcodes (address, caller info, or classification)
         const shortcodeDetected = detectAndApplyShortcodes(message);
 
-        // Only add to log if it's not a shortcode, or if it is a classification shortcode
-        if (!shortcodeDetected || message.startsWith('-')) {
-          addLoggingEntry(message);
-        }
+        // Always add user input to log, regardless of shortcode detection
+        addLoggingEntry(message);
         setKladblokText("");
       }
     }
@@ -1082,8 +1060,7 @@ export default function GMS2() {
             setSelectedIncident(updatedIncident);
           }
 
-          addLoggingEntry(`📋 Classificatie compleet: ${selectedMC1} > ${selectedMC2} > ${selectedMC3Value} (P${matchingClassification.PRIO})`);
-        }
+          }
       }
     });
 
