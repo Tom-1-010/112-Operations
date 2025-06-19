@@ -3001,13 +3001,13 @@ body {
 /* BAG API Search Styling */
 .gms2-locatietreffers {
   min-height: 60px;
-  max-height: none;
+  max-height: 300px;
   height: auto;
   display: flex;
   flex-direction: column;
   padding: 2px;
   background: white;
-  overflow: visible;
+  overflow: hidden;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
@@ -3047,17 +3047,18 @@ body {
 }
 
 .gms2-search-results {
-  overflow-y: visible;
-  overflow-x: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid #999;
   background: white;
-  max-height: none;
+  max-height: 200px;
   min-height: 35px;
   height: auto;
   width: 100%;
   box-sizing: border-box;
   position: relative;
   z-index: 10;
+  flex: 1;
 }
 
 .gms2-address-result {
