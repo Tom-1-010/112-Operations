@@ -378,26 +378,13 @@ export default function GMS2() {
                       <span>Karakteristieken</span>
                       <span>Waarde</span>
                     </div>
-                    <div className="gms2-char-row">
-                      <span>Soort voertuig</span>
-                      <span>Personenauto</span>
-                    </div>
-                    <div className="gms2-char-row">
-                      <span>RTIC</span>
-                      <span>nee</span>
-                    </div>
-                    <div className="gms2-char-row">
-                      <span>Meldercontact</span>
-                      <span>teruggebeld</span>
-                    </div>
-                    <div className="gms2-char-row">
-                      <span>Delaycode pol</span>
-                      <span>geen eenheid</span>
-                    </div>
-                    <div className="gms2-char-row">
-                      <span>Instantie</span>
-                      <span>cent meldg bp</span>
-                    </div>
+                    {/* Empty table ready for data input */}
+                    {Array.from({ length: 8 }).map((_, index) => (
+                      <div key={index} className="gms2-char-row">
+                        <span></span>
+                        <span></span>
+                      </div>
+                    ))}
                   </div>
 
                   
