@@ -2588,136 +2588,157 @@ body {
   resize: none;
 }
 
-/* Classic GMS Bottom Layout */
-.gms2-classic-bottom {
-  margin-top: 8px;
-  border-top: 1px solid #808080;
-  padding-top: 4px;
+/* GMS2 History Section */
+.gms2-history-section {
+  margin: 4px 0;
+  height: 120px;
+  border: 1px inset #c0c0c0;
+  background: white;
 }
 
-.gms2-mc-row {
+.gms2-history-scrollbox {
+  height: 100%;
+  overflow-y: auto;
+  padding: 2px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+}
+
+.gms2-history-entry {
+  padding: 1px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* GMS2 Dropdown Tabs */
+.gms2-dropdown-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0;
+  align-items: center;
+}
+
+.gms2-tab-group {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.gms2-mc-row .gms2-field-label {
-  font-weight: bold;
-  min-width: 40px;
-}
-
-.gms2-bottom-layout {
-  display: flex;
   gap: 2px;
-  height: 100px;
-  margin-bottom: 4px;
 }
 
-.gms2-bottom-left {
-  flex: 1;
-  border: 1px inset #c0c0c0;
-  background: #c0c0c0;
-  padding: 2px;
-}
-
-.gms2-bottom-center {
-  width: 100px;
-  border: 1px inset #c0c0c0;
-  background: #c0c0c0;
-  padding: 2px;
-  display: flex;
-  flex-direction: column;
-}
-
-.gms2-bottom-right {
-  flex: 1;
-  border: 1px inset #c0c0c0;
-  background: #c0c0c0;
-  padding: 2px;
-}
-
-.gms2-section-title {
+.gms2-tab-group label {
   font-size: 10px;
   font-weight: bold;
-  margin-bottom: 2px;
 }
 
-.gms2-karakteristieken-textarea {
-  width: 100%;
-  height: calc(100% - 16px);
+.gms2-dropdown {
   background: white;
   border: 1px inset #c0c0c0;
+  font-size: 10px;
+  padding: 2px 4px;
+  font-family: inherit;
+}
+
+/* GMS2 Characteristics Layout */
+.gms2-characteristics-layout {
+  display: flex;
+  gap: 4px;
+  height: 150px;
+  margin: 4px 0;
+}
+
+.gms2-characteristics-table {
+  flex: 2;
+  border: 1px inset #c0c0c0;
+  background: white;
+  overflow-y: auto;
+}
+
+.gms2-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 40px;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
   padding: 2px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.gms2-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 40px;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 2px;
+  font-size: 10px;
+}
+
+.gms2-table-row:nth-child(even) {
+  background: #f0f0f0;
+}
+
+.gms2-time-display {
+  width: 80px;
+  border: 1px inset #c0c0c0;
+  background: #c0c0c0;
+  padding: 4px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gms2-kladblok-modern {
+  flex: 1;
+  border: 1px inset #c0c0c0;
+  background: #c0c0c0;
+  padding: 2px;
+}
+
+.gms2-kladblok-textarea {
+  width: 100%;
+  height: 100%;
+  background: #ffffcc;
+  border: 1px inset #c0c0c0;
+  padding: 4px;
   font-size: 10px;
   font-family: 'Courier New', monospace;
   resize: none;
 }
 
-.gms2-waarde-display {
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  font-size: 11px;
+/* GMS2 Bottom Actions */
+.gms2-bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  border-top: 1px solid #808080;
   margin-top: 4px;
 }
 
-.gms2-notities-textarea {
-  width: 100%;
-  height: calc(100% - 4px);
-  background: #c0ffff;
-  border: 1px inset #c0c0c0;
-  padding: 2px;
-  font-size: 10px;
-  font-family: 'Courier New', monospace;
-  resize: none;
-}
-
-.gms2-action-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 0;
-  border-top: 1px solid #808080;
-}
-
-.gms2-priority-section {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.gms2-service-checkboxes {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.gms2-checkbox-group {
-  display: flex;
-  gap: 8px;
-}
-
-.gms2-checkbox-row {
+.gms2-priority-buttons {
   display: flex;
   align-items: center;
   gap: 2px;
   font-size: 10px;
 }
 
-.gms2-checkbox-row input[type="checkbox"] {
+.gms2-service-options {
+  display: flex;
+  gap: 8px;
+}
+
+.gms2-service-col {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+}
+
+.gms2-service-col input[type="checkbox"] {
   width: 12px;
   height: 12px;
 }
 
-.gms2-dec-row {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 10px;
-  margin-left: 8px;
-}
-
-.gms2-final-actions {
+.gms2-action-buttons {
   margin-left: auto;
   display: flex;
   gap: 4px;

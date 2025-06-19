@@ -301,98 +301,127 @@ export default function GMS2() {
                   <button className="gms2-btn tab-btn">Overige inzet</button>
                 </div>
 
-                {/* Kladblok Section */}
-                <div className="gms2-kladblok-section">
-                  <div className="gms2-kladblok-header">
-                    <span className="gms2-field-label">Kladblok:</span>
+                {/* Historical Data Section */}
+                <div className="gms2-history-section">
+                  <div className="gms2-history-scrollbox">
+                    <div className="gms2-history-entry">10:19 2018 10:52 wOt919 DPCC DFU Po</div>
+                    <div className="gms2-history-entry">-PCC</div>
+                    <div className="gms2-history-entry">10:19 2018 10:54 GMS13 u1tw1jk3</div>
+                    <div className="gms2-history-entry">-mdcot</div>
+                    <div className="gms2-history-entry">10:19 2018 10:55 GMS13 u1tw1jk3</div>
+                    <div className="gms2-history-entry">-irws</div>
+                    <div className="gms2-history-entry">10:19 2018 10:55 GMS13 u1tw1jk3</div>
+                    <div className="gms2-history-entry">-ilcm</div>
                   </div>
-                  <textarea 
-                    value={kladblokText}
-                    onChange={(e) => setKladblokText(e.target.value)}
-                    className="gms2-kladblok-text"
-                  />
                 </div>
 
-                {/* Classic GMS Bottom Layout */}
-                <div className="gms2-classic-bottom">
-                  {/* MC Row with Huis Kar label */}
-                  <div className="gms2-mc-row">
-                    <span className="gms2-field-label">Huis Kar</span>
-                    <span className="gms2-field-label">MC</span>
-                    <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
-                      <option value="Bezitsaantasting">{mc1Value}</option>
-                    </select>
-                    <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
-                      <option value="Inbraak">{mc2Value}</option>
+                {/* Dropdown tabs row */}
+                <div className="gms2-dropdown-tabs">
+                  <div className="gms2-tab-group">
+                    <label>Hints/Kar</label>
+                    <select className="gms2-dropdown">
+                      <option>MC</option>
                     </select>
                   </div>
+                  <div className="gms2-tab-group">
+                    <select className="gms2-dropdown" style={{ backgroundColor: '#90EE90' }}>
+                      <option>Dienstverlening</option>
+                    </select>
+                  </div>
+                  <div className="gms2-tab-group">
+                    <select className="gms2-dropdown" style={{ backgroundColor: '#90EE90' }}>
+                      <option>Scenario</option>
+                    </select>
+                  </div>
+                  <div className="gms2-tab-group">
+                    <select className="gms2-dropdown" style={{ backgroundColor: '#90EE90' }}>
+                      <option>Testmelding</option>
+                    </select>
+                  </div>
+                </div>
 
-                  {/* Main bottom layout with three sections */}
-                  <div className="gms2-bottom-layout">
-                    {/* Left section - Karakteristieken */}
-                    <div className="gms2-bottom-left">
-                      <div className="gms2-section-title">Karakteristieken</div>
-                      <textarea className="gms2-karakteristieken-textarea" />
+                {/* Main characteristics layout */}
+                <div className="gms2-characteristics-layout">
+                  <div className="gms2-characteristics-table">
+                    <div className="gms2-table-header">
+                      <span>Karakteristieken</span>
+                      <span>Waarde</span>
+                      <span>Bro</span>
                     </div>
-
-                    {/* Center section - Waarde */}
-                    <div className="gms2-bottom-center">
-                      <div className="gms2-section-title">Waarde</div>
-                      <div className="gms2-waarde-display">"08:26"</div>
+                    <div className="gms2-table-row">
+                      <span>RTIC</span>
+                      <span>nee</span>
+                      <span>PC</span>
                     </div>
-
-                    {/* Right section - Notes with blue background */}
-                    <div className="gms2-bottom-right">
-                      <textarea 
-                        value={notitiesText}
-                        onChange={(e) => setNotitiesText(e.target.value)}
-                        className="gms2-notities-textarea"
-                        placeholder="Zitten vast in schoorsteen"
-                      />
+                    <div className="gms2-table-row">
+                      <span>Meldercontact</span>
+                      <span>teruggebeld</span>
+                      <span>PC</span>
+                    </div>
+                    <div className="gms2-table-row">
+                      <span>Delaycode pol</span>
+                      <span>geen eenheid</span>
+                      <span>PC</span>
+                    </div>
+                    <div className="gms2-table-row">
+                      <span>Instantie</span>
+                      <span>cent meldg bp</span>
+                      <span>PC</span>
+                    </div>
+                    <div className="gms2-table-row">
+                      <span>Instantie</span>
+                      <span>verkeerscentr</span>
+                      <span>PC</span>
                     </div>
                   </div>
 
-                  {/* Bottom action row */}
-                  <div className="gms2-action-row">
-                    <div className="gms2-priority-section">
-                      <span className="gms2-field-label">P</span>
-                      <button className="gms2-btn priority-btn active">2</button>
-                      <button className="gms2-btn priority-btn">P</button>
-                      <button className="gms2-btn priority-btn">A</button>
-                    </div>
-                    
-                    <div className="gms2-service-checkboxes">
-                      <div className="gms2-checkbox-group">
-                        <div className="gms2-checkbox-row">
-                          <input type="checkbox" />
-                          <span>P</span>
-                          <input type="checkbox" />
-                        </div>
-                        <div className="gms2-checkbox-row">
-                          <input type="checkbox" />
-                          <span>B</span>
-                          <input type="checkbox" />
-                        </div>
-                        <div className="gms2-checkbox-row">
-                          <input type="checkbox" />
-                          <span>A</span>
-                          <input type="checkbox" />
-                        </div>
-                      </div>
-                      <div className="gms2-dec-row">
-                        <input type="checkbox" />
-                        <span>DEC</span>
-                      </div>
-                    </div>
+                  <div className="gms2-time-display">
+                    <strong>**11:00**</strong>
+                  </div>
 
-                    <div className="gms2-final-actions">
-                      <select className="gms2-select action-select">
-                        <option>Eindrapport</option>
-                      </select>
-                      <button className="gms2-btn action-btn">Uitgifte</button>
-                      <button className="gms2-btn action-btn">Sluit af</button>
-                      <button className="gms2-btn action-btn">Sluit</button>
+                  <div className="gms2-kladblok-modern">
+                    <textarea 
+                      value="Kladblok, hierin kan je alle relevante info vermelden"
+                      onChange={(e) => setKladblokText(e.target.value)}
+                      className="gms2-kladblok-textarea"
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom action section */}
+                <div className="gms2-bottom-actions">
+                  <div className="gms2-priority-buttons">
+                    <span>P</span>
+                    <button className="gms2-btn priority-btn active">2</button>
+                    <button className="gms2-btn priority-btn">P</button>
+                    <button className="gms2-btn priority-btn">A</button>
+                  </div>
+
+                  <div className="gms2-service-options">
+                    <div className="gms2-service-col">
+                      <input type="checkbox" />
+                      <span>P</span>
+                      <input type="checkbox" />
                     </div>
+                    <div className="gms2-service-col">
+                      <input type="checkbox" />
+                      <span>B</span>
+                      <input type="checkbox" />
+                    </div>
+                    <div className="gms2-service-col">
+                      <input type="checkbox" />
+                      <span>A</span>
+                      <input type="checkbox" />
+                    </div>
+                  </div>
+
+                  <div className="gms2-action-buttons">
+                    <select className="gms2-dropdown">
+                      <option>Testmelding</option>
+                    </select>
+                    <button className="gms2-btn">Uitgifte</button>
+                    <button className="gms2-btn">Archiveer</button>
+                    <button className="gms2-btn">Sluit</button>
                   </div>
                 </div>
               </div>
