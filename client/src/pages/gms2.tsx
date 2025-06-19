@@ -707,19 +707,17 @@ export default function GMS2() {
 
         {/* Right Panel - Incident Details */}
         <div className="gms2-right-panel">
-          {selectedIncident && (
-            <>
-              {/* Incident Header */}
-              <div className="gms2-incident-header">
-                P:Canadastraat 3
-              </div>
+          {/* Incident Header */}
+          <div className="gms2-incident-header">
+            {selectedIncident ? `P:${selectedIncident.locatie || 'Nieuwe melding'}` : 'P: Nieuwe melding'}
+          </div>
 
               {/* Incident Form */}
-              <div className="gms2-incident-form">
+          <div className="gms2-incident-form">
                 {/* Title Row */}
                 <div className="gms2-title-section">
-                  <span className="gms2-title-text">P: Inbraak woning</span>
-                  <span className="gms2-incident-id">{selectedIncident.nr}</span>
+                  <span className="gms2-title-text">P: {selectedIncident?.mc2 || 'Nieuwe melding'}</span>
+                  <span className="gms2-incident-id">{selectedIncident?.nr || 'Nieuw'}</span>
                 </div>
 
                 {/* Time Row */}
@@ -999,8 +997,6 @@ export default function GMS2() {
                   </div>
                 </div>
               </div>
-            </>
-          )}
         </div>
       </div>
 
