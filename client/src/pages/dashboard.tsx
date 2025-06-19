@@ -7465,6 +7465,12 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+        {activeSection === "gms2" && (
+          <div className="content-section active">
+            <GMS2 />
+          </div>
+        )}
+
         {activeSection === "gms" && (
           <div className="content-section active gms-fullscreen">
             <div id="gms" className="gms-wrapper">
