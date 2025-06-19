@@ -422,10 +422,10 @@ export default function GMS2() {
                 {/* Bottom action section */}
                 <div className="gms2-bottom-actions">
                   <div className="gms2-priority-buttons">
-                    <span>P</span>
-                    <button className="gms2-btn priority-btn active">2</button>
-                    <button className="gms2-btn priority-btn">P</button>
-                    <button className="gms2-btn priority-btn">A</button>
+                    <span>P:</span>
+                    <button className="gms2-btn priority-btn active">2 ▼</button>
+                    <button className="gms2-btn priority-btn">P ▼</button>
+                    <button className="gms2-btn priority-btn">A ▼</button>
                   </div>
 
                   <div className="gms2-service-options">
