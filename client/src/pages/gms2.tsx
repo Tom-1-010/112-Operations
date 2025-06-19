@@ -2,6 +2,15 @@
 import { useState, useEffect } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 
+interface LMCClassification {
+  MC1: string;
+  MC2: string;
+  MC3: string;
+  Code: string;
+  PRIO: number;
+  DEFINITIE: string;
+}
+
 interface GmsIncident {
   id: number;
   nr: number;
@@ -37,6 +46,10 @@ export default function GMS2() {
     timestamp: string;
     message: string;
   }>>([]);
+  const [lmcClassifications, setLmcClassifications] = useState<LMCClassification[]>([]);
+  const [selectedMC1, setSelectedMC1] = useState("");
+  const [selectedMC2, setSelectedMC2] = useState("");
+  const [selectedMC3, setSelectedMC3] = useState("");
   
   // Sample incidents data matching the interface
   const [incidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
@@ -78,6 +91,29 @@ export default function GMS2() {
       setSelectedIncident(incidents[0]);
     }
   }, [incidents, selectedIncident]);
+
+  // Load LMC classifications
+  useEffect(() => {
+    const loadLMCClassifications = async () => {
+      try {
+        const response = await fetch('/lmc_classifications.json');
+        const data = await response.json();
+        setLmcClassifications(data);
+        console.log('Loaded LMC classifications:', data.length, 'entries');
+      } catch (error) {
+        console.error('Error loading LMC classifications:', error);
+      }
+    };
+
+    loadLMCClassifications();
+  }, []);
+
+  // Initialize dropdowns when classifications are loaded
+  useEffect(() => {
+    if (lmcClassifications.length > 0) {
+      initializeLMCDropdowns();
+    }
+  }, [lmcClassifications]);
 
   const formatDateTime = (date: Date) => {
     const days = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
@@ -125,6 +161,104 @@ export default function GMS2() {
         addLoggingEntry(message);
         setKladblokText("");
       }
+    }
+  };
+
+  const initializeLMCDropdowns = () => {
+    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+
+    if (mc1Select && mc2Select && mc3Select) {
+      // Populate MC1 dropdown
+      const mc1Options = Array.from(new Set(lmcClassifications.map(c => c.MC1).filter(Boolean))).sort();
+      mc1Select.innerHTML = '<option value="">Selecteer MC1...</option>';
+      mc1Options.forEach(mc1 => {
+        const option = document.createElement('option');
+        option.value = mc1;
+        option.textContent = mc1;
+        mc1Select.appendChild(option);
+      });
+
+      // MC1 change handler
+      mc1Select.addEventListener('change', (e) => {
+        const selectedMC1 = (e.target as HTMLSelectElement).value;
+        setSelectedMC1(selectedMC1);
+        
+        // Clear and populate MC2
+        mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+        setSelectedMC2("");
+        setSelectedMC3("");
+
+        if (selectedMC1) {
+          const mc2Options = Array.from(new Set(
+            lmcClassifications
+              .filter(c => c.MC1 === selectedMC1 && c.MC2)
+              .map(c => c.MC2)
+          )).sort();
+          
+          mc2Options.forEach(mc2 => {
+            const option = document.createElement('option');
+            option.value = mc2;
+            option.textContent = mc2;
+            mc2Select.appendChild(option);
+          });
+        }
+      });
+
+      // MC2 change handler
+      mc2Select.addEventListener('change', (e) => {
+        const selectedMC2 = (e.target as HTMLSelectElement).value;
+        setSelectedMC2(selectedMC2);
+        
+        // Clear and populate MC3
+        mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+        setSelectedMC3("");
+
+        if (selectedMC2 && selectedMC1) {
+          const mc3Options = Array.from(new Set(
+            lmcClassifications
+              .filter(c => c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3)
+              .map(c => c.MC3)
+          )).sort();
+          
+          mc3Options.forEach(mc3 => {
+            const option = document.createElement('option');
+            option.value = mc3;
+            option.textContent = mc3;
+            mc3Select.appendChild(option);
+          });
+        }
+      });
+
+      // MC3 change handler
+      mc3Select.addEventListener('change', (e) => {
+        const selectedMC3 = (e.target as HTMLSelectElement).value;
+        setSelectedMC3(selectedMC3);
+        
+        // Find matching classification and update incident
+        if (selectedMC3 && selectedMC2 && selectedMC1) {
+          const matchingClassification = lmcClassifications.find(c => 
+            c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
+          );
+          
+          if (matchingClassification && selectedIncident) {
+            // Update incident with classification
+            const updatedIncident = {
+              ...selectedIncident,
+              mc: matchingClassification.Code.toUpperCase(),
+              mc1: selectedMC1,
+              mc2: selectedMC2,
+              mc3: selectedMC3
+            };
+            setSelectedIncident(updatedIncident);
+            
+            // Log the classification
+            addLoggingEntry(`Classificatie toegepast: ${matchingClassification.Code.toUpperCase()} - ${selectedMC1}/${selectedMC2}/${selectedMC3} (Prio: ${matchingClassification.PRIO})`);
+          }
+        }
+      });
     }
   };
 
@@ -346,21 +480,33 @@ export default function GMS2() {
                   </div>
                 </div>
 
-                {/* Dropdown tabs row */}
+                {/* LMC Classification dropdowns row */}
                 <div className="gms2-dropdown-tabs">
                   <div className="gms2-tab-group">
-                    <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
-                      <option>Dienstverlening</option>
+                    <select 
+                      id="gms2-mc1-select" 
+                      className="gms2-dropdown" 
+                      style={{ backgroundColor: '#f5f5f5' }}
+                    >
+                      <option value="">Selecteer MC1...</option>
                     </select>
                   </div>
                   <div className="gms2-tab-group">
-                    <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
-                      <option>Scenario</option>
+                    <select 
+                      id="gms2-mc2-select" 
+                      className="gms2-dropdown" 
+                      style={{ backgroundColor: '#f5f5f5' }}
+                    >
+                      <option value="">Selecteer MC2...</option>
                     </select>
                   </div>
                   <div className="gms2-tab-group">
-                    <select className="gms2-dropdown" style={{ backgroundColor: '#f5f5f5' }}>
-                      <option>Testmelding</option>
+                    <select 
+                      id="gms2-mc3-select" 
+                      className="gms2-dropdown" 
+                      style={{ backgroundColor: '#f5f5f5' }}
+                    >
+                      <option value="">Selecteer MC3...</option>
                     </select>
                   </div>
                 </div>
