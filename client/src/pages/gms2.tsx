@@ -793,14 +793,14 @@ export default function GMS2() {
                   <span className="gms2-field-label">Nr:</span>
                   <input 
                     type="text" 
-                    className="gms2-input extra-small" 
+                    className="gms2-input small" 
                     value={formData.huisnummer}
                     onChange={(e) => handleFormChange('huisnummer', e.target.value)}
                   />
                   <span className="gms2-field-label">PC:</span>
                   <input 
                     type="text" 
-                    className="gms2-input postal" 
+                    className="gms2-input small" 
                     value={formData.postcode}
                     onChange={(e) => handleFormChange('postcode', e.target.value)}
                     placeholder="1234AB"
@@ -808,7 +808,7 @@ export default function GMS2() {
                   <span className="gms2-field-label">Pts:</span>
                   <input 
                     type="text" 
-                    className="gms2-input place" 
+                    className="gms2-input small" 
                     value={formData.plaatsnaam}
                     onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
                     placeholder="Plaats"

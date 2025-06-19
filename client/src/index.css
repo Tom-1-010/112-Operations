@@ -2195,18 +2195,6 @@ body {
   width: 120px;
 }
 
-.gms2-input.extra-small {
-  width: 35px;
-}
-
-.gms2-input.postal {
-  width: 55px;
-}
-
-.gms2-input.place {
-  width: 90px;
-}
-
 .gms2-btn {
   background: #c0c0c0;
   border: 1px outset #c0c0c0;
