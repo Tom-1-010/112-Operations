@@ -3042,6 +3042,7 @@ body {
   border: 1px solid #999;
   background: white;
   max-height: 180px;
+  min-height: 120px;
 }
 
 .gms2-address-result {
@@ -3050,6 +3051,9 @@ body {
   cursor: pointer;
   font-size: 11px;
   transition: background-color 0.1s ease;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.3;
 }
 
 .gms2-address-result:hover {
@@ -3060,15 +3064,27 @@ body {
   background: #cce7ff;
 }
 
+.gms2-address-result:last-child {
+  border-bottom: none;
+}
+
 .gms2-address-main {
   font-weight: bold;
   color: #000;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .gms2-address-details {
   font-size: 10px;
   color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .gms2-no-results {
@@ -3077,6 +3093,8 @@ body {
   color: #666;
   font-style: italic;
   font-size: 11px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .gms2-search-instructions {
@@ -3085,6 +3103,9 @@ body {
   font-size: 11px;
   background: #f9f9f9;
   border-top: 1px solid #eee;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
 }
 
   flex: 1;
