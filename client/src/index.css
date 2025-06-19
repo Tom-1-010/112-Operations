@@ -3057,8 +3057,7 @@ body {
   box-sizing: border-box;
   position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 .gms2-address-result {
@@ -3071,8 +3070,8 @@ body {
   width: 100%;
   box-sizing: border-box;
   display: block;
-  flex-shrink: 0;
   background: white;
+  overflow: hidden;
 }
 
 .gms2-address-result:hover {
