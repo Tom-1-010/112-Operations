@@ -3007,6 +3007,8 @@ body {
   background: white;
   overflow: hidden;
   max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gms2-search-container {
@@ -3043,11 +3045,13 @@ body {
 .gms2-search-results {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid #999;
   background: white;
   max-height: 140px;
   min-height: 100px;
-  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gms2-address-result {
@@ -3059,8 +3063,10 @@ body {
   word-wrap: break-word;
   overflow-wrap: break-word;
   line-height: 1.2;
-  overflow: hidden;
   max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
 }
 
 .gms2-address-result:hover {
@@ -3079,21 +3085,23 @@ body {
   font-weight: bold;
   color: #000;
   margin-bottom: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   max-width: 100%;
   width: 100%;
+  line-height: 1.1;
+  box-sizing: border-box;
 }
 
 .gms2-address-details {
   font-size: 9px;
   color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   max-width: 100%;
   width: 100%;
+  line-height: 1.1;
+  box-sizing: border-box;
 }
 
 .gms2-no-results {
