@@ -13,7 +13,7 @@ async function updateKarakteristiekenData() {
     console.log('Clearing existing karakteristieken...');
     await db.execute(sql`TRUNCATE TABLE karakteristieken RESTART IDENTITY`);
     
-    // Insert data in batches using raw SQL for JSONB support
+    // Insert data in batches using raw SQL
     const batchSize = 100;
     let inserted = 0;
     
@@ -21,9 +21,10 @@ async function updateKarakteristiekenData() {
       const batch = data.slice(i, i + batchSize);
       
       for (const item of batch) {
+        const parsersJson = JSON.stringify(item.kt_parsers || []);
         await db.execute(sql`
           INSERT INTO karakteristieken (kt_naam, kt_type, kt_waarde, kt_code, kt_parsers)
-          VALUES (${item.kt_naam}, ${item.kt_type}, ${item.kt_waarde}, ${item.kt_code}, ${JSON.stringify(item.kt_parsers)})
+          VALUES (${item.kt_naam}, ${item.kt_type}, ${item.kt_waarde || null}, ${item.kt_code || null}, ${parsersJson}::text)
         `);
         inserted++;
       }
