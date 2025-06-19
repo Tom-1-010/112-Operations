@@ -580,6 +580,9 @@ export default function GMS2() {
                   <span className="gms2-field-label">Gem:</span>
                 </div>
 
+                {/* Visual separator between melder and location sections */}
+                <div className="gms2-section-separator"></div>
+
                 {/* Location Details Row 1 */}
                 <div className="gms2-form-row">
                   <span className="gms2-code-field">115</span>
