@@ -2107,6 +2107,282 @@ body {
   flex-direction: column;
 }
 
+/* Incident Form */
+.gms2-incident-form {
+  padding: 4px;
+  background: #c0c0c0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gms2-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #808080;
+  margin-bottom: 4px;
+}
+
+.gms2-title-text {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.gms2-incident-id {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.gms2-form-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.gms2-field-label {
+  font-size: 10px;
+  min-width: 40px;
+  color: black;
+}
+
+.gms2-time-display {
+  font-weight: bold;
+  color: black;
+  background: white;
+  padding: 2px 4px;
+  border: 1px inset #c0c0c0;
+  min-width: 40px;
+}
+
+.gms2-code-field {
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 2px 4px;
+  font-size: 10px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.gms2-input {
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 2px 4px;
+  font-size: 10px;
+  font-family: inherit;
+}
+
+.gms2-input.small {
+  width: 40px;
+}
+
+.gms2-input.medium {
+  width: 80px;
+}
+
+.gms2-input.wide {
+  width: 120px;
+}
+
+.gms2-btn {
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  padding: 2px 6px;
+  font-size: 10px;
+  cursor: pointer;
+  color: black;
+  font-family: inherit;
+}
+
+.gms2-btn:hover {
+  background: #e0e0e0;
+}
+
+.gms2-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.gms2-btn.small {
+  padding: 1px 4px;
+  font-size: 9px;
+}
+
+.gms2-btn.tab-btn {
+  padding: 2px 8px;
+  margin-right: 2px;
+}
+
+.gms2-button-row {
+  display: flex;
+  gap: 2px;
+  margin: 2px 0;
+  flex-wrap: wrap;
+}
+
+/* Kladblok Section */
+.gms2-kladblok-section {
+  margin: 4px 0;
+}
+
+.gms2-kladblok-header {
+  margin-bottom: 2px;
+}
+
+.gms2-kladblok-text {
+  width: 100%;
+  height: 80px;
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 4px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  resize: none;
+}
+
+/* MC Row */
+.gms2-mc-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.gms2-select {
+  background: white;
+  border: 1px inset #c0c0c0;
+  font-size: 10px;
+  padding: 2px;
+  font-family: inherit;
+}
+
+.gms2-select.mc-select {
+  width: 120px;
+}
+
+/* Bottom Section */
+.gms2-bottom-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.gms2-karakteristieken-section {
+  display: flex;
+  gap: 8px;
+  height: 100px;
+}
+
+.gms2-karakteristieken-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gms2-karakteristieken-textarea {
+  flex: 1;
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 4px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  resize: none;
+  margin-top: 2px;
+}
+
+.gms2-karakteristieken-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gms2-waarde-section {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.gms2-tijd-waarde {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+.gms2-notities-textarea {
+  flex: 1;
+  background: #e0ffff;
+  border: 1px inset #c0c0c0;
+  padding: 4px;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  resize: none;
+}
+
+/* Priority and Services */
+.gms2-priority-services {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+
+.gms2-priority-section {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.gms2-btn.priority-btn {
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gms2-btn.priority-btn.active {
+  background: #316ac5;
+  color: white;
+}
+
+.gms2-services-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gms2-service-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gms2-service-label {
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 12px;
+}
+
+.gms2-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gms2-select.action-select {
+  width: 80px;
+}
+
+.gms2-btn.action-btn {
+  width: 80px;
+  padding: 3px 6px;
+}
+
 .gms2-table-header {
   background: #c0c0c0;
   display: grid;

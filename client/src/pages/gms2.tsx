@@ -87,31 +87,11 @@ export default function GMS2() {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
     
-    return `${dayName}, ${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
+    return `${dayName} ${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
   };
 
   const handleIncidentSelect = (incident: GmsIncident) => {
     setSelectedIncident(incident);
-  };
-
-  const handleEindrapport = () => {
-    console.log("Eindrapport clicked");
-    // Functionality for Eindrapport
-  };
-
-  const handleUitgifte = () => {
-    console.log("Uitgifte clicked");
-    // Functionality for Uitgifte
-  };
-
-  const handleSluitAf = () => {
-    console.log("Sluit af clicked");
-    // Functionality for Sluit af
-  };
-
-  const handleSluit = () => {
-    console.log("Sluit clicked");
-    // Functionality for Sluit
   };
 
   return (
@@ -237,52 +217,62 @@ export default function GMS2() {
 
               {/* Incident Form */}
               <div className="gms2-incident-form">
-                {/* Time and ID Row */}
+                {/* Title Row */}
+                <div className="gms2-title-section">
+                  <span className="gms2-title-text">P: Inbraak woning</span>
+                  <span className="gms2-incident-id">161</span>
+                </div>
+
+                {/* Time Row */}
                 <div className="gms2-form-row">
-                  <span>08:23</span>
-                  <span style={{ marginLeft: 'auto' }}>161</span>
+                  <span className="gms2-field-label">Tijd:</span>
+                  <span className="gms2-time-display">08:23</span>
+                  <span className="gms2-field-label">Aangemaakt:</span>
+                  <input type="text" className="gms2-input medium" value="Janssen" readOnly />
+                  <span className="gms2-field-label">Koppie</span>
+                  <button className="gms2-btn small">Koppie</button>
                 </div>
 
                 {/* Melder Row */}
                 <div className="gms2-form-row">
-                  <span>Melder</span>
+                  <span className="gms2-field-label">Melder:</span>
                   <input type="text" className="gms2-input wide" value="Janssen" readOnly />
-                  <span>Tel</span>
-                  <input type="text" className="gms2-input" />
+                  <span className="gms2-field-label">Tel:</span>
+                  <input type="text" className="gms2-input medium" />
                   <button className="gms2-btn small">Anoniem</button>
-                  <button className="gms2-btn small">Kopie</button>
                 </div>
 
                 {/* Adres Row */}
                 <div className="gms2-form-row">
-                  <span>Adres</span>
+                  <span className="gms2-field-label">Adres:</span>
                   <input type="text" className="gms2-input wide" />
-                  <span>Nr</span>
+                  <span className="gms2-field-label">Nr:</span>
                   <input type="text" className="gms2-input small" />
-                  <span>L/C</span>
+                  <span className="gms2-field-label">L/C:</span>
                   <input type="text" className="gms2-input small" />
-                  <span>Gem</span>
+                  <span className="gms2-field-label">Gem:</span>
                 </div>
 
-                {/* Location Details */}
+                {/* Location Details Row 1 */}
                 <div className="gms2-form-row">
-                  <span>115</span>
+                  <span className="gms2-code-field">115</span>
                   <input type="text" className="gms2-input wide" value="CANADASTRAAT" readOnly />
-                  <span>Nr</span>
+                  <span className="gms2-field-label">Nr:</span>
                   <input type="text" className="gms2-input small" value="3" readOnly />
                 </div>
 
+                {/* Location Details Row 2 */}
                 <div className="gms2-form-row">
-                  <span>5651CE</span>
-                  <span>Pts</span>
+                  <span className="gms2-code-field">5651CE</span>
+                  <span className="gms2-field-label">Pts:</span>
                   <input type="text" className="gms2-input wide" value="EINDHOVEN" readOnly />
-                  <span>Gem</span>
+                  <span className="gms2-field-label">Gem:</span>
                   <input type="text" className="gms2-input wide" value="EINDHOVEN" readOnly />
                 </div>
 
                 {/* Function Row */}
                 <div className="gms2-form-row">
-                  <span>Func</span>
+                  <span className="gms2-field-label">Func:</span>
                   <input type="text" className="gms2-input wide" />
                 </div>
 
@@ -305,14 +295,17 @@ export default function GMS2() {
 
                 {/* Tab Row */}
                 <div className="gms2-button-row">
-                  <button className="gms2-btn">Hist. Meldblok</button>
-                  <button className="gms2-btn">Locatietreffpte</button>
-                  <button className="gms2-btn">Statusoverzicht</button>
-                  <button className="gms2-btn">Overige inzet</button>
+                  <button className="gms2-btn tab-btn">Hist. Meldblok</button>
+                  <button className="gms2-btn tab-btn">Locatietreffpte</button>
+                  <button className="gms2-btn tab-btn">Statusoverzicht</button>
+                  <button className="gms2-btn tab-btn">Overige inzet</button>
                 </div>
 
-                {/* Kladblok */}
-                <div className="gms2-kladblok">
+                {/* Kladblok Section */}
+                <div className="gms2-kladblok-section">
+                  <div className="gms2-kladblok-header">
+                    <span className="gms2-field-label">Kladblok:</span>
+                  </div>
                   <textarea 
                     value={kladblokText}
                     onChange={(e) => setKladblokText(e.target.value)}
@@ -320,27 +313,29 @@ export default function GMS2() {
                   />
                 </div>
 
-                {/* Hints/Kar and MC Row */}
-                <div className="gms2-form-row">
-                  <span>Hints/Kar</span>
-                  <select className="gms2-select" style={{ backgroundColor: '#90EE90' }}>
+                {/* MC Row */}
+                <div className="gms2-mc-row">
+                  <span className="gms2-field-label">Hints/Kar:</span>
+                  <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
                     <option value="Bezitsaantasting">{mc1Value}</option>
                   </select>
-                  <select className="gms2-select" style={{ backgroundColor: '#90EE90' }}>
+                  <select className="gms2-select mc-select" style={{ backgroundColor: '#90EE90' }}>
                     <option value="Inbraak">{mc2Value}</option>
                   </select>
                 </div>
 
-                {/* Karakteristieken */}
-                <div className="gms2-karakteristieken-row">
-                  <div className="gms2-karakteristieken-left">
-                    <span>Karakteristieken</span>
-                    <textarea className="gms2-karakteristieken-textarea" />
-                  </div>
-                  <div className="gms2-karakteristieken-right">
-                    <span>Waarde</span>
-                    <span>"08:26**"</span>
-                    <div className="gms2-notities-area">
+                {/* Bottom section with karakteristieken and buttons */}
+                <div className="gms2-bottom-section">
+                  <div className="gms2-karakteristieken-section">
+                    <div className="gms2-karakteristieken-left">
+                      <span className="gms2-field-label">Karakteristieken:</span>
+                      <textarea className="gms2-karakteristieken-textarea" />
+                    </div>
+                    <div className="gms2-karakteristieken-right">
+                      <div className="gms2-waarde-section">
+                        <span className="gms2-field-label">Waarde:</span>
+                        <span className="gms2-tijd-waarde">"08:26**"</span>
+                      </div>
                       <textarea 
                         value={notitiesText}
                         onChange={(e) => setNotitiesText(e.target.value)}
@@ -348,44 +343,43 @@ export default function GMS2() {
                       />
                     </div>
                   </div>
-                </div>
 
-                {/* Bottom Action Buttons */}
-                <div className="gms2-bottom-actions">
-                  <div className="gms2-bottom-left">
-                    <div className="gms2-form-row">
-                      <span>P</span>
-                      <button className="gms2-btn small">2</button>
-                      <button className="gms2-btn small">3</button>
-                      <button className="gms2-btn small">P</button>
-                      <button className="gms2-btn small">A</button>
-                      <button className="gms2-btn small">⬜</button>
-                      <button className="gms2-btn small">⬜</button>
-                      <span>DEC</span>
+                  {/* Priority and Service Buttons */}
+                  <div className="gms2-priority-services">
+                    <div className="gms2-priority-section">
+                      <span className="gms2-field-label">P:</span>
+                      <button className="gms2-btn priority-btn active">2</button>
+                      <button className="gms2-btn priority-btn">3</button>
+                      <button className="gms2-btn priority-btn">P</button>
+                      <button className="gms2-btn priority-btn">A</button>
                     </div>
-                    <div className="gms2-form-row">
-                      <input type="checkbox" />
-                      <span>P</span>
-                      <input type="checkbox" />
+                    
+                    <div className="gms2-services-section">
+                      <div className="gms2-service-row">
+                        <input type="checkbox" />
+                        <span className="gms2-service-label">P</span>
+                        <input type="checkbox" />
+                      </div>
+                      <div className="gms2-service-row">
+                        <input type="checkbox" />
+                        <span className="gms2-service-label">B</span>
+                        <input type="checkbox" />
+                      </div>
+                      <div className="gms2-service-row">
+                        <input type="checkbox" />
+                        <span className="gms2-service-label">A</span>
+                        <input type="checkbox" />
+                      </div>
                     </div>
-                    <div className="gms2-form-row">
-                      <input type="checkbox" />
-                      <span>B</span>
-                      <input type="checkbox" />
+
+                    <div className="gms2-action-buttons">
+                      <select className="gms2-select action-select">
+                        <option>Eindrapport</option>
+                      </select>
+                      <button className="gms2-btn action-btn">Uitgifte</button>
+                      <button className="gms2-btn action-btn">Sluit af</button>
+                      <button className="gms2-btn action-btn">Sluit</button>
                     </div>
-                    <div className="gms2-form-row">
-                      <input type="checkbox" />
-                      <span>A</span>
-                      <input type="checkbox" />
-                    </div>
-                  </div>
-                  <div className="gms2-bottom-right">
-                    <select className="gms2-select">
-                      <option>Eindrapport</option>
-                    </select>
-                    <button className="gms2-btn" onClick={handleUitgifte}>Uitgifte</button>
-                    <button className="gms2-btn" onClick={handleSluitAf}>Sluit af</button>
-                    <button className="gms2-btn" onClick={handleSluit}>Sluit</button>
                   </div>
                 </div>
               </div>
