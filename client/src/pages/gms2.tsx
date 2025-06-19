@@ -676,8 +676,7 @@ export default function GMS2() {
     '-reanimatie': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: '', code: 'gzra' },
     '-ambulance': { MC1: 'Gezondheid', MC2: 'Onwel/Ziekte', MC3: '', code: 'gzoz' },
     '-overval': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Bedrijf/Instelling', code: 'bzovbi' },
-    '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Voertuig', code: '```text
-bzdsvo' },
+    '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Voertuig', code: 'bzdsvo' },
     '-spookrijder': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' }
   };
 
@@ -1474,7 +1473,7 @@ bzdsvo' },
 
                 return (
                   <div 
-                    key={incident.id} 
+                    key={`incident-${incident.id}-${incident.nr}`} 
                     className={`gms2-table-row ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
                     onClick={() => handleIncidentSelect(incident)}
                   >
