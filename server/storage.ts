@@ -1,4 +1,12 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+// Placeholder types for user management (not currently implemented)
+interface User {
+  id: number;
+  username: string;
+}
+
+interface InsertUser {
+  username: string;
+}
 
 // modify the interface with any CRUD methods
 // you might need
