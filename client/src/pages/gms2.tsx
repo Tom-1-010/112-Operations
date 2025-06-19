@@ -340,12 +340,7 @@ export default function GMS2() {
                   <div className="gms2-history-scrollbox" id="gms2-logging-display">
                     {loggingEntries.map((entry) => (
                       <div key={entry.id} className="gms2-history-entry">
-                        {entry.timestamp}
-                      </div>
-                    ))}
-                    {loggingEntries.map((entry) => (
-                      <div key={`msg-${entry.id}`} className="gms2-history-entry">
-                        -{entry.message}
+                        {entry.timestamp} {entry.message}
                       </div>
                     ))}
                   </div>
