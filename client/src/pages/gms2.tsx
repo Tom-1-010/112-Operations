@@ -153,13 +153,139 @@ export default function GMS2() {
     setLoggingEntries(prev => [newEntry, ...prev]);
   };
 
+  // Shortcode mapping for quick classification
+  const shortcodeMappings = {
+    // Ongeval codes
+    '-ogovls': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: 'Letsel' },
+    '-osvls': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: 'Letsel' },
+    '-wegvervoer': { MC1: 'Ongeval', MC2: 'Wegvervoer', MC3: '' },
+    '-spoorvervoer': { MC1: 'Ongeval', MC2: 'Spoorvervoer', MC3: '' },
+    
+    // Geweld & Veiligheid codes
+    '-steekpartij': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Lichamelijk letsel' },
+    '-mesaanval': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Lichamelijk letsel' },
+    '-vechtpartij': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Vechtpartij' },
+    '-bedreiging': { MC1: 'Veiligheid & Openbare Orde', MC2: 'Geweld', MC3: 'Bedreiging' },
+    
+    // Brand codes
+    '-woningbrand': { MC1: 'Brand', MC2: 'Gebouwbrand', MC3: 'Woningbrand' },
+    '-autobrand': { MC1: 'Brand', MC2: 'Voertuigbrand', MC3: 'Personenauto' },
+    '-buitenbrand': { MC1: 'Brand', MC2: 'Buitenbrand', MC3: 'Natuurbrand' },
+    
+    // Bezitsaantasting codes
+    '-inbraak': { MC1: 'Bezitsaantasting', MC2: 'Inbraak', MC3: 'Woning' },
+    '-diefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Eenvoudige diefstal' },
+    '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Diefstal motorvoertuig' },
+    
+    // Gezondheid codes
+    '-ambulance': { MC1: 'Gezondheid', MC2: 'Ambulancevervoer', MC3: 'Spoed' },
+    '-reanimatie': { MC1: 'Gezondheid', MC2: 'Reanimatie', MC3: 'Hartstilstand' },
+    '-afstemverzoek': { MC1: 'Dienstverlening', MC2: 'Afstemverzoek', MC3: 'Ambulance' }
+  };
+
+  // Function to detect and apply classification from shortcodes
+  const detectAndApplyClassification = (text: string) => {
+    const lines = text.split('\n');
+    const lastLine = lines[lines.length - 1].trim().toLowerCase();
+    
+    if (lastLine.startsWith('-')) {
+      // Direct shortcode match
+      const shortcode = lastLine.split(' ')[0];
+      if (shortcodeMappings[shortcode]) {
+        const classification = shortcodeMappings[shortcode];
+        applyClassification(classification.MC1, classification.MC2, classification.MC3, shortcode);
+        return true;
+      }
+      
+      // Keyword combination detection
+      const keywords = lastLine.substring(1).split(' ').filter(word => word.length > 2);
+      const possibleMatch = findClassificationByKeywords(keywords);
+      if (possibleMatch) {
+        applyClassification(possibleMatch.MC1, possibleMatch.MC2, possibleMatch.MC3, lastLine);
+        return true;
+      }
+    }
+    
+    return false;
+  };
+
+  // Function to find classification by keywords
+  const findClassificationByKeywords = (keywords: string[]) => {
+    for (const classification of lmcClassifications) {
+      const classificationText = `${classification.MC1} ${classification.MC2} ${classification.MC3} ${classification.DEFINITIE}`.toLowerCase();
+      
+      let matchCount = 0;
+      for (const keyword of keywords) {
+        if (classificationText.includes(keyword)) {
+          matchCount++;
+        }
+      }
+      
+      // If at least 60% of keywords match, consider it a match
+      if (matchCount >= Math.ceil(keywords.length * 0.6)) {
+        return classification;
+      }
+    }
+    
+    return null;
+  };
+
+  // Function to apply classification to dropdowns
+  const applyClassification = (mc1: string, mc2: string, mc3: string, detectedCode: string) => {
+    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+
+    if (mc1Select && mc2Select && mc3Select) {
+      // Set MC1
+      mc1Select.value = mc1;
+      setSelectedMC1(mc1);
+      
+      // Trigger MC1 change to populate MC2
+      mc1Select.dispatchEvent(new Event('change'));
+      
+      setTimeout(() => {
+        if (mc2) {
+          mc2Select.value = mc2;
+          setSelectedMC2(mc2);
+          
+          // Trigger MC2 change to populate MC3
+          mc2Select.dispatchEvent(new Event('change'));
+          
+          setTimeout(() => {
+            if (mc3) {
+              mc3Select.value = mc3;
+              setSelectedMC3(mc3);
+              
+              // Trigger MC3 change to finalize
+              mc3Select.dispatchEvent(new Event('change'));
+            }
+          }, 100);
+        }
+      }, 100);
+      
+      // Log the automatic classification
+      addLoggingEntry(`Automatische classificatie toegepast via "${detectedCode}": ${mc1}${mc2 ? ' > ' + mc2 : ''}${mc3 ? ' > ' + mc3 : ''}`);
+    }
+  };
+
   const handleKladblokKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const message = kladblokText.trim();
       if (message) {
+        // Try to detect and apply classification before adding to log
+        const classificationDetected = detectAndApplyClassification(message);
+        
         addLoggingEntry(message);
         setKladblokText("");
+        
+        if (classificationDetected) {
+          // Add a small delay to show the classification was applied
+          setTimeout(() => {
+            addLoggingEntry("💡 Classificatie automatisch toegepast");
+          }, 500);
+        }
       }
     }
   };
@@ -535,7 +661,7 @@ export default function GMS2() {
                       onChange={(e) => setKladblokText(e.target.value)}
                       onKeyPress={handleKladblokKeyPress}
                       className="gms2-kladblok-textarea"
-                      placeholder="Kladblok, hierin kan je alle relevante info vermelden (Enter om toe te voegen aan logging)"
+                      placeholder="Kladblok - Gebruik snelcodes zoals: -inbraak, -steekpartij, -woningbrand, -ogovls (Enter om toe te voegen aan logging)"
                     />
                   </div>
                 </div>
