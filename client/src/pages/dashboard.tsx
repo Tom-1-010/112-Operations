@@ -6644,14 +6644,7 @@ export default function Dashboard() {
       />
 
       <main className="main-content">
-        {activeSection !== "gms" && (
-          <div className="header">
-            <div className="header-datetime">
-              <div className="header-time">{formatTime(currentTime)}</div>
-              <div className="header-title">Politie Meldkamer</div>
-            </div>
-          </div>
-        )}
+        
 
         {activeSection === "dashboard" && (
           <div className="content-section active">
