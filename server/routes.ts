@@ -299,25 +299,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const fs = await import('fs');
       const path = await import('path');
-      
+
       console.log('🔄 Starting karakteristieken import via GET API...');
-      
+
       // Use the newest karakteristieken file
       const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750369362301.json');
-      
+
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Karakteristieken file not found' });
       }
-      
+
       const jsonData = fs.readFileSync(filePath, 'utf8');
-      const karakteristiekenData = JSON.parse(jsonData);
-      
+      // Fix NaN values in JSON before parsing
+      const fixedJsonData = jsonData.replace(/:\s*NaN/g, ': null');
+      const karakteristiekenData = JSON.parse(fixedJsonData);
+
       console.log(`📊 Found ${karakteristiekenData.length} karakteristieken to import`);
-      
+
       // Clear existing data
       await db.delete(karakteristieken);
       console.log('🗑️ Cleared existing karakteristieken');
-      
+
       // Transform data to match schema
       const transformedData = karakteristiekenData.map(item => ({
         ktNaam: item['kt-naam'],
@@ -328,28 +330,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 (typeof item['kt-code'] === 'number' && isNaN(item['kt-code'])) ? null : String(item['kt-code']),
         ktPaser: item['kt-paser']
       }));
-      
+
       // Insert new data in batches
       const batchSize = 100;
       let imported = 0;
-      
+
       for (let i = 0; i < transformedData.length; i += batchSize) {
         const batch = transformedData.slice(i, i + batchSize);
         await db.insert(karakteristieken).values(batch);
         imported += batch.length;
         console.log(`📥 Imported ${imported}/${transformedData.length} karakteristieken`);
       }
-      
+
       // Verify import
       const count = await db.select().from(karakteristieken);
       console.log(`✅ Successfully imported ${count.length} karakteristieken to database`);
-      
+
       res.json({ 
         success: true, 
         imported: count.length,
         message: `Successfully imported ${count.length} karakteristieken` 
       });
-      
+
     } catch (error) {
       console.error('❌ Error importing karakteristieken:', error);
       res.status(500).json({ error: 'Failed to import karakteristieken' });
@@ -360,25 +362,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const fs = await import('fs');
       const path = await import('path');
-      
+
       console.log('🔄 Starting karakteristieken import via POST API...');
-      
+
       // Use the newest karakteristieken file
       const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_1750369362301.json');
-      
+
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: 'Karakteristieken file not found' });
       }
-      
+
       const jsonData = fs.readFileSync(filePath, 'utf8');
-      const karakteristiekenData = JSON.parse(jsonData);
-      
+      // Fix NaN values in JSON before parsing  
+      const fixedJsonData = jsonData.replace(/:\s*NaN/g, ': null');
+      const karakteristiekenData = JSON.parse(fixedJsonData);
+
       console.log(`📊 Found ${karakteristiekenData.length} karakteristieken to import`);
-      
+
       // Clear existing data
       await db.delete(karakteristieken);
       console.log('🗑️ Cleared existing karakteristieken');
-      
+
       // Transform data to match schema
       const transformedData = karakteristiekenData.map(item => ({
         ktNaam: item['kt-naam'],
@@ -389,28 +393,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 (typeof item['kt-code'] === 'number' && isNaN(item['kt-code'])) ? null : String(item['kt-code']),
         ktPaser: item['kt-paser']
       }));
-      
+
       // Insert new data in batches
       const batchSize = 100;
       let imported = 0;
-      
+
       for (let i = 0; i < transformedData.length; i += batchSize) {
         const batch = transformedData.slice(i, i + batchSize);
         await db.insert(karakteristieken).values(batch);
         imported += batch.length;
         console.log(`📥 Imported ${imported}/${transformedData.length} karakteristieken`);
       }
-      
+
       // Verify import
       const count = await db.select().from(karakteristieken);
       console.log(`✅ Successfully imported ${count.length} karakteristieken to database`);
-      
+
       res.json({ 
         success: true, 
         imported: count.length,
         message: `Successfully imported ${count.length} karakteristieken` 
       });
-      
+
     } catch (error) {
       console.error('❌ Error importing karakteristieken:', error);
       res.status(500).json({ error: 'Failed to import karakteristieken' });
