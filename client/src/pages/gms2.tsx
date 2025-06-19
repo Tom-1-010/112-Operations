@@ -406,6 +406,48 @@ export default function GMS2() {
     }
   };
 
+  // Handle "Nieuw" button click
+  const handleNieuw = () => {
+    // Clear all form fields for new incident
+    setFormData({
+      melderNaam: "",
+      telefoonnummer: "",
+      melderAdres: "",
+      huisnummer: "",
+      toevoeging: "",
+      gemeente: "",
+      straatnaam: "",
+      postcode: "",
+      plaatsnaam: "",
+      functie: "",
+      roepnummer: ""
+    });
+    
+    // Reset classifications
+    setSelectedMC1("");
+    setSelectedMC2("");
+    setSelectedMC3("");
+    setPriorityValue(2);
+    setNotitiesText("");
+    
+    // Clear selected incident
+    setSelectedIncident(null);
+    
+    // Clear dropdowns
+    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+    
+    if (mc1Select) mc1Select.value = "";
+    if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+    if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+    
+    // Clear logging entries for new incident
+    setLoggingEntries([]);
+    
+    addLoggingEntry(`📋 Nieuwe melding voorbereid`);
+  };
+
   const addLoggingEntry = (message: string) => {
     const now = new Date();
     const dateStr = String(now.getDate()).padStart(2, '0');
@@ -1127,7 +1169,7 @@ export default function GMS2() {
                       <button className="gms2-btn" onClick={handleUitgifte} style={{ minWidth: '60px' }}>Uitgifte</button>
                     )}
                     <button className="gms2-btn" onClick={handleArchiveer} style={{ minWidth: '70px' }}>Archiveer</button>
-                    <button className="gms2-btn" style={{ minWidth: '50px' }}>Sluit</button>
+                    <button className="gms2-btn" onClick={handleNieuw} style={{ minWidth: '50px' }}>Nieuw</button>
                   </div>
                 </div>
               </div>
