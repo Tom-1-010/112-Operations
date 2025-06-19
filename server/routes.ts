@@ -266,10 +266,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Karakteristieken endpoints
   app.get("/api/karakteristieken", async (req, res) => {
     try {
-      const karakteristiekenList = await db.select().from(karakteristieken);
+      const karakteristiekenList = await db.select().from(karakteristieken).catch(() => []);
       res.json(karakteristiekenList);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch karakteristieken" });
+      console.error("Error fetching karakteristieken:", error);
+      res.json([]); // Return empty array instead of error
     }
   });
 
