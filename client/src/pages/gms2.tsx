@@ -897,7 +897,12 @@ export default function GMS2() {
             ktCode: matchingKarakteristiek.ktCode
           };
 
-          setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
+          setSelectedKarakteristieken(prev => {
+            const updated = [...prev, newKarakteristiek];
+            console.log(`✅ Added karakteristiek: ${newKarakteristiek.ktNaam} = "${newKarakteristiek.waarde}"`);
+            console.log(`📊 Total karakteristieken now: ${updated.length}`);
+            return updated;
+          });
         }
 
         processed = true;
@@ -1958,17 +1963,22 @@ export default function GMS2() {
                       <span>Waarde</span>
                     </div>
                     {/* Dynamic karakteristieken rows */}
-                    {selectedKarakteristieken.map((kar, index) => (
-                      <div key={kar.id || index} className="gms2-char-row">
-                        <span title={kar.ktCode ? `Code: ${kar.ktCode}` : ''}>{kar.ktNaam}</span>
-                        <span>{kar.waarde}</span>
+                    {selectedKarakteristieken.length > 0 && selectedKarakteristieken.map((kar, index) => (
+                      <div key={kar.id || `kar-${index}`} className="gms2-char-row">
+                        <span 
+                          title={kar.ktCode ? `Code: ${kar.ktCode} | Type: ${kar.ktType}` : kar.ktType}
+                          className="gms2-char-name"
+                        >
+                          {kar.ktNaam}
+                        </span>
+                        <span className="gms2-char-value">{kar.waarde || '-'}</span>
                       </div>
                     ))}
                     {/* Fill remaining rows */}
                     {Array.from({ length: Math.max(0, 8 - selectedKarakteristieken.length) }).map((_, index) => (
-                      <div key={`empty-char-row-${index}`} className="gms2-char-row">
-                        <span></span>
-                        <span></span>
+                      <div key={`empty-char-row-${index}`} className="gms2-char-row gms2-char-row-empty">
+                        <span className="gms2-char-name"></span>
+                        <span className="gms2-char-value"></span>
                       </div>
                     ))}
                   </div>
