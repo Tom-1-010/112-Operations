@@ -730,6 +730,11 @@ export default function GMS2() {
                   <button className="gms2-btn small">Koppie</button>
                 </div>
 
+                {/* === MELDERGEGEVENS SECTIE === */}
+                <div className="gms2-section-header">
+                  <span className="gms2-section-title">Meldergegevens</span>
+                </div>
+
                 {/* Melder Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Melder:</span>
@@ -769,6 +774,11 @@ export default function GMS2() {
 
                 {/* Visual separator between melder and location sections */}
                 <div className="gms2-section-separator"></div>
+
+                {/* === INCIDENTLOCATIE SECTIE === */}
+                <div className="gms2-section-header">
+                  <span className="gms2-section-title">Incidentlocatie</span>
+                </div>
 
                 {/* Location Details Row 1 - Postcode en Straatnaam */}
                 <div className="gms2-form-row">
