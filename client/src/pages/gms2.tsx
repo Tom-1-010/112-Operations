@@ -1118,16 +1118,16 @@ export default function GMS2() {
                   </div>
 
                   <div className="gms2-action-buttons">
-                    <select className="gms2-dropdown">
+                    <select className="gms2-dropdown" style={{ minWidth: '100px' }}>
                       <option>Testmelding</option>
                     </select>
                     {selectedIncident && selectedIncident.nr ? (
-                      <button className="gms2-btn" onClick={handleUpdate}>Update</button>
+                      <button className="gms2-btn" onClick={handleUpdate} style={{ minWidth: '60px' }}>Update</button>
                     ) : (
-                      <button className="gms2-btn" onClick={handleUitgifte}>Uitgifte</button>
+                      <button className="gms2-btn" onClick={handleUitgifte} style={{ minWidth: '60px' }}>Uitgifte</button>
                     )}
-                    <button className="gms2-btn" onClick={handleArchiveer}>Archiveer</button>
-                    <button className="gms2-btn">Sluit</button>
+                    <button className="gms2-btn" onClick={handleArchiveer} style={{ minWidth: '70px' }}>Archiveer</button>
+                    <button className="gms2-btn" style={{ minWidth: '50px' }}>Sluit</button>
                   </div>
                 </div>
               </div>
