@@ -842,33 +842,47 @@ export default function GMS2() {
       return false;
     }
 
-    // Parse the line for karakteristieken codes - support both comma and space separation
-    const parts = lastLine.split(/[,\s]+/).map(part => part.trim()).filter(part => part.length > 0);
+    // Improved parsing - handle "-code value" patterns
+    const codePattern = /-(\w+)(?:\s+(.+?))?(?=\s+-|\s*$)/g;
     let processed = false;
-    let currentCode = '';
-    let currentValue = '';
+    let match;
 
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
+    while ((match = codePattern.exec(lastLine)) !== null) {
+      const code = match[1];
+      const value = match[2] ? match[2].trim() : '';
       
-      if (part.startsWith('-')) {
-        // Process previous code if exists
-        if (currentCode) {
-          processed = processKarakteristiekCode(currentCode, currentValue) || processed;
-        }
-        
-        // Start new code
-        currentCode = part.substring(1); // Remove the -
-        currentValue = '';
-      } else if (currentCode) {
-        // Add to current value
-        currentValue = currentValue ? `${currentValue} ${part}` : part;
-      }
+      console.log(`🔍 Parsing karakteristiek: code="${code}", value="${value}"`);
+      processed = processKarakteristiekCode(code, value) || processed;
     }
-    
-    // Process the last code
-    if (currentCode) {
-      processed = processKarakteristiekCode(currentCode, currentValue) || processed;
+
+    // Fallback: if no matches with regex, try simple space-based parsing
+    if (!processed) {
+      const parts = lastLine.split(/\s+/).map(part => part.trim()).filter(part => part.length > 0);
+      let currentCode = '';
+      let currentValue = '';
+
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        
+        if (part.startsWith('-')) {
+          // Process previous code if exists
+          if (currentCode) {
+            processed = processKarakteristiekCode(currentCode, currentValue) || processed;
+          }
+          
+          // Start new code
+          currentCode = part.substring(1); // Remove the -
+          currentValue = '';
+        } else if (currentCode) {
+          // Add to current value
+          currentValue = currentValue ? `${currentValue} ${part}` : part;
+        }
+      }
+      
+      // Process the last code
+      if (currentCode) {
+        processed = processKarakteristiekCode(currentCode, currentValue) || processed;
+      }
     }
 
     return processed;
@@ -876,6 +890,8 @@ export default function GMS2() {
 
   // Helper function to process individual karakteristiek code
   const processKarakteristiekCode = (code: string, value: string) => {
+    console.log(`🔍 Looking for karakteristiek with code: "${code}", value: "${value}"`);
+    
     // Find matching karakteristiek in database - try multiple matching strategies
     // Use ktCode (camelCase) as that's what comes from the API
     let matchingKarakteristiek = karakteristiekenDatabase.find(k => 
@@ -889,16 +905,59 @@ export default function GMS2() {
       );
     }
 
-    // If still not found, try matching by name parts
+    // If still not found, try matching by name parts (more flexible)
     if (!matchingKarakteristiek) {
-      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-        k.ktNaam && k.ktNaam.toLowerCase().includes(code.toLowerCase())
-      );
+      // Split the input code into words for better matching
+      const codeWords = code.toLowerCase().split(/\s+/);
+      matchingKarakteristiek = karakteristiekenDatabase.find(k => {
+        const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/);
+        return codeWords.some(codeWord => 
+          nameWords.some(nameWord => 
+            nameWord.includes(codeWord) || codeWord.includes(nameWord)
+          )
+        );
+      });
+    }
+
+    // Try specific common patterns
+    if (!matchingKarakteristiek) {
+      const codePatterns = {
+        'aantal': ['aantal'],
+        'aanhoudingen': ['aanhouding'],
+        'gewonden': ['gewond'],
+        'doden': ['doden', 'dood'],
+        'daders': ['dader'],
+        'personen': ['persoon', 'pers']
+      };
+      
+      for (const [pattern, variants] of Object.entries(codePatterns)) {
+        if (code.toLowerCase().includes(pattern)) {
+          matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+            variants.some(variant => 
+              (k.ktNaam || '').toLowerCase().includes(variant)
+            )
+          );
+          if (matchingKarakteristiek) break;
+        }
+      }
     }
 
     if (!matchingKarakteristiek) {
       console.log(`❌ No karakteristiek found for code: ${code}`);
-      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 5).map(k => ({ code: k.ktCode, naam: k.ktNaam })));
+      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 10).map(k => ({ 
+        code: k.ktCode, 
+        naam: k.ktNaam 
+      })));
+      
+      // Show specifically matching ones for debugging
+      const partialMatches = karakteristiekenDatabase.filter(k => 
+        (k.ktNaam || '').toLowerCase().includes(code.toLowerCase()) ||
+        (k.ktCode || '').toLowerCase().includes(code.toLowerCase())
+      );
+      if (partialMatches.length > 0) {
+        console.log(`🔍 Partial matches found:`, partialMatches.slice(0, 5));
+      }
+      
       return false;
     }
 
