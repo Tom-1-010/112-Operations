@@ -1,8 +1,6 @@
 
-import { db } from './server/db.js';
-import { karakteristieken } from './shared/schema.js';
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 async function importKarakteristieken() {
   try {
@@ -21,19 +19,23 @@ async function importKarakteristieken() {
     
     console.log(`📊 Found ${karakteristiekenData.length} karakteristieken to import`);
     
-    // Clear existing data
-    await db.delete(karakteristieken);
-    console.log('🗑️ Cleared existing karakteristieken');
+    // Post to API endpoint
+    const fetch = (await import('node-fetch')).default;
     
-    // Insert new data
-    if (karakteristiekenData.length > 0) {
-      await db.insert(karakteristieken).values(karakteristiekenData);
-      console.log(`✅ Successfully imported ${karakteristiekenData.length} karakteristieken`);
+    const response = await fetch('http://localhost:5000/api/karakteristieken/bulk', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(karakteristiekenData)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log(`✅ Successfully imported ${result.length} karakteristieken!`);
+    } else {
+      console.error('❌ Failed to import karakteristieken:', response.statusText);
     }
-    
-    // Verify import
-    const count = await db.select().from(karakteristieken);
-    console.log(`🔍 Verification: ${count.length} karakteristieken in database`);
     
   } catch (error) {
     console.error('❌ Error importing karakteristieken:', error);
