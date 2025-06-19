@@ -408,6 +408,9 @@ export default function GMS2() {
 
   // Handle "Nieuw" button click
   const handleNieuw = () => {
+    // Clear selected incident FIRST
+    setSelectedIncident(null);
+    
     // Clear all form fields for new incident
     setFormData({
       melderNaam: "",
@@ -430,9 +433,6 @@ export default function GMS2() {
     setPriorityValue(2);
     setNotitiesText("");
     
-    // Clear selected incident
-    setSelectedIncident(null);
-    
     // Clear dropdowns
     const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
     const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
@@ -442,10 +442,24 @@ export default function GMS2() {
     if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
     if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
     
-    // Clear logging entries for new incident
+    // Completely clear logging entries and start fresh
     setLoggingEntries([]);
     
-    addLoggingEntry(`📋 Nieuwe melding voorbereid`);
+    // Add fresh logging entry for new incident
+    const now = new Date();
+    const dateStr = String(now.getDate()).padStart(2, '0');
+    const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+    const yearStr = now.getFullYear();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
+    
+    const newEntry = {
+      id: Date.now(),
+      timestamp,
+      message: "📋 Nieuwe melding voorbereid"
+    };
+    
+    setLoggingEntries([newEntry]);
   };
 
   const addLoggingEntry = (message: string) => {
@@ -890,7 +904,7 @@ export default function GMS2() {
         <div className="gms2-right-panel">
           {/* Incident Header */}
           <div className="gms2-incident-header">
-            {selectedIncident ? `P:${selectedIncident.locatie || 'Nieuwe melding'}` : 'P: Nieuwe melding'}
+            {selectedIncident ? `P:${selectedIncident.locatie || selectedIncident.mc || 'Bestaande melding'}` : 'P: Nieuwe melding'}
           </div>
 
               {/* Incident Form */}
@@ -1163,7 +1177,7 @@ export default function GMS2() {
                     <select className="gms2-dropdown" style={{ minWidth: '100px' }}>
                       <option>Testmelding</option>
                     </select>
-                    {selectedIncident && selectedIncident.nr ? (
+                    {selectedIncident ? (
                       <button className="gms2-btn" onClick={handleUpdate} style={{ minWidth: '60px' }}>Update</button>
                     ) : (
                       <button className="gms2-btn" onClick={handleUitgifte} style={{ minWidth: '60px' }}>Uitgifte</button>
