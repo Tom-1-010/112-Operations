@@ -51,6 +51,21 @@ export default function GMS2() {
   const [selectedMC2, setSelectedMC2] = useState("");
   const [selectedMC3, setSelectedMC3] = useState("");
 
+  // Form state for new incidents
+  const [formData, setFormData] = useState({
+    melderNaam: "",
+    telefoonnummer: "",
+    melderAdres: "",
+    huisnummer: "",
+    toevoeging: "",
+    gemeente: "",
+    straatnaam: "",
+    postcode: "",
+    plaatsnaam: "",
+    functie: "",
+    roepnummer: ""
+  });
+
   // Get next incident number from localStorage, starting from 20250001
   const getNextIncidentNumber = () => {
     const lastNumber = localStorage.getItem("lastIncidentNumber");
@@ -66,8 +81,8 @@ export default function GMS2() {
     }
   }, []);
 
-  // Sample incidents data matching the interface
-  const [incidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
+  // Incidents state management with proper loading and saving
+  const [incidents, setIncidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", [
     {
       id: 1,
       nr: 20250001,
@@ -148,6 +163,131 @@ export default function GMS2() {
 
   const handleIncidentSelect = (incident: GmsIncident) => {
     setSelectedIncident(incident);
+  };
+
+  // Handle form field changes
+  const handleFormChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle "Uitgifte" button click
+  const handleUitgifte = () => {
+    const now = new Date();
+    const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const newIncidentNumber = getNextIncidentNumber();
+
+    // Determine MC code based on selected classification
+    let mcCode = "";
+    if (selectedMC3 && selectedMC2 && selectedMC1) {
+      const matchingClassification = lmcClassifications.find(c => 
+        c.MC1 === selectedMC1 && c.MC2 === selectedMC2 && c.MC3 === selectedMC3
+      );
+      if (matchingClassification) {
+        mcCode = matchingClassification.Code.toUpperCase();
+      }
+    } else if (selectedMC2 && selectedMC1) {
+      const matchingClassification = lmcClassifications.find(c => 
+        c.MC1 === selectedMC1 && c.MC2 === selectedMC2
+      );
+      if (matchingClassification) {
+        mcCode = matchingClassification.Code.toUpperCase();
+      }
+    }
+
+    // Create location string
+    const location = formData.straatnaam && formData.huisnummer 
+      ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+      : formData.straatnaam?.toUpperCase() || "";
+
+    const newIncident: GmsIncident = {
+      id: Date.now(),
+      nr: newIncidentNumber,
+      prio: priorityValue,
+      tijd: timeString,
+      mc: mcCode,
+      locatie: location,
+      plaats: formData.plaatsnaam?.substring(0, 3).toUpperCase() || "",
+      roepnr: formData.roepnummer || "",
+      positie: "",
+      melderNaam: formData.melderNaam,
+      melderAdres: formData.melderAdres,  
+      telefoonnummer: formData.telefoonnummer,
+      straatnaam: formData.straatnaam,
+      huisnummer: formData.huisnummer,
+      plaatsnaam: formData.plaatsnaam,
+      mc1: selectedMC1,
+      mc2: selectedMC2,
+      mc3: selectedMC3,
+      notities: "",
+      karakteristieken: [],
+      status: "Openstaand"
+    };
+
+    // Add to incidents list (at the beginning for newest first)
+    setIncidents(prev => [newIncident, ...prev]);
+    
+    // Select the new incident
+    setSelectedIncident(newIncident);
+
+    // Add logging entry
+    addLoggingEntry(`📋 Melding ${newIncidentNumber} uitgegeven - ${mcCode} ${location}`);
+
+    // Clear form for next incident
+    setFormData({
+      melderNaam: "",
+      telefoonnummer: "",
+      melderAdres: "",
+      huisnummer: "",
+      toevoeging: "",
+      gemeente: "",
+      straatnaam: "",
+      postcode: "",
+      plaatsnaam: "",
+      functie: "",
+      roepnummer: ""
+    });
+    
+    // Reset classifications
+    setSelectedMC1("");
+    setSelectedMC2("");
+    setSelectedMC3("");
+    setPriorityValue(2);
+
+    // Clear dropdowns
+    const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
+    const mc2Select = document.getElementById('gms2-mc2-select') as HTMLSelectElement;
+    const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
+    
+    if (mc1Select) mc1Select.value = "";
+    if (mc2Select) mc2Select.innerHTML = '<option value="">Selecteer MC2...</option>';
+    if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
+  };
+
+  // Handle "Archiveer" button click
+  const handleArchiveer = () => {
+    if (selectedIncident) {
+      const updatedIncident = {
+        ...selectedIncident,
+        status: "Gearchiveerd"
+      };
+      
+      // Update incident in list
+      setIncidents(prev => prev.map(inc => 
+        inc.id === selectedIncident.id ? updatedIncident : inc
+      ));
+      
+      // Remove from openstaande incidenten by filtering out archived ones
+      setIncidents(prev => prev.filter(inc => inc.id !== selectedIncident.id));
+      
+      addLoggingEntry(`📁 Melding ${selectedIncident.nr} gearchiveerd`);
+      
+      // Select first remaining incident or clear selection
+      const remainingIncidents = incidents.filter(inc => inc.id !== selectedIncident.id);
+      setSelectedIncident(remainingIncidents.length > 0 ? remainingIncidents[0] : null);
+    }
   };
 
   const addLoggingEntry = (message: string) => {
@@ -485,7 +625,7 @@ export default function GMS2() {
               {/* Empty rows for lopende incidenten */}
               <div className="gms2-empty-rows">
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <div key={index} className="gms2-table-row">
+                  <div key={`empty-lopend-row-${index}`} className="gms2-table-row">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -532,7 +672,7 @@ export default function GMS2() {
               ))}
               {/* Fill remaining rows */}
               {Array.from({ length: Math.max(0, 15 - incidents.length) }).map((_, index) => (
-                <div key={`empty-openstaand-${index}`} className="gms2-table-row">
+                <div key={`empty-openstaand-row-${index}`} className="gms2-table-row">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -577,22 +717,52 @@ export default function GMS2() {
                 {/* Melder Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Melder:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.melderNaam}
+                    onChange={(e) => handleFormChange('melderNaam', e.target.value)}
+                  />
                   <span className="gms2-field-label">Tel:</span>
-                  <input type="text" className="gms2-input medium" />
+                  <input 
+                    type="text" 
+                    className="gms2-input medium" 
+                    value={formData.telefoonnummer}
+                    onChange={(e) => handleFormChange('telefoonnummer', e.target.value)}
+                  />
                   <button className="gms2-btn small">Anoniem</button>
                 </div>
 
                 {/* Adres Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Adres:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.melderAdres}
+                    onChange={(e) => handleFormChange('melderAdres', e.target.value)}
+                  />
                   <span className="gms2-field-label">Nr:</span>
-                  <input type="text" className="gms2-input small" />
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.huisnummer}
+                    onChange={(e) => handleFormChange('huisnummer', e.target.value)}
+                  />
                   <span className="gms2-field-label">L/C:</span>
-                  <input type="text" className="gms2-input small" />
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.toevoeging}
+                    onChange={(e) => handleFormChange('toevoeging', e.target.value)}
+                  />
                   <span className="gms2-field-label">Gem:</span>
-                  <input type="text" className="gms2-input small" />
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.gemeente}
+                    onChange={(e) => handleFormChange('gemeente', e.target.value)}
+                  />
                 </div>
 
                 {/* Visual separator between melder and location sections */}
@@ -600,25 +770,63 @@ export default function GMS2() {
 
                 {/* Location Details Row 1 */}
                 <div className="gms2-form-row">
-                  <input type="text" className="gms2-input small" />
-                  <input type="text" className="gms2-input wide" />
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.postcode}
+                    onChange={(e) => handleFormChange('postcode', e.target.value)}
+                    placeholder="Postcode"
+                  />
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.straatnaam}
+                    onChange={(e) => handleFormChange('straatnaam', e.target.value)}
+                    placeholder="Straatnaam"
+                  />
                   <span className="gms2-field-label">Nr:</span>
-                  <input type="text" className="gms2-input small" />
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.huisnummer}
+                    onChange={(e) => handleFormChange('huisnummer', e.target.value)}
+                  />
                 </div>
 
                 {/* Location Details Row 2 */}
                 <div className="gms2-form-row">
-                  <input type="text" className="gms2-input small" />
+                  <input 
+                    type="text" 
+                    className="gms2-input small" 
+                    value={formData.plaatsnaam}
+                    onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
+                    placeholder="Plaats"
+                  />
                   <span className="gms2-field-label">Pts:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.plaatsnaam}
+                    onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
+                  />
                   <span className="gms2-field-label">Gem:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.gemeente}
+                    onChange={(e) => handleFormChange('gemeente', e.target.value)}
+                  />
                 </div>
 
                 {/* Function Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Func:</span>
-                  <input type="text" className="gms2-input wide" />
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.functie}
+                    onChange={(e) => handleFormChange('functie', e.target.value)}
+                  />
                 </div>
 
                 {/* Action Buttons Row */}
@@ -767,8 +975,8 @@ export default function GMS2() {
                     <select className="gms2-dropdown">
                       <option>Testmelding</option>
                     </select>
-                    <button className="gms2-btn">Uitgifte</button>
-                    <button className="gms2-btn">Archiveer</button>
+                    <button className="gms2-btn" onClick={handleUitgifte}>Uitgifte</button>
+                    <button className="gms2-btn" onClick={handleArchiveer}>Archiveer</button>
                     <button className="gms2-btn">Sluit</button>
                   </div>
                 </div>
