@@ -1593,10 +1593,28 @@ export default function GMS2() {
       if (message) {
         console.log(`🎯 Processing kladblok input: "${message}"`);
         
+        // Special handling for address commands - process immediately on Enter
+        if (message.startsWith('=')) {
+          const addressMatch = message.match(/^=([^\/]+)\/(.+?)\s+(\d+)$/i);
+          if (addressMatch) {
+            const [, stad, straatnaam, huisnummer] = addressMatch;
+            console.log(`📍 Manual address command via Enter: ${stad} / ${straatnaam} ${huisnummer}`);
+            
+            // Switch to Locatietreffers tab and process address
+            setActiveLoggingTab('locatietreffers');
+            await fillAddressFromBAG(stad, straatnaam, huisnummer);
+            
+            // Clear kladblok and search results
+            setKladblokText("");
+            setBagSearchResults([]);
+            return; // Exit early, address was processed
+          }
+        }
+        
         // First try to process karakteristieken
         const karakteristiekProcessed = processKarakteristieken(message);
         
-        // Then try to detect and apply other shortcodes (address, caller info, or classification)
+        // Then try to detect and apply other shortcodes (caller info or classification)
         const shortcodeDetected = await detectAndApplyShortcodes(message);
 
         // Always add user input to log, regardless of processing
@@ -1620,7 +1638,7 @@ export default function GMS2() {
         
         setKladblokText("");
 
-        // Clear any search results if we processed an address
+        // Clear any search results if we processed something
         if (bagSearchResults.length > 0) {
           setBagSearchResults([]);
         }
