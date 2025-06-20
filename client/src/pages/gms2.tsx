@@ -2037,7 +2037,9 @@ export default function GMS2() {
                 {/* Time Row */}
                 <div className="gms2-form-row">
                   <span className="gms2-field-label">Tijd:</span>
-                  <span className="gms2-time-display">08:23</span>
+                  <span className="gms2-time-display">
+                    {String(currentTime.getHours()).padStart(2, '0')}:{String(currentTime.getMinutes()).padStart(2, '0')}
+                  </span>
                   <span className="gms2-field-label">Aangemaakt:</span>
                   <input type="text" className="gms2-input medium" value="Janssen" readOnly />
                   <span className="gms2-field-label">Koppie</span>
