@@ -1708,9 +1708,8 @@ export default function GMS2() {
         // Always add user input to log, regardless of processing
         addLoggingEntry(message);
 
-        // Add feedback for karakteristieken processing
+        // Log karakteristieken processing to console only
         if (karakteristiekProcessed) {
-          addLoggingEntry("🏷️ Karakteristieken verwerkt en toegevoegd");
           console.log(`✅ Karakteristieken successfully processed for: "${message}"`);
         }
 
