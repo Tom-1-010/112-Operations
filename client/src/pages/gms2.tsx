@@ -2042,8 +2042,6 @@ export default function GMS2() {
                   </span>
                   <span className="gms2-field-label">Aangemaakt:</span>
                   <input type="text" className="gms2-input medium" value="OC-RT" readOnly />
-                  <span className="gms2-field-label">Koppie</span>
-                  <button className="gms2-btn small">Koppie</button>
                 </div>
 
                 {/* === MELDERGEGEVENS SECTIE === */}
