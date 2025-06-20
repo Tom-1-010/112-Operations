@@ -1404,6 +1404,42 @@ export default function GMS2() {
       }
     }
 
+    // Object shortcode: o/[object/gebouw]
+    if (lastLine.startsWith('o/')) {
+      const objectMatch = lastLine.match(/^o\/(.+)$/i);
+      if (objectMatch) {
+        const [, objectGebouw] = objectMatch;
+
+        console.log(`🏢 Object shortcode detected: ${objectGebouw}`);
+
+        // ALWAYS update form data regardless of incident selection
+        const newObjectData = {
+          functie: objectGebouw.trim()
+        };
+
+        setFormData(prev => {
+          const updated = {
+            ...prev,
+            ...newObjectData
+          };
+          console.log(`🏢 Object field updated for ${incidentContext}:`, updated);
+          return updated;
+        });
+
+        // Only update selected incident if one exists (editing mode)
+        if (selectedIncident) {
+          const updatedIncident = {
+            ...selectedIncident,
+            ...newObjectData
+          };
+          setSelectedIncident(updatedIncident);
+          console.log(`🏢 Existing incident updated: ${selectedIncident.nr}`);
+        }
+
+        return true;
+      }
+    }
+
     // Classification shortcode: -[code]
     if (lastLine.startsWith('-')) {
       const inputCode = lastLine.split(' ')[0].toLowerCase(); // Normalize to lowercase
@@ -2450,7 +2486,7 @@ export default function GMS2() {
                       onChange={handleKladblokChange}
                       onKeyPress={handleKladblokKeyPress}
                       className="gms2-kladblok-textarea"
-                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Karakteristieken: -aanh 1, -ovdp, -afkruisen rijstrook 1 | Adres: =Rotterdam/Kleiweg 12 | Melder: m/Naam;0612345678 (Enter om uit te voeren)"
+                      placeholder="Kladblok - Snelcodes: -inbraak, -steekpartij | Karakteristieken: -aanh 1, -ovdp, -afkruisen rijstrook 1 | Adres: =Rotterdam/Kleiweg 12 | Melder: m/Naam;0612345678 | Object: o/Winkelcentrum (Enter om uit te voeren)"
                     />
                   </div>
                 </div>
