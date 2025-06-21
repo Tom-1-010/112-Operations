@@ -723,24 +723,143 @@ export default function Dashboard() {
   }, [callTimers]);
 
   // Simulate 112 caller starting conversation
+  // Emergency scenario generator for realistic 112 calls
+  const emergencyScenarios = [
+    {
+      type: "verkeersongeval",
+      openingLines: [
+        "Er is een auto-ongeval gebeurd op de A20! Er liggen mensen op de weg!",
+        "112? Er zijn twee auto's op elkaar geknald, ik zie gewonden!",
+        "Help! Er is een kettingbotsing op de snelweg, meerdere voertuigen!",
+        "Ongeval met vrachtwagen! Er ligt iemand bekneld!"
+      ],
+      responses: {
+        "locatie": [
+          "Op de A20 richting Den Haag, tussen afslag Vlaardingen en Rotterdam-Noord",
+          "Coolsingel hoek Westersingel in Rotterdam centrum",
+          "Op de Erasmusbrug, aan de Rotterdamse kant",
+          "Kralingseweg ter hoogte van nummer 180"
+        ],
+        "gewonden": [
+          "Ja, er liggen twee mensen naast de auto's, ze bewegen niet!",
+          "Een persoon zit nog vast in de auto en gilt van de pijn",
+          "Ik zie veel bloed, maar durf niet dichterbij te komen",
+          "Er ligt iemand op straat, die is bewusteloos"
+        ],
+        "voertuigen": [
+          "Twee personenauto's, een blauwe en een rode",
+          "Een vrachtwagen en een klein autootje",
+          "Drie auto's, en er ligt ook een motor",
+          "Een bus en een auto, de bus staat scheef"
+        ]
+      }
+    },
+    {
+      type: "brand",
+      openingLines: [
+        "Er staat een huis in brand! De vlammen slaan eruit!",
+        "Brand! Er komt zwarte rook uit een woning!",
+        "Help! Ons huis staat in brand en er zitten nog mensen binnen!",
+        "Er is brand uitgebroken in een flatgebouw!"
+      ],
+      responses: {
+        "locatie": [
+          "Katendrecht, Maashaven Zuidzijde 42",
+          "Crooswijk, Crooswijkseweg 150",
+          "Een flat in Overschie, Boezemkade",
+          "Centrum, Nieuwe Binnenweg bij de Albert Heijn"
+        ],
+        "mensen": [
+          "Ja! Er zitten nog kinderen boven!",
+          "Ik weet niet, de buren zijn misschien nog binnen",
+          "Nee, iedereen is eruit volgens mij",
+          "De oude mevrouw van boven, die kan niet goed lopen!"
+        ],
+        "vuur": [
+          "Heel erg! De vlammen komen uit alle ramen!",
+          "Er komt veel rook, maar ik zie nog geen vlammen",
+          "Het begon in de keuken, maar het verspreidt zich snel",
+          "De hele begane grond staat in lichterlaaie!"
+        ]
+      }
+    },
+    {
+      type: "overval",
+      openingLines: [
+        "Er wordt een winkel overvallen! Er zijn gewapende mannen!",
+        "Overval! Ik zie iemand met een mes in de supermarkt!",
+        "Help! Er wordt iemand beroofd op straat!",
+        "Er zijn inbrekers in mijn huis! Ik verstop me!"
+      ],
+      responses: {
+        "locatie": [
+          "Albert Heijn op de Beijerlandselaan",
+          "Jumbo in het Zuidplein winkelcentrum",
+          "Op straat, Witte de Withstraat ter hoogte van café",
+          "Thuis, Bergselaan 280 tweede etage"
+        ],
+        "daders": [
+          "Twee mannen met bivakmutsen op",
+          "Een man in een zwarte jas, ongeveer 30 jaar",
+          "Drie jongens, ze hebben hun gezicht bedekt",
+          "Ik durf niet te kijken, maar ik hoor meerdere stemmen"
+        ],
+        "wapens": [
+          "Ja! Een heeft een mes en de ander iets dat op een pistool lijkt!",
+          "Ik zag een mes, een groot keukenmes!",
+          "Ik weet het niet zeker, ze hebben iets in hun hand",
+          "Ja, ik hoorde een van hen zeggen dat hij een wapen heeft"
+        ]
+      }
+    },
+    {
+      type: "medisch",
+      openingLines: [
+        "Mijn partner is bewusteloos! Hij reageert niet meer!",
+        "Help! Er is iemand van de trap gevallen!",
+        "Een oudere man is ingestort op straat!",
+        "Mijn buurvrouw heeft een hartaanval, denk ik!"
+      ],
+      responses: {
+        "locatie": [
+          "Thuis, Hobbemastraat 15 op de tweede verdieping",
+          "In het Kralingse Bos, bij de speeltuin",
+          "Voor de HEMA op de Lijnbaan",
+          "Bergweg 180, in de portiek"
+        ],
+        "toestand": [
+          "Hij ademt nog, maar heel zwak en hij is heel bleek",
+          "Ze ligt stil, ik weet niet of ze nog ademt",
+          "Hij zegt dat zijn borst pijn doet en hij is benauwd",
+          "Ze heeft heel veel pijn en kan niet meer opstaan"
+        ],
+        "bewustzijn": [
+          "Nee, hij reageert helemaal niet op mijn stem",
+          "Ze doet haar ogen even open, maar valt dan weer weg",
+          "Ja, hij kan nog praten maar hij is heel verward",
+          "Ze is bij bewustzijn maar heeft heel veel pijn"
+        ]
+      }
+    }
+  ];
+
   const simulateCallerMessage = () => {
     if (!currentConversation || currentConversation.type !== "112-gesprek") return;
 
-    const urgentOpenings = [
-      "Hallo, er is iets ergs gebeurd!",
-      "112? Ik heb hulp nodig!",
-      "Er is een ongeval gebeurd!",
-      "Kunt u mij helpen? Er is iets aan de hand!",
-      "Ik bel voor een noodsituatie!",
-      "Er is hier iets heel ergs gebeurd!"
-    ];
+    // Generate a realistic emergency scenario
+    const scenario = emergencyScenarios[Math.floor(Math.random() * emergencyScenarios.length)];
+    const openingLine = scenario.openingLines[Math.floor(Math.random() * scenario.openingLines.length)];
 
-    const randomOpening = urgentOpenings[Math.floor(Math.random() * urgentOpenings.length)];
+    // Store scenario in conversation for context-aware responses
+    setCurrentConversation(prev => ({
+      ...prev,
+      scenario: scenario
+    }));
 
     const callerMessage = {
       id: Date.now(),
-      sender: currentConversation.callerInfo,
-      content: randomOpening,
+      sender: `Melder - ${currentConversation.callerInfo}`,
+      content: openingLine,
       timestamp: new Date().toLocaleTimeString("nl-NL", {
         hour: "2-digit",
         minute: "2-digit",
@@ -753,69 +872,129 @@ export default function Dashboard() {
 
   // Generate realistic 112 caller responses
   const generate112Response = (question: string, conversationHistory: any[] = []) => {
-    const responses = {
-      "Wat is de exacte locatie?": [
-        "Eh... ik ben op de Coolsingel in Rotterdam, bij nummer 42",
-        "We zijn op de A20, richting Den Haag, ter hoogte van Vlaardingen",
-        "Thuis, dat is Laan op Zuid 150 in Rotterdam",
-        "Bij het winkelcentrum Zuidplein, aan de achterkant",
-        "Op de Markt in het centrum, bij de grote kerk",
-        "Ik weet het niet precies, maar het is in Rotterdam-Zuid"
-      ],
-      "Zijn er gewonden?": [
-        "Ja, er ligt iemand op de grond en die beweegt niet!",
-        "Ik zie bloed, maar ik durf niet te kijken",
-        "Ik denk het wel, iemand gilt van de pijn",
-        "Nee, volgens mij is iedereen oké",
-        "Er zit iemand in de auto en die reageert niet",
-        "Ik ben zelf gewond, mijn arm doet zeer"
-      ],
-      "Hoeveel personen zijn erbij betrokken?": [
-        "Twee auto's, dus misschien vier of vijf mensen",
-        "Ik zie drie personen hier",
-        "Alleen ik, voor zover ik weet",
-        "Een hele groep, misschien wel tien mensen",
-        "Twee personen die ruzie hebben",
-        "Ik kan het niet goed zien vanuit hier"
-      ],
-      "Is er een wapen gezien?": [
-        "Ja! Ik zag iemand met een mes!",
-        "Nee, volgens mij niet",
-        "Ik weet het niet, ik ben te bang om te kijken",
-        "Mogelijk, ik hoorde een harde knal",
-        "Ik denk dat ik een pistool zag",
-        "Nee, het was alleen met de vuisten"
-      ],
-      "Moeten er hulpdiensten komen?": [
-        "Ja, zeker! Kom zo snel mogelijk!",
-        "Een ambulance is echt nodig!",
-        "De brandweer ook, er is rook!",
-        "Ja, en de politie, het is heel gevaarlijk hier",
-        "Alles! Ambulance, politie en brandweer!",
-        "Ik weet het niet, maar het ziet er niet goed uit"
-      ]
-    };
-
-    const questionKey = Object.keys(responses).find(key => 
-      question.toLowerCase().includes(key.toLowerCase())
-    );
-
-    if (questionKey) {
-      const possibleResponses = responses[questionKey];
-      return possibleResponses[Math.floor(Math.random() * possibleResponses.length)];
+    // Get scenario context for realistic responses
+    const scenario = currentConversation?.scenario;
+    
+    const questionLower = question.toLowerCase();
+    
+    // Context-aware responses based on emergency type
+    if (scenario) {
+      // Location questions
+      if (questionLower.includes("waar") || questionLower.includes("locatie") || questionLower.includes("adres")) {
+        if (scenario.responses.locatie) {
+          return scenario.responses.locatie[Math.floor(Math.random() * scenario.responses.locatie.length)];
+        }
+      }
+      
+      // Injury/casualty questions
+      if (questionLower.includes("gewond") || questionLower.includes("letsel") || questionLower.includes("slachtoffer")) {
+        if (scenario.responses.gewonden) {
+          return scenario.responses.gewonden[Math.floor(Math.random() * scenario.responses.gewonden.length)];
+        }
+      }
+      
+      // People involved questions
+      if (questionLower.includes("hoeveel") || questionLower.includes("personen") || questionLower.includes("mensen")) {
+        if (scenario.responses.mensen) {
+          return scenario.responses.mensen[Math.floor(Math.random() * scenario.responses.mensen.length)];
+        } else if (scenario.responses.voertuigen) {
+          return scenario.responses.voertuigen[Math.floor(Math.random() * scenario.responses.voertuigen.length)];
+        }
+      }
+      
+      // Weapon questions
+      if (questionLower.includes("wapen") || questionLower.includes("gewapend") || questionLower.includes("mes") || questionLower.includes("pistool")) {
+        if (scenario.responses.wapens) {
+          return scenario.responses.wapens[Math.floor(Math.random() * scenario.responses.wapens.length)];
+        }
+      }
+      
+      // Medical condition questions
+      if (questionLower.includes("bewust") || questionLower.includes("adem") || questionLower.includes("toestand")) {
+        if (scenario.responses.toestand) {
+          return scenario.responses.toestand[Math.floor(Math.random() * scenario.responses.toestand.length)];
+        } else if (scenario.responses.bewustzijn) {
+          return scenario.responses.bewustzijn[Math.floor(Math.random() * scenario.responses.bewustzijn.length)];
+        }
+      }
+      
+      // Fire-specific questions
+      if (questionLower.includes("vuur") || questionLower.includes("brand") || questionLower.includes("rook")) {
+        if (scenario.responses.vuur) {
+          return scenario.responses.vuur[Math.floor(Math.random() * scenario.responses.vuur.length)];
+        }
+      }
+      
+      // Perpetrator questions
+      if (questionLower.includes("dader") || questionLower.includes("verdachte") || questionLower.includes("wie")) {
+        if (scenario.responses.daders) {
+          return scenario.responses.daders[Math.floor(Math.random() * scenario.responses.daders.length)];
+        }
+      }
     }
 
-    // Default responses for other questions
-    const defaultResponses = [
+    // Emergency service requests
+    if (questionLower.includes("ambulance") || questionLower.includes("ziekenwagen")) {
+      return "Ja! Een ambulance is echt nodig, kom alsjeblieft zo snel mogelijk!";
+    }
+    
+    if (questionLower.includes("brandweer")) {
+      return "Ja, de brandweer moet komen! Er is brand/rook!";
+    }
+    
+    if (questionLower.includes("politie")) {
+      return "Ja, stuur alsjeblieft de politie! Het is gevaarlijk hier!";
+    }
+
+    // Standard protocol responses
+    const standardResponses = {
+      "naam": [
+        "Mijn naam is Jan de Vries",
+        "Ik ben Maria Jansen",
+        "Dit is Piet Bakker",
+        "Sandra van der Berg"
+      ],
+      "telefoonnummer": [
+        "06-12345678",
+        "010-1234567", 
+        "06-87654321",
+        "Eh... 06-55443322"
+      ],
+      "kalm": [
+        "Ik probeer kalm te blijven, maar het is heel eng!",
+        "Sorry, ik ben gewoon heel bang...",
+        "Oké, ik doe mijn best om rustig te blijven",
+        "Het is moeilijk om kalm te blijven in deze situatie"
+      ]
+    };
+    
+    // Check for standard questions
+    if (questionLower.includes("naam")) {
+      return standardResponses.naam[Math.floor(Math.random() * standardResponses.naam.length)];
+    }
+    
+    if (questionLower.includes("telefoon") || questionLower.includes("nummer")) {
+      return standardResponses.telefoonnummer[Math.floor(Math.random() * standardResponses.telefoonnummer.length)];
+    }
+    
+    if (questionLower.includes("kalm") || questionLower.includes("rustig")) {
+      return standardResponses.kalm[Math.floor(Math.random() * standardResponses.kalm.length)];
+    }
+
+    // Emotional responses for general questions
+    const emotionalResponses = [
       "Ik ben heel bang, kunt u snel komen?",
-      "Het gaat niet goed hier!",
-      "Ik weet het niet precies...",
+      "Het gaat niet goed hier! Schiet alsjeblieft op!",
+      "Ik weet het niet precies... het ging zo snel!",
       "Kunt u mij helpen? Ik weet niet wat ik moet doen!",
-      "Het gebeurde zo snel!",
-      "Ik durf niet dichter bij te komen"
+      "Het gebeurde zo plotseling!",
+      "Ik durf niet dichter bij te komen, het is te gevaarlijk",
+      "Wanneer komen jullie? Het duurt nu al zo lang!",
+      "Ik hoor sirenes! Zijn dat jullie?",
+      "Wat moet ik nu doen? Moet ik ergens op wachten?"
     ];
 
-    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+    return emotionalResponses[Math.floor(Math.random() * emotionalResponses.length)];
   };
 
   const sendMessageToColleague = (message: string) => {
