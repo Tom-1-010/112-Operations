@@ -1245,52 +1245,41 @@ body {
   color: #333;
 }
 
-/* AI Conversations Placeholder Styling */
+/* AI Conversations Functional Styling */
 .ai-conversations-panel {
-  background: #f8f9fa;
-  border: 2px dashed #6c757d !important;
+  background: white;
+  border: 2px solid #dc3545 !important;
 }
 
-.ai-placeholder-content {
-  padding: 16px;
+.incoming-calls-container {
+  padding: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-incoming-calls {
   text-align: center;
+  padding: 20px;
+  color: #666;
 }
 
-.placeholder-message {
-  margin-bottom: 16px;
+.no-incoming-calls p {
+  margin-bottom: 10px;
+  font-style: italic;
 }
 
-.placeholder-message strong {
-  color: #495057;
-  font-size: 13px;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.placeholder-message p {
-  color: #6c757d;
-  font-size: 12px;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.placeholder-features {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 12px;
-}
-
-.feature-item {
+.simulate-call-btn {
+  background: #6c757d;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   font-size: 11px;
-  color: #495057;
-  text-align: left;
-  padding: 4px 0;
-  border-bottom: 1px dotted #dee2e6;
 }
 
-.feature-item:last-child {
-  border-bottom: none;
+.simulate-call-btn:hover {
+  background: #545b62;
 }
 
 /* Responsive Design */

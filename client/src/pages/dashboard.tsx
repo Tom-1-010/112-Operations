@@ -59,6 +59,10 @@ export default function Dashboard() {
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
 
+  // Incoming calls state management
+  const [incomingCalls, setIncomingCalls] = useState<any[]>([]);
+  const [callTimers, setCallTimers] = useState<{ [key: number]: number }>({});
+
   // Enhanced AI Conversation Engine for Emergency Services
   const generateColleagueResponse = (
     contact: any,
@@ -615,6 +619,123 @@ export default function Dashboard() {
 
     setChatMessages([initialMessage]);
   };
+
+  // Incoming call management functions
+  const formatCallDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const simulateIncomingCall = () => {
+    const incidentTypes = [
+      'Verkeersongeval',
+      'Woningbrand', 
+      'Inbraak',
+      'Huiselijk geweld',
+      'Schietpartij',
+      'Overval',
+      'Medische noodsituatie',
+      'Verdachte situatie'
+    ];
+
+    const priorities = ['zeer-hoog', 'hoog', 'middel', 'laag'];
+    const callerInfos = [
+      'Anonieme melder',
+      'Getuige ter plaatse', 
+      'Slachtoffer incident',
+      'Voorbijganger',
+      'Bewoner pand',
+      'Beveiligingsdienst'
+    ];
+
+    const descriptions = [
+      'Ernstig letsel, ambulance vereist',
+      'Verdachte personen gespot',
+      'Veel rook en vlammen zichtbaar',
+      'Geschreeuw en ruzie gehoord',
+      'Glasgerinkel en alarm',
+      'Gewapende personen aanwezig'
+    ];
+
+    const newCall = {
+      id: Date.now(),
+      line: Math.floor(Math.random() * 8) + 1,
+      callerInfo: callerInfos[Math.floor(Math.random() * callerInfos.length)],
+      incidentType: incidentTypes[Math.floor(Math.random() * incidentTypes.length)],
+      priority: priorities[Math.floor(Math.random() * priorities.length)],
+      description: descriptions[Math.floor(Math.random() * descriptions.length)],
+      duration: '00:00',
+      startTime: Date.now()
+    };
+
+    setIncomingCalls(prev => [...prev, newCall]);
+    setCallTimers(prev => ({ ...prev, [newCall.id]: 0 }));
+    
+    showNotificationMessage(`Nieuwe 112-oproep op lijn ${newCall.line}`);
+  };
+
+  const acceptCall = (callId: number) => {
+    const call = incomingCalls.find(c => c.id === callId);
+    if (!call) return;
+
+    // Remove from incoming calls
+    setIncomingCalls(prev => prev.filter(c => c.id !== callId));
+    setCallTimers(prev => {
+      const newTimers = { ...prev };
+      delete newTimers[callId];
+      return newTimers;
+    });
+
+    // Switch to burgers chat with this call active
+    setActiveChatTab("burgers");
+    
+    // Add to chat messages
+    const initialMessage = {
+      id: Date.now(),
+      sender: call.callerInfo,
+      content: `${call.incidentType}: ${call.description}`,
+      timestamp: new Date().toLocaleTimeString("nl-NL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      type: "incoming",
+    };
+
+    setChatMessages([initialMessage]);
+    showNotificationMessage(`Gesprek aangenomen van ${call.callerInfo}`);
+  };
+
+  const declineCall = (callId: number) => {
+    setIncomingCalls(prev => prev.filter(c => c.id !== callId));
+    setCallTimers(prev => {
+      const newTimers = { ...prev };
+      delete newTimers[callId];
+      return newTimers;
+    });
+    showNotificationMessage("Oproep doorgestuurd naar collega");
+  };
+
+  // Update call timers every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCallTimers(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(callId => {
+          updated[parseInt(callId)] = updated[parseInt(callId)] + 1;
+        });
+        return updated;
+      });
+
+      // Update call durations in display
+      setIncomingCalls(prev => prev.map(call => ({
+        ...call,
+        duration: formatCallDuration(callTimers[call.id] || 0)
+      })));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [callTimers]);
 
   const sendMessageToColleague = (message: string) => {
     if (!currentConversation || !message.trim()) return;
@@ -6914,31 +7035,60 @@ export default function Dashboard() {
 
                 {/* Right Column - Contact Panels */}
                 <div className="telefoon-contact-section">
-                  {/* AI Telephone Conversations - Placeholder */}
+                  {/* AI Telephone Conversations */}
                   <div className="contact-panel ai-conversations-panel">
                     <h3 className="panel-title">AI Telefoonconversaties</h3>
-                    <div className="ai-placeholder-content">
-                      <div className="placeholder-message">
-                        <strong>Toekomstige functionaliteit:</strong>
-                        <p>
-                          Hier komen dynamische AI-gestuurde telefoongesprekken
-                          met noodmelders via 112 en andere emergency services.
-                        </p>
-                      </div>
-                      <div className="placeholder-features">
-                        <div className="feature-item">
-                          • Realtime conversatie simulatie
+                    <div className="incoming-calls-container">
+                      {incomingCalls.map((call) => (
+                        <div key={call.id} className={`incoming-call-alert ${call.priority === 'zeer-hoog' ? 'priority-zeer-hoog' : call.priority === 'hoog' ? 'priority-hoog' : call.priority === 'middel' ? 'priority-middel' : 'priority-laag'}`}>
+                          <div className="call-header">
+                            <span className="call-indicator blinking">
+                              📞 INKOMENDE OPROEP - LIJN {call.line}
+                            </span>
+                            <span className="call-time">{call.duration}</span>
+                          </div>
+                          <div className="call-details">
+                            <div className="caller-info">
+                              {call.callerInfo}
+                            </div>
+                            <div className="incident-info">
+                              <span className={`priority-badge priority-${call.priority}`}>
+                                {call.priority.toUpperCase()}
+                              </span>
+                              <span className="incident-type">{call.incidentType}</span>
+                            </div>
+                            <div className="incident-description">
+                              {call.description}
+                            </div>
+                          </div>
+                          <div className="call-actions">
+                            <button 
+                              className="accept-call-btn"
+                              onClick={() => acceptCall(call.id)}
+                            >
+                              AANNEMEN
+                            </button>
+                            <button 
+                              className="decline-call-btn"
+                              onClick={() => declineCall(call.id)}
+                            >
+                              WEIGEREN
+                            </button>
+                          </div>
                         </div>
-                        <div className="feature-item">
-                          • Intelligente respons generatie
+                      ))}
+                      
+                      {incomingCalls.length === 0 && (
+                        <div className="no-incoming-calls">
+                          <p>Geen inkomende oproepen</p>
+                          <button 
+                            className="simulate-call-btn"
+                            onClick={simulateIncomingCall}
+                          >
+                            Simuleer 112-oproep
+                          </button>
                         </div>
-                        <div className="feature-item">
-                          • Automatische incident classificatie
-                        </div>
-                        <div className="feature-item">
-                          • Geïntegreerde GMS koppeling
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
 
