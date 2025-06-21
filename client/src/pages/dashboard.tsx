@@ -7117,6 +7117,15 @@ export default function Dashboard() {
                             className="question-btn"
                             onClick={(e) => {
                               e.preventDefault();
+                              sendMessageToColleague("Wat is er aan de hand?");
+                            }}
+                          >
+                            ❓ Wat is er aan de hand?
+                          </button>
+                          <button 
+                            className="question-btn"
+                            onClick={(e) => {
+                              e.preventDefault();
                               sendMessageToColleague("Wat is de exacte locatie?");
                             }}
                           >
@@ -7148,15 +7157,6 @@ export default function Dashboard() {
                             }}
                           >
                             ⚔️ Is er een wapen gezien?
-                          </button>
-                          <button 
-                            className="question-btn"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sendMessageToColleague("Moeten er hulpdiensten komen?");
-                            }}
-                          >
-                            🚨 Moeten er hulpdiensten komen?
                           </button>
                         </div>
                       </div>
