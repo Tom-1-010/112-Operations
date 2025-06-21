@@ -561,8 +561,12 @@ export default function Dashboard() {
   };
 
   const startConversationWithContact = (contact: any) => {
+    // This function is specifically for colleague conversations only
     setActiveChatTab("collega");
-    setCurrentConversation(contact);
+    setCurrentConversation({
+      ...contact,
+      type: "collega-gesprek"
+    });
 
     // Generate role-specific greeting
     const greetings = {
@@ -671,7 +675,7 @@ export default function Dashboard() {
     // Switch to burgers chat for 112 conversation
     setActiveChatTab("burgers");
     
-    // Start with empty chat - melder will start talking
+    // Clear any existing conversation and messages
     setChatMessages([]);
     
     // Set current conversation data for the active call
@@ -1029,7 +1033,7 @@ export default function Dashboard() {
         };
         setChatMessages((prev) => [...prev, responseMessage]);
       }, 800 + Math.random() * 1500); // Quick response for 112 calls
-    } else if (currentConversation?.functie) {
+    } else if (currentConversation?.type === "collega-gesprek" && currentConversation?.functie) {
       // Generate AI response for colleague conversations
       setTimeout(
         () => {
