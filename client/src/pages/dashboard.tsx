@@ -830,54 +830,9 @@ export default function Dashboard() {
     }
   ];
 
+  // This function is no longer needed as scenario generation is handled in acceptCall
   const simulateCallerMessage = () => {
-    console.log("🎭 Starting caller simulation...");
-    
-    if (!currentConversation || currentConversation.type !== "112-gesprek") {
-      console.log("❌ No valid 112 conversation found");
-      return;
-    }
-
-    // Select random gemeente and address
-    const gemeenten = Object.keys(realisticAddresses);
-    const selectedGemeente = gemeenten[Math.floor(Math.random() * gemeenten.length)];
-    const addresses = realisticAddresses[selectedGemeente];
-    const selectedAddress = addresses[Math.floor(Math.random() * addresses.length)];
-    
-    console.log("📍 Selected address:", selectedAddress, "in", selectedGemeente);
-    
-    // Select random emergency scenario
-    const scenario = realistic112Scenarios[Math.floor(Math.random() * realistic112Scenarios.length)];
-    console.log("🚨 Selected scenario:", scenario.type);
-    
-    const initialMessage = scenario.initialMessage(selectedAddress, selectedGemeente);
-    console.log("💬 Initial message:", initialMessage);
-    
-    // Store scenario context for later responses - update immediately
-    setCurrentConversation(prev => {
-      const updated = {
-        ...prev,
-        scenarioType: scenario.type,
-        address: selectedAddress,
-        gemeente: selectedGemeente,
-        scenarioResponses: scenario.responses
-      };
-      console.log("📝 Updated conversation context:", updated);
-      return updated;
-    });
-    
-    const callerMessage = {
-      id: Date.now(),
-      sender: `Melder - ${currentConversation?.callerInfo}`,
-      content: initialMessage,
-      timestamp: new Date().toLocaleTimeString("nl-NL", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      type: "incoming",
-    };
-
-    setChatMessages([callerMessage]);
+    console.log("🎭 simulateCallerMessage called but scenario already generated");
   };
 
   // Generate realistic 112 caller responses
