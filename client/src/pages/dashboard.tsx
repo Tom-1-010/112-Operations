@@ -831,7 +831,12 @@ export default function Dashboard() {
   ];
 
   const simulateCallerMessage = () => {
-    if (!currentConversation || currentConversation.type !== "112-gesprek") return;
+    console.log("🎭 Starting caller simulation...");
+    
+    if (!currentConversation || currentConversation.type !== "112-gesprek") {
+      console.log("❌ No valid 112 conversation found");
+      return;
+    }
 
     // Select random gemeente and address
     const gemeenten = Object.keys(realisticAddresses);
@@ -839,18 +844,27 @@ export default function Dashboard() {
     const addresses = realisticAddresses[selectedGemeente];
     const selectedAddress = addresses[Math.floor(Math.random() * addresses.length)];
     
+    console.log("📍 Selected address:", selectedAddress, "in", selectedGemeente);
+    
     // Select random emergency scenario
     const scenario = realistic112Scenarios[Math.floor(Math.random() * realistic112Scenarios.length)];
-    const initialMessage = scenario.initialMessage(selectedAddress, selectedGemeente);
+    console.log("🚨 Selected scenario:", scenario.type);
     
-    // Store scenario context for later responses
-    setCurrentConversation(prev => ({
-      ...prev,
-      scenarioType: scenario.type,
-      address: selectedAddress,
-      gemeente: selectedGemeente,
-      scenarioResponses: scenario.responses
-    }));
+    const initialMessage = scenario.initialMessage(selectedAddress, selectedGemeente);
+    console.log("💬 Initial message:", initialMessage);
+    
+    // Store scenario context for later responses - update immediately
+    setCurrentConversation(prev => {
+      const updated = {
+        ...prev,
+        scenarioType: scenario.type,
+        address: selectedAddress,
+        gemeente: selectedGemeente,
+        scenarioResponses: scenario.responses
+      };
+      console.log("📝 Updated conversation context:", updated);
+      return updated;
+    });
     
     const callerMessage = {
       id: Date.now(),
@@ -878,14 +892,21 @@ export default function Dashboard() {
     
     // Context-aware responses based on scenario and operator question
     if (message.includes("locatie") || message.includes("waar") || message.includes("adres")) {
+      console.log("📍 Location question - address:", address, "gemeente:", gemeente);
       if (scenarioResponses?.locatie) {
         if (typeof scenarioResponses.locatie === 'function') {
-          return scenarioResponses.locatie(address, gemeente);
+          const response = scenarioResponses.locatie(address, gemeente);
+          console.log("📍 Function response:", response);
+          return response;
         } else if (Array.isArray(scenarioResponses.locatie)) {
-          return scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
+          const response = scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
+          console.log("📍 Array response:", response);
+          return response;
         }
       }
-      return `${address} in ${gemeente}, precies voor het gebouw`;
+      const fallbackResponse = address && gemeente ? `${address} in ${gemeente}, precies voor het gebouw` : "Coolsingel 125 in Rotterdam, voor het gebouw";
+      console.log("📍 Fallback response:", fallbackResponse);
+      return fallbackResponse;
     }
     
     if (message.includes("gewond") || message.includes("slachtoffer") || message.includes("letsel")) {
