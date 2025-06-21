@@ -1,8 +1,12 @@
-import Dashboard from "@/pages/dashboard";
-import "./index.css";
+import React from "react";
+import Dashboard from "./pages/dashboard";
 
 function App() {
-  return <Dashboard />;
+  return (
+    <div className="App">
+      <Dashboard />
+    </div>
+  );
 }
 
 export default App;
