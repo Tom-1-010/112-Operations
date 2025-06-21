@@ -59,6 +59,11 @@ export default function Dashboard() {
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
 
+  // Debug active chat tab changes
+  useEffect(() => {
+    console.log("🔄 Active chat tab changed to:", activeChatTab);
+  }, [activeChatTab]);
+
   // Incoming calls state management
   const [incomingCalls, setIncomingCalls] = useState<any[]>([]);
   const [callTimers, setCallTimers] = useState<{ [key: number]: number }>({});
@@ -668,8 +673,14 @@ export default function Dashboard() {
   };
 
   const acceptCall = (callId: number) => {
+    console.log("🚨 ACCEPT CALL TRIGGERED - ID:", callId);
     const call = incomingCalls.find(c => c.id === callId);
-    if (!call) return;
+    if (!call) {
+      console.error("❌ Call not found:", callId);
+      return;
+    }
+
+    console.log("📞 Found call:", call);
 
     // Remove from incoming calls
     setIncomingCalls(prev => prev.filter(c => c.id !== callId));
@@ -680,14 +691,17 @@ export default function Dashboard() {
     });
 
     // Clear any existing conversation and messages first
+    console.log("🧹 Clearing existing conversation state");
     setChatMessages([]);
     setCurrentConversation(null);
     
-    // Force switch to burgers tab for 112 conversations
+    // CRITICAL: Force switch to burgers tab for 112 conversations
+    console.log("🔄 FORCING TAB SWITCH TO BURGERS");
     setActiveChatTab("burgers");
     
     // Set current conversation data specifically for 112 calls
     setTimeout(() => {
+      console.log("🎯 Setting 112 conversation data");
       setCurrentConversation({
         id: callId,
         type: "112-gesprek",
@@ -701,9 +715,10 @@ export default function Dashboard() {
       
       // Simulate caller starting the conversation
       setTimeout(() => {
+        console.log("💬 Starting caller simulation");
         simulateCallerMessage();
       }, 1000);
-    }, 100);
+    }, 200);
   };
 
   const declineCall = (callId: number) => {
@@ -7382,7 +7397,12 @@ export default function Dashboard() {
                           <div className="call-actions">
                             <button 
                               className="accept-call-btn"
-                              onClick={() => acceptCall(call.id)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log("🚨 Button clicked - accepting call", call.id);
+                                acceptCall(call.id);
+                              }}
                             >
                               AANNEMEN
                             </button>
