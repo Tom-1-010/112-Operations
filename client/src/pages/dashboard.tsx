@@ -819,7 +819,7 @@ export default function Dashboard() {
   };
 
   const sendMessageToColleague = (message: string) => {
-    if (!currentConversation || !message.trim()) return;
+    if (!message.trim()) return;
 
     const userMessage = {
       id: Date.now(),
@@ -835,7 +835,7 @@ export default function Dashboard() {
     setChatMessages((prev) => [...prev, userMessage]);
 
     // Handle 112 caller responses differently
-    if (currentConversation.type === "112-gesprek") {
+    if (currentConversation?.type === "112-gesprek") {
       setTimeout(() => {
         const callerResponse = generate112Response(message, chatMessages);
         const responseMessage = {
@@ -850,7 +850,7 @@ export default function Dashboard() {
         };
         setChatMessages((prev) => [...prev, responseMessage]);
       }, 800 + Math.random() * 1500); // Quick response for 112 calls
-    } else {
+    } else if (currentConversation?.functie) {
       // Generate AI response for colleague conversations
       setTimeout(
         () => {
@@ -3925,68 +3925,35 @@ export default function Dashboard() {
         const chatInput = document.getElementById(
           "chatInput",
         ) as HTMLInputElement;
-        const chatMessages = document.getElementById("chatMessages");
+        const chatMessagesContainer = document.getElementById("chatMessages");
 
         const sendChatMessage = () => {
-          if (!chatInput || !chatMessages) return;
+          if (!chatInput) return;
 
           const messageText = chatInput.value.trim();
           if (!messageText) return;
 
-          const timestamp = new Date().toLocaleTimeString("nl-NL", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          // Create outgoing message
-          const messageDiv = document.createElement("div");
-          messageDiv.className = "chat-message outgoing";
-          messageDiv.innerHTML = `
-            <div class="message-sender">Meldkamer</div>
-            <div class="message-content">${messageText}</div>
-            <div class="message-time">${timestamp}</div>
-          `;
-
-          chatMessages.appendChild(messageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-
-          // Clear input
-          chatInput.value = "";
-
-          // Simulate response after 2-3 seconds
-          setTimeout(
-            () => {
-              const responseDiv = document.createElement("div");
-              responseDiv.className = "chat-message incoming";
-              const responses = [
-                "Bedankt voor de snelle reactie.",
-                "Ik begrijp het. Hulpdiensten zijn onderweg.",
-                "Kunt u op een veilige plek blijven?",
-                "We houden contact voor updates.",
-                "De eenheden zijn ter plaatse aangekomen.",
-              ];
-              const randomResponse =
-                responses[Math.floor(Math.random() * responses.length)];
-
-              responseDiv.innerHTML = `
-              <div class="message-sender">Melder - 06-12345678</div>
-              <div class="message-content">${randomResponse}</div>
-              <div class="message-time">${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}</div>
-            `;
-
-              chatMessages.appendChild(responseDiv);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-            },
-            2000 + Math.random() * 1000,
-          );
+          // Use the React state function to send message
+          if (
+            (activeChatTab === "burgers" && currentConversation?.type === "112-gesprek") ||
+            (activeChatTab === "collega" && currentConversation)
+          ) {
+            sendMessageToColleague(messageText);
+            chatInput.value = "";
+          }
         };
 
+        // Remove old event listeners to prevent duplicates
         if (chatSendBtn) {
-          chatSendBtn.addEventListener("click", sendChatMessage);
+          const newChatSendBtn = chatSendBtn.cloneNode(true);
+          chatSendBtn.parentNode?.replaceChild(newChatSendBtn, chatSendBtn);
+          newChatSendBtn.addEventListener("click", sendChatMessage);
         }
 
         if (chatInput) {
-          chatInput.addEventListener("keydown", (e) => {
+          const newChatInput = chatInput.cloneNode(true) as HTMLInputElement;
+          chatInput.parentNode?.replaceChild(newChatInput, chatInput);
+          newChatInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               sendChatMessage();
@@ -7014,31 +6981,46 @@ export default function Dashboard() {
                         <div className="question-buttons">
                           <button 
                             className="question-btn"
-                            onClick={() => sendMessageToColleague("Wat is de exacte locatie?")}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sendMessageToColleague("Wat is de exacte locatie?");
+                            }}
                           >
                             📍 Wat is de exacte locatie?
                           </button>
                           <button 
                             className="question-btn"
-                            onClick={() => sendMessageToColleague("Zijn er gewonden?")}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sendMessageToColleague("Zijn er gewonden?");
+                            }}
                           >
                             🩹 Zijn er gewonden?
                           </button>
                           <button 
                             className="question-btn"
-                            onClick={() => sendMessageToColleague("Hoeveel personen zijn erbij betrokken?")}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sendMessageToColleague("Hoeveel personen zijn erbij betrokken?");
+                            }}
                           >
                             👥 Hoeveel personen zijn erbij betrokken?
                           </button>
                           <button 
                             className="question-btn"
-                            onClick={() => sendMessageToColleague("Is er een wapen gezien?")}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sendMessageToColleague("Is er een wapen gezien?");
+                            }}
                           >
                             ⚔️ Is er een wapen gezien?
                           </button>
                           <button 
                             className="question-btn"
-                            onClick={() => sendMessageToColleague("Moeten er hulpdiensten komen?")}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sendMessageToColleague("Moeten er hulpdiensten komen?");
+                            }}
                           >
                             🚨 Moeten er hulpdiensten komen?
                           </button>
@@ -7138,8 +7120,9 @@ export default function Dashboard() {
                         }
                         id="chatInput"
                         disabled={activeChatTab === "burgers" && !currentConversation}
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
                           if (e.key === "Enter") {
+                            e.preventDefault();
                             const input = e.target as HTMLInputElement;
                             if (input.value.trim()) {
                               if (
@@ -7157,7 +7140,8 @@ export default function Dashboard() {
                         className="chat-send-btn"
                         id="chatSendBtn"
                         disabled={activeChatTab === "burgers" && !currentConversation}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
                           const input = document.getElementById(
                             "chatInput",
                           ) as HTMLInputElement;
