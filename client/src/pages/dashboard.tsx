@@ -628,43 +628,24 @@ export default function Dashboard() {
   };
 
   const simulateIncomingCall = () => {
-    const incidentTypes = [
-      'Verkeersongeval',
-      'Woningbrand', 
-      'Inbraak',
-      'Huiselijk geweld',
-      'Schietpartij',
-      'Overval',
-      'Medische noodsituatie',
-      'Verdachte situatie'
+    const phoneNumbers = [
+      '06-12345678',
+      '06-87654321', 
+      '06-11223344',
+      '010-1234567',
+      '06-55667788',
+      '070-9876543',
+      '06-99887766',
+      '06-44556677'
     ];
 
     const priorities = ['zeer-hoog', 'hoog', 'middel', 'laag'];
-    const callerInfos = [
-      'Anonieme melder',
-      'Getuige ter plaatse', 
-      'Slachtoffer incident',
-      'Voorbijganger',
-      'Bewoner pand',
-      'Beveiligingsdienst'
-    ];
-
-    const descriptions = [
-      'Ernstig letsel, ambulance vereist',
-      'Verdachte personen gespot',
-      'Veel rook en vlammen zichtbaar',
-      'Geschreeuw en ruzie gehoord',
-      'Glasgerinkel en alarm',
-      'Gewapende personen aanwezig'
-    ];
 
     const newCall = {
       id: Date.now(),
       line: Math.floor(Math.random() * 8) + 1,
-      callerInfo: callerInfos[Math.floor(Math.random() * callerInfos.length)],
-      incidentType: incidentTypes[Math.floor(Math.random() * incidentTypes.length)],
+      phoneNumber: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)],
       priority: priorities[Math.floor(Math.random() * priorities.length)],
-      description: descriptions[Math.floor(Math.random() * descriptions.length)],
       duration: '00:00',
       startTime: Date.now()
     };
@@ -697,8 +678,7 @@ export default function Dashboard() {
     setCurrentConversation({
       id: callId,
       type: "112-gesprek",
-      callerInfo: call.callerInfo,
-      incidentType: call.incidentType,
+      callerInfo: call.phoneNumber,
       priority: call.priority,
       startTime: Date.now()
     });
@@ -860,7 +840,7 @@ export default function Dashboard() {
         const callerResponse = generate112Response(message, chatMessages);
         const responseMessage = {
           id: Date.now() + 1,
-          sender: currentConversation.callerInfo,
+          sender: `Melder - ${currentConversation.callerInfo}`,
           content: callerResponse,
           timestamp: new Date().toLocaleTimeString("nl-NL", {
             hour: "2-digit",
@@ -7205,7 +7185,7 @@ export default function Dashboard() {
                     <h3 className="panel-title">AI Telefoonconversaties</h3>
                     <div className="incoming-calls-container">
                       {incomingCalls.map((call) => (
-                        <div key={call.id} className={`incoming-call-alert ${call.priority === 'zeer-hoog' ? 'priority-zeer-hoog' : call.priority === 'hoog' ? 'priority-hoog' : call.priority === 'middel' ? 'priority-middel' : 'priority-laag'}`}>
+                        <div key={call.id} className="incoming-call-alert">
                           <div className="call-header">
                             <span className="call-indicator blinking">
                               📞 INKOMENDE OPROEP - LIJN {call.line}
@@ -7214,16 +7194,7 @@ export default function Dashboard() {
                           </div>
                           <div className="call-details">
                             <div className="caller-info">
-                              {call.callerInfo}
-                            </div>
-                            <div className="incident-info">
-                              <span className={`priority-badge priority-${call.priority}`}>
-                                {call.priority.toUpperCase()}
-                              </span>
-                              <span className="incident-type">{call.incidentType}</span>
-                            </div>
-                            <div className="incident-description">
-                              {call.description}
+                              Telefoonnummer: {call.phoneNumber}
                             </div>
                           </div>
                           <div className="call-actions">
