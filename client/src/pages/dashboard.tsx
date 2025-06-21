@@ -563,9 +563,13 @@ export default function Dashboard() {
   const startConversationWithContact = (contact: any) => {
     // This function is specifically for colleague conversations only
     setActiveChatTab("collega");
+    
+    // Clear any existing messages and set new colleague conversation
+    setChatMessages([]);
     setCurrentConversation({
       ...contact,
-      type: "collega-gesprek"
+      type: "collega-gesprek",
+      isEmergencyCall: false
     });
 
     // Generate role-specific greeting
@@ -672,19 +676,20 @@ export default function Dashboard() {
       return newTimers;
     });
 
-    // Switch to burgers chat for 112 conversation
+    // ALWAYS switch to burgers tab for 112 conversations
     setActiveChatTab("burgers");
     
     // Clear any existing conversation and messages
     setChatMessages([]);
     
-    // Set current conversation data for the active call
+    // Set current conversation data specifically for 112 calls
     setCurrentConversation({
       id: callId,
       type: "112-gesprek",
       callerInfo: call.phoneNumber,
       priority: call.priority,
-      startTime: Date.now()
+      startTime: Date.now(),
+      isEmergencyCall: true
     });
 
     showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
@@ -1017,8 +1022,10 @@ export default function Dashboard() {
 
     setChatMessages((prev) => [...prev, userMessage]);
 
-    // Handle 112 caller responses differently
-    if (currentConversation?.type === "112-gesprek") {
+    // Handle responses based on conversation type and current tab
+    if (currentConversation?.type === "112-gesprek" || 
+        (currentConversation?.isEmergencyCall && activeChatTab === "burgers")) {
+      // This is a 112 emergency call - generate realistic caller response
       setTimeout(() => {
         const callerResponse = generate112Response(message, chatMessages);
         const responseMessage = {
@@ -1033,8 +1040,10 @@ export default function Dashboard() {
         };
         setChatMessages((prev) => [...prev, responseMessage]);
       }, 800 + Math.random() * 1500); // Quick response for 112 calls
-    } else if (currentConversation?.type === "collega-gesprek" && currentConversation?.functie) {
-      // Generate AI response for colleague conversations
+    } else if (currentConversation?.type === "collega-gesprek" && 
+               currentConversation?.functie && 
+               activeChatTab === "collega") {
+      // This is a colleague conversation - generate professional response
       setTimeout(
         () => {
           const aiResponse = generateColleagueResponse(
