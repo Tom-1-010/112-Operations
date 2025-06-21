@@ -7242,31 +7242,52 @@ export default function Dashboard() {
                     )}
 
                     <div className="chat-messages" id="chatMessages">
-                      {activeChatTab === "burgers" && currentConversation?.type === "112-gesprek" && (
-                        <div className="conversation-header">
-                          <strong>112-Gesprek: {currentConversation.callerInfo}</strong>
-                          <button 
-                            className="end-call-btn"
-                            onClick={() => {
-                              setCurrentConversation(null);
-                              setChatMessages([]);
-                              showNotificationMessage("112-gesprek beëindigd");
-                            }}
-                          >
-                            Gesprek Beëindigen
-                          </button>
-                        </div>
-                      )}
+                      {activeChatTab === "burgers" && (
+                        <>
+                          {currentConversation?.type === "112-gesprek" && (
+                            <div className="conversation-header">
+                              <strong>112-Gesprek: {currentConversation.callerInfo}</strong>
+                              <button 
+                                className="end-call-btn"
+                                onClick={() => {
+                                  setCurrentConversation(null);
+                                  setChatMessages([]);
+                                  showNotificationMessage("112-gesprek beëindigd");
+                                }}
+                              >
+                                Gesprek Beëindigen
+                              </button>
+                            </div>
+                          )}
 
-                      {activeChatTab === "burgers" && !currentConversation && (
-                        <div className="no-conversation">
-                          <p>Geen actief 112-gesprek. Neem een inkomende oproep aan om te beginnen.</p>
-                        </div>
+                          {!currentConversation && (
+                            <div className="no-conversation">
+                              <p>Geen actief 112-gesprek. Neem een inkomende oproep aan om te beginnen.</p>
+                            </div>
+                          )}
+
+                          {currentConversation?.type === "112-gesprek" && chatMessages.map((message) => (
+                            <div
+                              key={message.id}
+                              className={`chat-message ${message.type}`}
+                            >
+                              <div className="message-sender">
+                                {message.sender}
+                              </div>
+                              <div className="message-content">
+                                {message.content}
+                              </div>
+                              <div className="message-time">
+                                {message.timestamp}
+                              </div>
+                            </div>
+                          ))}
+                        </>
                       )}
 
                       {activeChatTab === "collega" && (
                         <>
-                          {currentConversation && (
+                          {currentConversation?.type === "collega-gesprek" && (
                             <div className="conversation-header">
                               <strong>
                                 Gesprek met: {currentConversation.functie}
@@ -7277,17 +7298,16 @@ export default function Dashboard() {
                             </div>
                           )}
 
-                          {chatMessages.length === 0 &&
-                            !currentConversation && (
-                              <div className="no-conversation">
-                                <p>
-                                  Geen actief gesprek. Klik op een collega
-                                  rechts om een gesprek te starten.
-                                </p>
-                              </div>
-                            )}
+                          {!currentConversation && (
+                            <div className="no-conversation">
+                              <p>
+                                Geen actief gesprek. Klik op een collega
+                                rechts om een gesprek te starten.
+                              </p>
+                            </div>
+                          )}
 
-                          {chatMessages.map((message) => (
+                          {currentConversation?.type === "collega-gesprek" && chatMessages.map((message) => (
                             <div
                               key={message.id}
                               className={`chat-message ${message.type}`}
