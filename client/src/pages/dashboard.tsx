@@ -699,25 +699,54 @@ export default function Dashboard() {
     console.log("🔄 FORCING TAB SWITCH TO BURGERS");
     setActiveChatTab("burgers");
     
-    // Set current conversation data specifically for 112 calls
+    // Generate scenario data immediately for 112 calls
     setTimeout(() => {
       console.log("🎯 Setting 112 conversation data");
+      
+      // Generate realistic scenario context based on LMC classifications
+      const gemeenten = Object.keys(realisticAddresses);
+      const selectedGemeente = gemeenten[Math.floor(Math.random() * gemeenten.length)];
+      const addresses = realisticAddresses[selectedGemeente];
+      const selectedAddress = addresses[Math.floor(Math.random() * addresses.length)];
+      const scenario = generateRealistic112Scenario(selectedAddress, selectedGemeente);
+      
+      console.log("📍 Generated address:", selectedAddress, "in", selectedGemeente);
+      console.log("🚨 Generated scenario:", scenario.type);
+      
+      // Set conversation with complete scenario data
       setCurrentConversation({
         id: callId,
         type: "112-gesprek",
         callerInfo: call.phoneNumber,
         priority: call.priority,
         startTime: Date.now(),
-        isEmergencyCall: true
+        isEmergencyCall: true,
+        scenarioType: scenario.type,
+        address: selectedAddress,
+        gemeente: selectedGemeente,
+        scenarioResponses: scenario.responses
       });
 
       showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
       
-      // Simulate caller starting the conversation
+      // Generate initial caller message
+      const initialMessage = scenario.initialMessage;
+      console.log("💬 Generated initial message:", initialMessage);
+      
+      // Add caller message after brief delay
       setTimeout(() => {
-        console.log("💬 Starting caller simulation");
-        simulateCallerMessage();
-      }, 1000);
+        const callerMessage = {
+          id: Date.now(),
+          sender: `Melder - ${call.phoneNumber}`,
+          content: initialMessage,
+          timestamp: new Date().toLocaleTimeString("nl-NL", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          type: "incoming",
+        };
+        setChatMessages([callerMessage]);
+      }, 800);
     }, 200);
   };
 
@@ -849,12 +878,8 @@ export default function Dashboard() {
     
     // Context-aware responses based on scenario and operator question
     if (message.includes("locatie") || message.includes("waar") || message.includes("adres")) {
-      if (scenarioResponses?.locatie) {
-        if (typeof scenarioResponses.locatie === 'function') {
-          return scenarioResponses.locatie(address, gemeente);
-        } else if (Array.isArray(scenarioResponses.locatie)) {
-          return scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
-        }
+      if (scenarioResponses?.locatie && Array.isArray(scenarioResponses.locatie)) {
+        return scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
       }
       return address && gemeente ? `${address} in ${gemeente}, ter hoogte van de ingang` : "Bergweg 89 in Rotterdam, bij de bushalte";
     }

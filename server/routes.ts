@@ -14,6 +14,21 @@ import {
 import { eq, desc } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Load LMC classifications from JSON file
+  app.get("/api/lmc-classifications", (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(process.cwd(), 'attached_assets', 'LMC_classificaties_1750171129152.json');
+      const data = fs.readFileSync(filePath, 'utf8');
+      const classifications = JSON.parse(data);
+      res.json(classifications);
+    } catch (error) {
+      console.error('Error loading LMC classifications:', error);
+      res.status(500).json({ error: 'Failed to load LMC classifications' });
+    }
+  });
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
