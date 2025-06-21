@@ -687,23 +687,28 @@ export default function Dashboard() {
       return newTimers;
     });
 
-    // Switch to burgers chat with this call active
+    // Switch to burgers chat for 112 conversation
     setActiveChatTab("burgers");
     
-    // Add to chat messages
-    const initialMessage = {
-      id: Date.now(),
-      sender: call.callerInfo,
-      content: `${call.incidentType}: ${call.description}`,
-      timestamp: new Date().toLocaleTimeString("nl-NL", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      type: "incoming",
-    };
+    // Start with empty chat - melder will start talking
+    setChatMessages([]);
+    
+    // Set current conversation data for the active call
+    setCurrentConversation({
+      id: callId,
+      type: "112-gesprek",
+      callerInfo: call.callerInfo,
+      incidentType: call.incidentType,
+      priority: call.priority,
+      startTime: Date.now()
+    });
 
-    setChatMessages([initialMessage]);
-    showNotificationMessage(`Gesprek aangenomen van ${call.callerInfo}`);
+    showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
+    
+    // Simulate caller starting the conversation after short delay
+    setTimeout(() => {
+      simulateCallerMessage();
+    }, 1500);
   };
 
   const declineCall = (callId: number) => {
@@ -737,6 +742,102 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, [callTimers]);
 
+  // Simulate 112 caller starting conversation
+  const simulateCallerMessage = () => {
+    if (!currentConversation || currentConversation.type !== "112-gesprek") return;
+
+    const urgentOpenings = [
+      "Hallo, er is iets ergs gebeurd!",
+      "112? Ik heb hulp nodig!",
+      "Er is een ongeval gebeurd!",
+      "Kunt u mij helpen? Er is iets aan de hand!",
+      "Ik bel voor een noodsituatie!",
+      "Er is hier iets heel ergs gebeurd!"
+    ];
+
+    const randomOpening = urgentOpenings[Math.floor(Math.random() * urgentOpenings.length)];
+
+    const callerMessage = {
+      id: Date.now(),
+      sender: currentConversation.callerInfo,
+      content: randomOpening,
+      timestamp: new Date().toLocaleTimeString("nl-NL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      type: "incoming",
+    };
+
+    setChatMessages([callerMessage]);
+  };
+
+  // Generate realistic 112 caller responses
+  const generate112Response = (question: string, conversationHistory: any[] = []) => {
+    const responses = {
+      "Wat is de exacte locatie?": [
+        "Eh... ik ben op de Coolsingel in Rotterdam, bij nummer 42",
+        "We zijn op de A20, richting Den Haag, ter hoogte van Vlaardingen",
+        "Thuis, dat is Laan op Zuid 150 in Rotterdam",
+        "Bij het winkelcentrum Zuidplein, aan de achterkant",
+        "Op de Markt in het centrum, bij de grote kerk",
+        "Ik weet het niet precies, maar het is in Rotterdam-Zuid"
+      ],
+      "Zijn er gewonden?": [
+        "Ja, er ligt iemand op de grond en die beweegt niet!",
+        "Ik zie bloed, maar ik durf niet te kijken",
+        "Ik denk het wel, iemand gilt van de pijn",
+        "Nee, volgens mij is iedereen oké",
+        "Er zit iemand in de auto en die reageert niet",
+        "Ik ben zelf gewond, mijn arm doet zeer"
+      ],
+      "Hoeveel personen zijn erbij betrokken?": [
+        "Twee auto's, dus misschien vier of vijf mensen",
+        "Ik zie drie personen hier",
+        "Alleen ik, voor zover ik weet",
+        "Een hele groep, misschien wel tien mensen",
+        "Twee personen die ruzie hebben",
+        "Ik kan het niet goed zien vanuit hier"
+      ],
+      "Is er een wapen gezien?": [
+        "Ja! Ik zag iemand met een mes!",
+        "Nee, volgens mij niet",
+        "Ik weet het niet, ik ben te bang om te kijken",
+        "Mogelijk, ik hoorde een harde knal",
+        "Ik denk dat ik een pistool zag",
+        "Nee, het was alleen met de vuisten"
+      ],
+      "Moeten er hulpdiensten komen?": [
+        "Ja, zeker! Kom zo snel mogelijk!",
+        "Een ambulance is echt nodig!",
+        "De brandweer ook, er is rook!",
+        "Ja, en de politie, het is heel gevaarlijk hier",
+        "Alles! Ambulance, politie en brandweer!",
+        "Ik weet het niet, maar het ziet er niet goed uit"
+      ]
+    };
+
+    const questionKey = Object.keys(responses).find(key => 
+      question.toLowerCase().includes(key.toLowerCase())
+    );
+
+    if (questionKey) {
+      const possibleResponses = responses[questionKey];
+      return possibleResponses[Math.floor(Math.random() * possibleResponses.length)];
+    }
+
+    // Default responses for other questions
+    const defaultResponses = [
+      "Ik ben heel bang, kunt u snel komen?",
+      "Het gaat niet goed hier!",
+      "Ik weet het niet precies...",
+      "Kunt u mij helpen? Ik weet niet wat ik moet doen!",
+      "Het gebeurde zo snel!",
+      "Ik durf niet dichter bij te komen"
+    ];
+
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+  };
+
   const sendMessageToColleague = (message: string) => {
     if (!currentConversation || !message.trim()) return;
 
@@ -753,18 +854,14 @@ export default function Dashboard() {
 
     setChatMessages((prev) => [...prev, userMessage]);
 
-    // Generate AI response after a short delay
-    setTimeout(
-      () => {
-        const aiResponse = generateColleagueResponse(
-          currentConversation,
-          message,
-          chatMessages,
-        );
+    // Handle 112 caller responses differently
+    if (currentConversation.type === "112-gesprek") {
+      setTimeout(() => {
+        const callerResponse = generate112Response(message, chatMessages);
         const responseMessage = {
           id: Date.now() + 1,
-          sender: currentConversation.functie,
-          content: aiResponse,
+          sender: currentConversation.callerInfo,
+          content: callerResponse,
           timestamp: new Date().toLocaleTimeString("nl-NL", {
             hour: "2-digit",
             minute: "2-digit",
@@ -772,9 +869,31 @@ export default function Dashboard() {
           type: "incoming",
         };
         setChatMessages((prev) => [...prev, responseMessage]);
-      },
-      1000 + Math.random() * 2000,
-    ); // Random delay between 1-3 seconds
+      }, 800 + Math.random() * 1500); // Quick response for 112 calls
+    } else {
+      // Generate AI response for colleague conversations
+      setTimeout(
+        () => {
+          const aiResponse = generateColleagueResponse(
+            currentConversation,
+            message,
+            chatMessages,
+          );
+          const responseMessage = {
+            id: Date.now() + 1,
+            sender: currentConversation.functie,
+            content: aiResponse,
+            timestamp: new Date().toLocaleTimeString("nl-NL", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            type: "incoming",
+          };
+          setChatMessages((prev) => [...prev, responseMessage]);
+        },
+        1000 + Math.random() * 2000,
+      ); // Random delay between 1-3 seconds
+    }
   };
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState({
@@ -6908,28 +7027,66 @@ export default function Dashboard() {
                   </div>
 
                   <div className="chat-container">
+                    {/* Standard Dispatch Questions for 112 calls */}
+                    {activeChatTab === "burgers" && currentConversation?.type === "112-gesprek" && (
+                      <div className="predefined-questions">
+                        <div className="questions-header">📋 Standaard Centralisten Vragen</div>
+                        <div className="question-buttons">
+                          <button 
+                            className="question-btn"
+                            onClick={() => sendMessageToColleague("Wat is de exacte locatie?")}
+                          >
+                            📍 Wat is de exacte locatie?
+                          </button>
+                          <button 
+                            className="question-btn"
+                            onClick={() => sendMessageToColleague("Zijn er gewonden?")}
+                          >
+                            🩹 Zijn er gewonden?
+                          </button>
+                          <button 
+                            className="question-btn"
+                            onClick={() => sendMessageToColleague("Hoeveel personen zijn erbij betrokken?")}
+                          >
+                            👥 Hoeveel personen zijn erbij betrokken?
+                          </button>
+                          <button 
+                            className="question-btn"
+                            onClick={() => sendMessageToColleague("Is er een wapen gezien?")}
+                          >
+                            ⚔️ Is er een wapen gezien?
+                          </button>
+                          <button 
+                            className="question-btn"
+                            onClick={() => sendMessageToColleague("Moeten er hulpdiensten komen?")}
+                          >
+                            🚨 Moeten er hulpdiensten komen?
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="chat-messages" id="chatMessages">
-                      {activeChatTab === "burgers" && (
-                        <>
-                          <div className="chat-message incoming">
-                            <div className="message-sender">
-                              Melder - 06-12345678
-                            </div>
-                            <div className="message-content">
-                              Er is een verkeersongeval op de A20 richting Den
-                              Haag, ter hoogte van afslag Vlaardingen.
-                            </div>
-                            <div className="message-time">14:23</div>
-                          </div>
-                          <div className="chat-message outgoing">
-                            <div className="message-sender">Meldkamer</div>
-                            <div className="message-content">
-                              Dank u voor de melding. Zijn er gewonden? En kunt
-                              u de exacte locatie bevestigen?
-                            </div>
-                            <div className="message-time">14:24</div>
-                          </div>
-                        </>
+                      {activeChatTab === "burgers" && currentConversation?.type === "112-gesprek" && (
+                        <div className="conversation-header">
+                          <strong>112-Gesprek: {currentConversation.callerInfo}</strong>
+                          <button 
+                            className="end-call-btn"
+                            onClick={() => {
+                              setCurrentConversation(null);
+                              setChatMessages([]);
+                              showNotificationMessage("112-gesprek beëindigd");
+                            }}
+                          >
+                            Gesprek Beëindigen
+                          </button>
+                        </div>
+                      )}
+
+                      {activeChatTab === "burgers" && !currentConversation && (
+                        <div className="no-conversation">
+                          <p>Geen actief 112-gesprek. Neem een inkomende oproep aan om te beginnen.</p>
+                        </div>
                       )}
 
                       {activeChatTab === "collega" && (
@@ -6993,20 +7150,25 @@ export default function Dashboard() {
                         type="text"
                         className="chat-input"
                         placeholder={
-                          activeChatTab === "collega" && currentConversation
+                          activeChatTab === "burgers" && currentConversation?.type === "112-gesprek"
+                            ? "Typ uw vraag aan de melder..."
+                            : activeChatTab === "collega" && currentConversation
                             ? `Bericht naar ${currentConversation.functie}...`
                             : "Typ uw bericht..."
                         }
                         id="chatInput"
+                        disabled={activeChatTab === "burgers" && !currentConversation}
                         onKeyPress={(e) => {
                           if (e.key === "Enter") {
                             const input = e.target as HTMLInputElement;
-                            if (
-                              activeChatTab === "collega" &&
-                              input.value.trim()
-                            ) {
-                              sendMessageToColleague(input.value);
-                              input.value = "";
+                            if (input.value.trim()) {
+                              if (
+                                (activeChatTab === "burgers" && currentConversation?.type === "112-gesprek") ||
+                                (activeChatTab === "collega" && currentConversation)
+                              ) {
+                                sendMessageToColleague(input.value);
+                                input.value = "";
+                              }
                             }
                           }
                         }}
@@ -7014,16 +7176,19 @@ export default function Dashboard() {
                       <button
                         className="chat-send-btn"
                         id="chatSendBtn"
+                        disabled={activeChatTab === "burgers" && !currentConversation}
                         onClick={() => {
                           const input = document.getElementById(
                             "chatInput",
                           ) as HTMLInputElement;
-                          if (
-                            activeChatTab === "collega" &&
-                            input?.value.trim()
-                          ) {
-                            sendMessageToColleague(input.value);
-                            input.value = "";
+                          if (input?.value.trim()) {
+                            if (
+                              (activeChatTab === "burgers" && currentConversation?.type === "112-gesprek") ||
+                              (activeChatTab === "collega" && currentConversation)
+                            ) {
+                              sendMessageToColleague(input.value);
+                              input.value = "";
+                            }
                           }
                         }}
                       >
