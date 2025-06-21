@@ -835,7 +835,7 @@ export default function Dashboard() {
     console.log("🎭 simulateCallerMessage called but scenario already generated");
   };
 
-  // Generate realistic 112 caller responses
+  // Generate realistic 112 caller responses with enhanced Dutch emergency protocol
   const generate112Response = (operatorMessage: string, conversationHistory: any[] = []) => {
     const message = operatorMessage.toLowerCase();
     
@@ -845,23 +845,18 @@ export default function Dashboard() {
     const gemeente = currentConversation?.gemeente;
     const scenarioResponses = currentConversation?.scenarioResponses;
     
+    console.log("🤖 AI Response Context - Scenario:", scenarioType, "Address:", address, "Gemeente:", gemeente);
+    
     // Context-aware responses based on scenario and operator question
     if (message.includes("locatie") || message.includes("waar") || message.includes("adres")) {
-      console.log("📍 Location question - address:", address, "gemeente:", gemeente);
       if (scenarioResponses?.locatie) {
         if (typeof scenarioResponses.locatie === 'function') {
-          const response = scenarioResponses.locatie(address, gemeente);
-          console.log("📍 Function response:", response);
-          return response;
+          return scenarioResponses.locatie(address, gemeente);
         } else if (Array.isArray(scenarioResponses.locatie)) {
-          const response = scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
-          console.log("📍 Array response:", response);
-          return response;
+          return scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
         }
       }
-      const fallbackResponse = address && gemeente ? `${address} in ${gemeente}, precies voor het gebouw` : "Coolsingel 125 in Rotterdam, voor het gebouw";
-      console.log("📍 Fallback response:", fallbackResponse);
-      return fallbackResponse;
+      return address && gemeente ? `${address} in ${gemeente}, ter hoogte van de ingang` : "Bergweg 89 in Rotterdam, bij de bushalte";
     }
     
     if (message.includes("gewond") || message.includes("slachtoffer") || message.includes("letsel")) {
@@ -924,14 +919,13 @@ export default function Dashboard() {
     }
     
     if (message.includes("naam") || message.includes("telefoonnummer") || message.includes("gegevens")) {
-      const identityResponses = [
-        `Mijn naam is Sandra de Vries, telefoonnummer ${currentConversation?.callerInfo}`,
-        `Ik ben Mark Jansen, mijn nummer is ${currentConversation?.callerInfo}`,
-        `Linda van der Berg, ${currentConversation?.callerInfo}`,
-        `Peter Willems, telefoonnummer ${currentConversation?.callerInfo}`,
-        `Fatima el Bakri, mijn nummer is ${currentConversation?.callerInfo}`
+      const dutchNames = [
+        "Sandra de Vries", "Mark Jansen", "Linda van der Berg", "Peter Willems", 
+        "Fatima el Bakri", "Ahmed Hassan", "Marieke Visser", "Tom van Dijk",
+        "Nadia Oussama", "Dennis Bakker", "Yasmin Özdemir", "Jan Koster"
       ];
-      return identityResponses[Math.floor(Math.random() * identityResponses.length)];
+      const selectedName = dutchNames[Math.floor(Math.random() * dutchNames.length)];
+      return `Mijn naam is ${selectedName}, telefoonnummer ${currentConversation?.callerInfo}`;
     }
     
     // Scenario-specific responses for current situation
