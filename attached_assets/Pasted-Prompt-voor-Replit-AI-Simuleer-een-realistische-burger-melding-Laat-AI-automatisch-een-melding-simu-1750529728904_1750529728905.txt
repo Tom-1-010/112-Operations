@@ -1,0 +1,115 @@
+Prompt voor Replit AI: Simuleer een realistische burger-melding
+Laat AI automatisch een melding simuleren op basis van de reeds geïmporteerde meldingclassificaties en hun definities.
+
+❗ Belangrijk:
+
+De uiteindelijke melding mag niet de naam van de meldingclassificatie bevatten in de tekst.
+
+Voeg automatisch een willekeurig adres toe (straat + huisnummer) via de BAG API, met locatie in een van de volgende gemeenten:
+
+Albrandswaard, Barendrecht, Capelle aan den IJssel, Goeree-Overflakkee, Krimpen aan den IJssel, Lansingerland, Maassluis, Nissewaard, Ridderkerk, Rotterdam, Schiedam, Voorne aan Zee, Vlaardingen.
+
+Formuleer de locatie realistisch, bijv.:
+
+“Ik sta op de [straat] ter hoogte van nummer [huisnummer]…”
+
+“Het is op de hoek van [straatnaam] en [kruising] in [gemeente]…”
+
+📞 Meldinggesprekstructuur
+Gebruik deze gespreksopbouw:
+
+Locatievermelding
+
+Ik sta op de [straatnaam] ter hoogte van huisnummer [huisnummer] in [gemeente].
+
+Of: bij het winkelcentrum, bushalte, flat etc.
+
+Omschrijving incident (zonder MC-term)
+
+Er is net iemand neergestoken, er ligt iemand op straat.
+
+Er is een grote vechtpartij aan de gang, mensen slaan elkaar.
+
+Een auto rijdt met hoge snelheid en botst tegen een boom.
+
+Automatische vervolgvragen door meldkamer-AI
+
+Zijn er gewonden?
+
+Kent u het kenteken?
+
+Kunt u de dader beschrijven? Wat draagt hij/zij?
+
+Welke kant is de persoon op gevlucht?
+
+Wat is het geslacht, huidskleur, kleding, leeftijdsindicatie?
+
+🧪 Voorbeeld melding (door AI gegenereerd)
+text
+Kopiëren
+Bewerken
+Melder:
+“Hallo, ik sta op de Mariniersweg ter hoogte van nummer 66 in Rotterdam. Iemand is zojuist uit een auto gestapt en heeft een ander persoon meerdere keren geslagen. De persoon ligt nu op de grond. Het gebeurde echt heel snel.”
+
+Meldkamer:
+“Begrijp ik goed dat er mogelijk iemand gewond is geraakt?”
+
+Melder:
+“Ja, hij beweegt niet veel meer…”
+
+Meldkamer:
+“Kunt u de dader beschrijven? Wat draagt hij?”
+
+Melder:
+“Hij had een zwarte jas aan met een capuchon en een blauwe spijkerbroek. Hij liep richting de Hoogstraat.”
+
+Meldkamer:
+“Is er een kenteken van het voertuig bekend?”
+
+Melder:
+“Ja, het was een grijze Volkswagen Golf, kenteken begint met 45-X.”
+
+🧰 Voorbeeld Replit-scriptopzet (JS/Python pseudocode)
+python
+Kopiëren
+Bewerken
+# Vereist: BAG API + meldingclassificaties geladen
+
+# Stap 1: Kies willekeurige meldingclassificatie (zonder tekstnaam)
+chosen_classification = random.choice(classificaties)
+
+# Stap 2: Genereer een willekeurig BAG-adres binnen gemeenten
+adres = bag_api.get_random_address(gemeentes=[
+    "Rotterdam", "Schiedam", "Maassluis", "Barendrecht", ...
+])
+
+# Stap 3: Laat AI melding genereren
+melding = ai.generate_message({
+    "type": "burger-melding",
+    "adres": adres,
+    "incident_type": chosen_classification['omschrijving'],
+    "exclusief_mc_naam": True
+})
+
+# Stap 4: Interactieve meldkamervragen (AI)
+vragen = [
+    "Zijn er gewonden?",
+    "Kunt u het kenteken noemen?",
+    "Kunt u de dader beschrijven?",
+    "Welke kant is hij op gevlucht?",
+    "Wat is er precies gebeurd?"
+]
+
+for vraag in vragen:
+    response = ai.simulate_response(vraag)
+    log_chat(vraag, response)
+✅ Resultaat
+Je krijgt:
+
+Een realistisch telefoongesprek met burger over een incident
+
+Geautomatiseerd gegenereerde locatie uit een geldige BAG-adres
+
+Een interactief verloop tussen melder en meldkamer
+
+Toepasbaar voor je meldkamersimulatie of GMS-dashboard
