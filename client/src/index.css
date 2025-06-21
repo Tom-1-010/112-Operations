@@ -1668,6 +1668,11 @@ body {
 .emergency-btn.weapons { background: #f8d7da; border-color: #dc3545; }
 .emergency-btn.services { background: #cce5ff; border-color: #007bff; }
 .emergency-btn.identity { background: #e2e3e5; border-color: #6c757d; }
+.emergency-btn.direction { background: #ffeaa7; border-color: #fdcb6e; }
+.emergency-btn.vehicle { background: #74b9ff; border-color: #0984e3; color: white; }
+.emergency-btn.safety { background: #fd79a8; border-color: #e84393; color: white; }
+.emergency-btn.witness { background: #a29bfe; border-color: #6c5ce7; color: white; }
+.emergency-btn.details { background: #fd79a8; border-color: #e84393; color: white; }
 .emergency-btn.calm { background: #d1ecf1; border-color: #17a2b8; }
 .emergency-btn.condition { background: #fff3cd; border-color: #ffc107; }
 
