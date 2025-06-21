@@ -562,7 +562,10 @@ export default function Dashboard() {
 
   const startConversationWithContact = (contact: any) => {
     // This function is specifically for colleague conversations only
-    setActiveChatTab("collega");
+    // Only switch to collega tab if we're not in an active 112 call
+    if (currentConversation?.type !== "112-gesprek") {
+      setActiveChatTab("collega");
+    }
     
     // Clear any existing messages and set new colleague conversation
     setChatMessages([]);
@@ -676,28 +679,31 @@ export default function Dashboard() {
       return newTimers;
     });
 
-    // ALWAYS switch to burgers tab for 112 conversations
+    // Clear any existing conversation and messages first
+    setChatMessages([]);
+    setCurrentConversation(null);
+    
+    // Force switch to burgers tab for 112 conversations
     setActiveChatTab("burgers");
     
-    // Clear any existing conversation and messages
-    setChatMessages([]);
-    
     // Set current conversation data specifically for 112 calls
-    setCurrentConversation({
-      id: callId,
-      type: "112-gesprek",
-      callerInfo: call.phoneNumber,
-      priority: call.priority,
-      startTime: Date.now(),
-      isEmergencyCall: true
-    });
-
-    showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
-    
-    // Simulate caller starting the conversation after short delay
     setTimeout(() => {
-      simulateCallerMessage();
-    }, 1500);
+      setCurrentConversation({
+        id: callId,
+        type: "112-gesprek",
+        callerInfo: call.phoneNumber,
+        priority: call.priority,
+        startTime: Date.now(),
+        isEmergencyCall: true
+      });
+
+      showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
+      
+      // Simulate caller starting the conversation
+      setTimeout(() => {
+        simulateCallerMessage();
+      }, 1000);
+    }, 100);
   };
 
   const declineCall = (callId: number) => {
