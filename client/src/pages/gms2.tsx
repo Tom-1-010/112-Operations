@@ -1097,22 +1097,73 @@ export default function GMS2() {
     let matchingKarakteristiek = null;
     let finalValue = value;
 
-    // Step 1: Handle "aantal [type] [getal]" patterns specifically
+    // Step 1: Try exact code match first (most reliable)
+    if (code && code !== 'aantal') {
+      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+        k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
+      );
+      if (matchingKarakteristiek) {
+        console.log(`✅ Found exact code match: "${code}" -> "${matchingKarakteristiek.ktNaam}"`);
+        return { matchingKarakteristiek, finalValue };
+      }
+    }
+
+    // Step 2: Handle "aantal [type] [number]" patterns specifically
     if (code === 'aantal') {
       const aantalMatch = fullInput.match(/aantal\s+(\w+)\s+(\d+)/);
       if (aantalMatch) {
         const [, type, number] = aantalMatch;
         finalValue = number; // Extract the number
 
+        // More comprehensive mapping with exact matches
         const typeToCodeMap = {
+          'verdachten': 'ddrs',  // Fix: verdachten -> daders
+          'daders': 'ddrs',
+          'dader': 'ddrs',
           'doden': 'dd',
           'dood': 'dd',
           'gewonden': 'gew',
           'gewond': 'gew',
           'aanhoudingen': 'aanh',
           'aanhouding': 'aanh',
+          'personen': 'pers',
+          'persoon': 'pers',
+          'vermisten': 'verm',
+          'vermist': 'verm',
+          'water': 'tewt',
+          'zelfredz': 'nzrz',
+          'object': 'iobj',
+          'dieren': 'dier'
+        };
+
+        const targetCode = typeToCodeMap[type];
+        if (targetCode) {
+          matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+            k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
+          );
+          if (matchingKarakteristiek) {
+            console.log(`✅ Found "aantal [type] [number]" match: "${type}" -> "${targetCode}" with value "${finalValue}"`);
+            return { matchingKarakteristiek, finalValue };
+          }
+        }
+      }
+
+      // Handle "aantal [type]" without number
+      const aantalSimpleMatch = fullInput.match(/aantal\s+(\w+)$/);
+      if (aantalSimpleMatch) {
+        const [, type] = aantalSimpleMatch;
+        finalValue = '1'; // Default to 1 if no number specified
+
+        const typeToCodeMap = {
+          'verdachten': 'ddrs',  // Fix: verdachten -> daders  
           'daders': 'ddrs',
           'dader': 'ddrs',
+          'doden': 'dd',
+          'dood': 'dd',
+          'gewonden': 'gew',
+          'gewond': 'gew',
+          'aanhoudingen': 'aanh',
+          'aanhouding': 'aanh',
           'personen': 'pers',
           'persoon': 'pers',
           'vermisten': 'verm',
@@ -1125,139 +1176,79 @@ export default function GMS2() {
             k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
           );
           if (matchingKarakteristiek) {
-            console.log(`✅ Found "aantal [type] [number]" match: "${type}" -> "${targetCode}" with value "${finalValue}"`);
+            console.log(`✅ Found "aantal [type]" match: "${type}" -> "${targetCode}" with default value "${finalValue}"`);
+            return { matchingKarakteristiek, finalValue };
           }
         }
       }
     }
 
-    // Step 2: Try exact specific patterns (if not already matched)
-    if (!matchingKarakteristiek) {
-      const specificPatterns = {
-        'aantal doden': 'dd',
-        'aantal gewonden': 'gew', 
-        'aantal aanhoudingen': 'aanh',
-        'aantal daders': 'ddrs',
-        'aantal personen': 'pers',
-        'aantal vermisten': 'verm',
-        'aantal te water': 'tewt',
-        'aantal niet zelfredz': 'nzrz',
-        'aantal in object': 'iobj',
-        'aantal dieren': 'dier',
-        'overval diefstal': 'ovdp',
-        'ovdp': 'ovdp',
-        'afkruisen': 'afkr',
-        'afkr': 'afkr'
-      };
+    // Step 3: Try exact specific patterns
+    const specificPatterns = {
+      'overval diefstal': 'ovdp',
+      'ovdp': 'ovdp',
+      'afkruisen': 'afkr',
+      'afkr': 'afkr'
+    };
 
-      // Check for specific exact matches
-      for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
-        if (fullInput.includes(pattern)) {
-          matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-            k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
-          );
-          if (matchingKarakteristiek) {
-            console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
-            break;
-          }
-        }
-      }
-    }
-
-    // Step 3: Try exact code match (most reliable)
-    if (!matchingKarakteristiek) {
-      matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-        k.ktCode && k.ktCode.toLowerCase() === code.toLowerCase()
-      );
-      if (matchingKarakteristiek) {
-        console.log(`✅ Found exact code match: "${code}" -> "${matchingKarakteristiek.ktNaam}"`);
-      }
-    }
-
-    // Step 4: Try value-based matching for "aantal" + specific word (fallback)
-    if (!matchingKarakteristiek && code === 'aantal' && value) {
-      const valueWords = value.toLowerCase().split(/\s+/);
-      const firstValueWord = valueWords[0];
-
-      // Map value words to expected codes
-      const valueToCodeMap = {
-        'doden': 'dd',
-        'dood': 'dd',
-        'gewonden': 'gew',
-        'gewond': 'gew',
-        'aanhoudingen': 'aanh',
-        'aanhouding': 'aanh',
-        'daders': 'ddrs',
-        'dader': 'ddrs',
-        'personen': 'pers',
-        'persoon': 'pers',
-        'vermisten': 'verm',
-        'vermist': 'verm'
-      };
-
-      const expectedCode = valueToCodeMap[firstValueWord];
-      if (expectedCode) {
+    // Check for specific exact matches
+    for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
+      if (fullInput === pattern || fullInput.startsWith(pattern + ' ')) {
         matchingKarakteristiek = karakteristiekenDatabase.find(k => 
           k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
         );
         if (matchingKarakteristiek) {
-          console.log(`✅ Found value-based match: "aantal ${firstValueWord}" -> "${expectedCode}"`);
-          // Extract number from remaining words for value
-          const numberMatch = value.match(/\d+/);
-          if (numberMatch) {
-            finalValue = numberMatch[0];
-          }
+          console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
+          return { matchingKarakteristiek, finalValue };
         }
       }
     }
 
-    // Step 5: Enhanced fuzzy matching by name content (improved scoring)
-    if (!matchingKarakteristiek) {
-      const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
+    // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
+    const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
 
-      let bestMatch = null;
-      let bestScore = 0;
+    let bestMatch = null;
+    let bestScore = 0;
 
-      for (const k of karakteristiekenDatabase) {
-        const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
-        const fullName = (k.ktNaam || '').toLowerCase();
+    for (const k of karakteristiekenDatabase) {
+      const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
+      const fullName = (k.ktNaam || '').toLowerCase();
 
-        let score = 0;
+      let score = 0;
 
-        // Check for full phrase match in name
-        if (fullName.includes(fullInput)) {
-          score += 15; // High score for full phrase match
-        }
+      // Check for full phrase match in name
+      if (fullName.includes(fullInput)) {
+        score += 20; // Higher score for full phrase match
+      }
 
-        // Check individual word matches
-        for (const inputWord of inputWords) {
-          for (const nameWord of nameWords) {
-            if (inputWord === nameWord) {
-              score += 8; // Exact word match
-            } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
-              score += 4; // Partial match
-            } else if (inputWord.includes(nameWord) && nameWord.length > 3) {
-              score += 3; // Reverse partial match
-            }
+      // Check individual word matches (more strict)
+      let exactMatches = 0;
+      for (const inputWord of inputWords) {
+        for (const nameWord of nameWords) {
+          if (inputWord === nameWord) {
+            score += 10; // Higher score for exact word match
+            exactMatches++;
+          } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
+            score += 3; // Lower score for partial match
           }
-
-          // Bonus for matching against the full name
-          if (fullName.includes(inputWord) && inputWord.length > 3) {
-            score += 2;
-          }
-        }
-
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = k;
         }
       }
 
-      // Use match if we have a strong enough score
-      if (bestScore >= 8) {
-        matchingKarakteristiek = bestMatch;
-        console.log(`✅ Found fuzzy match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}" for input "${fullInput}"`);
+      // Require at least one exact word match for fuzzy matching
+      if (exactMatches === 0) {
+        score = 0;
       }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = k;
+      }
+    }
+
+    // Use match only if we have a very strong score
+    if (bestScore >= 15) {
+      matchingKarakteristiek = bestMatch;
+      console.log(`✅ Found fuzzy match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}" for input "${fullInput}"`);
     }
 
     if (!matchingKarakteristiek) {
