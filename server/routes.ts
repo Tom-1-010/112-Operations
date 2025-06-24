@@ -281,9 +281,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Karakteristieken endpoints
   app.get("/api/karakteristieken", async (req, res) => {
     try {
-      console.log('🔍 Fetching karakteristieken from database...');
+      console.log('Fetching karakteristieken from database...');
       const allKarakteristieken = await db.select().from(karakteristieken);
-      console.log(`📊 Found ${allKarakteristieken.length} karakteristieken in database`);
+      console.log(`Found ${allKarakteristieken.length} karakteristieken in database`);
 
       // Transform to match expected format
       const formattedKarakteristieken = allKarakteristieken.map(k => ({
@@ -294,10 +294,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ktParser: k.kt_paser // Note: keeping original column name mapping
       }));
 
-      console.log(`✅ Returning ${formattedKarakteristieken.length} formatted karakteristieken`);
+      console.log(`Returning ${formattedKarakteristieken.length} formatted karakteristieken`);
       res.json(formattedKarakteristieken);
     } catch (error) {
-      console.error("❌ Error fetching karakteristieken:", error);
+      console.error("Error fetching karakteristieken:", error);
       res.status(500).json({ error: "Failed to fetch karakteristieken" });
     }
   });
@@ -328,7 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fs = await import('fs');
       const path = await import('path');
 
-      console.log('🔄 Starting karakteristieken import via GET API...');
+      console.log('Starting karakteristieken import via GET API...');
 
       // Use the newest complete karakteristieken file
       const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_volledig_1750370790422.json');

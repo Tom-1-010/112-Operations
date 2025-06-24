@@ -1456,7 +1456,6 @@ export default function GMS2() {
           };
           console.log(`Form data updated for ${incidentContext}:`, updated);
           return updated;
-        ```javascript
         });
 
         // Only update selected incident if one exists (editing mode)
@@ -1985,7 +1984,7 @@ export default function GMS2() {
 
         // Test: show sample data
         if (data.length > 0) {
-          console.log('📋 Sample karakteristiek:', {
+          console.log('Sample karakteristiek:', {
             naam: data[0].ktNaam,
             type: data[0].ktType,
             waarde: data[0].ktWaarde,
@@ -2047,7 +2046,7 @@ export default function GMS2() {
 
     console.log(`Found ${matches.length} matches for "${searchText}"`);
     if (matches.length > 0) {
-      console.log('📋 First few matches:', matches.slice(0, 3).map(m => m.ktParser));
+      console.log('First few matches:', matches.slice(0, 3).map(m => m.ktParser));
     }
     return matches;
   };
@@ -2376,7 +2375,7 @@ export default function GMS2() {
                             setBagSearchQuery(query);
 
                             if (query.length >= 2) {
-                              console.log(`🔍 Manual search for: "${query}"`);
+                              console.log(`Manual search for: "${query}"`);
                               const results = await searchBAGAddress(query);
                               setBagSearchResults(results);
                             } else {
@@ -2412,9 +2411,9 @@ export default function GMS2() {
                                 if (fallbackResults.length > 0) {
                                   const result = fallbackResults[0];
                                   setFormData(prev => ({ ...prev, postcode: result.postcode }));
-                                  addLoggingEntry(`📍 Postcode automatisch ingevuld: ${result.postcode}`);
+                                  addLoggingEntry(`Postcode automatisch ingevuld: ${result.postcode}`);
                                 } else {
-                                  addLoggingEntry(`❌ Geen adres gevonden voor: "${bagSearchQuery}"`);
+                                  addLoggingEntry(`Geen adres gevonden voor: "${bagSearchQuery}"`);
                                 }
                               }
                             }
