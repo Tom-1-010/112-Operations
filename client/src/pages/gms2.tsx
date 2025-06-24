@@ -1590,7 +1590,7 @@ export default function GMS2() {
       return;
     }
 
-    console.log(`🔧 Applying classification: ${mc1} > ${mc2} > ${mc3} (code: ${detectedCode})`);
+    console.log(`Applying classification: ${mc1} > ${mc2} > ${mc3} (code: ${detectedCode})`);
 
     // Step 1: Validate and find exact match in classifications
     const exactMatch = lmcClassifications.find(c => 
@@ -1733,12 +1733,12 @@ export default function GMS2() {
 
         // Log karakteristieken processing to console only
         if (karakteristiekProcessed) {
-          console.log(`✅ Karakteristieken successfully processed for: "${message}"`);
+          console.log(`Karakteristieken successfully processed for: "${message}"`);
         }
 
         // Add feedback for shortcode detection
         if (shortcodeDetected && !karakteristiekProcessed) {
-          console.log(`✅ Shortcode successfully processed for: "${message}"`);
+          console.log(`Shortcode successfully processed for: "${message}"`);
         }
 
         // If nothing was processed, log it
@@ -1770,7 +1770,7 @@ export default function GMS2() {
       const searchQuery = newText.substring(1);
 
       if (searchQuery.length >= 2) {
-        console.log(`🔍 Real-time BAG search for: "${searchQuery}"`);
+        console.log(`Real-time BAG search for: "${searchQuery}"`);
 
         // Update the search input and trigger search
         setBagSearchQuery(searchQuery);
@@ -1802,7 +1802,7 @@ export default function GMS2() {
     const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
     if (!mc1Select || !mc2Select || !mc3Select) {
-      console.warn('❌ MC dropdowns not found in DOM');
+      console.warn('MC dropdowns not found in DOM');
       return;
     }
 
@@ -1954,7 +1954,7 @@ export default function GMS2() {
       }, 100);
     }
 
-    console.log(`✅ LMC dropdowns initialized for ${context} - ready for shortcodes`);
+    console.log(`LMC dropdowns initialized for ${context} - ready for shortcodes`);
   };
 
   // Helper function to update priority from classification
@@ -1975,13 +1975,13 @@ export default function GMS2() {
   useEffect(() => {
     const loadKarakteristieken = async () => {
       try {
-        console.log('🔄 Loading karakteristieken...');
+        console.log('Loading karakteristieken...');
         const response = await fetch('/api/karakteristieken');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(`📊 Loaded ${data.length} karakteristieken`);
+        console.log(`Loaded ${data.length} karakteristieken`);
 
         // Test: show sample data
         if (data.length > 0) {
@@ -1994,15 +1994,15 @@ export default function GMS2() {
 
           // Test: look for common patterns
           const inzetPatterns = data.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('inzet'));
-          console.log(`🔍 Found ${inzetPatterns.length} 'inzet' patterns`);
+          console.log(`Found ${inzetPatterns.length} 'inzet' patterns`);
 
           const polPatterns = data.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('pol'));
-          console.log(`🔍 Found ${polPatterns.length} 'pol' patterns`);
+          console.log(`Found ${polPatterns.length} 'pol' patterns`);
         }
 
         setKarakteristiekenDb(data);
       } catch (error) {
-        console.error('❌ Error loading karakteristieken:', error);
+        console.error('Error loading karakteristieken:', error);
       }
     };
 
@@ -2012,12 +2012,12 @@ export default function GMS2() {
   // Function to find matching karakteristieken for input text
   const findMatchingKarakteristieken = (inputText: string) => {
     if (!inputText || !karakteristiekenDb.length) {
-      console.log("❌ No input text or karakteristieken database");
+      console.log("No input text or karakteristieken database");
       return [];
     }
 
     const searchText = inputText.toLowerCase().trim();
-    console.log(`🔍 Searching for: "${searchText}" in ${karakteristiekenDb.length} karakteristieken`);
+    console.log(`Searching for: "${searchText}" in ${karakteristiekenDb.length} karakteristieken`);
 
     const matches = karakteristiekenDb.filter(k => {
       if (!k.ktParser) return false;
@@ -2045,7 +2045,7 @@ export default function GMS2() {
       return hasWordMatch;
     });
 
-    console.log(`✅ Found ${matches.length} matches for "${searchText}"`);
+    console.log(`Found ${matches.length} matches for "${searchText}"`);
     if (matches.length > 0) {
       console.log('📋 First few matches:', matches.slice(0, 3).map(m => m.ktParser));
     }
