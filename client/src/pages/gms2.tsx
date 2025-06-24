@@ -2525,7 +2525,7 @@ export default function GMS2() {
                 return (
                   <div 
                     key={incident.id} 
-                    className={`gms2-table-row ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
+                    className={`gms2-table-row priority-${incident.prio} ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
                     onClick={() => handleIncidentSelect(incident)}
                   >
                     <span>{incident.prio}</span>
