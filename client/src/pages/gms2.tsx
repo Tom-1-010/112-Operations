@@ -2629,3 +2629,4 @@ export default function GMS2() {
     </div>
   );
 }
+}
