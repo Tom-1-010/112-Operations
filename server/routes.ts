@@ -381,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error) {
-      console.error('❌ Error importing karakteristieken:', error);
+      console.error('Error importing karakteristieken:', error);
       res.status(500).json({ error: 'Failed to import karakteristieken' });
     }
   });
@@ -391,7 +391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fs = await import('fs');
       const path = await import('path');
 
-      console.log('🔄 Starting karakteristieken import via POST API...');
+      console.log('Starting karakteristieken import via POST API...');
 
       // Use the newest complete karakteristieken file
       const filePath = path.join(process.cwd(), 'attached_assets', 'karakteristieken_volledig_1750370790422.json');
@@ -430,12 +430,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const batch = transformedData.slice(i, i + batchSize);
         await db.insert(karakteristieken).values(batch);
         imported += batch.length;
-        console.log(`📥 Imported ${imported}/${transformedData.length} karakteristieken`);
+        console.log(`Imported ${imported}/${transformedData.length} karakteristieken`);
       }
 
       // Verify import
       const count = await db.select().from(karakteristieken);
-      console.log(`✅ Successfully imported ${count.length} karakteristieken to database`);
+      console.log(`Successfully imported ${count.length} karakteristieken to database`);
 
       res.json({ 
         success: true, 
@@ -444,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error) {
-      console.error('❌ Error importing karakteristieken:', error);
+      console.error('Error importing karakteristieken:', error);
       res.status(500).json({ error: 'Failed to import karakteristieken' });
     }
   });
