@@ -1142,11 +1142,11 @@ export default function GMS2() {
         if (!k.ktParser) return false;
         const parser = k.ktParser.toLowerCase().trim();
         const searchInput = `-${fullInput}`.toLowerCase().trim();
-        
+
         // Check if the search input matches the parser pattern closely
         const parserWords = parser.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
         const inputWords = searchInput.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
-        
+
         // Count matching words
         let matchCount = 0;
         for (const inputWord of inputWords) {
@@ -1157,25 +1157,25 @@ export default function GMS2() {
             }
           }
         }
-        
+
         // Require at least 80% word match
         const matchRatio = matchCount / Math.max(inputWords.length, parserWords.length);
         return matchRatio >= 0.8;
       });
-      
+
       if (partialMatches.length > 0) {
         // Sort by best match (most matching words)
         partialMatches.sort((a, b) => {
           const aParser = a.ktParser.toLowerCase();
           const bParser = b.ktParser.toLowerCase();
           const searchInput = `-${fullInput}`.toLowerCase();
-          
+
           const aScore = aParser.split(' ').filter(word => searchInput.includes(word)).length;
           const bScore = bParser.split(' ').filter(word => searchInput.includes(word)).length;
-          
+
           return bScore - aScore;
         });
-        
+
         foundKarakteristiek = partialMatches[0];
         console.log(`✅ Found partial parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
         finalValue = foundKarakteristiek.ktWaarde || value;
@@ -1274,7 +1274,7 @@ export default function GMS2() {
     // Step 6: Enhanced fuzzy matching by name content with improved precision
     if (!foundKarakteristiek) {
       const searchWords = fullInput.toLowerCase().split(' ').filter(w => w.length > 2);
-      
+
       const fuzzyMatches = karakteristiekenDatabase.filter(k => {
         const name = k.ktNaam?.toLowerCase() || '';
         const ktCode = k.ktCode?.toLowerCase() || '';
@@ -1303,7 +1303,7 @@ export default function GMS2() {
         }
 
         const totalScore = exactWordMatches + partialWordMatches;
-        
+
         // Require higher threshold and prioritize exact word matches
         return totalScore >= 4 && exactWordMatches >= 2;
       });
@@ -1314,24 +1314,24 @@ export default function GMS2() {
           const aName = a.ktNaam?.toLowerCase() || '';
           const bName = b.ktNaam?.toLowerCase() || '';
           const searchLower = fullInput.toLowerCase();
-          
+
           // Calculate exact word match scores
           const aWords = aName.split(' ').filter(w => w.length > 2);
           const bWords = bName.split(' ').filter(w => w.length > 2);
-          
+
           let aExactMatches = 0;
           let bExactMatches = 0;
-          
+
           for (const searchWord of searchWords) {
             if (aWords.includes(searchWord)) aExactMatches++;
             if (bWords.includes(searchWord)) bExactMatches++;
           }
-          
+
           // First priority: more exact word matches
           if (aExactMatches !== bExactMatches) {
             return bExactMatches - aExactMatches;
           }
-          
+
           // Second priority: shorter names (more specific)
           return aName.length - bName.length;
         });
@@ -1456,6 +1456,7 @@ export default function GMS2() {
           };
           console.log(`👤 Form data updated for ${incidentContext}:`, updated);
           return updated;
+        ```javascript
         });
 
         // Only update selected incident if one exists (editing mode)
@@ -1967,6 +1968,88 @@ export default function GMS2() {
     if (matchingClassification) {
       setPriorityValue(matchingClassification.PRIO);
     }
+  };
+
+  //Karakteristieken database
+  const [karakteristiekenDb, setKarakteristiekenDb] = useState<any[]>([]);
+  useEffect(() => {
+    const loadKarakteristieken = async () => {
+      try {
+        console.log('🔄 Loading karakteristieken...');
+        const response = await fetch('/api/karakteristieken');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(`📊 Loaded ${data.length} karakteristieken`);
+
+        // Test: show sample data
+        if (data.length > 0) {
+          console.log('📋 Sample karakteristiek:', {
+            naam: data[0].ktNaam,
+            type: data[0].ktType,
+            waarde: data[0].ktWaarde,
+            parser: data[0].ktParser
+          });
+
+          // Test: look for common patterns
+          const inzetPatterns = data.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('inzet'));
+          console.log(`🔍 Found ${inzetPatterns.length} 'inzet' patterns`);
+
+          const polPatterns = data.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('pol'));
+          console.log(`🔍 Found ${polPatterns.length} 'pol' patterns`);
+        }
+
+        setKarakteristiekenDb(data);
+      } catch (error) {
+        console.error('❌ Error loading karakteristieken:', error);
+      }
+    };
+
+    loadKarakteristieken();
+  }, []);
+
+  // Function to find matching karakteristieken for input text
+  const findMatchingKarakteristieken = (inputText: string) => {
+    if (!inputText || !karakteristiekenDb.length) {
+      console.log("❌ No input text or karakteristieken database");
+      return [];
+    }
+
+    const searchText = inputText.toLowerCase().trim();
+    console.log(`🔍 Searching for: "${searchText}" in ${karakteristiekenDb.length} karakteristieken`);
+
+    const matches = karakteristiekenDb.filter(k => {
+      if (!k.ktParser) return false;
+
+      const parser = k.ktParser.toLowerCase();
+      // Remove leading dash if present
+      const cleanParser = parser.startsWith('-') ? parser.substring(1).trim() : parser.trim();
+
+      // More flexible matching - check if any word in the search matches any word in the parser
+      const searchWords = searchText.split(/\s+/);
+      const parserWords = cleanParser.split(/\s+/);
+
+      // Check for exact phrase match first
+      if (cleanParser.includes(searchText) || searchText.includes(cleanParser)) {
+        return true;
+      }
+
+      // Check for word matches
+      const hasWordMatch = searchWords.some(searchWord => 
+        parserWords.some(parserWord => 
+          parserWord.includes(searchWord) || searchWord.includes(parserWord)
+        )
+      );
+
+      return hasWordMatch;
+    });
+
+    console.log(`✅ Found ${matches.length} matches for "${searchText}"`);
+    if (matches.length > 0) {
+      console.log('📋 First few matches:', matches.slice(0, 3).map(m => m.ktParser));
+    }
+    return matches;
   };
 
   return (
