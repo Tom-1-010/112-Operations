@@ -1187,8 +1187,8 @@ export default function GMS2() {
               'gewond': 'gew',
               'aanhoudingen': 'aanh',
               'aanhouding': 'aanh',
-              'personen': 'persoon',
-              'persoon': 'persoon',
+              'personen': 'pers',
+              'persoon': 'pers',
               'vermisten': 'verm',
               'vermist': 'verm'
             };
@@ -1481,7 +1481,9 @@ export default function GMS2() {
           };
           setSelectedIncident(updatedIncident);
           console.log(`🏢 Existing incident updated: ${selectedIncident.nr}`);
-                return true;
+        }
+
+        return true;
       }
     }
 
@@ -2628,5 +2630,4 @@ export default function GMS2() {
       </div>
     </div>
   );
-}
 }
