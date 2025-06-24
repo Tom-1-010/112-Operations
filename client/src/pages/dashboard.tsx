@@ -61,7 +61,7 @@ export default function Dashboard() {
 
   // Debug active chat tab changes
   useEffect(() => {
-    console.log("🔄 Active chat tab changed to:", activeChatTab);
+    console.log("Active chat tab changed to:", activeChatTab);
   }, [activeChatTab]);
 
   // Incoming calls state management
@@ -676,7 +676,7 @@ export default function Dashboard() {
     console.log("🚨 ACCEPT CALL TRIGGERED - ID:", callId);
     const call = incomingCalls.find(c => c.id === callId);
     if (!call) {
-      console.error("❌ Call not found:", callId);
+      console.error("Call not found:", callId);
       return;
     }
 
@@ -696,7 +696,7 @@ export default function Dashboard() {
     setCurrentConversation(null);
     
     // CRITICAL: Force switch to burgers tab for 112 conversations
-    console.log("🔄 FORCING TAB SWITCH TO BURGERS");
+    console.log("FORCING TAB SWITCH TO BURGERS");
     setActiveChatTab("burgers");
     
     // Generate scenario data immediately for 112 calls
