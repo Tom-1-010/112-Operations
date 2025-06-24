@@ -2082,106 +2082,177 @@ export default function GMS2() {
                 </span>
               </div>
 
-              {/* Current Incident Pager Display */}
-              {selectedIncident && (
-                <div className="gms2-p2000-current-incident">
-                  <div className="gms2-p2000-section-header">Actieve Melding - Pagertext</div>
-                  <div className="gms2-p2000-pager-text">
-                    {(() => {
+              {/* Editable Pager Text Section */}
+              <div className="gms2-p2000-current-incident">
+                <div className="gms2-p2000-section-header">
+                  Pagertext Editor
+                  <button 
+                    className="gms2-btn"
+                    onClick={() => {
+                      const now = new Date();
+                      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                      addLoggingEntry(`🚨 ALARMERING VERZONDEN om ${timeStr}`);
+                    }}
+                    style={{ marginLeft: '10px', background: '#ff4444', color: 'white' }}
+                  >
+                    🚨 ALARMEER
+                  </button>
+                </div>
+                <textarea 
+                  className="gms2-p2000-pager-edit"
+                  value={(() => {
+                    if (selectedIncident) {
                       const prio = selectedIncident.prio || 4;
                       const classification = selectedIncident.mc3 || selectedIncident.mc2 || selectedIncident.mc1 || 'MELDING';
                       const adres = selectedIncident.locatie || 'ONBEKEND';
                       const plaats = selectedIncident.plaatsnaam || selectedIncident.plaats || 'ROTTERDAM';
                       const incidentNr = selectedIncident.nr || '000000';
-                      
-                      return `${prio} ${classification.toUpperCase()} ${adres.toUpperCase()} ${plaats.toUpperCase()} ICNUM ${incidentNr}`;
-                    })()}
-                  </div>
-                  <div className="gms2-p2000-incident-details">
-                    <div>Incident: #{selectedIncident.nr}</div>
-                    <div>Prioriteit: P{selectedIncident.prio}</div>
-                    <div>Tijd: {selectedIncident.tijd}</div>
-                    <div>Classificatie: {selectedIncident.mc3 || selectedIncident.mc2 || selectedIncident.mc1 || 'Onbekend'}</div>
-                  </div>
-                </div>
-              )}
+                      return `Prio ${prio} ${classification.toUpperCase()} ${adres.toUpperCase()} ${plaats.toUpperCase()} ICNUM ${incidentNr}`;
+                    }
+                    return 'Prio 4 DEMONSTRATIE DOELWATER ROTTERDAM ICNUM 357062';
+                  })()}
+                  onChange={() => {}}
+                  rows={2}
+                  style={{ 
+                    width: '100%', 
+                    background: '#000080', 
+                    color: '#00ff00', 
+                    fontFamily: 'Courier New', 
+                    fontSize: '11px',
+                    border: '1px solid #008000',
+                    padding: '4px'
+                  }}
+                />
+              </div>
 
-              {!selectedIncident && (
-                <div className="gms2-p2000-current-incident">
-                  <div className="gms2-p2000-section-header">Geen Actieve Melding</div>
-                  <div className="gms2-p2000-pager-text demo">
-                    4 DEMONSTRATIE DOELWATER ROTTERDAM ICNUM 357062
+              <div className="gms2-p2000-full-screen">
+                {/* Realistic P2000 Feed like in the image */}
+                <div className="gms2-p2000-feed">
+                  <div className="gms2-p2000-entry recent">
+                    <div className="gms2-p2000-datetime">24-06-2025</div>
+                    <div className="gms2-p2000-priority prio-1">Prio 1</div>
+                    <div className="gms2-p2000-message">Prio 1 A20 Li 16,3 MAASLD :</div>
+                    <div className="gms2-p2000-address">Adres: A20 Li 16,5, Maasland</div>
+                    <div className="gms2-p2000-capcode">1505791 15:57:14 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Verkeersmanagement Centrale Rijkswaterstaat</div>
                   </div>
-                  <div className="gms2-p2000-incident-details">
-                    <div>Selecteer een incident om pagertext te genereren</div>
-                  </div>
-                </div>
-              )}
 
-              <div className="gms2-p2000-grid">
-                <div className="gms2-p2000-section">
-                  <div className="gms2-p2000-section-header">Actieve Alarmeringen</div>
-                  <div className="gms2-p2000-list">
-                    {selectedIncident && (
-                      <div className="gms2-p2000-alarm-item active">
-                        <span className="gms2-p2000-prio">P{selectedIncident.prio}</span>
-                        <span className="gms2-p2000-capcode">1401{String(selectedIncident.nr).slice(-3)}</span>
-                        <span className="gms2-p2000-text">
-                          {selectedIncident.mc2 || selectedIncident.mc1 || 'MELDING'} {selectedIncident.locatie}
-                        </span>
-                        <span className="gms2-p2000-time-small">
-                          {selectedIncident.tijd || String(currentTime.getHours()).padStart(2, '0') + ':' + String(currentTime.getMinutes()).padStart(2, '0')}
-                        </span>
+                  <div className="gms2-p2000-entry">
+                    <div className="gms2-p2000-datetime">24-06-2025</div>
+                    <div className="gms2-p2000-priority prio-4">Prio 4</div>
+                    <div className="gms2-p2000-message">Prio 4 A20 Re 16,8 MAASLD Wegverkeer verkeersstremming</div>
+                    <div className="gms2-p2000-address">Adres: A20 Re 16,8, Maasland</div>
+                    <div className="gms2-p2000-capcode">1505791 12:46:36 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Verkeersmanagement Centrale Rijkswaterstaat</div>
+                  </div>
+
+                  <div className="gms2-p2000-entry">
+                    <div className="gms2-p2000-datetime">22-06-2025</div>
+                    <div className="gms2-p2000-priority prio-2">Prio 2</div>
+                    <div className="gms2-p2000-message">P 2 BDH-04 BR buiten Helenaslootpad Maasland 156230</div>
+                    <div className="gms2-p2000-address">Adres: Maasland</div>
+                    <div className="gms2-p2000-capcode">1500152 14:27:00 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Kazernealarm Maasland</div>
+                    <div className="gms2-p2000-capcode">1500307 14:27:00 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Onbekende code</div>
+                    <div className="gms2-p2000-capcode">1503902 14:27:00 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Meldkamer Brandweer Den Haag</div>
+                    <div className="gms2-p2000-capcode">2029580 14:27:00</div>
+                    <div className="gms2-p2000-unit">Groepsoproep</div>
+                  </div>
+
+                  <div className="gms2-p2000-entry">
+                    <div className="gms2-p2000-datetime">21-06-2025</div>
+                    <div className="gms2-p2000-priority prio-2">Prio 2</div>
+                    <div className="gms2-p2000-message">P 2 BDH-02 BR berm/boschaage NVV 27 Doelpad Maasland 156230</div>
+                    <div className="gms2-p2000-address">Adres: Doelpad, Maasland</div>
+                    <div className="gms2-p2000-capcode">1500152 13:32:05 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Kazernealarm Maasland</div>
+                    <div className="gms2-p2000-capcode">1500307 13:32:05 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Onbekende code</div>
+                    <div className="gms2-p2000-capcode">1503902 13:32:05 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Meldkamer Brandweer Den Haag</div>
+                    <div className="gms2-p2000-capcode">2029573 13:32:05</div>
+                    <div className="gms2-p2000-unit">Groepsoproep</div>
+                  </div>
+
+                  <div className="gms2-p2000-entry">
+                    <div className="gms2-p2000-datetime">20-06-2025</div>
+                    <div className="gms2-p2000-priority prio-1">Prio 1</div>
+                    <div className="gms2-p2000-message">Prio 1 A20 Li 14,4 MAASLD Ongeval wegvervoer letsel</div>
+                    <div className="gms2-p2000-address">Adres: A20 Li 14,4, Maasland</div>
+                    <div className="gms2-p2000-capcode">1505791 15:42:39 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Verkeersmanagement Centrale Rijkswaterstaat</div>
+                  </div>
+
+                  <div className="gms2-p2000-entry">
+                    <div className="gms2-p2000-datetime">20-06-2025</div>
+                    <div className="gms2-p2000-priority prio-1">Prio 1</div>
+                    <div className="gms2-p2000-message">Prio 1 A20 Li 14,4 MAASLD Ongeval wegvervoer letsel</div>
+                    <div className="gms2-p2000-address">Adres: A20 Li 14,4, Maasland</div>
+                    <div className="gms2-p2000-capcode">1530875 15:41:55 Haaglanden</div>
+                    <div className="gms2-p2000-unit">Persounformatie</div>
+                  </div>
+
+                  <div className="gms2-p2000-entry">
+                    <div className="gms2-p2000-datetime">20-06-2025</div>
+                    <div className="gms2-p2000-priority prio-1">Prio 1</div>
+                    <div className="gms2-p2000-message">A1 AMBU 17126 Westgaag 31550E Maasland MAASLD hon 01123</div>
+                    <div className="gms2-p2000-address">Adres: Westgaag, Maasland</div>
+                    <div className="gms2-p2000-capcode">1420026 13:25:55 Rotterdam-Rijnmond</div>
+                    <div className="gms2-p2000-unit">Spoed ambu 17-126</div>
+                    <div className="gms2-p2000-capcode">1420099 13:25:55 Rotterdam-Rijnmond</div>
+                    <div className="gms2-p2000-unit">Meldkamer Ambu Rotterdam</div>
+                    <div className="gms2-p2000-capcode">2029581 13:25:55</div>
+                    <div className="gms2-p2000-unit">Groepsoproep</div>
+                  </div>
+
+                  {/* Add current incident if selected */}
+                  {selectedIncident && (
+                    <div className="gms2-p2000-entry current">
+                      <div className="gms2-p2000-datetime">{new Date().toLocaleDateString('nl-NL')}</div>
+                      <div className={`gms2-p2000-priority prio-${selectedIncident.prio}`}>Prio {selectedIncident.prio}</div>
+                      <div className="gms2-p2000-message">
+                        Prio {selectedIncident.prio} {selectedIncident.mc3 || selectedIncident.mc2 || selectedIncident.mc1} {selectedIncident.locatie}
                       </div>
-                    )}
-                    <div className="gms2-p2000-alarm-item">
-                      <span className="gms2-p2000-prio">P1</span>
-                      <span className="gms2-p2000-capcode">1401998</span>
-                      <span className="gms2-p2000-text">A1 Ambu 17101 - Rit 26851</span>
-                      <span className="gms2-p2000-time-small">
-                        {String(currentTime.getHours()).padStart(2, '0')}:
-                        {String(currentTime.getMinutes()).padStart(2, '0')}
-                      </span>
+                      <div className="gms2-p2000-address">Adres: {selectedIncident.locatie}, {selectedIncident.plaatsnaam}</div>
+                      <div className="gms2-p2000-capcode">1401{String(selectedIncident.nr).slice(-3)} {selectedIncident.tijd} Haaglanden</div>
+                      <div className="gms2-p2000-unit">GMS Dispatch Systeem</div>
                     </div>
-                    <div className="gms2-p2000-alarm-item">
-                      <span className="gms2-p2000-prio">P2</span>
-                      <span className="gms2-p2000-capcode">1430112</span>
-                      <span className="gms2-p2000-text">B2 GRIP 1 OMS Brandweer</span>
-                      <span className="gms2-p2000-time-small">
-                        {String(currentTime.getHours()).padStart(2, '0')}:
-                        {String(currentTime.getMinutes() - 2).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <div className="gms2-p2000-alarm-item">
-                      <span className="gms2-p2000-prio">P1</span>
-                      <span className="gms2-p2000-capcode">1401047</span>
-                      <span className="gms2-p2000-text">A1 Rotterdam-Rijnmond</span>
-                      <span className="gms2-p2000-time-small">
-                        {String(currentTime.getHours()).padStart(2, '0')}:
-                        {String(currentTime.getMinutes() - 5).padStart(2, '0')}
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                <div className="gms2-p2000-section">
-                  <div className="gms2-p2000-section-header">Discipline Overzicht</div>
-                  <div className="gms2-p2000-disciplines">
-                    <div className="gms2-p2000-discipline active">
-                      <span className="gms2-p2000-discipline-name">POL</span>
-                      <span className="gms2-p2000-discipline-count">23</span>
+                {/* Statistics Panel */}
+                <div className="gms2-p2000-stats">
+                  <div className="gms2-p2000-section-header">Live Statistieken</div>
+                  <div className="gms2-p2000-stat-grid">
+                    <div className="gms2-p2000-stat-item">
+                      <span className="stat-label">Totaal berichten:</span>
+                      <span className="stat-value">{incidents.length + 247}</span>
                     </div>
-                    <div className="gms2-p2000-discipline">
-                      <span className="gms2-p2000-discipline-name">BRW</span>
-                      <span className="gms2-p2000-discipline-count">8</span>
+                    <div className="gms2-p2000-stat-item">
+                      <span className="stat-label">Prio 1:</span>
+                      <span className="stat-value prio-1">{incidents.filter(i => i.prio === 1).length + 12}</span>
                     </div>
-                    <div className="gms2-p2000-discipline">
-                      <span className="gms2-p2000-discipline-name">AMB</span>
-                      <span className="gms2-p2000-discipline-count">15</span>
+                    <div className="gms2-p2000-stat-item">
+                      <span className="stat-label">Prio 2:</span>
+                      <span className="stat-value prio-2">{incidents.filter(i => i.prio === 2).length + 8}</span>
                     </div>
-                    <div className="gms2-p2000-discipline">
-                      <span className="gms2-p2000-discipline-name">KNRM</span>
-                      <span className="gms2-p2000-discipline-count">2</span>
+                    <div className="gms2-p2000-stat-item">
+                      <span className="stat-label">Laatste update:</span>
+                      <span className="stat-value">
+                        {String(currentTime.getHours()).padStart(2, '0')}:
+                        {String(currentTime.getMinutes()).padStart(2, '0')}:
+                        {String(currentTime.getSeconds()).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="gms2-p2000-stat-item">
+                      <span className="stat-label">Regio Haaglanden:</span>
+                      <span className="stat-value">ACTIEF</span>
+                    </div>
+                    <div className="gms2-p2000-stat-item">
+                      <span className="stat-label">Filter:</span>
+                      <span className="stat-value">ALLE</span>
                     </div>
                   </div>
                 </div>

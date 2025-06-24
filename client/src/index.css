@@ -3271,6 +3271,152 @@ body {
   font-weight: bold;
 }
 
+/* P2000 Pager Text Editor */
+.gms2-p2000-pager-edit {
+  width: 100%;
+  background: #000080;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  border: 1px solid #008000;
+  padding: 4px;
+  resize: vertical;
+}
+
+/* P2000 Full Screen Feed */
+.gms2-p2000-full-screen {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.gms2-p2000-feed {
+  flex: 2;
+  background: #000;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  padding: 4px;
+  overflow-y: auto;
+  max-height: 400px;
+  border: 1px solid #008000;
+}
+
+.gms2-p2000-entry {
+  margin-bottom: 15px;
+  padding: 8px;
+  border-left: 3px solid #008000;
+  background: rgba(0, 255, 0, 0.05);
+}
+
+.gms2-p2000-entry.recent {
+  border-left-color: #ff0000;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.gms2-p2000-entry.current {
+  border-left-color: #ffff00;
+  background: rgba(255, 255, 0, 0.1);
+}
+
+.gms2-p2000-datetime {
+  color: #00ffff;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.gms2-p2000-priority {
+  font-weight: bold;
+  margin-bottom: 2px;
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.gms2-p2000-priority.prio-1 {
+  background: #ff0000;
+  color: #ffffff;
+}
+
+.gms2-p2000-priority.prio-2 {
+  background: #ff8800;
+  color: #ffffff;
+}
+
+.gms2-p2000-priority.prio-4 {
+  background: #0088ff;
+  color: #ffffff;
+}
+
+.gms2-p2000-message {
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+
+.gms2-p2000-address {
+  color: #ffff00;
+  margin-bottom: 3px;
+  font-size: 9px;
+}
+
+.gms2-p2000-capcode {
+  color: #ff8800;
+  font-size: 8px;
+  margin-bottom: 1px;
+}
+
+.gms2-p2000-unit {
+  color: #00ff88;
+  font-size: 8px;
+  margin-bottom: 1px;
+  margin-left: 10px;
+}
+
+/* P2000 Statistics Panel */
+.gms2-p2000-stats {
+  flex: 1;
+  background: #001100;
+  border: 1px solid #008000;
+  padding: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.gms2-p2000-stat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gms2-p2000-stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 6px;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid #004400;
+  font-size: 9px;
+}
+
+.gms2-p2000-stat-item .stat-label {
+  color: #00ff00;
+}
+
+.gms2-p2000-stat-item .stat-value {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.gms2-p2000-stat-item .stat-value.prio-1 {
+  color: #ff0000;
+}
+
+.gms2-p2000-stat-item .stat-value.prio-2 {
+  color: #ff8800;
+}
+
 .gms2-p2000-discipline-name {
   font-weight: bold;
 }
