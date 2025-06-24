@@ -2178,37 +2178,168 @@ export default function GMS2() {
                   }
                 </div>
 
-                {/* Statistics Panel */}
-                <div className="gms2-p2000-stats">
-                  <div className="gms2-p2000-section-header">Live Statistieken</div>
-                  <div className="gms2-p2000-stat-grid">
-                    <div className="gms2-p2000-stat-item">
-                      <span className="stat-label">Totaal berichten:</span>
-                      <span className="stat-value">{incidents.length + 247}</span>
+                {/* Functionarissen/Capcodes Panel */}
+                <div className="gms2-p2000-functionarissen">
+                  <div className="gms2-p2000-section-header">Functionarissen & Capcodes</div>
+                  <div className="gms2-functionarissen-grid">
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="persvoorlichting"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430020");
+                            addLoggingEntry("📢 Persalarm (capcode: 1430020) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430020", ""));
+                            addLoggingEntry("📢 Persalarm (capcode: 1430020) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="persvoorlichting" className="gms2-functionaris-label">
+                        <span className="functionaris-name">Persalarm</span>
+                        <span className="functionaris-capcode">(capcode: 1430020)</span>
+                      </label>
                     </div>
-                    <div className="gms2-p2000-stat-item">
-                      <span className="stat-label">Prio 1:</span>
-                      <span className="stat-value prio-1">{incidents.filter(i => i.prio === 1).length + 12}</span>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="tev-piket"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430050");
+                            addLoggingEntry("🔍 TEV piket (capcode: 1430050) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430050", ""));
+                            addLoggingEntry("🔍 TEV piket (capcode: 1430050) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="tev-piket" className="gms2-functionaris-label">
+                        <span className="functionaris-name">TEV piket</span>
+                        <span className="functionaris-capcode">(capcode: 1430050)</span>
+                      </label>
                     </div>
-                    <div className="gms2-p2000-stat-item">
-                      <span className="stat-label">Prio 2:</span>
-                      <span className="stat-value prio-2">{incidents.filter(i => i.prio === 2).length + 8}</span>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="officier-dienst"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430030");
+                            addLoggingEntry("👮 Officier van Dienst (capcode: 1430030) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430030", ""));
+                            addLoggingEntry("👮 Officier van Dienst (capcode: 1430030) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="officier-dienst" className="gms2-functionaris-label">
+                        <span className="functionaris-name">Officier van Dienst</span>
+                        <span className="functionaris-capcode">(capcode: 1430030)</span>
+                      </label>
                     </div>
-                    <div className="gms2-p2000-stat-item">
-                      <span className="stat-label">Laatste update:</span>
-                      <span className="stat-value">
-                        {String(currentTime.getHours()).padStart(2, '0')}:
-                        {String(currentTime.getMinutes()).padStart(2, '0')}:
-                        {String(currentTime.getSeconds()).padStart(2, '0')}
-                      </span>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="bvt"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430060");
+                            addLoggingEntry("🕵️ BVT (capcode: 1430060) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430060", ""));
+                            addLoggingEntry("🕵️ BVT (capcode: 1430060) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="bvt" className="gms2-functionaris-label">
+                        <span className="functionaris-name">BVT</span>
+                        <span className="functionaris-capcode">(capcode: 1430060)</span>
+                      </label>
                     </div>
-                    <div className="gms2-p2000-stat-item">
-                      <span className="stat-label">Regio Haaglanden:</span>
-                      <span className="stat-value">ACTIEF</span>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="hovj"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430040");
+                            addLoggingEntry("⚖️ HOVJ (capcode: 1430040) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430040", ""));
+                            addLoggingEntry("⚖️ HOVJ (capcode: 1430040) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="hovj" className="gms2-functionaris-label">
+                        <span className="functionaris-name">HOVJ</span>
+                        <span className="functionaris-capcode">(capcode: 1430040)</span>
+                      </label>
                     </div>
-                    <div className="gms2-p2000-stat-item">
-                      <span className="stat-label">Filter:</span>
-                      <span className="stat-value">ALLE</span>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="verkeersongevallenanalyse"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430070");
+                            addLoggingEntry("🚗 VOA (capcode: 1430070) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430070", ""));
+                            addLoggingEntry("🚗 VOA (capcode: 1430070) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="verkeersongevallenanalyse" className="gms2-functionaris-label">
+                        <span className="functionaris-name">VOA</span>
+                        <span className="functionaris-capcode">(capcode: 1430070)</span>
+                      </label>
+                    </div>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="coordinatie-centrum"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430080");
+                            addLoggingEntry("📞 Coördinatie Centrum (capcode: 1430080) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430080", ""));
+                            addLoggingEntry("📞 Coördinatie Centrum (capcode: 1430080) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="coordinatie-centrum" className="gms2-functionaris-label">
+                        <span className="functionaris-name">Coördinatie Centrum</span>
+                        <span className="functionaris-capcode">(capcode: 1430080)</span>
+                      </label>
+                    </div>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="forensische-opsporing"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430090");
+                            addLoggingEntry("🔬 Forensische Opsporing (capcode: 1430090) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430090", ""));
+                            addLoggingEntry("🔬 Forensische Opsporing (capcode: 1430090) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="forensische-opsporing" className="gms2-functionaris-label">
+                        <span className="functionaris-name">Forensische Opsporing</span>
+                        <span className="functionaris-capcode">(capcode: 1430090)</span>
+                      </label>
                     </div>
                   </div>
                 </div>
