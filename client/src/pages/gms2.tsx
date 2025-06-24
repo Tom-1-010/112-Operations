@@ -1187,8 +1187,8 @@ export default function GMS2() {
               'gewond': 'gew',
               'aanhoudingen': 'aanh',
               'aanhouding': 'aanh',
-              'personen': 'pers',
-              'persoon': 'pers',
+              'personen': 'persoon',
+              'persoon': 'persoon',
               'vermisten': 'verm',
               'vermist': 'verm'
             };
@@ -1481,9 +1481,7 @@ export default function GMS2() {
           };
           setSelectedIncident(updatedIncident);
           console.log(`🏢 Existing incident updated: ${selectedIncident.nr}`);
-        }
-
-        return true;
+                return true;
       }
     }
 
@@ -2631,3 +2629,283 @@ export default function GMS2() {
     </div>
   );
 }
+
+const processKarakteristiekCode = async (code: string, value: string, selectedKarakteristieken: any[], setSelectedKarakteristieken: any[], karakteristiekenDatabase: any[]) => {
+    console.log(`🔍 Looking for karakteristiek with code: "${code}", value: "${value}"`);
+
+    // Use all karakteristieken from database, not just unique ones
+    let matchingKarakteristiek = null;
+    let foundKarakteristiek = null;
+    let finalValue = value;
+
+    // Step 1: Direct code or name match
+    foundKarakteristiek = karakteristiekenDatabase.find(k =>
+      k.ktCode?.toLowerCase() === code.toLowerCase() ||
+      k.ktNaam?.toLowerCase() === code.toLowerCase()
+    );
+
+    // Step 2: Handle "aantal [type] [number]" patterns specifically
+      if (code === 'aantal') {
+        const aantalMatch = `${code} ${value}`.toLowerCase().match(/aantal\s+(\w+)\s+(\d+)/);
+        if (aantalMatch) {
+          const [, type, number] = aantalMatch;
+          finalValue = number; // Extract the number
+
+          // More comprehensive mapping with exact matches
+          const typeToCodeMap = {
+            'verdachten': 'ddrs',  // Fix: verdachten -> daders
+            'daders': 'ddrs',
+            'dader': 'ddrs',
+            'doden': 'dd',
+            'dood': 'dd',
+            'gewonden': 'gew',
+            'gewond': 'gew',
+            'aanhoudingen': 'aanh',
+            'aanhouding': 'aanh',
+            'personen': 'pers',
+            'persoon': 'pers',
+            'vermisten': 'verm',
+            'vermist': 'verm',
+            'water': 'tewt',
+            'zelfredz': 'nzrz',
+            'object': 'iobj'
+          };
+
+          const targetCode = typeToCodeMap[type];
+          if (targetCode) {
+            matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+              k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
+            );
+            if (matchingKarakteristiek) {
+              console.log(`✅ Found "aantal [type] [number]" match: "${type}" -> "${targetCode}" with value "${finalValue}"`);
+              // Don't return here, continue to processing below
+            }
+          }
+        }
+
+        // Handle "aantal [type]" without number
+        if (!matchingKarakteristiek) {
+          const aantalSimpleMatch = `${code} ${value}`.toLowerCase().match(/aantal\s+(\w+)$/);
+          if (aantalSimpleMatch) {
+            const [, type] = aantalSimpleMatch;
+            finalValue = '1'; // Default to 1 if no number specified
+
+            const typeToCodeMap = {
+              'verdachten': 'ddrs',  // Fix: verdachten -> daders  
+              'daders': 'ddrs',
+              'dader': 'ddrs',
+              'doden': 'dd',
+              'dood': 'dd',
+              'gewonden': 'gew',
+              'gewond': 'gew',
+              'aanhoudingen': 'aanh',
+              'aanhouding': 'aanh',
+              'personen': 'persoon',
+              'persoon': 'persoon',
+              'vermisten': 'verm',
+              'vermist': 'verm'
+            };
+
+            const targetCode = typeToCodeMap[type];
+            if (targetCode) {
+              matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+                k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
+              );
+              if (matchingKarakteristiek) {
+                console.log(`✅ Found "aantal [type]" match: "${type}" -> "${targetCode}" with default value "${finalValue}"`);
+                // Don't return here, continue to processing below
+              }
+            }
+          }
+        }
+      }
+
+      // Step 3: Try exact specific patterns
+      if (!matchingKarakteristiek) {
+        const specificPatterns = {
+          'overval diefstal': 'ovdp',
+          'ovdp': 'ovdp',
+          'afkruisen': 'afkr'
+        };
+
+        // Check for specific exact matches
+        for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
+          if (`${code} ${value}`.toLowerCase() === pattern) {
+            matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+              k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
+            );
+            if (matchingKarakteristiek) {
+              console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
+              break; // Don't return here, continue to processing below
+            }
+          }
+        }
+      }
+
+    // Step 3.5: Handle special "inzet pol [specific]" patterns
+      if (code === 'inzet' && value.startsWith('pol ')) {
+        const specificPart = value.substring(4); // Remove "pol " prefix
+        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+          k.ktCode && k.ktCode.toLowerCase() === 'ipa' // Inzet Pol algemeen code
+        );
+        if (matchingKarakteristiek) {
+          finalValue = specificPart; // Use only the specific part (e.g., "ovdp")
+          console.log(`✅ Found "inzet pol [specific]" match: "${specificPart}" for Inzet Pol algemeen`);
+          // Don't return here, continue to processing below
+        }
+      }
+
+    // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
+      if (!foundKarakteristiek) {
+        const fuzzyMatches = karakteristiekenDatabase.filter(k => {
+          const name = k.ktNaam?.toLowerCase() || '';
+          const searchLower = `${code} ${value}`.toLowerCase();
+          const ktCode = k.ktCode?.toLowerCase() || '';
+
+          // Check abbreviation mappings first
+          const codeAbbrevs = {
+            'pol': ['politie', 'police'],
+            'brw': ['brandweer', 'brand'],
+            'ambu': ['ambulance', 'ambu'],
+            'gew': ['gewonden', 'gewond'],
+            'dd': ['doden', 'dood'],
+            'pers': ['personen', 'persoon'],
+            'ovdp': ['overval', 'diefstal', 'poging']
+          };
+
+          const codeAbbrevsList = codeAbbrevs[ktCode] || [];
+          for (const abbrev of codeAbbrevsList) {
+            if (searchLower.includes(abbrev.toLowerCase())) {
+              return true;
+            }
+          }
+
+          // Calculate simple similarity score
+          let score = 0;
+          const searchWords = searchLower.split(' ').filter(w => w.length > 2);
+
+          for (const word of searchWords) {
+            if (name.includes(word)) {
+              score += word.length;
+            }
+            // Also check if the karakteristiek name contains abbreviations
+            if (ktCode && word.includes(ktCode)) {
+              score += ktCode.length * 2; // Boost code matches
+            }
+          }
+
+          return score > 3; // Minimum score threshold
+        });
+
+        if (fuzzyMatches.length > 0) {
+          // Sort by relevance (code matches first, then longer matches)
+          fuzzyMatches.sort((a, b) => {
+            const aCode = a.ktCode?.toLowerCase() || '';
+            const bCode = b.ktCode?.toLowerCase() || '';
+            const searchLower = `${code} ${value}`.toLowerCase();
+
+            // Prioritize exact code matches
+            const aCodeMatch = searchLower.includes(aCode) || aCode.includes(searchLower);
+            const bCodeMatch = searchLower.includes(bCode) || bCode.includes(searchLower);
+
+            if (aCodeMatch && !bCodeMatch) return -1;
+            if (!aCodeMatch && bCodeMatch) return 1;
+
+            const aName = a.ktNaam?.toLowerCase() || '';
+            const bName = b.ktNaam?.toLowerCase() || '';
+            return bName.length - aName.length;
+          });
+
+          foundKarakteristiek = fuzzyMatches[0];
+          console.log(`✅ Found fuzzy match with score ${fuzzyMatches.length}: "${foundKarakteristiek.ktNaam}" for input "${code} ${value}"`);
+        }
+      }
+
+    if (!foundKarakteristiek) {
+      console.log(`❌ No karakteristiek found for code: ${code}`);
+      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 10).map(k => ({ 
+        code: k.ktCode, 
+        naam: k.ktNaam 
+      })));
+
+      // Show specifically matching ones for debugging
+      const partialMatches = karakteristiekenDatabase.filter(k => 
+        (k.ktNaam || '').toLowerCase().includes(code.toLowerCase()) ||
+        (k.ktCode || '').toLowerCase().includes(code.toLowerCase())
+      );
+      if (partialMatches.length > 0) {
+        console.log(`🔍 Partial matches found:`, partialMatches.slice(0, 5));
+      }
+
+      return false;
+    }
+
+    console.log(`✅ Found karakteristiek: ${foundKarakteristiek.ktNaam} for code: ${code} (type: ${foundKarakteristiek.ktType})`);
+        matchingKarakteristiek = foundKarakteristiek
+
+    // Final value is already determined above, but refine based on type if needed
+    if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
+      // For "Vrije tekst" and "Getal" types, use the determined final value
+      if (!finalValue) {
+        finalValue = value || '';
+      }
+      console.log(`📝 Using determined value for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
+    } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
+      // For Ja/Nee types, use the provided value or default from database
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || 'Ja';
+    } else if (matchingKarakteristiek.ktType === 'Enkelvoudige opsom') {
+      // For single choice, use provided value or database default
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
+    } else if (matchingKarakteristiek.ktType === 'Meervoudige opsom') {
+      // For multiple choice, use provided value or database default
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
+    } else {
+      // Fallback
+      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
+    }
+
+    // Check if this exact karakteristiek already exists (by code AND name to allow multiples)
+    const existingIndex = selectedKarakteristieken.findIndex(k => 
+      k.ktCode === matchingKarakteristiek.ktCode && k.ktNaam === matchingKarakteristiek.ktNaam
+    );
+
+    if (existingIndex !== -1) {
+      // Update existing karakteristiek 
+      setSelectedKarakteristieken(prev => {
+        const updated = [...prev];
+        const existing = updated[existingIndex];
+
+        // For meervoudige types, append values; for others, replace
+        if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
+            finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
+          updated[existingIndex] = {
+            ...existing,
+            waarde: `${existing.waarde}, ${finalValue}`
+          };
+          console.log(`📝 Appended value to existing karakteristiek: ${existing.waarde} + ${finalValue}`);
+        } else if (finalValue) {
+          updated[existingIndex] = {
+            ...existing,
+            waarde: finalValue
+          };
+          console.log(`📝 Updated existing karakteristiek with new value: ${finalValue}`);
+        }
+
+        return updated;
+      });
+    } else {
+      // Add new karakteristiek
+      const newKarakteristiek = {
+        id: Date.now() + Math.random(),
+        ktNaam: matchingKarakteristiek.ktNaam,
+        ktType: matchingKarakteristiek.ktType,
+        waarde: finalValue,
+        ktCode: matchingKarakteristiek.ktCode
+      };
+
+      console.log(`📝 Added new karakteristiek:`, newKarakteristiek);
+      setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
+    }
+
+    return true;
+  };
