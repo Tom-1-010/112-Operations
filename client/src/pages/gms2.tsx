@@ -1125,15 +1125,61 @@ export default function GMS2() {
     // Step 1: Try parser-based exact matching first (highest priority)
     foundKarakteristiek = karakteristiekenDatabase.find(k => {
       if (!k.ktParser) return false;
-      const parser = k.ktParser.toLowerCase();
-      const searchInput = `-${fullInput}`;
+      const parser = k.ktParser.toLowerCase().trim();
+      const searchInput = `-${fullInput}`.toLowerCase().trim();
+      console.log(`🔍 Comparing parser "${parser}" with input "${searchInput}"`);
       return parser === searchInput;
     });
 
     if (foundKarakteristiek) {
-      console.log(`✅ Found parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
-      // Use the value from the matching parser entry, not the default ktWaarde
+      console.log(`✅ Found exact parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
       finalValue = foundKarakteristiek.ktWaarde || value;
+    }
+
+    // Step 1b: If no exact match, try partial parser matching
+    if (!foundKarakteristiek) {
+      const partialMatches = karakteristiekenDatabase.filter(k => {
+        if (!k.ktParser) return false;
+        const parser = k.ktParser.toLowerCase().trim();
+        const searchInput = `-${fullInput}`.toLowerCase().trim();
+        
+        // Check if the search input matches the parser pattern closely
+        const parserWords = parser.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
+        const inputWords = searchInput.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
+        
+        // Count matching words
+        let matchCount = 0;
+        for (const inputWord of inputWords) {
+          for (const parserWord of parserWords) {
+            if (inputWord === parserWord || inputWord.includes(parserWord) || parserWord.includes(inputWord)) {
+              matchCount++;
+              break;
+            }
+          }
+        }
+        
+        // Require at least 80% word match
+        const matchRatio = matchCount / Math.max(inputWords.length, parserWords.length);
+        return matchRatio >= 0.8;
+      });
+      
+      if (partialMatches.length > 0) {
+        // Sort by best match (most matching words)
+        partialMatches.sort((a, b) => {
+          const aParser = a.ktParser.toLowerCase();
+          const bParser = b.ktParser.toLowerCase();
+          const searchInput = `-${fullInput}`.toLowerCase();
+          
+          const aScore = aParser.split(' ').filter(word => searchInput.includes(word)).length;
+          const bScore = bParser.split(' ').filter(word => searchInput.includes(word)).length;
+          
+          return bScore - aScore;
+        });
+        
+        foundKarakteristiek = partialMatches[0];
+        console.log(`✅ Found partial parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
+        finalValue = foundKarakteristiek.ktWaarde || value;
+      }
     }
 
     // Step 2: Direct code match
