@@ -285,16 +285,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allKarakteristieken = await db.select().from(karakteristieken);
       console.log(`Found ${allKarakteristieken.length} karakteristieken in database`);
 
-      // Transform to match expected format
+      // Transform to match expected format with proper field mapping
       const formattedKarakteristieken = allKarakteristieken.map(k => ({
-        ktNaam: k.kt_naam,
-        ktType: k.kt_type, 
-        ktWaarde: k.kt_waarde,
-        ktCode: k.kt_code,
-        ktParser: k.kt_paser // Note: keeping original column name mapping
+        ktNaam: k.ktNaam || k.kt_naam || '',
+        ktType: k.ktType || k.kt_type || '', 
+        ktWaarde: k.ktWaarde || k.kt_waarde || '',
+        ktCode: k.ktCode || k.kt_code || '',
+        ktParser: k.ktParser || k.kt_paser || k.kt_parser || ''
       }));
 
       console.log(`Returning ${formattedKarakteristieken.length} formatted karakteristieken`);
+      console.log('Sample karakteristiek:', formattedKarakteristieken[0] || 'No data');
       res.json(formattedKarakteristieken);
     } catch (error) {
       console.error("Error fetching karakteristieken:", error);
