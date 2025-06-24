@@ -78,6 +78,7 @@ export default function GMS2() {
   const [karakteristieken, setKarakteristieken] = useState<any[]>([]);
   const [karakteristiekenDatabase, setKarakteristiekenDatabase] = useState<any[]>([]);
   const [selectedKarakteristieken, setSelectedKarakteristieken] = useState<any[]>([]);
+  const [showP2000Screen, setShowP2000Screen] = useState(false);
 
   // Form state for new incidents
   const [formData, setFormData] = useState({
@@ -2053,6 +2054,100 @@ export default function GMS2() {
 
   return (
     <div className="gms2-container">
+      {/* P2000 Alarm Screen Popup */}
+      {showP2000Screen && (
+        <div className="gms2-p2000-overlay">
+          <div className="gms2-p2000-window">
+            <div className="gms2-p2000-header">
+              <span className="gms2-p2000-title">P2000 Alarmering</span>
+              <button 
+                className="gms2-p2000-close"
+                onClick={() => setShowP2000Screen(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="gms2-p2000-content">
+              <div className="gms2-p2000-info-bar">
+                <span>🚨 ALARMERING ACTIEF</span>
+                <span className="gms2-p2000-time">
+                  {String(currentTime.getHours()).padStart(2, '0')}:
+                  {String(currentTime.getMinutes()).padStart(2, '0')}:
+                  {String(currentTime.getSeconds()).padStart(2, '0')}
+                </span>
+              </div>
+
+              <div className="gms2-p2000-grid">
+                <div className="gms2-p2000-section">
+                  <div className="gms2-p2000-section-header">Actieve Alarmeringen</div>
+                  <div className="gms2-p2000-list">
+                    <div className="gms2-p2000-alarm-item active">
+                      <span className="gms2-p2000-prio">P1</span>
+                      <span className="gms2-p2000-capcode">1401998</span>
+                      <span className="gms2-p2000-text">A1 Ambu 17101 - Rit 26851</span>
+                      <span className="gms2-p2000-time-small">
+                        {String(currentTime.getHours()).padStart(2, '0')}:
+                        {String(currentTime.getMinutes()).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="gms2-p2000-alarm-item">
+                      <span className="gms2-p2000-prio">P2</span>
+                      <span className="gms2-p2000-capcode">1430112</span>
+                      <span className="gms2-p2000-text">B2 GRIP 1 OMS Brandweer</span>
+                      <span className="gms2-p2000-time-small">
+                        {String(currentTime.getHours()).padStart(2, '0')}:
+                        {String(currentTime.getMinutes() - 2).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="gms2-p2000-alarm-item">
+                      <span className="gms2-p2000-prio">P1</span>
+                      <span className="gms2-p2000-capcode">1401047</span>
+                      <span className="gms2-p2000-text">A1 Rotterdam-Rijnmond</span>
+                      <span className="gms2-p2000-time-small">
+                        {String(currentTime.getHours()).padStart(2, '0')}:
+                        {String(currentTime.getMinutes() - 5).padStart(2, '0')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="gms2-p2000-section">
+                  <div className="gms2-p2000-section-header">Discipline Overzicht</div>
+                  <div className="gms2-p2000-disciplines">
+                    <div className="gms2-p2000-discipline active">
+                      <span className="gms2-p2000-discipline-name">POL</span>
+                      <span className="gms2-p2000-discipline-count">23</span>
+                    </div>
+                    <div className="gms2-p2000-discipline">
+                      <span className="gms2-p2000-discipline-name">BRW</span>
+                      <span className="gms2-p2000-discipline-count">8</span>
+                    </div>
+                    <div className="gms2-p2000-discipline">
+                      <span className="gms2-p2000-discipline-name">AMB</span>
+                      <span className="gms2-p2000-discipline-count">15</span>
+                    </div>
+                    <div className="gms2-p2000-discipline">
+                      <span className="gms2-p2000-discipline-name">KNRM</span>
+                      <span className="gms2-p2000-discipline-count">2</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gms2-p2000-controls">
+                <button className="gms2-btn">Filter POL</button>
+                <button className="gms2-btn">Filter BRW</button>
+                <button className="gms2-btn">Filter AMB</button>
+                <button className="gms2-btn">Alle</button>
+                <button className="gms2-btn">Pause</button>
+                <button className="gms2-btn">Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Menu Bar */}
       <div className="gms2-menu-bar">
         <div className="gms2-menu-left">
@@ -2314,7 +2409,12 @@ export default function GMS2() {
                   <button className="gms2-btn small">OGS</button>
                   <button className="gms2-btn small">OBJ</button>
                   <button className="gms2-btn small">LOC</button>
-                  <button className="gms2-btn small">PROC</button>
+                  <button 
+                    className="gms2-btn small"
+                    onClick={() => setShowP2000Screen(true)}
+                  >
+                    PROC
+                  </button>
                   <button className="gms2-btn small">IV</button>
                   <button className="gms2-btn small">IV+</button>
                   <button className="gms2-btn small">TK</button>
