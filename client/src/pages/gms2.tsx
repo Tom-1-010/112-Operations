@@ -1271,56 +1271,73 @@ export default function GMS2() {
       }
     }
 
-    // Step 6: Enhanced fuzzy matching by name content
+    // Step 6: Enhanced fuzzy matching by name content with improved precision
     if (!foundKarakteristiek) {
+      const searchWords = fullInput.toLowerCase().split(' ').filter(w => w.length > 2);
+      
       const fuzzyMatches = karakteristiekenDatabase.filter(k => {
         const name = k.ktNaam?.toLowerCase() || '';
-        const searchLower = fullInput.toLowerCase();
         const ktCode = k.ktCode?.toLowerCase() || '';
 
         // Check abbreviation mappings first
         const codeAbbrevs = commonAbbreviations[ktCode] || [];
         for (const abbrev of codeAbbrevs) {
-          if (searchLower.includes(abbrev.toLowerCase()) || abbrev.toLowerCase().includes(searchLower)) {
+          if (fullInput.toLowerCase().includes(abbrev.toLowerCase()) || abbrev.toLowerCase().includes(fullInput.toLowerCase())) {
             return true;
           }
         }
 
-        // Calculate simple similarity score
-        let score = 0;
-        const searchWords = searchLower.split(' ').filter(w => w.length > 2);
+        // Calculate word-based similarity score with higher precision
+        let exactWordMatches = 0;
+        let partialWordMatches = 0;
+        const nameWords = name.split(' ').filter(w => w.length > 2);
 
-        for (const word of searchWords) {
-          if (name.includes(word)) {
-            score += word.length;
-          }
-          if (ktCode && word.includes(ktCode)) {
-            score += ktCode.length * 2;
+        for (const searchWord of searchWords) {
+          for (const nameWord of nameWords) {
+            if (searchWord === nameWord) {
+              exactWordMatches += 3; // Higher weight for exact matches
+            } else if (searchWord.includes(nameWord) || nameWord.includes(searchWord)) {
+              partialWordMatches += 1;
+            }
           }
         }
 
-        return score > 3;
+        const totalScore = exactWordMatches + partialWordMatches;
+        
+        // Require higher threshold and prioritize exact word matches
+        return totalScore >= 4 && exactWordMatches >= 2;
       });
 
       if (fuzzyMatches.length > 0) {
+        // Sort by relevance: prioritize exact word matches and shorter names
         fuzzyMatches.sort((a, b) => {
-          const aCode = a.ktCode?.toLowerCase() || '';
-          const bCode = b.ktCode?.toLowerCase() || '';
-          const searchLower = fullInput.toLowerCase();
-
-          const aCodeMatch = searchLower.includes(aCode) || aCode.includes(searchLower);
-          const bCodeMatch = searchLower.includes(bCode) || bCode.includes(searchLower);
-
-          if (aCodeMatch && !bCodeMatch) return -1;
-          if (!aCodeMatch && bCodeMatch) return 1;
-
           const aName = a.ktNaam?.toLowerCase() || '';
           const bName = b.ktNaam?.toLowerCase() || '';
-          return bName.length - aName.length;
+          const searchLower = fullInput.toLowerCase();
+          
+          // Calculate exact word match scores
+          const aWords = aName.split(' ').filter(w => w.length > 2);
+          const bWords = bName.split(' ').filter(w => w.length > 2);
+          
+          let aExactMatches = 0;
+          let bExactMatches = 0;
+          
+          for (const searchWord of searchWords) {
+            if (aWords.includes(searchWord)) aExactMatches++;
+            if (bWords.includes(searchWord)) bExactMatches++;
+          }
+          
+          // First priority: more exact word matches
+          if (aExactMatches !== bExactMatches) {
+            return bExactMatches - aExactMatches;
+          }
+          
+          // Second priority: shorter names (more specific)
+          return aName.length - bName.length;
         });
 
         foundKarakteristiek = fuzzyMatches[0];
-        console.log(`✅ Found fuzzy match: "${foundKarakteristiek.ktNaam}" for input "${fullInput}"`);
+        console.log(`✅ Found precise fuzzy match: "${foundKarakteristiek.ktNaam}" for input "${fullInput}"`);
       }
     }
 
