@@ -4267,8 +4267,8 @@
     "kt_type": "Meervoudige opsom",
     "kt_waarde": "MKP OVD-OC",
     "kt_code": "imk",
-    "kt_parser": "-inzet gmk mkp ovd-oc"
-  },
+    "kt_parser": ["-inzet gmk mkp ovd-oc", "-ovdoc"]
+  }
   {
     "kt_naam": "Inzet GMK",
     "kt_type": "Meervoudige opsom",
@@ -6982,7 +6982,7 @@
     "kt_naam": "Optisch & geluidsign",
     "kt_type": "Meervoudige opsom",
     "kt_waarde": "Politie",
-    "kt_code": "-opgelp",
+    "kt_code": "-ogs politie",
     "kt_parser": "-optisch-geluidsign politie"
   },
   {
