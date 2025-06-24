@@ -206,6 +206,20 @@ export default function GMS2() {
     // Set selected incident first
     setSelectedIncident(incident);
 
+    // Generate automatic pager text
+    const generatePagerText = (incident: GmsIncident) => {
+      const prio = incident.prio || 2;
+      const classificatie = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || "Onbekend";
+      const adres = incident.locatie || "Adres onbekend";
+      const plaats = incident.plaatsnaam || incident.plaats || "Plaats onbekend";
+      const incidentNummer = incident.nr || "000000";
+      
+      return `${prio} ${classificatie} ${adres} ${plaats} ICNUM ${incidentNummer}`;
+    };
+
+    // Set pager text automatically
+    setPagerText(generatePagerText(incident));
+
     // Load all incident data into form fields
     if (incident) {
       const incidentFormData = {
@@ -482,6 +496,20 @@ export default function GMS2() {
       tijdstip: new Date().toISOString(),
       prioriteit: priorityValue
     };
+
+    // Generate automatic pager text for new incident
+    const generatePagerText = (incident: GmsIncident) => {
+      const prio = incident.prio || 2;
+      const classificatie = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || "Onbekend";
+      const adres = incident.locatie || "Adres onbekend";
+      const plaats = incident.plaatsnaam || incident.plaats || "Plaats onbekend";
+      const incidentNummer = incident.nr || "000000";
+      
+      return `${prio} ${classificatie} ${adres} ${plaats} ICNUM ${incidentNummer}`;
+    };
+
+    // Set pager text for new incident
+    setPagerText(generatePagerText(newIncident));
 
     // Add to incidents list (at the beginning for newest first)
     setIncidents(prev => [newIncident, ...prev]);
