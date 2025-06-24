@@ -1183,13 +1183,17 @@ export default function GMS2() {
       }
     }
 
-    // Step 2: Direct code match
+    // Step 2: Direct code match (kt_code)
     if (!foundKarakteristiek) {
       foundKarakteristiek = karakteristiekenDatabase.find(k =>
         k.ktCode?.toLowerCase() === code.toLowerCase()
       );
       if (foundKarakteristiek) {
-        console.log(`✅ Found direct code match: "${foundKarakteristiek.ktNaam}" for code "${code}"`);
+        console.log(`✅ Found direct kt_code match: "${foundKarakteristiek.ktNaam}" for code "${code}"`);
+        // Use ktWaarde as default value if no specific value provided
+        if (!finalValue && foundKarakteristiek.ktWaarde) {
+          finalValue = foundKarakteristiek.ktWaarde;
+        }
       }
     }
 
