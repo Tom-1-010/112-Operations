@@ -1415,7 +1415,7 @@ export default function GMS2() {
     const lastLine = lines[lines.length - 1].trim();
 
     const incidentContext = selectedIncident ? `incident ${selectedIncident.nr}` : 'NIEUWE MELDING';
-    console.log(`🔍 Shortcode detection for: "${lastLine}" | Context: ${incidentContext}`);
+    console.log(`Shortcode detection for: "${lastLine}" | Context: ${incidentContext}`);
 
     // Address shortcode: =[stad]/[straatnaam] [huisnummer]
     if (lastLine.startsWith('=')) {
@@ -1441,7 +1441,7 @@ export default function GMS2() {
       if (callerMatch) {
         const [, meldernaam, telefoonnummer] = callerMatch;
 
-        console.log(`👤 Caller shortcode detected: ${meldernaam} / ${telefoonnummer}`);
+        console.log(`Caller shortcode detected: ${meldernaam} / ${telefoonnummer}`);
 
         // ALWAYS update form data regardless of incident selection
         const newCallerData = {
@@ -1454,7 +1454,7 @@ export default function GMS2() {
             ...prev,
             ...newCallerData
           };
-          console.log(`👤 Form data updated for ${incidentContext}:`, updated);
+          console.log(`Form data updated for ${incidentContext}:`, updated);
           return updated;
         ```javascript
         });
@@ -1466,7 +1466,7 @@ export default function GMS2() {
             ...newCallerData
           };
           setSelectedIncident(updatedIncident);
-          console.log(`👤 Existing incident updated: ${selectedIncident.nr}`);
+          console.log(`Existing incident updated: ${selectedIncident.nr}`);
         }
 
         return true;
@@ -1513,7 +1513,7 @@ export default function GMS2() {
     if (lastLine.startsWith('-')) {
       const inputCode = lastLine.split(' ')[0].toLowerCase(); // Normalize to lowercase
 
-      console.log(`🔍 Zoeken naar classificatie shortcode: ${inputCode} voor ${incidentContext}`);
+      console.log(`Zoeken naar classificatie shortcode: ${inputCode} voor ${incidentContext}`);
 
       // Direct shortcode match (case-insensitive)
       let matchedMapping = null;
@@ -1525,7 +1525,7 @@ export default function GMS2() {
       }
 
       if (matchedMapping) {
-        console.log(`✅ Shortcode gevonden voor ${incidentContext}:`, matchedMapping);
+        console.log(`Shortcode gevonden voor ${incidentContext}:`, matchedMapping);
         applyClassification(matchedMapping.MC1, matchedMapping.MC2, matchedMapping.MC3, inputCode);
         return true;
       }
@@ -1536,7 +1536,7 @@ export default function GMS2() {
       );
 
       if (directCodeMatch) {
-        console.log(`✅ Directe LMC code gevonden voor ${incidentContext}:`, directCodeMatch);
+        console.log(`Directe LMC code gevonden voor ${incidentContext}:`, directCodeMatch);
         applyClassification(directCodeMatch.MC1, directCodeMatch.MC2, directCodeMatch.MC3, inputCode);
         return true;
       }
@@ -1545,13 +1545,13 @@ export default function GMS2() {
       const keywords = lastLine.substring(1).split(' ').filter(word => word.length > 2);
       const possibleMatch = findClassificationByKeywords(keywords);
       if (possibleMatch) {
-        console.log(`✅ Keyword match gevonden voor ${incidentContext}:`, possibleMatch);
+        console.log(`Keyword match gevonden voor ${incidentContext}:`, possibleMatch);
         applyClassification(possibleMatch.MC1, possibleMatch.MC2, possibleMatch.MC3, lastLine);
         return true;
       }
 
       // No match found
-      console.warn(`❌ Geen match gevonden voor: ${inputCode} in ${incidentContext}`);
+      console.warn(`Geen match gevonden voor: ${inputCode} in ${incidentContext}`);
       return false;
     }
 
@@ -1586,7 +1586,7 @@ export default function GMS2() {
     const mc3Select = document.getElementById('gms2-mc3-select') as HTMLSelectElement;
 
     if (!mc1Select || !mc2Select || !mc3Select || lmcClassifications.length === 0) {
-      console.warn('❌ Classification dropdowns not found or no classifications loaded');
+      console.warn('Classification dropdowns not found or no classifications loaded');
       return;
     }
 
@@ -1600,7 +1600,7 @@ export default function GMS2() {
     );
 
     if (!exactMatch) {
-      console.warn(`❌ No exact match found for ${mc1} > ${mc2} > ${mc3}`);
+      console.warn(`No exact match found for ${mc1} > ${mc2} > ${mc3}`);
       return;
     }
 
