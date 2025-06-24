@@ -2120,7 +2120,72 @@ export default function GMS2() {
                     onClick={() => {
                       const now = new Date();
                       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                      
+                      // Add to logging
                       addLoggingEntry(`🚨 ALARMERING VERZONDEN: "${pagerText}" om ${timeStr}`);
+                      
+                      // Create new P2000 entry for current incident/melding
+                      const currentIncident = selectedIncident || {
+                        nr: getNextIncidentNumber(),
+                        prio: priorityValue,
+                        tijd: timeStr,
+                        mc: selectedMC3 || selectedMC2 || selectedMC1 || "Onbekend",
+                        locatie: formData.straatnaam && formData.huisnummer 
+                          ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+                          : "Locatie onbekend",
+                        plaatsnaam: formData.plaatsnaam || "Plaats onbekend",
+                        tijdstip: new Date().toISOString(),
+                        mc1: selectedMC1,
+                        mc2: selectedMC2,
+                        mc3: selectedMC3
+                      };
+                      
+                      // Add current melding to incidents list if it's not already there
+                      if (!selectedIncident) {
+                        const newIncident: GmsIncident = {
+                          id: Date.now(),
+                          nr: currentIncident.nr,
+                          prio: currentIncident.prio,
+                          tijd: currentIncident.tijd,
+                          mc: currentIncident.mc,
+                          locatie: currentIncident.locatie,
+                          plaats: formData.plaatsnaam?.substring(0, 3).toUpperCase() || "",
+                          roepnr: formData.roepnummer || "",
+                          positie: "",
+                          melderNaam: formData.melderNaam,
+                          melderAdres: formData.melderAdres,  
+                          telefoonnummer: formData.telefoonnummer,
+                          straatnaam: formData.straatnaam,
+                          huisnummer: formData.huisnummer,
+                          toevoeging: formData.toevoeging,
+                          postcode: formData.postcode,
+                          plaatsnaam: formData.plaatsnaam,
+                          gemeente: formData.gemeente,
+                          functie: formData.functie,
+                          mc1: selectedMC1,
+                          mc2: selectedMC2,
+                          mc3: selectedMC3,
+                          notities: notitiesText,
+                          karakteristieken: selectedKarakteristieken,
+                          status: "Gealarmeerd",
+                          meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
+                          tijdstip: new Date().toISOString(),
+                          prioriteit: priorityValue
+                        };
+                        
+                        setIncidents(prev => [newIncident, ...prev]);
+                        setSelectedIncident(newIncident);
+                      } else {
+                        // Update existing incident status
+                        const updatedIncident = {
+                          ...selectedIncident,
+                          status: "Gealarmeerd"
+                        };
+                        setIncidents(prev => prev.map(inc => 
+                          inc.id === selectedIncident.id ? updatedIncident : inc
+                        ));
+                        setSelectedIncident(updatedIncident);
+                      }
                     }}
                     style={{ marginLeft: '10px', background: '#ff4444', color: 'white' }}
                   >
