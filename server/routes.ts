@@ -343,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                    (typeof item['kt_waarde'] === 'number' && isNaN(item['kt_waarde'])) ? null : String(item['kt_waarde']),
         ktCode: item['kt_code'] === null || item['kt_code'] === undefined || 
                 (typeof item['kt_code'] === 'number' && isNaN(item['kt_code'])) ? null : String(item['kt_code']),
-        ktPaser: item['kt_parser'] || item['kt-paser']
+        ktParser: item['kt_parser'] || item['kt-paser']
       }));
 
       // Insert new data in batches
@@ -406,7 +406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                    (typeof item['kt_waarde'] === 'number' && isNaN(item['kt_waarde'])) ? null : String(item['kt_waarde']),
         ktCode: item['kt_code'] === null || item['kt_code'] === undefined || 
                 (typeof item['kt_code'] === 'number' && isNaN(item['kt_code'])) ? null : String(item['kt_code']),
-        ktPaser: item['kt_parser'] || item['kt-paser']
+        ktParser: item['kt_parser'] || item['kt-paser']
       }));
 
       // Insert new data in batches
