@@ -2082,11 +2082,59 @@ export default function GMS2() {
                 </span>
               </div>
 
+              {/* Current Incident Pager Display */}
+              {selectedIncident && (
+                <div className="gms2-p2000-current-incident">
+                  <div className="gms2-p2000-section-header">Actieve Melding - Pagertext</div>
+                  <div className="gms2-p2000-pager-text">
+                    {(() => {
+                      const prio = selectedIncident.prio || 4;
+                      const classification = selectedIncident.mc3 || selectedIncident.mc2 || selectedIncident.mc1 || 'MELDING';
+                      const adres = selectedIncident.locatie || 'ONBEKEND';
+                      const plaats = selectedIncident.plaatsnaam || selectedIncident.plaats || 'ROTTERDAM';
+                      const incidentNr = selectedIncident.nr || '000000';
+                      
+                      return `${prio} ${classification.toUpperCase()} ${adres.toUpperCase()} ${plaats.toUpperCase()} ICNUM ${incidentNr}`;
+                    })()}
+                  </div>
+                  <div className="gms2-p2000-incident-details">
+                    <div>Incident: #{selectedIncident.nr}</div>
+                    <div>Prioriteit: P{selectedIncident.prio}</div>
+                    <div>Tijd: {selectedIncident.tijd}</div>
+                    <div>Classificatie: {selectedIncident.mc3 || selectedIncident.mc2 || selectedIncident.mc1 || 'Onbekend'}</div>
+                  </div>
+                </div>
+              )}
+
+              {!selectedIncident && (
+                <div className="gms2-p2000-current-incident">
+                  <div className="gms2-p2000-section-header">Geen Actieve Melding</div>
+                  <div className="gms2-p2000-pager-text demo">
+                    4 DEMONSTRATIE DOELWATER ROTTERDAM ICNUM 357062
+                  </div>
+                  <div className="gms2-p2000-incident-details">
+                    <div>Selecteer een incident om pagertext te genereren</div>
+                  </div>
+                </div>
+              )}
+
               <div className="gms2-p2000-grid">
                 <div className="gms2-p2000-section">
                   <div className="gms2-p2000-section-header">Actieve Alarmeringen</div>
                   <div className="gms2-p2000-list">
-                    <div className="gms2-p2000-alarm-item active">
+                    {selectedIncident && (
+                      <div className="gms2-p2000-alarm-item active">
+                        <span className="gms2-p2000-prio">P{selectedIncident.prio}</span>
+                        <span className="gms2-p2000-capcode">1401{String(selectedIncident.nr).slice(-3)}</span>
+                        <span className="gms2-p2000-text">
+                          {selectedIncident.mc2 || selectedIncident.mc1 || 'MELDING'} {selectedIncident.locatie}
+                        </span>
+                        <span className="gms2-p2000-time-small">
+                          {selectedIncident.tijd || String(currentTime.getHours()).padStart(2, '0') + ':' + String(currentTime.getMinutes()).padStart(2, '0')}
+                        </span>
+                      </div>
+                    )}
+                    <div className="gms2-p2000-alarm-item">
                       <span className="gms2-p2000-prio">P1</span>
                       <span className="gms2-p2000-capcode">1401998</span>
                       <span className="gms2-p2000-text">A1 Ambu 17101 - Rit 26851</span>
