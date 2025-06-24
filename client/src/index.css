@@ -3303,6 +3303,36 @@ body {
   border: 1px solid #008000;
 }
 
+.gms2-p2000-entry.live-alarm {
+  background: #003300;
+  border: 1px solid #00ff00;
+  margin: 2px 0;
+  padding: 4px;
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% { background: #003300; }
+  50% { background: #004400; }
+  100% { background: #003300; }
+}
+
+.gms2-p2000-entry.live-alarm .gms2-p2000-message {
+  color: #ffff00;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.gms2-p2000-entry.live-alarm .gms2-p2000-capcode {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.gms2-p2000-entry.live-alarm .gms2-p2000-unit {
+  color: #ff8800;
+  font-weight: bold;
+}
+
 .gms2-p2000-entry {
   margin-bottom: 15px;
   padding: 8px;

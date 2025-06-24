@@ -2214,6 +2214,18 @@ export default function GMS2() {
                 <div className="gms2-p2000-feed">
                   
 
+                  {/* Live P2000 Feed Entries */}
+                  {/* Show current pager text as live entry when alarm is sent */}
+                  {pagerText && (
+                    <div className="gms2-p2000-entry live-alarm">
+                      <div className="gms2-p2000-datetime">{new Date().toLocaleDateString('nl-NL')}</div>
+                      <div className="gms2-p2000-time">{String(currentTime.getHours()).padStart(2, '0')}:{String(currentTime.getMinutes()).padStart(2, '0')}</div>
+                      <div className="gms2-p2000-message">{pagerText}</div>
+                      <div className="gms2-p2000-capcode">GMS2 ALARMERING VERZONDEN</div>
+                      <div className="gms2-p2000-unit">🚨 LIVE UITZENDERING</div>
+                    </div>
+                  )}
+
                   {/* Add current incident if selected */}
                   {selectedIncident && (
                     <div className="gms2-p2000-entry current">
