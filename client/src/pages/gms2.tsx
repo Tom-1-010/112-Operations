@@ -1197,51 +1197,66 @@ export default function GMS2() {
         }
       }
 
-    // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
-    const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
-
-    let bestMatch = null;
-    let bestScore = 0;
-
-    for (const k of karakteristiekenDatabase) {
-      const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
-      const fullName = (k.ktNaam || '').toLowerCase();
-
-      let score = 0;
-
-      // Check for full phrase match in name
-      if (fullName.includes(fullInput)) {
-        score += 20; // Higher score for full phrase match
-      }
-
-      // Check individual word matches (more strict)
-      let exactMatches = 0;
-      for (const inputWord of inputWords) {
-        for (const nameWord of nameWords) {
-          if (inputWord === nameWord) {
-            score += 10; // Higher score for exact word match
-            exactMatches++;
-          } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
-            score += 3; // Lower score for partial match
-          }
+    // Step 3.5: Handle special "inzet pol [specific]" patterns
+      if (code === 'inzet' && value.startsWith('pol ')) {
+        const specificPart = value.substring(4); // Remove "pol " prefix
+        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+          k.ktCode && k.ktCode.toLowerCase() === 'ipa' // Inzet Pol algemeen code
+        );
+        if (matchingKarakteristiek) {
+          finalValue = specificPart; // Use only the specific part (e.g., "ovdp")
+          console.log(`✅ Found "inzet pol [specific]" match: "${specificPart}" for Inzet Pol algemeen`);
+          // Don't return here, continue to processing below
         }
       }
 
-      // Require at least one exact word match for fuzzy matching
-      if (exactMatches === 0) {
-        score = 0;
-      }
+      // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
+      if (!matchingKarakteristiek) {
+        const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
 
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = k;
-      }
-    }
+        let bestMatch = null;
+        let bestScore = 0;
+
+        for (const k of karakteristiekenDatabase) {
+          const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
+          const fullName = (k.ktNaam || '').toLowerCase();
+
+          let score = 0;
+
+          // Check for full phrase match in name
+          if (fullName.includes(fullInput)) {
+            score += 20; // Higher score for full phrase match
+          }
+
+          // Check individual word matches (more strict)
+          let exactMatches = 0;
+          for (const inputWord of inputWords) {
+            for (const nameWord of nameWords) {
+              if (inputWord === nameWord) {
+                score += 10; // Higher score for exact word match
+                exactMatches++;
+              } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
+                score += 3; // Lower score for partial match
+              }
+            }
+          }
+
+          // Require at least one exact word match for fuzzy matching
+          if (exactMatches === 0) {
+            score = 0;
+          }
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = k;
+          }
+        }
 
     // Use match only if we have a very strong score
-      if (bestScore >= 15) {
-        matchingKarakteristiek = bestMatch;
-        console.log(`✅ Found fuzzy match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}" for input "${fullInput}"`);
+        if (bestScore >= 15) {
+          matchingKarakteristiek = bestMatch;
+          console.log(`✅ Found fuzzy match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}" for input "${fullInput}"`);
+        }
       }
 
     if (!matchingKarakteristiek) {
