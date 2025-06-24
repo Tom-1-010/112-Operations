@@ -14,7 +14,7 @@ import {
 import { eq, desc } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
   // Load LMC classifications from JSON file
   app.get("/api/lmc-classifications", (req, res) => {
     try {
@@ -281,11 +281,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Karakteristieken endpoints
   app.get("/api/karakteristieken", async (req, res) => {
     try {
-      const karakteristiekenList = await db.select().from(karakteristieken).catch(() => []);
-      res.json(karakteristiekenList);
+      console.log('🔍 Fetching karakteristieken from database...');
+      const allKarakteristieken = await db.select().from(karakteristieken);
+      console.log(`📊 Found ${allKarakteristieken.length} karakteristieken in database`);
+
+      // Transform to match expected format
+      const formattedKarakteristieken = allKarakteristieken.map(k => ({
+        ktNaam: k.kt_naam,
+        ktType: k.kt_type, 
+        ktWaarde: k.kt_waarde,
+        ktCode: k.kt_code,
+        ktParser: k.kt_paser // Note: keeping original column name mapping
+      }));
+
+      console.log(`✅ Returning ${formattedKarakteristieken.length} formatted karakteristieken`);
+      res.json(formattedKarakteristieken);
     } catch (error) {
-      console.error("Error fetching karakteristieken:", error);
-      res.json([]); // Return empty array instead of error
+      console.error("❌ Error fetching karakteristieken:", error);
+      res.status(500).json({ error: "Failed to fetch karakteristieken" });
     }
   });
 
