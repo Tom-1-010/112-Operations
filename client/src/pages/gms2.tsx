@@ -2530,7 +2530,7 @@ export default function GMS2() {
                   >
                     <span>{incident.prio}</span>
                     <span>{incident.locatie}</span>
-                    <span>{incident.plaats}</span>
+                    <span>{incident.plaatsnaam || incident.plaats}</span>
                     <span className="gms2-mc-cell">{mcClassification}</span>
                     <span>{incident.roepnr}</span>
                     <span>{incident.nr}</span>
