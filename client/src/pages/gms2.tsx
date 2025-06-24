@@ -3002,8 +3002,15 @@ export default function GMS2() {
                   </div>
 
                   <div className="gms2-action-buttons" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <select className="gms2-dropdown" style={{ minWidth: '100px' }}>
-                      <option>Testmelding</option>
+                    <select className="gms2-dropdown" style={{ minWidth: '150px' }} defaultValue="7">
+                      <option value="1">1 Autom. afgeh. MK</option>
+                      <option value="2">2 Info bericht</option>
+                      <option value="3">3 Test/oefening</option>
+                      <option value="4">4 Vals/misbruik</option>
+                      <option value="5">5 Overig afgeh. MK</option>
+                      <option value="6">6 Afgebroken inzet</option>
+                      <option value="7">7 Inzet</option>
+                      <option value="8">8 Samengevoegd incident</option>
                     </select>
                     {selectedIncident ? (
                       <button className="gms2-btn" onClick={handleUpdate} style={{ minWidth: '60px' }}>Update</button>
