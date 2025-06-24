@@ -3596,7 +3596,7 @@ body {
 
 .gms2-table-header {
   display: grid;
-  grid-template-columns: 80px 30px 30px 60px 200px 180px 60px 40px;
+  grid-template-columns: 80px 30px 30px 60px 200px 200px 60px 40px;
   background: #c0c0c0;
   border-bottom: 1px solid #808080;
   padding: 2px;
@@ -3606,7 +3606,7 @@ body {
 
 .gms2-table-row {
   display: grid;
-  grid-template-columns: 80px 30px 30px 60px 200px 180px 60px 40px;
+  grid-template-columns: 80px 30px 30px 60px 200px 200px 60px 40px;
   border-bottom: 1px solid #e0e0e0;
   padding: 2px;
   font-size: 10px;
