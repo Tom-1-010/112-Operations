@@ -1119,232 +1119,189 @@ export default function GMS2() {
     const fullInput = `${code} ${value}`.toLowerCase().trim();
     console.log(`🔍 Full input: "${fullInput}"`);
 
-    // Use all karakteristieken from database, not just unique ones
-    let matchingKarakteristiek = null;
     let foundKarakteristiek = null;
     let finalValue = value;
 
-    // Step 1: Direct code or name match
-    foundKarakteristiek = karakteristiekenDatabase.find(k =>
-      k.ktCode?.toLowerCase() === code.toLowerCase() ||
-      k.ktNaam?.toLowerCase() === code.toLowerCase()
-    );
+    // Step 1: Try parser-based exact matching first (highest priority)
+    foundKarakteristiek = karakteristiekenDatabase.find(k => {
+      if (!k.ktParser) return false;
+      const parser = k.ktParser.toLowerCase();
+      const searchInput = `-${fullInput}`;
+      return parser === searchInput;
+    });
 
-    // Step 2: Handle "aantal [type] [number]" patterns specifically
-      if (code === 'aantal') {
-        const aantalMatch = fullInput.match(/aantal\s+(\w+)\s+(\d+)/);
-        if (aantalMatch) {
-          const [, type, number] = aantalMatch;
-          finalValue = number; // Extract the number
+    if (foundKarakteristiek) {
+      console.log(`✅ Found parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
+    }
 
-          // More comprehensive mapping with exact matches
+    // Step 2: Direct code match
+    if (!foundKarakteristiek) {
+      foundKarakteristiek = karakteristiekenDatabase.find(k =>
+        k.ktCode?.toLowerCase() === code.toLowerCase()
+      );
+      if (foundKarakteristiek) {
+        console.log(`✅ Found direct code match: "${foundKarakteristiek.ktNaam}" for code "${code}"`);
+      }
+    }
+
+    // Step 3: Direct name match
+    if (!foundKarakteristiek) {
+      foundKarakteristiek = karakteristiekenDatabase.find(k =>
+        k.ktNaam?.toLowerCase() === code.toLowerCase()
+      );
+      if (foundKarakteristiek) {
+        console.log(`✅ Found direct name match: "${foundKarakteristiek.ktNaam}" for name "${code}"`);
+      }
+    }
+
+    // Step 4: Handle "aantal [type] [number]" patterns specifically
+    if (!foundKarakteristiek && code === 'aantal') {
+      const aantalMatch = fullInput.match(/aantal\s+(\w+)\s+(\d+)/);
+      if (aantalMatch) {
+        const [, type, number] = aantalMatch;
+        finalValue = number;
+
+        const typeToCodeMap = {
+          'verdachten': 'ddrs', 'daders': 'ddrs', 'dader': 'ddrs',
+          'doden': 'dd', 'dood': 'dd',
+          'gewonden': 'gew', 'gewond': 'gew',
+          'aanhoudingen': 'aanh', 'aanhouding': 'aanh',
+          'personen': 'pers', 'persoon': 'pers',
+          'vermisten': 'verm', 'vermist': 'verm',
+          'water': 'tewt', 'zelfredz': 'nzrz', 'object': 'iobj', 'dieren': 'dier'
+        };
+
+        const targetCode = typeToCodeMap[type];
+        if (targetCode) {
+          foundKarakteristiek = karakteristiekenDatabase.find(k => 
+            k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
+          );
+          if (foundKarakteristiek) {
+            console.log(`✅ Found "aantal [type] [number]" match: "${type}" -> "${targetCode}" with value "${finalValue}"`);
+          }
+        }
+      }
+
+      // Handle "aantal [type]" without number
+      if (!foundKarakteristiek) {
+        const aantalSimpleMatch = fullInput.match(/aantal\s+(\w+)$/);
+        if (aantalSimpleMatch) {
+          const [, type] = aantalSimpleMatch;
+          finalValue = '1';
+
           const typeToCodeMap = {
-            'verdachten': 'ddrs',  // Fix: verdachten -> daders
-            'daders': 'ddrs',
-            'dader': 'ddrs',
-            'doden': 'dd',
-            'dood': 'dd',
-            'gewonden': 'gew',
-            'gewond': 'gew',
-            'aanhoudingen': 'aanh',
-            'aanhouding': 'aanh',
-            'personen': 'pers',
-            'persoon': 'pers',
-            'vermisten': 'verm',
-            'vermist': 'verm',
-            'water': 'tewt',
-            'zelfredz': 'nzrz',
-            'object': 'iobj',
-            'dieren': 'dier'
+            'verdachten': 'ddrs', 'daders': 'ddrs', 'dader': 'ddrs',
+            'doden': 'dd', 'dood': 'dd',
+            'gewonden': 'gew', 'gewond': 'gew',
+            'aanhoudingen': 'aanh', 'aanhouding': 'aanh',
+            'personen': 'pers', 'persoon': 'pers',
+            'vermisten': 'verm', 'vermist': 'verm'
           };
 
           const targetCode = typeToCodeMap[type];
           if (targetCode) {
-            matchingKarakteristiek = karakteristiekenDatabase.find(k => 
+            foundKarakteristiek = karakteristiekenDatabase.find(k => 
               k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
             );
-            if (matchingKarakteristiek) {
-              console.log(`✅ Found "aantal [type] [number]" match: "${type}" -> "${targetCode}" with value "${finalValue}"`);
-              // Don't return here, continue to processing below
-            }
-          }
-        }
-
-        // Handle "aantal [type]" without number
-        if (!matchingKarakteristiek) {
-          const aantalSimpleMatch = fullInput.match(/aantal\s+(\w+)$/);
-          if (aantalSimpleMatch) {
-            const [, type] = aantalSimpleMatch;
-            finalValue = '1'; // Default to 1 if no number specified
-
-            const typeToCodeMap = {
-              'verdachten': 'ddrs',  // Fix: verdachten -> daders  
-              'daders': 'ddrs',
-              'dader': 'ddrs',
-              'doden': 'dd',
-              'dood': 'dd',
-              'gewonden': 'gew',
-              'gewond': 'gew',
-              'aanhoudingen': 'aanh',
-              'aanhouding': 'aanh',
-              'personen': 'pers',
-              'persoon': 'pers',
-              'vermisten': 'verm',
-              'vermist': 'verm'
-            };
-
-            const targetCode = typeToCodeMap[type];
-            if (targetCode) {
-              matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-                k.ktCode && k.ktCode.toLowerCase() === targetCode.toLowerCase()
-              );
-              if (matchingKarakteristiek) {
-                console.log(`✅ Found "aantal [type]" match: "${type}" -> "${targetCode}" with default value "${finalValue}"`);
-                // Don't return here, continue to processing below
-              }
+            if (foundKarakteristiek) {
+              console.log(`✅ Found "aantal [type]" match: "${type}" -> "${targetCode}" with default value "${finalValue}"`);
             }
           }
         }
       }
+    }
 
-      // Step 3: Try exact specific patterns
-      if (!matchingKarakteristiek) {
-        const specificPatterns = {
-          'overval diefstal': 'ovdp',
-          'ovdp': 'ovdp',
-          'afkruisen': 'afkr',
-          'afkr': 'afkr'
-        };
+    // Step 5: Handle special "inzet pol [specific]" patterns
+    if (!foundKarakteristiek && code === 'inzet' && value.startsWith('pol ')) {
+      const specificPart = value.substring(4);
+      foundKarakteristiek = karakteristiekenDatabase.find(k => 
+        k.ktCode && k.ktCode.toLowerCase() === 'ipa'
+      );
+      if (foundKarakteristiek) {
+        finalValue = specificPart;
+        console.log(`✅ Found "inzet pol [specific]" match: "${specificPart}" for Inzet Pol algemeen`);
+      }
+    }
 
-        // Check for specific exact matches
-        for (const [pattern, expectedCode] of Object.entries(specificPatterns)) {
-          if (fullInput === pattern || fullInput.startsWith(pattern + ' ')) {
-            matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-              k.ktCode && k.ktCode.toLowerCase() === expectedCode.toLowerCase()
-            );
-            if (matchingKarakteristiek) {
-              console.log(`✅ Found specific pattern match: "${pattern}" -> "${expectedCode}"`);
-              break; // Don't return here, continue to processing below
-            }
+    // Step 6: Enhanced fuzzy matching by name content
+    if (!foundKarakteristiek) {
+      const fuzzyMatches = karakteristiekenDatabase.filter(k => {
+        const name = k.ktNaam?.toLowerCase() || '';
+        const searchLower = fullInput.toLowerCase();
+        const ktCode = k.ktCode?.toLowerCase() || '';
+
+        // Check abbreviation mappings first
+        const codeAbbrevs = commonAbbreviations[ktCode] || [];
+        for (const abbrev of codeAbbrevs) {
+          if (searchLower.includes(abbrev.toLowerCase()) || abbrev.toLowerCase().includes(searchLower)) {
+            return true;
           }
         }
-      }
 
-    // Step 3.5: Handle special "inzet pol [specific]" patterns
-      if (code === 'inzet' && value.startsWith('pol ')) {
-        const specificPart = value.substring(4); // Remove "pol " prefix
-        matchingKarakteristiek = karakteristiekenDatabase.find(k => 
-          k.ktCode && k.ktCode.toLowerCase() === 'ipa' // Inzet Pol algemeen code
-        );
-        if (matchingKarakteristiek) {
-          finalValue = specificPart; // Use only the specific part (e.g., "ovdp")
-          console.log(`✅ Found "inzet pol [specific]" match: "${specificPart}" for Inzet Pol algemeen`);
-          // Don't return here, continue to processing below
+        // Calculate simple similarity score
+        let score = 0;
+        const searchWords = searchLower.split(' ').filter(w => w.length > 2);
+
+        for (const word of searchWords) {
+          if (name.includes(word)) {
+            score += word.length;
+          }
+          if (ktCode && word.includes(ktCode)) {
+            score += ktCode.length * 2;
+          }
         }
-      }
 
-    // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
-      if (!foundKarakteristiek) {
-        const fuzzyMatches = karakteristiekenDatabase.filter(k => {
-          const name = k.ktNaam?.toLowerCase() || '';
+        return score > 3;
+      });
+
+      if (fuzzyMatches.length > 0) {
+        fuzzyMatches.sort((a, b) => {
+          const aCode = a.ktCode?.toLowerCase() || '';
+          const bCode = b.ktCode?.toLowerCase() || '';
           const searchLower = fullInput.toLowerCase();
-          const ktCode = k.ktCode?.toLowerCase() || '';
 
-          // Check abbreviation mappings first
-          const codeAbbrevs = commonAbbreviations[ktCode] || [];
-          for (const abbrev of codeAbbrevs) {
-            if (searchLower.includes(abbrev.toLowerCase()) || abbrev.toLowerCase().includes(searchLower)) {
-              return true;
-            }
-          }
+          const aCodeMatch = searchLower.includes(aCode) || aCode.includes(searchLower);
+          const bCodeMatch = searchLower.includes(bCode) || bCode.includes(searchLower);
 
-          // Calculate simple similarity score
-          let score = 0;
-          const searchWords = searchLower.split(' ').filter(w => w.length > 2);
+          if (aCodeMatch && !bCodeMatch) return -1;
+          if (!aCodeMatch && bCodeMatch) return 1;
 
-          for (const word of searchWords) {
-            if (name.includes(word)) {
-              score += word.length;
-            }
-            // Also check if the karakteristiek name contains abbreviations
-            if (ktCode && word.includes(ktCode)) {
-              score += ktCode.length * 2; // Boost code matches
-            }
-          }
-
-          return score > 3; // Minimum score threshold
+          const aName = a.ktNaam?.toLowerCase() || '';
+          const bName = b.ktNaam?.toLowerCase() || '';
+          return bName.length - aName.length;
         });
 
-        if (fuzzyMatches.length > 0) {
-          // Sort by relevance (code matches first, then longer matches)
-          fuzzyMatches.sort((a, b) => {
-            const aCode = a.ktCode?.toLowerCase() || '';
-            const bCode = b.ktCode?.toLowerCase() || '';
-            const searchLower = fullInput.toLowerCase();
-
-            // Prioritize exact code matches
-            const aCodeMatch = searchLower.includes(aCode) || aCode.includes(searchLower);
-            const bCodeMatch = searchLower.includes(bCode) || bCode.includes(searchLower);
-
-            if (aCodeMatch && !bCodeMatch) return -1;
-            if (!aCodeMatch && bCodeMatch) return 1;
-
-            const aName = a.ktNaam?.toLowerCase() || '';
-            const bName = b.ktNaam?.toLowerCase() || '';
-            return bName.length - aName.length;
-          });
-
-          foundKarakteristiek = fuzzyMatches[0];
-          console.log(`✅ Found fuzzy match with score ${fuzzyMatches.length}: "${foundKarakteristiek.ktNaam}" for input "${fullInput}"`);
-        }
+        foundKarakteristiek = fuzzyMatches[0];
+        console.log(`✅ Found fuzzy match: "${foundKarakteristiek.ktNaam}" for input "${fullInput}"`);
       }
+    }
 
     if (!foundKarakteristiek) {
       console.log(`❌ No karakteristiek found for code: ${code}`);
-      console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 10).map(k => ({ 
-        code: k.ktCode, 
-        naam: k.ktNaam 
-      })));
-
-      // Show specifically matching ones for debugging
-      const partialMatches = karakteristiekenDatabase.filter(k => 
-        (k.ktNaam || '').toLowerCase().includes(code.toLowerCase()) ||
-        (k.ktCode || '').toLowerCase().includes(code.toLowerCase())
-      );
-      if (partialMatches.length > 0) {
-        console.log(`🔍 Partial matches found:`, partialMatches.slice(0, 5));
-      }
-
       return false;
     }
 
     console.log(`✅ Found karakteristiek: ${foundKarakteristiek.ktNaam} for code: ${code} (type: ${foundKarakteristiek.ktType})`);
-        matchingKarakteristiek = foundKarakteristiek
 
-    // Final value is already determined above, but refine based on type if needed
-    if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
-      // For "Vrije tekst" and "Getal" types, use the determined final value
+    // Determine final value based on type
+    if (foundKarakteristiek.ktType === 'Vrije tekst' || foundKarakteristiek.ktType === 'Getal') {
       if (!finalValue) {
         finalValue = value || '';
       }
-      console.log(`📝 Using determined value for ${matchingKarakteristiek.ktType}: "${finalValue}"`);
-    } else if (matchingKarakteristiek.ktType === 'Ja/Nee') {
-      // For Ja/Nee types, use the provided value or default from database
-      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || 'Ja';
-    } else if (matchingKarakteristiek.ktType === 'Enkelvoudige opsom') {
-      // For single choice, use provided value or database default
-      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
-    } else if (matchingKarakteristiek.ktType === 'Meervoudige opsom') {
-      // For multiple choice, use provided value or database default
-      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
+      console.log(`📝 Using determined value for ${foundKarakteristiek.ktType}: "${finalValue}"`);
+    } else if (foundKarakteristiek.ktType === 'Ja/Nee') {
+      finalValue = finalValue || value || foundKarakteristiek.ktWaarde || 'Ja';
+    } else if (foundKarakteristiek.ktType === 'Enkelvoudige opsom') {
+      finalValue = finalValue || value || foundKarakteristiek.ktWaarde || '';
+    } else if (foundKarakteristiek.ktType === 'Meervoudige opsom') {
+      finalValue = finalValue || value || foundKarakteristiek.ktWaarde || '';
     } else {
-      // Fallback
-      finalValue = finalValue || value || matchingKarakteristiek.ktWaarde || '';
+      finalValue = finalValue || value || foundKarakteristiek.ktWaarde || '';
     }
 
-    // Check if this exact karakteristiek already exists (by code AND name to allow multiples)
+    // Check if this exact karakteristiek already exists
     const existingIndex = selectedKarakteristieken.findIndex(k => 
-      k.ktCode === matchingKarakteristiek.ktCode && k.ktNaam === matchingKarakteristiek.ktNaam
+      k.ktCode === foundKarakteristiek.ktCode && k.ktNaam === foundKarakteristiek.ktNaam
     );
 
     if (existingIndex !== -1) {
@@ -1353,8 +1310,7 @@ export default function GMS2() {
         const updated = [...prev];
         const existing = updated[existingIndex];
 
-        // For meervoudige types, append values; for others, replace
-        if (matchingKarakteristiek.ktType === 'Meervoudige opsom' && 
+        if (foundKarakteristiek.ktType === 'Meervoudige opsom' && 
             finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
           updated[existingIndex] = {
             ...existing,
@@ -1375,10 +1331,10 @@ export default function GMS2() {
       // Add new karakteristiek
       const newKarakteristiek = {
         id: Date.now() + Math.random(),
-        ktNaam: matchingKarakteristiek.ktNaam,
-        ktType: matchingKarakteristiek.ktType,
+        ktNaam: foundKarakteristiek.ktNaam,
+        ktType: foundKarakteristiek.ktType,
         waarde: finalValue,
-        ktCode: matchingKarakteristiek.ktCode
+        ktCode: foundKarakteristiek.ktCode
       };
 
       console.log(`📝 Added new karakteristiek:`, newKarakteristiek);
