@@ -1086,8 +1086,34 @@ export default function GMS2() {
     return processed;
   };
 
-  // Helper function to process individual karakteristiek code
-  const processKarakteristiekCode = (code: string, value: string) => {
+  // Check for OVDP-related codes
+    console.log("🔍 Found OVDP-related codes:", karakteristiekenDatabase.filter(k => 
+      k.ktCode?.toLowerCase().includes('ovdp') || 
+      k.ktNaam?.toLowerCase().includes('overval') ||
+      k.ktNaam?.toLowerCase().includes('diefstal')
+    ).slice(0, 10));
+
+    // Common abbreviations mapping for better shortcode detection
+    const commonAbbreviations: Record<string, string[]> = {
+      'pol': ['politie', 'police'],
+      'brw': ['brandweer', 'brand'],
+      'ambu': ['ambulance', 'ambu'],
+      'gew': ['gewonden', 'gewond'],
+      'dd': ['doden', 'dood'],
+      'pers': ['personen', 'persoon'],
+      'ovdp': ['overval', 'diefstal', 'poging'],
+      'betr': ['betreft'],
+      'opgelp': ['opgelost', 'oplosing'],
+      'vtgs': ['vracht', 'tank', 'gevaarlijke stof'],
+      'ddrs': ['daders', 'dader'],
+      'nzrz': ['niet zelfredding', 'zelfreddend'],
+      'iobj': ['in object', 'object'],
+      'tewt': ['te water', 'water'],
+      'verm': ['vermist', 'vermissing'],
+      'aanh': ['aanhouding', 'aanhouden']
+    };
+
+    function processKarakteristiekCode(code: string, value: string) {
     console.log(`🔍 Looking for karakteristiek with code: "${code}", value: "${value}"`);
 
     const fullInput = `${code} ${value}`.toLowerCase().trim();
@@ -1095,7 +1121,14 @@ export default function GMS2() {
 
     // Use all karakteristieken from database, not just unique ones
     let matchingKarakteristiek = null;
+    let foundKarakteristiek = null;
     let finalValue = value;
+
+    // Step 1: Direct code or name match
+    foundKarakteristiek = karakteristiekenDatabase.find(k =>
+      k.ktCode?.toLowerCase() === code.toLowerCase() ||
+      k.ktNaam?.toLowerCase() === code.toLowerCase()
+    );
 
     // Step 2: Handle "aantal [type] [number]" patterns specifically
       if (code === 'aantal') {
@@ -1210,56 +1243,63 @@ export default function GMS2() {
         }
       }
 
-      // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
-      if (!matchingKarakteristiek) {
-        const inputWords = fullInput.split(/\s+/).filter(word => word.length > 2);
+    // Step 4: Enhanced fuzzy matching by name content (with stricter scoring)
+      if (!foundKarakteristiek) {
+        const fuzzyMatches = karakteristiekenDatabase.filter(k => {
+          const name = k.ktNaam?.toLowerCase() || '';
+          const searchLower = fullInput.toLowerCase();
+          const ktCode = k.ktCode?.toLowerCase() || '';
 
-        let bestMatch = null;
-        let bestScore = 0;
-
-        for (const k of karakteristiekenDatabase) {
-          const nameWords = (k.ktNaam || '').toLowerCase().split(/\s+/).filter(word => word.length > 2);
-          const fullName = (k.ktNaam || '').toLowerCase();
-
-          let score = 0;
-
-          // Check for full phrase match in name
-          if (fullName.includes(fullInput)) {
-            score += 20; // Higher score for full phrase match
-          }
-
-          // Check individual word matches (more strict)
-          let exactMatches = 0;
-          for (const inputWord of inputWords) {
-            for (const nameWord of nameWords) {
-              if (inputWord === nameWord) {
-                score += 10; // Higher score for exact word match
-                exactMatches++;
-              } else if (nameWord.includes(inputWord) && inputWord.length > 3) {
-                score += 3; // Lower score for partial match
-              }
+          // Check abbreviation mappings first
+          const codeAbbrevs = commonAbbreviations[ktCode] || [];
+          for (const abbrev of codeAbbrevs) {
+            if (searchLower.includes(abbrev.toLowerCase()) || abbrev.toLowerCase().includes(searchLower)) {
+              return true;
             }
           }
 
-          // Require at least one exact word match for fuzzy matching
-          if (exactMatches === 0) {
-            score = 0;
+          // Calculate simple similarity score
+          let score = 0;
+          const searchWords = searchLower.split(' ').filter(w => w.length > 2);
+
+          for (const word of searchWords) {
+            if (name.includes(word)) {
+              score += word.length;
+            }
+            // Also check if the karakteristiek name contains abbreviations
+            if (ktCode && word.includes(ktCode)) {
+              score += ktCode.length * 2; // Boost code matches
+            }
           }
 
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = k;
-          }
-        }
+          return score > 3; // Minimum score threshold
+        });
 
-    // Use match only if we have a very strong score
-        if (bestScore >= 15) {
-          matchingKarakteristiek = bestMatch;
-          console.log(`✅ Found fuzzy match with score ${bestScore}: "${matchingKarakteristiek.ktNaam}" for input "${fullInput}"`);
+        if (fuzzyMatches.length > 0) {
+          // Sort by relevance (code matches first, then longer matches)
+          fuzzyMatches.sort((a, b) => {
+            const aCode = a.ktCode?.toLowerCase() || '';
+            const bCode = b.ktCode?.toLowerCase() || '';
+            const searchLower = fullInput.toLowerCase();
+
+            // Prioritize exact code matches
+            const aCodeMatch = searchLower.includes(aCode) || aCode.includes(searchLower);
+            const bCodeMatch = searchLower.includes(bCode) || bCode.includes(searchLower);
+
+            if (aCodeMatch && !bCodeMatch) return -1;
+            if (!aCodeMatch && bCodeMatch) return 1;
+
+            const aName = a.ktNaam?.toLowerCase() || '';
+            const bName = b.ktNaam?.toLowerCase() || '';
+            return bName.length - aName.length;
+          });
+
+          foundKarakteristiek = fuzzyMatches[0];
+          console.log(`✅ Found fuzzy match with score ${fuzzyMatches.length}: "${foundKarakteristiek.ktNaam}" for input "${fullInput}"`);
         }
       }
 
-    if (!matchingKarakteristiek) {
+    if (!foundKarakteristiek) {
       console.log(`❌ No karakteristiek found for code: ${code}`);
       console.log(`🔍 Available codes sample:`, karakteristiekenDatabase.slice(0, 10).map(k => ({ 
         code: k.ktCode, 
@@ -1278,7 +1318,8 @@ export default function GMS2() {
       return false;
     }
 
-    console.log(`✅ Found karakteristiek: ${matchingKarakteristiek.ktNaam} for code: ${code} (type: ${matchingKarakteristiek.ktType})`);
+    console.log(`✅ Found karakteristiek: ${foundKarakteristiek.ktNaam} for code: ${code} (type: ${foundKarakteristiek.ktType})`);
+        matchingKarakteristiek = foundKarakteristiek
 
     // Final value is already determined above, but refine based on type if needed
     if (matchingKarakteristiek.ktType === 'Vrije tekst' || matchingKarakteristiek.ktType === 'Getal') {
@@ -1565,7 +1606,7 @@ export default function GMS2() {
     if (mc1) {
       const mc2Options = Array.from(new Set(
         lmcClassifications
-          .filter(c => c.MC1 === mc1 && c.MC2 && c.MC2.trim() !== "")
+          .filter(c => c.MC1 === mc1 && c.MC2)
           .map(c => c.MC2)
       )).sort();
 
