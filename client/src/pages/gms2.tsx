@@ -1375,19 +1375,19 @@ export default function GMS2() {
         const updated = [...prev];
         const existing = updated[existingIndex];
 
-        if (foundKarakteristiek.ktType === 'Meervoudige opsom' && 
-            finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
+        // Always append with comma for any karakteristiek type when adding a new value
+        if (finalValue && existing.waarde && !existing.waarde.includes(finalValue)) {
           updated[existingIndex] = {
             ...existing,
             waarde: `${existing.waarde}, ${finalValue}`
           };
           console.log(`📝 Appended value to existing karakteristiek: ${existing.waarde} + ${finalValue}`);
-        } else if (finalValue) {
+        } else if (finalValue && !existing.waarde) {
           updated[existingIndex] = {
             ...existing,
             waarde: finalValue
           };
-          console.log(`📝 Updated existing karakteristiek with new value: ${finalValue}`);
+          console.log(`📝 Set first value for existing karakteristiek: ${finalValue}`);
         }
 
         return updated;
