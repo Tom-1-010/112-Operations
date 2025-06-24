@@ -1132,6 +1132,8 @@ export default function GMS2() {
 
     if (foundKarakteristiek) {
       console.log(`✅ Found parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
+      // Use the value from the matching parser entry, not the default ktWaarde
+      finalValue = foundKarakteristiek.ktWaarde || value;
     }
 
     // Step 2: Direct code match
