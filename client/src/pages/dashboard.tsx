@@ -4,6 +4,7 @@ import StatsGrid from "../components/stats-grid";
 import IncidentTable from "../components/incident-table";
 import UnitsPanel from "../components/units-panel";
 import GMS2 from "./gms2";
+import GMSEenheden from "./gms-eenheden";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { Incident, Unit, Stats } from "../types";
 
@@ -8404,6 +8405,12 @@ export default function Dashboard() {
         {activeSection === "gms2" && (
           <div className="content-section active">
             <GMS2 />
+          </div>
+        )}
+
+        {activeSection === "gms-eenheden" && (
+          <div className="content-section active">
+            <GMSEenheden />
           </div>
         )}
 
