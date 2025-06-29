@@ -130,39 +130,132 @@ export default function ActiveUnitsDisplay() {
         <div className="active-units-time">{formatTime(currentTime)}</div>
       </div>
 
-      <div className="active-units-table" style={{ overflowY: 'auto', maxHeight: '400px' }}>
-        <table className="units-table">
-          <thead>
+      <div className="active-units-table-wrapper" style={{ 
+        overflowY: 'auto', 
+        overflowX: 'auto',
+        maxHeight: '600px',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        backgroundColor: '#fff'
+      }}>
+        <table className="units-table" style={{ 
+          width: '100%', 
+          borderCollapse: 'collapse',
+          fontSize: '12px'
+        }}>
+          <thead style={{ 
+            position: 'sticky', 
+            top: 0, 
+            backgroundColor: '#f8f9fa',
+            zIndex: 10,
+            borderBottom: '2px solid #dee2e6'
+          }}>
             <tr>
-              <th>Roepnummer</th>
-              <th>Status</th>
-              <th>Inzetrol</th>
-              <th>Locatie</th>
+              <th style={{ 
+                padding: '8px 12px', 
+                textAlign: 'left',
+                borderRight: '1px solid #dee2e6',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}>Roepnummer</th>
+              <th style={{ 
+                padding: '8px 12px', 
+                textAlign: 'left',
+                borderRight: '1px solid #dee2e6',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}>Status</th>
+              <th style={{ 
+                padding: '8px 12px', 
+                textAlign: 'left',
+                borderRight: '1px solid #dee2e6',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}>Inzetrol</th>
+              <th style={{ 
+                padding: '8px 12px', 
+                textAlign: 'left',
+                borderRight: '1px solid #dee2e6',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}>Team</th>
+              <th style={{ 
+                padding: '8px 12px', 
+                textAlign: 'left',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}>Locatie</th>
             </tr>
           </thead>
           <tbody>
-            {activeUnits.map((unit) => (
+            {activeUnits.map((unit, index) => (
               <tr 
                 key={unit.id} 
                 className="unit-table-row"
-                style={{ borderLeft: `3px solid ${getStatusColor(unit.status)}` }}
+                style={{ 
+                  borderLeft: `3px solid ${getStatusColor(unit.status)}`,
+                  backgroundColor: index % 2 === 0 ? '#fff' : '#f8f9fa',
+                  borderBottom: '1px solid #dee2e6'
+                }}
               >
-                <td className="unit-roepnummer-cell">
+                <td style={{ 
+                  padding: '6px 12px',
+                  borderRight: '1px solid #dee2e6',
+                  whiteSpace: 'nowrap'
+                }}>
                   <strong>{unit.roepnummer}</strong>
                 </td>
-                <td className="unit-status-cell">
+                <td style={{ 
+                  padding: '6px 12px',
+                  borderRight: '1px solid #dee2e6',
+                  whiteSpace: 'nowrap'
+                }}>
                   <span 
                     className="status-badge"
-                    style={{ backgroundColor: getStatusColor(unit.status) }}
+                    style={{ 
+                      backgroundColor: getStatusColor(unit.status),
+                      color: '#000',
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                      fontSize: '10px',
+                      fontWeight: 'bold'
+                    }}
                   >
                     {getStatusAbbreviation(unit.status)}
                   </span>
                 </td>
-                <td className="unit-role-cell">
-                  {unit.rollen.join(", ")}
+                <td style={{ 
+                  padding: '6px 12px',
+                  borderRight: '1px solid #dee2e6',
+                  maxWidth: '120px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  <span title={unit.rollen.join(", ")}>
+                    {unit.rollen.join(", ")}
+                  </span>
                 </td>
-                <td className="unit-location-cell">
-                  {unit.locatie || "-"}
+                <td style={{ 
+                  padding: '6px 12px',
+                  borderRight: '1px solid #dee2e6',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '80px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  <span title={unit.team}>
+                    {unit.team}
+                  </span>
+                </td>
+                <td style={{ 
+                  padding: '6px 12px',
+                  maxWidth: '150px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  <span title={unit.locatie || "-"}>
+                    {unit.locatie || "-"}
+                  </span>
                 </td>
               </tr>
             ))}
