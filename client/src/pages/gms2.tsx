@@ -3059,52 +3059,69 @@ export default function GMS2() {
 
                   {activeLoggingTab === 'statusoverzicht' && (
                     <div className="gms2-status-overview">
-                      <div className="gms2-status-table-container">
-                        <div className="gms2-status-table">
+                      <div className="gms2-status-table-container" style={{ 
+                        overflowX: 'auto', 
+                        width: '100%',
+                        fontSize: '10px'
+                      }}>
+                        <table style={{ 
+                          width: '100%', 
+                          borderCollapse: 'collapse', 
+                          border: '1px solid #ccc',
+                          fontSize: '10px'
+                        }}>
                           {/* Header row */}
-                          <div className="gms2-status-header-row">
-                            <div className="gms2-status-cell header-dp">D<br/>P</div>
-                            <div className="gms2-status-cell header-roepnaam" style={{ minWidth: '120px' }}>Roepnaam</div>
-                            <div className="gms2-status-cell header-soort">Soort voe</div>
-                            <div className="gms2-status-cell header-ov">ov</div>
-                            <div className="gms2-status-cell header-ar">ar</div>
-                            <div className="gms2-status-cell header-tp">tp</div>
-                            <div className="gms2-status-cell header-nb">nb</div>
-                            <div className="gms2-status-cell header-am">am</div>
-                            <div className="gms2-status-cell header-vr">vr</div>
-                            <div className="gms2-status-cell header-fd">fd</div>
-                            <div className="gms2-status-cell header-ga">GA</div>
-                          </div>
+                          <thead>
+                            <tr style={{ backgroundColor: '#f0f0f0' }}>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '30px' }}>D<br/>P</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '80px' }}>Roepnaam</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '60px' }}>Soort voe</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>ov</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>ar</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>tp</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>nb</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>am</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>vr</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>fd</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>GA</th>
+                            </tr>
+                          </thead>
 
-                          
-
-                          {/* Dynamic rows for assigned units from selected incident */}
-                          {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
-                            selectedIncident.assignedUnits.map((unit, index) => (
-                              <div key={`${unit.roepnummer}-${index}`} className="gms2-status-data-row">
-                                <div className="gms2-status-cell data-dp">P</div>
-                                <div className="gms2-status-cell data-roepnaam" style={{ minWidth: '120px' }}>{unit.roepnummer}</div>
-                                <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
-                                <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
-                                <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
-                                <div className="gms2-status-cell data-tp">{unit.tp_tijd || ''}</div>
-                                <div className="gms2-status-cell data-nb">{unit.nb_tijd || ''}</div>
-                                <div className="gms2-status-cell data-am">{unit.am_tijd || ''}</div>
-                                <div className="gms2-status-cell data-vr">{unit.vr_tijd || ''}</div>
-                                <div className="gms2-status-cell data-fd">{unit.fd_tijd || ''}</div>
-                                <div className="gms2-status-cell data-ga">{unit.ga_tijd || ''}</div>
-                              </div>
-                            ))
-                          ) : (
-                            selectedIncident && (
-                              <div className="gms2-status-data-row">
-                                <div className="gms2-status-cell" style={{ gridColumn: '1 / -1', textAlign: 'center', fontStyle: 'italic', color: '#666' }}>
-                                  Geen eenheden toegewezen aan dit incident
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
+                          <tbody>
+                            {/* Dynamic rows for assigned units from selected incident */}
+                            {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
+                              selectedIncident.assignedUnits.map((unit, index) => (
+                                <tr key={`${unit.roepnummer}-${index}`}>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>P</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.roepnummer}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.soort_voertuig || 'SurvBus'}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.ov_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.ar_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.tp_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.nb_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.am_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.vr_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.fd_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.ga_tijd || ''}</td>
+                                </tr>
+                              ))
+                            ) : (
+                              selectedIncident && (
+                                <tr>
+                                  <td colSpan={11} style={{ 
+                                    border: '1px solid #ccc', 
+                                    padding: '10px', 
+                                    textAlign: 'center', 
+                                    fontStyle: 'italic', 
+                                    color: '#666' 
+                                  }}>
+                                    Geen eenheden toegewezen aan dit incident
+                                  </td>
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   )}
