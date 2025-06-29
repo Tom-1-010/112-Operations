@@ -3636,6 +3636,15 @@ export default function Dashboard() {
                     "schieten": "vogwsi",
                     "schiet": "vogwsi",
                     
+                    // Traffic accidents
+                    "ongeval wegvervoer letsel": "ogwels",
+                    "wegvervoer letsel": "ogwels",
+                    "verkeersongeval letsel": "ogwels",
+                    "ogwels": "ogwels",
+                    "wegongeval": "ogwels",
+                    "auto ongeval": "ogwels",
+                    "aanrijding": "ogwels",
+                    
                     // Traffic violations
                     "wegverkeer onder invloed": "vkweoi",
                     "onder invloed": "vkweoi",
@@ -3666,6 +3675,9 @@ export default function Dashboard() {
                     "ongeval spoorvervoer letsel": "ogspls",
                     "wegongeval letsel": "ogwels",
                     "spoorwegongeval letsel": "ogspls",
+                    "ogwels": "ogwels",
+                    "wegvervoer letsel": "ogwels",
+                    "verkeersongeval letsel": "ogwels",
                     
                     // Property crimes
                     "bz": "bzdsbr",
