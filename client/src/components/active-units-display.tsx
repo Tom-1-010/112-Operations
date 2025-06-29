@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 
-interface PoliceUnit {
+interface Unit {
   id?: number;
   roepnummer: string;
   aantal_mensen: number;
@@ -12,12 +11,6 @@ interface PoliceUnit {
   locatie?: string;
   incident?: string;
 }
-
-const fetchPoliceUnits = async (): Promise<PoliceUnit[]> => {
-  const response = await fetch('/api/police-units');
-  if (!response.ok) throw new Error('Failed to fetch police units');
-  return response.json();
-};
 
 export default function ActiveUnitsDisplay() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -71,7 +64,7 @@ export default function ActiveUnitsDisplay() {
   };
 
   // Filter only active units (not "5 - Afmelden")
-  const activeUnits = policeUnits.filter(unit => 
+  const activeUnits = units.filter(unit => 
     unit.status !== "5 - Afmelden" && unit.status !== "5 - afmelden"
   );
 
