@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useLocalStorage } from "../hooks/use-local-storage";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface PoliceUnit {
+  id?: number;
   roepnummer: string;
   aantal_mensen: number;
   rollen: string[];
@@ -10,140 +11,61 @@ interface PoliceUnit {
   status: string;
   locatie?: string;
   incident?: string;
-  lastUpdate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-// Default units data from JSON
-const defaultPoliceUnitsData: PoliceUnit[] = [
-  {
-    roepnummer: "RT 11.01",
-    aantal_mensen: 2,
-    rollen: ["Noodhulp"],
-    soort_auto: "BPV - bus",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.02",
-    aantal_mensen: 2,
-    rollen: ["Noodhulp"],
-    soort_auto: "BPV - bus",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.03",
-    aantal_mensen: 2,
-    rollen: ["Noodhulp"],
-    soort_auto: "BPV - bus",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.04",
-    aantal_mensen: 2,
-    rollen: ["Noodhulp"],
-    soort_auto: "BPV - bus",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.05",
-    aantal_mensen: 2,
-    rollen: ["Noodhulp"],
-    soort_auto: "BPV - bus",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.09",
-    aantal_mensen: 1,
-    rollen: ["Senior", "ACO"],
-    soort_auto: "BPV-auto",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.10",
-    aantal_mensen: 1,
-    rollen: ["Opr. Expert", "OPCO"],
-    soort_auto: "BPV-auto",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.16",
-    aantal_mensen: 2,
-    rollen: ["Noodhulp", "Onopvallend"],
-    soort_auto: "BPV-onopvallend",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.21",
-    aantal_mensen: 1,
-    rollen: ["Noodhulp", "Motor"],
-    soort_auto: "BPV-motor",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.26",
-    aantal_mensen: 2,
-    rollen: ["Voet/fiets"],
-    soort_auto: "Fiets",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.34",
-    aantal_mensen: 3,
-    rollen: ["Noodhulp", "Studenten"],
-    soort_auto: "BPV-auto",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.50",
-    aantal_mensen: 1,
-    rollen: ["Opsporing"],
-    soort_auto: "BPV-onopvallend",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.60",
-    aantal_mensen: 1,
-    rollen: ["Wijkagent"],
-    soort_auto: "BPV-auto",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.95",
-    aantal_mensen: 1,
-    rollen: ["Reisnummer"],
-    soort_auto: "BPV-auto",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  },
-  {
-    roepnummer: "RT 11.99",
-    aantal_mensen: 1,
-    rollen: ["teamchef"],
-    soort_auto: "BPV-auto",
-    team: "Basisteam Waterweg (A1)",
-    status: "5 - Afmelden"
-  }
-];
+// API functions
+const fetchPoliceUnits = async (): Promise<PoliceUnit[]> => {
+  const response = await fetch('/api/police-units');
+  if (!response.ok) throw new Error('Failed to fetch police units');
+  return response.json();
+};
+
+const updatePoliceUnit = async (unit: PoliceUnit): Promise<PoliceUnit> => {
+  const response = await fetch(`/api/police-units/${unit.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(unit),
+  });
+  if (!response.ok) throw new Error('Failed to update police unit');
+  return response.json();
+};
+
+const createPoliceUnit = async (unit: Omit<PoliceUnit, 'id'>): Promise<PoliceUnit> => {
+  const response = await fetch('/api/police-units', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(unit),
+  });
+  if (!response.ok) throw new Error('Failed to create police unit');
+  return response.json();
+};
 
 export default function GMSEenheden() {
-  const [policeUnits, setPoliceUnits] = useLocalStorage<PoliceUnit[]>(
-    "policeUnitsDatabase",
-    defaultPoliceUnitsData
-  );
-
+  const queryClient = useQueryClient();
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Fetch police units from database
+  const { data: policeUnits = [], isLoading, error } = useQuery({
+    queryKey: ['police-units'],
+    queryFn: fetchPoliceUnits,
+  });
+
+  // Mutations
+  const updateUnitMutation = useMutation({
+    mutationFn: updatePoliceUnit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['police-units'] });
+    },
+  });
+
+  const createUnitMutation = useMutation({
+    mutationFn: createPoliceUnit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['police-units'] });
+    },
+  });
 
   // Update time every second
   useEffect(() => {
@@ -161,34 +83,16 @@ export default function GMSEenheden() {
     });
   };
 
-  const updateUnitStatus = (roepnummer: string, newStatus: string) => {
-    setPoliceUnits(prev => 
-      prev.map(unit => 
-        unit.roepnummer === roepnummer 
-          ? { ...unit, status: newStatus, lastUpdate: new Date().toISOString() }
-          : unit
-      )
-    );
+  const updateUnitStatus = (unit: PoliceUnit, newStatus: string) => {
+    updateUnitMutation.mutate({ ...unit, status: newStatus });
   };
 
-  const updateUnitLocation = (roepnummer: string, newLocation: string) => {
-    setPoliceUnits(prev => 
-      prev.map(unit => 
-        unit.roepnummer === roepnummer 
-          ? { ...unit, locatie: newLocation, lastUpdate: new Date().toISOString() }
-          : unit
-      )
-    );
+  const updateUnitLocation = (unit: PoliceUnit, newLocation: string) => {
+    updateUnitMutation.mutate({ ...unit, locatie: newLocation });
   };
 
-  const updateUnitIncident = (roepnummer: string, newIncident: string) => {
-    setPoliceUnits(prev => 
-      prev.map(unit => 
-        unit.roepnummer === roepnummer 
-          ? { ...unit, incident: newIncident, lastUpdate: new Date().toISOString() }
-          : unit
-      )
-    );
+  const updateUnitIncident = (unit: PoliceUnit, newIncident: string) => {
+    updateUnitMutation.mutate({ ...unit, incident: newIncident });
   };
 
   const getStatusColor = (status: string) => {
@@ -218,12 +122,42 @@ export default function GMSEenheden() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="gms-eenheden-container">
+        <div className="gms-eenheden-header">
+          <div className="gms-eenheden-title">
+            <h2>GMS Eenheden Overzicht</h2>
+            <div className="gms-eenheden-time">Laden...</div>
+          </div>
+        </div>
+        <div className="loading-message">Database wordt geladen...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="gms-eenheden-container">
+        <div className="gms-eenheden-header">
+          <div className="gms-eenheden-title">
+            <h2>GMS Eenheden Overzicht</h2>
+            <div className="gms-eenheden-time">Fout</div>
+          </div>
+        </div>
+        <div className="error-message">
+          Fout bij laden van database: {error.message}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="gms-eenheden-container">
       {/* Header */}
       <div className="gms-eenheden-header">
         <div className="gms-eenheden-title">
-          <h2>GMS Eenheden Overzicht</h2>
+          <h2>GMS Eenheden Overzicht (Database)</h2>
           <div className="gms-eenheden-time">
             {formatTime(currentTime)}
           </div>
@@ -247,8 +181,8 @@ export default function GMSEenheden() {
               </tr>
             </thead>
             <tbody>
-              {policeUnits.map((unit, index) => (
-                <tr key={unit.roepnummer} className="gms-eenheden-data-row">
+              {policeUnits.map((unit) => (
+                <tr key={unit.id} className="gms-eenheden-data-row">
                   <td className="gms-eenheden-roepnummer">
                     <strong>{unit.roepnummer}</strong>
                   </td>
@@ -258,8 +192,9 @@ export default function GMSEenheden() {
                   >
                     <select 
                       value={unit.status}
-                      onChange={(e) => updateUnitStatus(unit.roepnummer, e.target.value)}
+                      onChange={(e) => updateUnitStatus(unit, e.target.value)}
                       className="gms-status-select"
+                      disabled={updateUnitMutation.isPending}
                     >
                       <option value="1 - Beschikbaar/vrij">1 - Beschikbaar/vrij</option>
                       <option value="2 - Aanrijdend">2 - Aanrijdend</option>
@@ -286,18 +221,20 @@ export default function GMSEenheden() {
                     <input
                       type="text"
                       value={unit.locatie || ""}
-                      onChange={(e) => updateUnitLocation(unit.roepnummer, e.target.value)}
+                      onChange={(e) => updateUnitLocation(unit, e.target.value)}
                       className="gms-location-input"
                       placeholder="Locatie..."
+                      disabled={updateUnitMutation.isPending}
                     />
                   </td>
                   <td className="gms-eenheden-incident">
                     <input
                       type="text"
                       value={unit.incident || ""}
-                      onChange={(e) => updateUnitIncident(unit.roepnummer, e.target.value)}
+                      onChange={(e) => updateUnitIncident(unit, e.target.value)}
                       className="gms-incident-input"
                       placeholder="Incident..."
+                      disabled={updateUnitMutation.isPending}
                     />
                   </td>
                   <td className="gms-eenheden-team">

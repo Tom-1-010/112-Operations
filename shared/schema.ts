@@ -1,5 +1,5 @@
-import { pgTable, text, serial, integer, timestamp, boolean } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { pgTable, text, serial, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const incidents = pgTable("incidents", {
@@ -22,12 +22,12 @@ export const units = pgTable("units", {
 // GMS incidents table for the dispatch simulator
 export const gmsIncidents = pgTable("gms_incidents", {
   id: serial("id").primaryKey(),
-  
+
   // Meldergegevens
   melderNaam: text("melder_naam"),
   melderAdres: text("melder_adres"),
   telefoonnummer: text("telefoonnummer"),
-  
+
   // Meldingslocatie
   straatnaam: text("straatnaam"),
   huisnummer: text("huisnummer"),
@@ -35,21 +35,21 @@ export const gmsIncidents = pgTable("gms_incidents", {
   postcode: text("postcode"),
   plaatsnaam: text("plaatsnaam"),
   gemeente: text("gemeente"),
-  
+
   // Classificaties
   mc1: text("mc1"),
   mc2: text("mc2"),
   mc3: text("mc3"),
-  
+
   // Tijdstip en prioriteit
   tijdstip: text("tijdstip").notNull(),
   prioriteit: integer("prioriteit").notNull().default(3),
-  
+
   // Status en logging
   status: text("status").notNull().default("Nieuw"),
   meldingslogging: text("meldingslogging"),
   notities: text("notities"),
-  
+
   // Metadata
   aangemaaktOp: timestamp("aangemaakt_op").notNull().defaultNow(),
   afgesloten: timestamp("afgesloten"),
@@ -66,6 +66,28 @@ export const phoneNumbers = pgTable("phone_numbers", {
   opmerkingen: text("opmerkingen"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Example table - you can modify or remove this
+export const users = pgTable("users", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  username: text("username").unique().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Police units table for GMS-eenheden
+export const policeUnits = pgTable("police_units", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  roepnummer: text("roepnummer").unique().notNull(),
+  aantal_mensen: integer("aantal_mensen").notNull().default(2),
+  rollen: json("rollen").$type<string[]>().notNull(),
+  soort_auto: text("soort_auto").notNull(),
+  team: text("team").notNull(),
+  status: text("status").notNull().default("5 - Afmelden"),
+  locatie: text("locatie"),
+  incident: text("incident"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertIncidentSchema = createInsertSchema(incidents).omit({
@@ -87,12 +109,20 @@ export const insertPhoneNumberSchema = createInsertSchema(phoneNumbers).omit({
   updatedAt: true,
 });
 
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
+
+export const insertPoliceUnitSchema = createInsertSchema(policeUnits);
+export const selectPoliceUnitSchema = createSelectSchema(policeUnits);
+
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
 export type InsertUnit = z.infer<typeof insertUnitSchema>;
 export type Unit = typeof units.$inferSelect;
 export type InsertGmsIncident = z.infer<typeof insertGmsIncidentSchema>;
 export type GmsIncident = typeof gmsIncidents.$inferSelect;
+export type InsertPhoneNumber = z.infer<typeof insertPhoneNumberSchema>;
+export type PhoneNumber = typeof phoneNumbers.$inferSelect;
 export const karakteristieken = pgTable("karakteristieken", {
   id: serial("id").primaryKey(),
   ktNaam: text("kt_naam").notNull(),
@@ -110,7 +140,10 @@ export const insertKarakteristiekSchema = createInsertSchema(karakteristieken).o
   updatedAt: true,
 });
 
-export type InsertPhoneNumber = z.infer<typeof insertPhoneNumberSchema>;
-export type PhoneNumber = typeof phoneNumbers.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type SelectUser = typeof users.$inferSelect;
+
+export type InsertPoliceUnit = typeof policeUnits.$inferInsert;
+export type SelectPoliceUnit = typeof policeUnits.$inferSelect;
 export type InsertKarakteristiek = z.infer<typeof insertKarakteristiekSchema>;
 export type Karakteristiek = typeof karakteristieken.$inferSelect;

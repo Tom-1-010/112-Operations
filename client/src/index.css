@@ -5056,6 +5056,34 @@ body {
   color: hsl(0, 80%, 35%); /* Dark red for emergency call */
 }
 
+/* Loading and error states for GMS-eenheden */
+.loading-message, .error-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  font-size: 16px;
+  color: hsl(220, 9%, 40%);
+  background: white;
+  border: 1px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.error-message {
+  color: hsl(0, 65%, 51%);
+  background: hsl(0, 65%, 95%);
+  border-color: hsl(0, 65%, 85%);
+}
+
+/* Disabled states for form elements */
+.gms-status-select:disabled,
+.gms-location-input:disabled,
+.gms-incident-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Pagination Styles */
 .pagination-container {
   display: flex;
