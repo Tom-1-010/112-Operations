@@ -1628,6 +1628,153 @@ body {
   color: #2e7d32;
 }
 
+/* Active Units Display Styling */
+.active-units-container {
+  background: white;
+  border: 2px solid #0066cc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.active-units-header {
+  background: #f0f8ff;
+  border-bottom: 1px solid #cce7ff;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.active-units-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #0066cc;
+}
+
+.active-units-summary {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.active-units-time {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.active-units-table {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 400px;
+}
+
+.units-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.units-table thead {
+  background: #e6f3ff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.units-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 10px;
+  border-bottom: 2px solid #0066cc;
+  border-right: 1px solid #cce7ff;
+  color: #0066cc;
+}
+
+.units-table th:last-child {
+  border-right: none;
+}
+
+.unit-table-row {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.1s ease;
+}
+
+.unit-table-row:hover {
+  background-color: #f5f5f5;
+}
+
+.unit-table-row td {
+  padding: 6px 10px;
+  border-right: 1px solid #e0e0e0;
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+.unit-table-row td:last-child {
+  border-right: none;
+}
+
+.unit-roepnummer-cell strong {
+  color: #0066cc;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.unit-status-cell {
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: bold;
+  color: black;
+  min-width: 50px;
+  text-align: center;
+}
+
+.unit-role-cell {
+  font-size: 9px;
+  color: #666;
+}
+
+.unit-location-cell {
+  font-size: 9px;
+  color: #333;
+  font-style: italic;
+}
+
+.no-active-units {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.loading-text {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+}
+
 /* Burger Chat Simulation Styling */
 .burger-chat-container {
   background: white;
