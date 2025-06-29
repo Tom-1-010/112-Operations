@@ -7422,52 +7422,61 @@ export default function Dashboard() {
                     {activeChatTab === "burgers" && currentConversation?.type === "112-gesprek" && (
                       <div className="predefined-questions">
                         <div className="questions-header">📋 Standaard Centralisten Vragen</div>
-                        <div className="question-buttons">
-                          <button 
-                            className="question-btn"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sendMessageToColleague("Wat is er aan de hand?");
+                        <div className="questions-dropdown-section">
+                          <select 
+                            className="questions-dropdown"
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                sendMessageToColleague(e.target.value);
+                                e.target.value = ""; // Reset dropdown after sending
+                              }
                             }}
                           >
-                            ❓ Wat is er aan de hand?
-                          </button>
-                          <button 
-                            className="question-btn"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sendMessageToColleague("Wat is de exacte locatie?");
-                            }}
-                          >
-                            📍 Wat is de exacte locatie?
-                          </button>
-                          <button 
-                            className="question-btn"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sendMessageToColleague("Zijn er gewonden?");
-                            }}
-                          >
-                            🩹 Zijn er gewonden?
-                          </button>
-                          <button 
-                            className="question-btn"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sendMessageToColleague("Hoeveel personen zijn erbij betrokken?");
-                            }}
-                          >
-                            👥 Hoeveel personen zijn erbij betrokken?
-                          </button>
-                          <button 
-                            className="question-btn"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              sendMessageToColleague("Is er een wapen gezien?");
-                            }}
-                          >
-                            ⚔️ Is er een wapen gezien?
-                          </button>
+                            <option value="">Selecteer een standaardvraag...</option>
+                            <option value="Wat is er aan de hand?">❓ Wat is er aan de hand?</option>
+                            <option value="Wat is de exacte locatie?">📍 Wat is de exacte locatie?</option>
+                            <option value="Zijn er gewonden?">🩹 Zijn er gewonden?</option>
+                            <option value="Hoeveel personen zijn erbij betrokken?">👥 Hoeveel personen zijn erbij betrokken?</option>
+                            <option value="Is er een wapen gezien?">⚔️ Is er een wapen gezien?</option>
+                            <option value="Bent u op een veilige plek?">🛡️ Bent u op een veilige plek?</option>
+                            <option value="Kunt u uw naam en telefoonnummer doorgeven?">📞 Kunt u uw naam en telefoonnummer doorgeven?</option>
+                            <option value="Is de situatie nog gaande?">⏰ Is de situatie nog gaande?</option>
+                            <option value="Kunt u de dader(s) beschrijven?">👤 Kunt u de dader(s) beschrijven?</option>
+                            <option value="In welke richting zijn ze vertrokken?">➡️ In welke richting zijn ze vertrokken?</option>
+                            <option value="Is er een voertuig bij betrokken?">🚗 Is er een voertuig bij betrokken?</option>
+                            <option value="Blijft u aan de lijn tot de hulpdiensten er zijn?">📱 Blijft u aan de lijn tot de hulpdiensten er zijn?</option>
+                          </select>
+                          
+                          <div className="custom-question-input">
+                            <input
+                              type="text"
+                              className="custom-question-field"
+                              placeholder="Of typ je eigen vraag hier..."
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  const input = e.target as HTMLInputElement;
+                                  if (input.value.trim()) {
+                                    sendMessageToColleague(input.value);
+                                    input.value = "";
+                                  }
+                                }
+                              }}
+                            />
+                            <button
+                              className="send-custom-question-btn"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                                if (input.value.trim()) {
+                                  sendMessageToColleague(input.value);
+                                  input.value = "";
+                                }
+                              }}
+                            >
+                              Verzend
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
