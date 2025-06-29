@@ -73,11 +73,15 @@ export default function ActiveUnitsDisplay() {
       return;
     }
 
-    // Create assignment object
+    // Create assignment object with current timestamp for "ov" (koppelen)
+    const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
     const assignment = {
       roepnummer: contextMenu.unit.roepnummer,
       soort_voertuig: contextMenu.unit.soort_auto,
-      ov_tijd: new Date().toTimeString().slice(0, 5), // Current time as "HH:MM"
+      ov_tijd: currentTime, // Tijdstip koppelen
+      ar_tijd: '', // Will be filled when status changes to "2 - Aanrijdend"
+      tp_tijd: '', // Will be filled when status changes to "3 - Ter plaatse"
+      vr_tijd: '', // Will be filled when status changes to "1 - Beschikbaar/vrij"
     };
 
     // Update incident with assigned unit
@@ -91,8 +95,10 @@ export default function ActiveUnitsDisplay() {
       (gms2Window as any).updateSelectedIncident(updatedIncident);
     }
 
-    // Update unit status to "2 - Aanrijdend" automatically
+    // Update unit status to "2 - Aanrijdend" automatically with timestamp
     try {
+      const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
+      
       const updatedUnit = {
         ...contextMenu.unit,
         status: "2 - Aanrijdend",
@@ -112,6 +118,12 @@ export default function ActiveUnitsDisplay() {
         setUnits(prev => prev.map(unit => 
           unit.id === contextMenu.unit?.id ? updatedUnit : unit
         ));
+
+        // Update status time in GMS2 incident if function is available
+        const gms2Window = window.parent || window;
+        if ((gms2Window as any).updateUnitStatusTime) {
+          (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, "2 - Aanrijdend");
+        }
       } else {
         console.error('Failed to update unit status');
       }

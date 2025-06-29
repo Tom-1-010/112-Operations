@@ -247,7 +247,7 @@ export default function GMSEenheden() {
             <option value="9 - Info">9 - Info</option>
             <option value="N - Noodoproep">N - Noodoproep</option>
           </select>
-          
+
           <button
             onClick={() => setStatusFilter('in-dienst')}
             className={`gms-dienst-button ${statusFilter === 'in-dienst' ? 'active' : ''}`}

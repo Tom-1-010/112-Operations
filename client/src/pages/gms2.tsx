@@ -538,8 +538,23 @@ export default function GMS2() {
   // Handle "Archiveer" button click
   const handleArchiveer = async () => {
     if (selectedIncident) {
-      // Update status of all assigned units to "1 - Beschikbaar/vrij"
+      // Update status of all assigned units to "1 - Beschikbaar/vrij" with "vr" time
       if (selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0) {
+        const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
+        
+        // First update the assigned units with "vr" time before archiving
+        const updatedAssignedUnits = selectedIncident.assignedUnits.map(unit => ({
+          ...unit,
+          vr_tijd: currentTime
+        }));
+
+        const updatedIncidentWithTimes = {
+          ...selectedIncident,
+          assignedUnits: updatedAssignedUnits
+        };
+
+        setSelectedIncident(updatedIncidentWithTimes);
+
         try {
           // Get all police units to find the ones that need updating
           const response = await fetch('/api/police-units');
@@ -563,7 +578,7 @@ export default function GMS2() {
                   body: JSON.stringify(updatedUnit),
                 });
 
-                console.log(`✅ Eenheid ${assignedUnit.roepnummer} status automatisch gewijzigd naar "1 - Beschikbaar/vrij" na archivering`);
+                console.log(`✅ Eenheid ${assignedUnit.roepnummer} status automatisch gewijzigd naar "1 - Beschikbaar/vrij" na archivering om ${currentTime}`);
               }
             }
 
@@ -876,6 +891,49 @@ export default function GMS2() {
     }
   };
 
+  // Function to update unit status times based on status changes
+  const updateUnitStatusTime = (roepnummer: string, newStatus: string) => {
+    if (!selectedIncident || !selectedIncident.assignedUnits) return;
+
+    const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
+    
+    const updatedAssignedUnits = selectedIncident.assignedUnits.map(unit => {
+      if (unit.roepnummer === roepnummer) {
+        const updatedUnit = { ...unit };
+        
+        // Update specific time field based on status
+        switch (newStatus) {
+          case "2 - Aanrijdend":
+            updatedUnit.ar_tijd = currentTime;
+            break;
+          case "3 - Ter plaatse":
+            updatedUnit.tp_tijd = currentTime;
+            break;
+          case "1 - Beschikbaar/vrij":
+            updatedUnit.vr_tijd = currentTime;
+            break;
+          default:
+            break;
+        }
+        
+        return updatedUnit;
+      }
+      return unit;
+    });
+
+    const updatedIncident = {
+      ...selectedIncident,
+      assignedUnits: updatedAssignedUnits
+    };
+
+    setSelectedIncident(updatedIncident);
+    setIncidents(prev => prev.map(inc => 
+      inc.id === updatedIncident.id ? updatedIncident : inc
+    ));
+
+    console.log(`⏰ Status tijd bijgewerkt voor ${roepnummer}: ${newStatus} om ${currentTime}`);
+  };
+
   // Function to update selected incident from external components
   const updateSelectedIncident = async (updatedIncident: GmsIncident) => {
     setSelectedIncident(updatedIncident);
@@ -942,6 +1000,7 @@ export default function GMS2() {
     (window as any).gms2SelectedIncident = selectedIncident;
     (window as any).gms2Incidents = incidents;
     (window as any).updateSelectedIncident = updateSelectedIncident;
+    (window as any).updateUnitStatusTime = updateUnitStatusTime;
   }, [selectedIncident, incidents]);
 
   // Enhanced shortcode mapping with official LMC codes
