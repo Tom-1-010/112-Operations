@@ -439,55 +439,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const count = await db.select().from(karakteristieken);
       console.log(`Successfully imported ${count.length} karakteristieken to database`);
 
-      // Police units routes
-      app.get("/api/police-units", async (req, res) => {
-        try {
-          const units = await db.select().from(policeUnits).orderBy(policeUnits.roepnummer);
-          return res.json(units);
-        } catch (error) {
-            console.error("Error fetching police units:", error);
-            return res.status(500).json({ error: "Failed to fetch police units" });
-        }
-      });
-
-      app.post("/api/police-units", async (req, res) => {
-        try {
-          const body = req.body;
-          const [newUnit] = await db.insert(policeUnits).values(body).returning();
-          return res.json(newUnit);
-        } catch (error) {
-            console.error("Error creating police unit:", error);
-            return res.status(400).json({ error: "Invalid police unit data" });
-        }
-      });
-
-      app.put("/api/police-units/:id", async (req, res) => {
-        try {
-          const id = parseInt(req.params.id);
-          const body = req.body;
-          const [updatedUnit] = await db
-            .update(policeUnits)
-            .set({ ...body, updatedAt: new Date() })
-            .where(eq(policeUnits.id, id))
-            .returning();
-          return res.json(updatedUnit);
-        } catch (error) {
-            console.error("Error updating police unit:", error);
-            return res.status(400).json({ error: "Failed to update police unit" });
-        }
-      });
-
-      app.delete("/api/police-units/:id", async (req, res) => {
-        try {
-          const id = parseInt(req.params.id);
-          await db.delete(policeUnits).where(eq(policeUnits.id, id));
-          return res.json({ success: true });
-        } catch (error) {
-            console.error("Error deleting police unit:", error);
-            return res.status(500).json({ error: "Failed to delete police unit" });
-        }
-      });
-
       res.json({ 
         success: true, 
         imported: count.length,
@@ -497,6 +448,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error importing karakteristieken:', error);
       res.status(500).json({ error: 'Failed to import karakteristieken' });
+    }
+  });
+
+  // Police units routes
+  app.get("/api/police-units", async (req, res) => {
+    try {
+      const units = await db.select().from(policeUnits).orderBy(policeUnits.roepnummer);
+      return res.json(units);
+    } catch (error) {
+        console.error("Error fetching police units:", error);
+        return res.status(500).json({ error: "Failed to fetch police units" });
+    }
+  });
+
+  app.post("/api/police-units", async (req, res) => {
+    try {
+      const body = req.body;
+      const [newUnit] = await db.insert(policeUnits).values(body).returning();
+      return res.json(newUnit);
+    } catch (error) {
+        console.error("Error creating police unit:", error);
+        return res.status(400).json({ error: "Invalid police unit data" });
+    }
+  });
+
+  app.put("/api/police-units/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const body = req.body;
+      const [updatedUnit] = await db
+        .update(policeUnits)
+        .set({ ...body, updatedAt: new Date() })
+        .where(eq(policeUnits.id, id))
+        .returning();
+      return res.json(updatedUnit);
+    } catch (error) {
+        console.error("Error updating police unit:", error);
+        return res.status(400).json({ error: "Failed to update police unit" });
+    }
+  });
+
+  app.delete("/api/police-units/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(policeUnits).where(eq(policeUnits.id, id));
+      return res.json({ success: true });
+    } catch (error) {
+        console.error("Error deleting police unit:", error);
+        return res.status(500).json({ error: "Failed to delete police unit" });
     }
   });
 
