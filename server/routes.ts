@@ -147,17 +147,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/gms-incidents/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const gmsIncidentData = insertGmsIncidentSchema.parse(req.body);
+      
+      // Handle the data more flexibly to support assigned units
+      const incidentData = {
+        melderNaam: req.body.melderNaam || "",
+        melderAdres: req.body.melderAdres || "",
+        telefoonnummer: req.body.telefoonnummer || "",
+        straatnaam: req.body.straatnaam || "",
+        huisnummer: req.body.huisnummer || "",
+        toevoeging: req.body.toevoeging || "",
+        postcode: req.body.postcode || "",
+        plaatsnaam: req.body.plaatsnaam || "",
+        gemeente: req.body.gemeente || "",
+        mc1: req.body.mc1 || "",
+        mc2: req.body.mc2 || "",
+        mc3: req.body.mc3 || "",
+        tijdstip: req.body.tijdstip || new Date().toISOString(),
+        prioriteit: req.body.prioriteit || 3,
+        status: req.body.status || "Nieuw",
+        meldingslogging: req.body.meldingslogging || "",
+        notities: req.body.notities || "",
+        assignedUnits: req.body.assignedUnits || []
+      };
+
       const [updatedGmsIncident] = await db
         .update(gmsIncidents)
-        .set(gmsIncidentData)
+        .set(incidentData)
         .where(eq(gmsIncidents.id, id))
         .returning();
+        
       if (!updatedGmsIncident) {
         return res.status(404).json({ error: "GMS incident not found" });
       }
+      
+      console.log(`Updated incident ${id} with ${incidentData.assignedUnits.length} assigned units`);
       res.json(updatedGmsIncident);
     } catch (error) {
+      console.error("Error updating GMS incident:", error);
       res.status(400).json({ error: "Failed to update GMS incident" });
     }
   });

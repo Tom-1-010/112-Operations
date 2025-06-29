@@ -73,6 +73,17 @@ export default function ActiveUnitsDisplay() {
       return;
     }
 
+    // Check if unit is already assigned
+    const existingAssignment = (selectedIncident.assignedUnits || []).find(
+      (unit: any) => unit.roepnummer === contextMenu.unit?.roepnummer
+    );
+
+    if (existingAssignment) {
+      alert(`Eenheid ${contextMenu.unit.roepnummer} is al gekoppeld aan dit incident`);
+      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+      return;
+    }
+
     // Create assignment record
     const assignment = {
       roepnummer: contextMenu.unit.roepnummer,
@@ -93,12 +104,12 @@ export default function ActiveUnitsDisplay() {
       assignedUnits: [...(selectedIncident.assignedUnits || []), assignment]
     };
 
-    // Update the parent window's incident data
+    // Update the parent window's incident data (this will now save to database)
     if (gms2Window && (gms2Window as any).updateSelectedIncident) {
       (gms2Window as any).updateSelectedIncident(updatedIncident);
     }
 
-    console.log(`Eenheid ${contextMenu.unit.roepnummer} gekoppeld aan incident ${selectedIncident.nr}`);
+    console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} gekoppeld aan incident ${selectedIncident.nr}`);
     setContextMenu({ visible: false, x: 0, y: 0, unit: null });
   };
 
@@ -115,6 +126,17 @@ export default function ActiveUnitsDisplay() {
       return;
     }
 
+    // Check if unit is actually assigned
+    const isAssigned = (selectedIncident.assignedUnits || []).some(
+      (unit: any) => unit.roepnummer === contextMenu.unit?.roepnummer
+    );
+
+    if (!isAssigned) {
+      alert(`Eenheid ${contextMenu.unit.roepnummer} is niet gekoppeld aan dit incident`);
+      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+      return;
+    }
+
     // Remove assignment from incident
     const updatedIncident = {
       ...selectedIncident,
@@ -123,12 +145,12 @@ export default function ActiveUnitsDisplay() {
       )
     };
 
-    // Update the parent window's incident data
+    // Update the parent window's incident data (this will now save to database)
     if (gms2Window && (gms2Window as any).updateSelectedIncident) {
       (gms2Window as any).updateSelectedIncident(updatedIncident);
     }
 
-    console.log(`Eenheid ${contextMenu.unit.roepnummer} ontkoppeld van incident ${selectedIncident.nr}`);
+    console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} ontkoppeld van incident ${selectedIncident.nr}`);
     setContextMenu({ visible: false, x: 0, y: 0, unit: null });
   };
 

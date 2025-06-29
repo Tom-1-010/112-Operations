@@ -842,15 +842,64 @@ export default function GMS2() {
   };
 
   // Function to update selected incident from external components
-  const updateSelectedIncident = (updatedIncident: GmsIncident) => {
+  const updateSelectedIncident = async (updatedIncident: GmsIncident) => {
     setSelectedIncident(updatedIncident);
     
     // Also update in the incidents list
     setIncidents(prev => prev.map(inc => 
       inc.id === updatedIncident.id ? updatedIncident : inc
     ));
+
+    // Save to database if incident exists
+    if (updatedIncident.id && typeof updatedIncident.id === 'number') {
+      try {
+        const saveData = {
+          melderNaam: updatedIncident.melderNaam || "",
+          melderAdres: updatedIncident.melderAdres || "",
+          telefoonnummer: updatedIncident.telefoonnummer || "",
+          straatnaam: updatedIncident.straatnaam || "",
+          huisnummer: updatedIncident.huisnummer || "",
+          toevoeging: updatedIncident.toevoeging || "",
+          postcode: updatedIncident.postcode || "",
+          plaatsnaam: updatedIncident.plaatsnaam || "",
+          gemeente: updatedIncident.gemeente || "",
+          mc1: updatedIncident.mc1 || "",
+          mc2: updatedIncident.mc2 || "",
+          mc3: updatedIncident.mc3 || "",
+          tijdstip: updatedIncident.tijdstip || new Date().toISOString(),
+          prioriteit: updatedIncident.prioriteit || priorityValue,
+          status: updatedIncident.status || "Openstaand",
+          meldingslogging: updatedIncident.meldingslogging || "",
+          notities: updatedIncident.notities || "",
+          assignedUnits: updatedIncident.assignedUnits || []
+        };
+
+        const response = await fetch(`/api/gms-incidents/${updatedIncident.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(saveData)
+        });
+
+        if (response.ok) {
+          console.log(`✅ Incident ${updatedIncident.nr} assignments saved to database`);
+          
+          // Add logging entry for the assignment change
+          const now = new Date();
+          const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          const assignedCount = updatedIncident.assignedUnits?.length || 0;
+          
+          addLoggingEntry(`🚔 Eenheden bijgewerkt: ${assignedCount} eenhe${assignedCount === 1 ? 'id' : 'den'} gekoppeld`);
+        } else {
+          console.error('Failed to save incident assignments to database');
+        }
+      } catch (error) {
+        console.error('Error saving incident assignments:', error);
+      }
+    }
     
-    console.log(`Incident ${updatedIncident.nr} updated with unit assignments`);
+    console.log(`Incident ${updatedIncident.nr} updated with ${updatedIncident.assignedUnits?.length || 0} unit assignments`);
   };
 
   // Expose state and functions to popup windows and child components for data sync
