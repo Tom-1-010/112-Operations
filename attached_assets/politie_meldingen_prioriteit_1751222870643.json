@@ -1,0 +1,1325 @@
+{
+  "prioriteit_aanwijzing": "Genereer meldingen met onderstaande classificaties (politie-gerelateerd) vaker dan andere. Andere classificaties mogen ook voorkomen, maar met lagere frequentie.",
+  "politie_meldingen": [
+    {
+      "MC1": "Alarm",
+      "MC2": "PAC alarm",
+      "MC3": "Inbraakalarm",
+      "Code": "alpaib",
+      "PRIO": 2.0,
+      "DEFINITIE": "Inbraakmeldingen die via de PAC binnenkomen van de op PAC aangesloten inbraak detectiesystemen."
+    },
+    {
+      "MC1": "Alarm",
+      "MC2": "RAC alarm",
+      "MC3": "Inbraakalarm",
+      "Code": "alraib",
+      "PRIO": 1.0,
+      "DEFINITIE": "Inbraakmeldingen die via de RAC binnenkomen van de op RAC aangesloten inbraakdetectie systemen."
+    },
+    {
+      "MC1": "Alarm",
+      "MC2": "Sensing",
+      "MC3": "Opsporingsmiddel",
+      "Code": "alseom",
+      "PRIO": 2.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "",
+      "MC3": "",
+      "Code": "bz",
+      "PRIO": 4,
+      "DEFINITIE": "Aantasting van andermans bezit of een poging daartoe."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "",
+      "Code": "bzds",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het wegnemen of toe-eigenen van enig goed dat geheel of gedeeltelijk aan een ander toebehoort."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Afpersing",
+      "Code": "bzdsap",
+      "PRIO": 3.0,
+      "DEFINITIE": "Bij een afpersing (in de volksmond: chantage) probeert iemand zich wederrechtelijk te bevoordelen door een ander, al dan niet met geweld/smaad/laster/openbaarmaking, te dwingen iets te geven/te doen/niet te doen/te dulden. Dit kan gepaard gaan met een cybercomponent of seksueel getint materiaal. De daders willen geen politie-inmenging."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Beroving",
+      "Code": "bzdsbr",
+      "PRIO": 1.0,
+      "DEFINITIE": "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Dier",
+      "Code": "bzdsdi",
+      "PRIO": 3.0,
+      "DEFINITIE": "Diefstal van een dier."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Fraude",
+      "Code": "bzdsfd",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het misleiden, bedriegen of schenden van vertrouwen met als doel een oneerlijk of onrechtvaardig voordeel danwel winst te verkrijgen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Goederen",
+      "Code": "bzdsgd",
+      "PRIO": 3.0,
+      "DEFINITIE": "Diefstal van goederen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Heling",
+      "Code": "bzdshl",
+      "PRIO": 3.0,
+      "DEFINITIE": "Heling is het afnemen, verkopen of verhandelen van hetgeen iemand anders gestolen heeft."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Luchtvaartuig",
+      "Code": "bzdslu",
+      "PRIO": 3.0,
+      "DEFINITIE": "Diefstal van een luchtvaartuig."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Oplichting",
+      "Code": "bzdsol",
+      "PRIO": 3.0,
+      "DEFINITIE": "Iemand bewegen tot afgifte van enig goed door middel van het aanwenden van bedrieglijke middelen of door het toepassen van listige kunstgrepen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Vaartuig",
+      "Code": "bzdsva",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie diefstal."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Verduistering",
+      "Code": "bzdsvd",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het opzettelijk en wederrechtelijk toe-eigenen van enig goed dat geheel, of ten dele, aan een ander toebehoort en dat men anders dan door een misdrijf in het bezit gekregen heeft."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Voertuig",
+      "Code": "bzdsvo",
+      "PRIO": 3.0,
+      "DEFINITIE": "Diefstal van een voertuig"
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Winkeldiefstal",
+      "Code": "bzdswk",
+      "PRIO": 2.0,
+      "DEFINITIE": "Diefstal uit een winkel"
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Diefstal",
+      "MC3": "Zakkenrollerij",
+      "Code": "bzdszk",
+      "PRIO": 3.0,
+      "DEFINITIE": "Diefstal door een zakkenroller"
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "",
+      "Code": "bzib",
+      "PRIO": 3.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Bedrijf/Instelling",
+      "Code": "bzibbi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een bedrijf of instelling, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Bijgebouw",
+      "Code": "bzibbg",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Luchtvaartuig",
+      "Code": "bziblu",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een luchtvaartuig, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Spoorvervoer",
+      "Code": "bzibsp",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een railvoertuig, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Vaartuig",
+      "Code": "bzibva",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een vaartuig, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Voertuig",
+      "Code": "bzibvo",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een voertuig, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Inbraak",
+      "MC3": "Woning",
+      "Code": "bzibwn",
+      "PRIO": 2.0,
+      "DEFINITIE": "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Overval",
+      "MC3": "",
+      "Code": "bzov",
+      "PRIO": 1.0,
+      "DEFINITIE": "Het dwingen tot afgifte van enig goed door middel van geweld of het dreigen met geweld met voorbedachte rade."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Overval",
+      "MC3": "Bedrijf/Instelling",
+      "Code": "bzovbi",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een geplande overval op een bedrijf of instelling"
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Overval",
+      "MC3": "Luchtvaartuig",
+      "Code": "bzovlu",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een geplande overval op of in luchtvaartuig niet zijnde een kaping."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Overval",
+      "MC3": "Voertuig/Vaartuig",
+      "Code": "bzovvv",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een geplande overval op een voer- of vaartuig."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Overval",
+      "MC3": "Waardetransport",
+      "Code": "bzovwd",
+      "PRIO": 1.0,
+      "DEFINITIE": "Het met geweld of bedreiging met geweld wegnemen of afpersen van enig goed, gepleegd tegen personen in een afgeschermde ruimte of op een gepland dan wel georganiseerd waardetransport of poging daartoe."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Overval",
+      "MC3": "Woning",
+      "Code": "bzovwn",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een geplande overval op een particulier persoon vaak binnenshuis"
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Stroperij",
+      "MC3": "",
+      "Code": "bzsp",
+      "PRIO": 2.0,
+      "DEFINITIE": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten, dieren etc. wegnemen met het oogmerk van toe-eigening."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Stroperij",
+      "MC3": "Dier",
+      "Code": "bzspdi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende dier(en) wegnemen met het oogmerk van toe-eigening."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Stroperij",
+      "MC3": "Goederen",
+      "Code": "bzspgd",
+      "PRIO": 2.0,
+      "DEFINITIE": "Zonder geweld of dreiging daartoe, het geheel of ten dele, aan een ander toebehorende klei, bagger, veldvruchten etc. wegnemen met het oogmerk van toe-eigening."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "",
+      "Code": "bzvn",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het opzettelijk en wederrechtelijk vernielen, beschadigen, onbruikbaar of wegmaken van enig goed dat aan een ander toebehoort."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Gebouw",
+      "Code": "bzvngb",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Goederen",
+      "Code": "bzvngd",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Graffiti",
+      "Code": "bzvngf",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling. Immers, het herstellen van de schade brengt zodanige kosten met zich mee dat van beschadiging mag worden uitgegaan."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Luchtvaartuig",
+      "Code": "bzvnlu",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Spoorvervoer",
+      "Code": "bzvnsp",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Vaartuig",
+      "Code": "bzvnva",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling."
+    },
+    {
+      "MC1": "Bezitsaantasting",
+      "MC2": "Vernieling",
+      "MC3": "Voertuig",
+      "Code": "bzvnvo",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zie vernieling."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "",
+      "Code": "dvpo",
+      "PRIO": 5.0,
+      "DEFINITIE": "Het verlenen van hulp en leveren van diensten door de politie aan derden en de eigen dienst. Niet zijnde directe inzet voor een incident tenzij het grootschalige bijstand buiten de regio/werkingsgebied betreft."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Aan instanties",
+      "Code": "dvpoai",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het verlenen van hulp en leveren van diensten door de politie aan instanties."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Aantreffen van",
+      "Code": "dvpoav",
+      "PRIO": 3.0,
+      "DEFINITIE": "De inzet van de politie in het kader van het aantreffen van personen of goederen."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Afstemverzoek",
+      "Code": "dvplav",
+      "PRIO": 3.0,
+      "DEFINITIE": "Verzoek van de alarmcentrale aan contactpersoon van de politie in een bepaald gebied, om contact op te nemen met de meldkamer voor overleg hoe om te gaan met een niet spoedeisende, mogelijk nog nader te classificeren zaak."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Begeleiden",
+      "Code": "dvpobg",
+      "PRIO": 3.0,
+      "DEFINITIE": "Inzet van de politie bij de begeleiding van personen  en goederen."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Bijstand",
+      "Code": "dvpobs",
+      "PRIO": 3.0,
+      "DEFINITIE": "Bijstand aanvraag/-inzet van de politie voor (grootschalige) inzet buiten het werkgebied van de alarmcentrale."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Controle Wet ID",
+      "Code": "dvpoci",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Dienst aan derden",
+      "Code": "dvpodd",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het verlenen van diensten aan derden door de politie."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Eigen initiatief",
+      "Code": "dvpoei",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Geplande actie",
+      "Code": "dvpoga",
+      "PRIO": 5.0,
+      "DEFINITIE": "Acties van de politie die, op zich, niet op onverwacht voordoende incidenten gebaseerd zijn maar van te voren gepland zijn. Onder andere bij oefeningen en stand-by staan bij evenementen."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Oefening",
+      "Code": "dvpooe",
+      "PRIO": 5.0,
+      "DEFINITIE": "Het verwerken van een fictief incident, voor trainingsdoeleinden."
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Overbrengen",
+      "Code": "dvpoob",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Testmelding",
+      "Code": "dvpltm",
+      "PRIO": 5.0,
+      "DEFINITIE": "Het verwerken van een testmelding, voor doeleinden om berichtaflevering/aansturing te testen"
+    },
+    {
+      "MC1": "Dienstverlening",
+      "MC2": "Politie",
+      "MC3": "Vermissing",
+      "Code": "dvpovm",
+      "PRIO": 2.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Leefmilieu",
+      "MC2": "Conflict",
+      "MC3": "Burenruzie",
+      "Code": "lmcfbu",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een conflict tussen buren."
+    },
+    {
+      "MC1": "Leefmilieu",
+      "MC2": "Overlast van/door",
+      "MC3": "Verkeer",
+      "Code": "lmolvk",
+      "PRIO": 3.0,
+      "DEFINITIE": "Overlast veroorzaakt door weg-, water-, spoor- en luchtverkeer."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "",
+      "MC3": "",
+      "Code": "vo",
+      "PRIO": 4,
+      "DEFINITIE": "Aantasting van de lichamelijke integriteit van persoon of dreiging met maatschappelijke gevolgen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "",
+      "Code": "voat",
+      "PRIO": 3.0,
+      "DEFINITIE": "Verstoring van de openbare orde"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Demonstratie",
+      "Code": "voatdm",
+      "PRIO": 4.0,
+      "DEFINITIE": "Een spontane of aangekondigde betoging op de openbare weg door een of meerdere personen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Evenementen",
+      "Code": "voatev",
+      "PRIO": 4.0,
+      "DEFINITIE": "Een spontane of aangekondigde gebeurtenis op de openbare weg door eenn of meerdere personen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Huis/lok. vredebreuk",
+      "Code": "voatvb",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het wederrechtelijk binnendringen van een woning of lokaliteit."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Onbevoegd betreden",
+      "Code": "voatob",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zonder toestemming van de eigenaar betreden van een terrein of gebouw."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Overtreding avondklok",
+      "Code": "vooak",
+      "PRIO": 3.0,
+      "DEFINITIE": "Zonder toestemming zich in de openbaarheid begeven gedurende de periode dat een avondklok van toepassing is"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Samenscholing",
+      "Code": "voatsm",
+      "PRIO": 3.0,
+      "DEFINITIE": "Samen zijn van een groep personen dat als hinderlijk wordt ervaren."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Aantast. Openb orde",
+      "MC3": "Stalking",
+      "Code": "vostk",
+      "PRIO": 2.0,
+      "DEFINITIE": "Iemand opzettelijk en structureel lastigvallen, waardoor die persoon zich in zijn of haar vrijheid en veiligheid voelt aangetast."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging",
+      "MC3": "",
+      "Code": "vobev",
+      "PRIO": 3.0,
+      "DEFINITIE": "Beveiligingswerkzaamheden uitgevoerd door 1 of meerdere eenheden van de politie en/of KMAR."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging luchtvaart",
+      "MC3": "",
+      "Code": "vobb",
+      "PRIO": 3.0,
+      "DEFINITIE": "Incidenten met betrekking tot vliegvelden en vliegtuigen van de burgerluchtvaart."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging luchtvaart",
+      "MC3": "Onbeheerde bagage",
+      "Code": "vobbbg",
+      "PRIO": 2.0,
+      "DEFINITIE": "Aantreffen van bagage zonder dat een eigenaar waarneembaar is."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging luchtvaart",
+      "MC3": "Security incident",
+      "Code": "vobbsi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Incident waarvoor 'security' protocollen gelden."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging luchtvaart",
+      "MC3": "Startverbod vliegtuig",
+      "Code": "vobbsv",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een of meerdere vliegtuigen is verboden op te starten."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging luchtvaart",
+      "MC3": "Steekproef security",
+      "Code": "vobbss",
+      "PRIO": 3.0,
+      "DEFINITIE": "Vanuit beveiligingsoverweging steekproefsgewijs extra controle uitvoeren."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Beveiliging luchtvaart",
+      "MC3": "Vluchtafhandeling",
+      "Code": "vobbva",
+      "PRIO": 3.0,
+      "DEFINITIE": "Beveiliging incheck, bagage, passagiers, platform etcetera."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Bijzondere Wetten",
+      "MC3": "",
+      "Code": "vobzw",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Bijzondere Wetten",
+      "MC3": "GB Controle",
+      "Code": "vogbc",
+      "PRIO": 3.0,
+      "DEFINITIE": "Controle aan de Nederlandse grens"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Bijzondere Wetten",
+      "MC3": "Militaire Zaken",
+      "Code": "vomi",
+      "PRIO": 3.0,
+      "DEFINITIE": "Meldingen met betrekking tot het militair tucht of strafrecht, welke niet onder een andere MC’s kunnen vallen, of andere zaken met betrekking tot de Nederlandse Krijgsmacht. "
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Bijzondere Wetten",
+      "MC3": "MTV Controle",
+      "Code": "vomtv",
+      "PRIO": 3.0,
+      "DEFINITIE": "Controle aan de Schengen binnengrens van het Koninkrijk. (NL-DU en NL-BE) "
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Bijzondere Wetten",
+      "MC3": "Veiligheidscontrole WWM",
+      "Code": "vovhc",
+      "PRIO": 2.0,
+      "DEFINITIE": "Veiligheidscontrole Wet Wapens en Munitie"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Bijzondere Wetten",
+      "MC3": "Vreemdelingenzaak",
+      "Code": "vovzk",
+      "PRIO": 3.0,
+      "DEFINITIE": "Overige vreemdelingenzaken, niet zijnde GB of MTV"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Digitaal",
+      "MC3": "",
+      "Code": "vodg",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Digitaal",
+      "MC3": "Cybercrime",
+      "Code": "vodgcc",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Digitaal",
+      "MC3": "Digitale criminaliteit",
+      "Code": "vodgdc",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Drugszaak",
+      "MC3": "",
+      "Code": "vodz",
+      "PRIO": 3.0,
+      "DEFINITIE": "Alle meldingen met betrekking tot het bezit en gebruik van drugs."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Drugszaak",
+      "MC3": "Dealen",
+      "Code": "vodzdl",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het (illegaal) handelen in drugs."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Drugszaak",
+      "MC3": "Drugslab",
+      "Code": "vodzlb",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van een drugslaboratorium."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Drugszaak",
+      "MC3": "Wietplantage",
+      "Code": "vodzwp",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van hennep- en wietplantages."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Explosief/Munitie",
+      "MC3": "",
+      "Code": "voex",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van een explosief of munitie, niet zijnde het gebruik hiervan."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Explosief/Munitie",
+      "MC3": "Aantref. explosieven",
+      "Code": "voexat",
+      "PRIO": 1.0,
+      "DEFINITIE": "Het aantreffen van explosieven."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Explosief/Munitie",
+      "MC3": "Bommelding",
+      "Code": "voexbm",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een melding waarbij gedreigd wordt tot het gebruik van een explosief."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Explosief/Munitie",
+      "MC3": "Explosie",
+      "Code": "voexex",
+      "PRIO": 1.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Explosief/Munitie",
+      "MC3": "Munitie",
+      "Code": "voexmu",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het aantreffen van vuurwapens en/of munitie."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Explosief/Munitie",
+      "MC3": "Vuurwerkopslag",
+      "Code": "voexvw",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het aantreffen van (illegaal) vuurwerk."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Gevangenis",
+      "MC3": "",
+      "Code": "vogv",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een gebouw om gedetineerden in bewaring te stellen of in hechtenis te nemen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Gevangenis",
+      "MC3": "Ontsnapping",
+      "Code": "vogvos",
+      "PRIO": 1.0,
+      "DEFINITIE": "Het zonder toestemming verlaten van de gevangenis."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Gevangenis",
+      "MC3": "Oproer",
+      "Code": "vogvor",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een melding van verzet, onrust door meerdere personen in een gevangenis."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "",
+      "Code": "vogw",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het opzettelijk, door middel van het toepassen van geweld, toebrengen van pijn of letsel aan personen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Bedreiging",
+      "Code": "vogwbd",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het verbaal bedreigen van personen met het toebrengen van schade, pijn of letsel zonder dit daadwerkelijk al te hebben uitgevoerd."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "CBRN-e dreiging",
+      "Code": "vogwcb",
+      "PRIO": 1.0,
+      "DEFINITIE": "De dreiging van chemische, biologische, radioactieve, nucleaire stoffen/wapens waarbij pijn of letsel kan ontstaan."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Gijzeling",
+      "Code": "vogwgz",
+      "PRIO": 1.0,
+      "DEFINITIE": "Personen met geweld of bedreiging met geweld tegen hun wil vasthouden."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Kaping",
+      "Code": "vogwkp",
+      "PRIO": 1.0,
+      "DEFINITIE": "Het met geweld of dreiging met geweld het commando overnemen van een voertuig, vaartuig, of luchtvaartuig."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Mishandeling",
+      "Code": "vogwmh",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het opzettelijk toebrengen van pijn of letsel aan een ander."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Ontvoering",
+      "Code": "vogwon",
+      "PRIO": 1.0,
+      "DEFINITIE": "Iemand tegen diens wil onttrekken uit zijn/haar vertrouwde omgeving en wederrechtelijk verplaatsen/wegvoeren."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Schietpartij",
+      "Code": "vogwsi",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een vuurgevecht door middel van vuurwapens tussen of gericht tegen personen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Steekpartij",
+      "Code": "vogwst",
+      "PRIO": 1.0,
+      "DEFINITIE": "Het gebruiken van steekwapens gericht tegen personen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Terrorisme",
+      "Code": "vogwte",
+      "PRIO": 1.0,
+      "DEFINITIE": "Op de meldkamer geeft de politie aan of een incident als terrorisme geclassificeerd moet worden. Het betreffen acties met oogmerk om de bevolking of een deel van de bevolking van een land vrees aan te jagen, dan wel een overheid of internationale organisatie te dwingen iets te doen, niet te doen of te dulden, dan wel de fundamentele politieke, constitutionele, economische of sociale structuren van een land of een internationale organisatie ernstig te ontwrichten of te vernietigen. (bron: AIVD) Deze definitie die het gevolg is van het Europese standpunt van de Raad van de Europese Unie inzake terrorismebestrijding, zoals deze materieel gelijk is beschreven in de bepaling in de (ontwerp-)WTM, artikel 83a WvSr: wet- en regelgeving Art. 83a WvSr en 140 WvSr hiërarchische verhouding"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Geweld",
+      "MC3": "Vechtpartij",
+      "Code": "vogwve",
+      "PRIO": 1.0,
+      "DEFINITIE": "Door toepassing van lijfelijk geweld een geschil trachten te slechten."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Noodoproep",
+      "MC3": "",
+      "Code": "vono",
+      "PRIO": 1.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Verdachte situatie",
+      "MC3": "",
+      "Code": "vovs",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een ongewone situatie die om nader onderzoek vraagt"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Verdachte situatie",
+      "MC3": "Gebouw",
+      "Code": "vovsgb",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een ongewone situatie in en om een gebouw die om nader onderzoek vraagt"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Verdachte situatie",
+      "MC3": "Overleden persoon",
+      "Code": "vovsop",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van een overleden persoon waarvan de identiteit niet direct kan worden vastgesteld en de doodsoorzaak vraagt om nader onderzoek."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Verdachte situatie",
+      "MC3": "Pakket/Voorwerp",
+      "Code": "vovspv",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van een verdacht pakket of voorwerp."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Verdachte situatie",
+      "MC3": "Persoon",
+      "Code": "vovsps",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van een persoon die verdacht is of verdacht gedraagt"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Verdachte situatie",
+      "MC3": "Voertuig/Vaartuig",
+      "Code": "vovsvv",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het aantreffen van een verdacht voertuig "
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "",
+      "Code": "vosd",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een melding van een incident waarbij sprake is van een seksueel misdrijf"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Aanranding",
+      "Code": "vosdar",
+      "PRIO": 2.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Aanstootgevend gedrag",
+      "Code": "vosdag",
+      "PRIO": 2.0,
+      "DEFINITIE": "Tonen geslachtsdeel (bijv potloodventer), kan ook live via internet"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Kinderpornografie",
+      "Code": "vosdkp",
+      "PRIO": 2.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Ontucht minderjarigen",
+      "Code": "vozdom",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het plegen van ontucht (seksuele handelingen) met een minderjarig persoon. Onder ontucht wordt hier ook verstaan het betasten van intieme delen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Prostitutie",
+      "Code": "vosdpt",
+      "PRIO": 2.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Seksueel benaderen kind",
+      "Code": "vosdbk",
+      "PRIO": 2.0,
+      "DEFINITIE": "Seksuele benadering van een kind, schriftelijk of mondeling (sexchatting of grooming)"
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Seksueel misbruik kind",
+      "Code": "vosdmk",
+      "PRIO": 2.0,
+      "DEFINITIE": "Seksuele handelingen met kind (verkrachting of aanranding kind)."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Seksuele intimidatie",
+      "Code": "vosdsi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Seksuele intimidatie in het openbaar (op straat of online). Kan gaan om opmerkingen, geluiden, gebaren of aanrakingen."
+    },
+    {
+      "MC1": "Veiligheid en openbare orde",
+      "MC2": "Seksueel delict",
+      "MC3": "Verkrachting",
+      "Code": "vosdvk",
+      "PRIO": 1.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "",
+      "MC3": "",
+      "Code": "vk",
+      "PRIO": 4,
+      "DEFINITIE": "Een verkeersgebeurtenis niet zijnde een ongeval."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Luchtvaart",
+      "MC3": "",
+      "Code": "vklu",
+      "PRIO": 3.0,
+      "DEFINITIE": "Betreft alle luchtvaartvervoermiddelen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Luchtvaart",
+      "MC3": "Laag vliegen",
+      "Code": "vklulv",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het lager vliegen dan de voorgeschreven minimale hoogte."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Luchtvaart",
+      "MC3": "Onbevoegd vliegen",
+      "Code": "vkluov",
+      "PRIO": 2.0,
+      "DEFINITIE": "Zonder daarvoor voorafgegane toestemming vliegen met een luchtvaartuig."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Luchtvaart",
+      "MC3": "Onbevoegde landing",
+      "Code": "vkluol",
+      "PRIO": 2.0,
+      "DEFINITIE": "Zonder daarvoor voorafgegane toestemming op een luchtvaartterrein of ander terrein landen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Luchtvaart",
+      "MC3": "Onder invloed",
+      "Code": "vkluoi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een luchtvaartuig besturen terwijl de gezagvoerder onder invloed van alcoholische drank of drugs verkeert."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Luchtvaart",
+      "MC3": "Runway incursion",
+      "Code": "vkluri",
+      "PRIO": 2.0,
+      "DEFINITIE": "Er is sprake van een runway incursion wanneer een vliegtuig, een voertuig of een persoon zich ten onrechte op de start- en of landingsbaan bevindt of binnen de beschermende zone daarvan."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "",
+      "Code": "vksh",
+      "PRIO": 3.0,
+      "DEFINITIE": "Incidenten die het vervoer op het water aangaan."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "Aanmeerproblemen",
+      "Code": "vkshap",
+      "PRIO": 3.0,
+      "DEFINITIE": "Er doen zich problemen voor bij het afmeren aan een steiger of kade of bij het ankeren."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "Afgevallen lading",
+      "Code": "vkshal",
+      "PRIO": 3.0,
+      "DEFINITIE": "Lading dat van een schip is gevallen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "ASO-vaargedrag",
+      "Code": "vkshav",
+      "PRIO": 3.0,
+      "DEFINITIE": "Gedrag op het water waar anderen hinder van ondervinden."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "Hinderl. waterbeweging",
+      "Code": "vkshhw",
+      "PRIO": 3.0,
+      "DEFINITIE": "Een vaartuig veroorzaakt een golfbeweging die hinder of schade veroorzaakt."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "Onbevoegd varen",
+      "Code": "vkshov",
+      "PRIO": 3.0,
+      "DEFINITIE": "Het besturen van een vaartuig zonder in het bezit te zijn van de vereiste documenten."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "Onder invloed",
+      "Code": "vkshoi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een vaartuig onder invloed van alcoholische drank of drugs besturen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Scheepvaart",
+      "MC3": "Stremming",
+      "Code": "vkshsm",
+      "PRIO": 3.0,
+      "DEFINITIE": "Gedeeltelijke of gehele stremming van de vaarweg niet zijnde een ongeval"
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "",
+      "Code": "vksp",
+      "PRIO": 3.0,
+      "DEFINITIE": "Incidenten die het vervoer op of om het spoor aangaan."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Defect meubilair",
+      "Code": "vkspdm",
+      "PRIO": 5.0,
+      "DEFINITIE": "Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Loslopende dieren",
+      "Code": "vkspld",
+      "PRIO": 2.0,
+      "DEFINITIE": "Hulpmiddelen langs het spoor bijv. spoorwegbomen, seinpalen, seinborden die defect zijn."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Negeren rood sein",
+      "Code": "vksprs",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een treinmachinist geeft geen gevolg aan een rood stopteken."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Onder invloed",
+      "Code": "vkspoi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een persoon bevindt zich onbevoegd op het spoor."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Persoon o/b spoor",
+      "Code": "vkspps",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een persoon bevindt zich onbevoegd op of bij het spoor of spoorbed."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Stremming",
+      "Code": "vkspss",
+      "PRIO": 3.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Spoorvervoer",
+      "MC3": "Verstoring treindienst",
+      "Code": "vkspvt",
+      "PRIO": 4.0,
+      "DEFINITIE": "Trein Incident Management onderscheid 4 gradaties van in toenemende mate ernstiger wordende verstoringen van de treindienst: TIS 1.1 t/m TIS 1.4 Zolang het geen ontsporing zonder slachtoffers, verstoring door slecht weer of door de overheid opgelegde verstoring treindienst is b.v. voor het ruimen van WO2 bom kunnen deze meldingen hieronder geplaatst worden."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "",
+      "Code": "vkwe",
+      "PRIO": 3.0,
+      "DEFINITIE": "Betreft alle wegvervoermiddelen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Achtervolging",
+      "Code": "vkweav",
+      "PRIO": 1.0,
+      "DEFINITIE": ""
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Afgevallen lading",
+      "Code": "vkweal",
+      "PRIO": 2.0,
+      "DEFINITIE": "Lading dat van een voertuig is gevallen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "ASO-rijgedrag",
+      "Code": "vkwear",
+      "PRIO": 3.0,
+      "DEFINITIE": "Gedrag op de weg waar anderen hinder van ondervinden."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Bijz. Verk zaken",
+      "Code": "vkwebz",
+      "PRIO": 3.0,
+      "DEFINITIE": "Bijzondere verkeerszaken bijv. extreem vervoer"
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Defect straatmeubilair",
+      "Code": "vkweds",
+      "PRIO": 4.0,
+      "DEFINITIE": "Hulpmiddelen langs de weg bijv. verkeersborden, lichtmasten, wegbebording, schrikhekken die defect of beschadigd zijn."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Fietser o/b rijbaan",
+      "Code": "vkwefs",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een fietser bevindt zich onbevoegd op of bij de rijbaan"
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Gladheid",
+      "Code": "vkwegh",
+      "PRIO": 3.0,
+      "DEFINITIE": "Wegdek dat door atmosferische invloed glad is geworden of dreigt te worden."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Joyriding",
+      "Code": "vkwejr",
+      "PRIO": 2.0,
+      "DEFINITIE": "Het zonder toestemming van de eigenaar met een motorvoertuig over de voor het openbaar verkeer openstaande weg rijden."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Loslopende dieren",
+      "Code": "vkwedi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Dieren die zonder een geleider op of langs de rijbaan van een weg lopen."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Onder invloed",
+      "Code": "vkweoi",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een voertuig besturen terwijl de bestuurder onder invloed van alcoholische drank of drugs verkeert."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Parkeerprobleem",
+      "Code": "vkwepk",
+      "PRIO": 3.0,
+      "DEFINITIE": "Er doen zich problemen voor door of met het parkeren van een voertuig."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Persoon o/b rijbaan",
+      "Code": "vkweps",
+      "PRIO": 2.0,
+      "DEFINITIE": "Een persoon bevindt zich onbevoegd op of bij de rijbaan"
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Spookrijder",
+      "Code": "vkwesr",
+      "PRIO": 1.0,
+      "DEFINITIE": "Een bestuurder van een motorvoertuig rijdt tegen de rijrichting van het overige verkeer in."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Verkeersgeleiding",
+      "Code": "vkwegl",
+      "PRIO": 4.0,
+      "DEFINITIE": "Bestuurders krijgen een aanwijzing door middel van matrix- borden om een bepaalde snelheid te rijden of van een bepaalde rijstrook gebruik te maken."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Verkeersstremming",
+      "Code": "vkwest",
+      "PRIO": 3.0,
+      "DEFINITIE": "De rijbaan is geheel of gedeeltelijk gestremd door een voorwerp of voertuig waardoor het verkeer niet of slechts gedeeltelijk door kan gaan."
+    },
+    {
+      "MC1": "Verkeer",
+      "MC2": "Wegverkeer",
+      "MC3": "Vervuild wegdek",
+      "Code": "vkwevw",
+      "PRIO": 3.0,
+      "DEFINITIE": "Wegdekvervuiling door gelekte vloeistof, afvallende lading of loslatende modder van banden."
+    }
+  ]
+}
