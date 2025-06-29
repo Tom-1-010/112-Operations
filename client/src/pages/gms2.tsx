@@ -3068,22 +3068,23 @@ export default function GMS2() {
                           width: '100%', 
                           borderCollapse: 'collapse', 
                           border: '1px solid #ccc',
-                          fontSize: '10px'
+                          fontSize: '10px',
+                          tableLayout: 'auto'
                         }}>
                           {/* Header row */}
                           <thead>
                             <tr style={{ backgroundColor: '#f0f0f0' }}>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '30px' }}>D<br/>P</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '80px' }}>Roepnaam</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '60px' }}>Soort voe</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>ov</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>ar</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>tp</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>nb</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>am</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>vr</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>fd</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', minWidth: '35px' }}>GA</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '25px' }}>D<br/>P</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: 'auto', minWidth: '100px' }}>Roepnaam</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '70px' }}>Soort voe</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ov</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ar</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>tp</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>nb</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>am</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>vr</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>fd</th>
+                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>GA</th>
                             </tr>
                           </thead>
 
@@ -3092,17 +3093,17 @@ export default function GMS2() {
                             {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
                               selectedIncident.assignedUnits.map((unit, index) => (
                                 <tr key={`${unit.roepnummer}-${index}`}>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>P</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.roepnummer}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.soort_voertuig || 'SurvBus'}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.ov_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.ar_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.tp_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.nb_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.am_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.vr_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.fd_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center' }}>{unit.ga_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', fontSize: '9px' }}>P</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'left', fontSize: '9px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.roepnummer}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px' }}>{unit.soort_voertuig || 'SurvBus'}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ov_tijd ? '#ffff99' : 'transparent' }}>{unit.ov_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ar_tijd ? '#ffff99' : 'transparent' }}>{unit.ar_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.tp_tijd ? '#ffff99' : 'transparent' }}>{unit.tp_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.nb_tijd ? '#ffff99' : 'transparent' }}>{unit.nb_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.am_tijd ? '#ffff99' : 'transparent' }}>{unit.am_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.vr_tijd ? '#ffff99' : 'transparent' }}>{unit.vr_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.fd_tijd ? '#ffff99' : 'transparent' }}>{unit.fd_tijd || ''}</td>
+                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ga_tijd ? '#ffff99' : 'transparent' }}>{unit.ga_tijd || ''}</td>
                                 </tr>
                               ))
                             ) : (
@@ -3113,7 +3114,8 @@ export default function GMS2() {
                                     padding: '10px', 
                                     textAlign: 'center', 
                                     fontStyle: 'italic', 
-                                    color: '#666' 
+                                    color: '#666',
+                                    fontSize: '9px'
                                   }}>
                                     Geen eenheden toegewezen aan dit incident
                                   </td>
