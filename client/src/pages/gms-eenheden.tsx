@@ -173,6 +173,13 @@ export default function GMSEenheden() {
     }
   };
 
+  // Fetch police units every 60 seconds to reduce server load
+  useEffect(() => {
+    fetchPoliceUnits();
+    const interval = setInterval(fetchPoliceUnits, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (isLoading || isInitializing) {
     return (
       <div className="gms-eenheden-container">
@@ -215,7 +222,7 @@ export default function GMSEenheden() {
             {formatTime(currentTime)}
           </div>
         </div>
-        
+
         {/* Status Filter */}
         <div className="gms-filter-controls">
           <label htmlFor="status-filter">Filter op status:</label>

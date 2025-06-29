@@ -529,9 +529,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const body = req.body;
+      
+      // Remove timestamp fields and let the database handle them
+      const { createdAt, updatedAt, ...updateData } = body;
+      
       const [updatedUnit] = await db
         .update(policeUnits)
-        .set({ ...body, updatedAt: new Date() })
+        .set(updateData)
         .where(eq(policeUnits.id, id))
         .returning();
       return res.json(updatedUnit);
