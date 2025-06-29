@@ -56,10 +56,37 @@ export default function ActiveUnitsDisplay() {
 
   const handleRightClick = (e: React.MouseEvent, unit: PoliceUnit) => {
     e.preventDefault();
+    
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Context menu approximate dimensions
+    const menuWidth = 180;
+    const menuHeight = 150;
+    
+    // Calculate position, ensuring menu stays within viewport
+    let x = e.clientX;
+    let y = e.clientY;
+    
+    // Adjust if menu would go beyond right edge
+    if (x + menuWidth > viewportWidth) {
+      x = viewportWidth - menuWidth - 10;
+    }
+    
+    // Adjust if menu would go beyond bottom edge
+    if (y + menuHeight > viewportHeight) {
+      y = viewportHeight - menuHeight - 10;
+    }
+    
+    // Ensure minimum distance from edges
+    x = Math.max(10, x);
+    y = Math.max(10, y);
+    
     setContextMenu({
       visible: true,
-      x: e.clientX,
-      y: e.clientY,
+      x: x,
+      y: y,
       unit: unit
     });
   };
@@ -487,13 +514,14 @@ export default function ActiveUnitsDisplay() {
             position: 'fixed',
             left: `${contextMenu.x}px`,
             top: `${contextMenu.y}px`,
-            zIndex: 1000,
+            zIndex: 9999,
             backgroundColor: 'white',
             border: '1px solid #ccc',
             borderRadius: '4px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
             padding: '4px 0',
-            minWidth: '120px'
+            minWidth: '180px',
+            maxWidth: '220px'
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -547,16 +575,19 @@ export default function ActiveUnitsDisplay() {
               <div 
                 className="gms2-status-submenu"
                 style={{
-                  position: 'absolute',
-                  left: '100%',
-                  top: '0',
+                  position: 'fixed',
+                  left: contextMenu.x + 180 + 5 > window.innerWidth ? `${contextMenu.x - 185}px` : `${contextMenu.x + 180}px`,
+                  top: `${contextMenu.y + 60}px`,
                   backgroundColor: 'white',
                   border: '1px solid #ccc',
                   borderRadius: '4px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                   padding: '4px 0',
                   minWidth: '180px',
-                  zIndex: 1000
+                  maxWidth: '220px',
+                  zIndex: 10000,
+                  maxHeight: '300px',
+                  overflowY: 'auto'
                 }}
                 onMouseEnter={() => setShowStatusSubmenu(true)}
                 onMouseLeave={() => setShowStatusSubmenu(false)}
