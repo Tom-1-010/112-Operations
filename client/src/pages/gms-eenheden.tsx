@@ -46,6 +46,7 @@ export default function GMSEenheden() {
   const queryClient = useQueryClient();
   const [isInitializing, setIsInitializing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Create table and import data function
   const initializeDatabase = async () => {
@@ -118,6 +119,12 @@ export default function GMSEenheden() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Filter units based on status
+  const filteredPoliceUnits = policeUnits.filter(unit => {
+    if (statusFilter === 'all') return true;
+    return unit.status === statusFilter;
+  });
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("nl-NL", {
@@ -208,6 +215,29 @@ export default function GMSEenheden() {
             {formatTime(currentTime)}
           </div>
         </div>
+        
+        {/* Status Filter */}
+        <div className="gms-filter-controls">
+          <label htmlFor="status-filter">Filter op status:</label>
+          <select
+            id="status-filter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="gms-status-filter"
+          >
+            <option value="all">Alle statussen</option>
+            <option value="1 - Beschikbaar/vrij">1 - Beschikbaar/vrij</option>
+            <option value="2 - Aanrijdend">2 - Aanrijdend</option>
+            <option value="3 - Ter plaatse">3 - Ter plaatse</option>
+            <option value="4 - Niet inzetbaar">4 - Niet inzetbaar</option>
+            <option value="5 - Afmelden">5 - Afmelden</option>
+            <option value="6 - Spraakaanvraag">6 - Spraakaanvraag</option>
+            <option value="7 - Spraakaanvraag urgent">7 - Spraakaanvraag urgent</option>
+            <option value="8 - Eigen melding">8 - Eigen melding</option>
+            <option value="9 - Info">9 - Info</option>
+            <option value="N - Noodoproep">N - Noodoproep</option>
+          </select>
+        </div>
       </div>
 
       {/* Scrollable Units Table */}
@@ -227,7 +257,7 @@ export default function GMSEenheden() {
               </tr>
             </thead>
             <tbody>
-              {policeUnits.map((unit) => (
+              {filteredPoliceUnits.map((unit) => (
                 <tr key={unit.id} className="gms-eenheden-data-row">
                   <td className="gms-eenheden-roepnummer">
                     <strong>{unit.roepnummer}</strong>
@@ -261,7 +291,7 @@ export default function GMSEenheden() {
                     {unit.soort_auto}
                   </td>
                   <td className="gms-eenheden-rollen">
-                    {unit.rollen.join(", ")}
+                    {Array.isArray(unit.rollen) ? unit.rollen.join(", ") : unit.rollen}
                   </td>
                   <td className="gms-eenheden-locatie">
                     <input
@@ -274,14 +304,15 @@ export default function GMSEenheden() {
                     />
                   </td>
                   <td className="gms-eenheden-incident">
-                    <input
-                      type="text"
-                      value={unit.incident || ""}
-                      onChange={(e) => updateUnitIncident(unit, e.target.value)}
-                      className="gms-incident-input"
-                      placeholder="Incident..."
-                      disabled={updateUnitMutation.isPending}
-                    />
+                    <div className="gms-incident-display">
+                      {unit.incident ? (
+                        <span className="incident-info" title={`Incident: ${unit.incident}`}>
+                          📋 {unit.incident.length > 20 ? `${unit.incident.substring(0, 20)}...` : unit.incident}
+                        </span>
+                      ) : (
+                        <span className="no-incident">Geen melding</span>
+                      )}
+                    </div>
                   </td>
                   <td className="gms-eenheden-team">
                     {unit.team}
@@ -296,10 +327,11 @@ export default function GMSEenheden() {
       {/* Footer Summary */}
       <div className="gms-eenheden-footer">
         <div className="gms-eenheden-summary">
-          <span>Totaal: {policeUnits.length} eenheden</span>
+          <span>Getoond: {filteredPoliceUnits.length} van {policeUnits.length} eenheden</span>
           <span>Beschikbaar: {policeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}</span>
           <span>Ter plaatse: {policeUnits.filter(u => u.status === '3 - Ter plaatse').length}</span>
           <span>Aanrijdend: {policeUnits.filter(u => u.status === '2 - Aanrijdend').length}</span>
+          <span>Met melding: {policeUnits.filter(u => u.incident && u.incident.trim()).length}</span>
         </div>
       </div>
     </div>

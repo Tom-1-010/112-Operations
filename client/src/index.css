@@ -5162,6 +5162,73 @@ body {
   color: hsl(213, 22%, 24%);
 }
 
+/* GMS Eenheden Filter Controls */
+.gms-filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.gms-filter-controls label {
+  font-size: 14px;
+  font-weight: 500;
+  color: hsl(220, 9%, 40%);
+}
+
+.gms-status-filter {
+  padding: 6px 12px;
+  border: 1px solid hsl(214, 13%, 91%);
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.gms-status-filter:focus {
+  outline: none;
+  border-color: hsl(221, 83%, 53%);
+  box-shadow: 0 0 0 2px hsl(221, 83%, 53%, 0.2);
+}
+
+/* Incident Display Styling */
+.gms-incident-display {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.incident-info {
+  background: hsl(221, 83%, 95%);
+  color: hsl(221, 83%, 53%);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 200px;
+  cursor: help;
+}
+
+.no-incident {
+  color: hsl(220, 9%, 60%);
+  font-style: italic;
+  font-size: 12px;
+}
+
+.gms-eenheden-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background: white;
+  padding: 16px;
+  border: 1px solid hsl(214, 13%, 91%);
+  border-radius: 8px;
+}
+
 /* Status color styles for Dutch police units */
 .stat-vrij {
   color: hsl(123, 38%, 44%); /* Green for available */
