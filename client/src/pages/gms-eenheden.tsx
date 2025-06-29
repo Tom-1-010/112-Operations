@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 
@@ -22,7 +21,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.02",
@@ -30,7 +29,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.03",
@@ -38,7 +37,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.04",
@@ -46,7 +45,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.05",
@@ -54,7 +53,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.09",
@@ -62,7 +61,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Senior", "ACO"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.10",
@@ -70,7 +69,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Opr. Expert", "OPCO"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.16",
@@ -78,7 +77,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp", "Onopvallend"],
     soort_auto: "BPV-onopvallend",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.21",
@@ -86,7 +85,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp", "Motor"],
     soort_auto: "BPV-motor",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.26",
@@ -94,7 +93,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Voet/fiets"],
     soort_auto: "Fiets",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.34",
@@ -102,7 +101,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp", "Studenten"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.50",
@@ -110,7 +109,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Opsporing"],
     soort_auto: "BPV-onopvallend",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.60",
@@ -118,7 +117,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Wijkagent"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.95",
@@ -126,7 +125,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Reisnummer"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   },
   {
     roepnummer: "RT 11.99",
@@ -134,7 +133,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["teamchef"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "Beschikbaar"
+    status: "1 - Beschikbaar/vrij"
   }
 ];
 
