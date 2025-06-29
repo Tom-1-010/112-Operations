@@ -195,15 +195,24 @@ export default function GMSEenheden() {
     switch (status.toLowerCase()) {
       case '1 - beschikbaar/vrij':
         return '#90EE90'; // Light green
-      case '2 - onderweg':
+      case '2 - aanrijdend':
         return '#FFD700'; // Gold
-      case '3 - bezig':
-      case '4 - bezet':
-        return '#FFA500'; // Orange
-      case '6 - onderhoud':
-        return '#FFB6C1'; // Light pink
+      case '3 - ter plaatse':
+        return '#1E90FF'; // Dodger blue
+      case '4 - niet inzetbaar':
+        return '#FF6347'; // Tomato red
       case '5 - afmelden':
         return '#D3D3D3'; // Light Gray
+      case '6 - spraakaanvraag':
+        return '#DA70D6'; // Orchid
+      case '7 - spraakaanvraag urgent':
+        return '#FF1493'; // Deep pink
+      case '8 - eigen melding':
+        return '#FFA500'; // Orange
+      case '9 - info':
+        return '#87CEEB'; // Sky blue
+      case 'n - noodoproep':
+        return '#DC143C'; // Crimson red
       default:
         return '#FFFFFF'; // White
     }
@@ -253,11 +262,15 @@ export default function GMSEenheden() {
                       className="gms-status-select"
                     >
                       <option value="1 - Beschikbaar/vrij">1 - Beschikbaar/vrij</option>
-                      <option value="2 - Onderweg">2 - Onderweg</option>
-                      <option value="3 - Bezig">3 - Bezig</option>
-                      <option value="4 - Bezet">4 - Bezet</option>
+                      <option value="2 - Aanrijdend">2 - Aanrijdend</option>
+                      <option value="3 - Ter plaatse">3 - Ter plaatse</option>
+                      <option value="4 - Niet inzetbaar">4 - Niet inzetbaar</option>
                       <option value="5 - Afmelden">5 - Afmelden</option>
-                      <option value="6 - Onderhoud">6 - Onderhoud</option>
+                      <option value="6 - Spraakaanvraag">6 - Spraakaanvraag</option>
+                      <option value="7 - Spraakaanvraag urgent">7 - Spraakaanvraag urgent</option>
+                      <option value="8 - Eigen melding">8 - Eigen melding</option>
+                      <option value="9 - Info">9 - Info</option>
+                      <option value="N - Noodoproep">N - Noodoproep</option>
                     </select>
                   </td>
                   <td className="gms-eenheden-mensen">
@@ -302,8 +315,8 @@ export default function GMSEenheden() {
         <div className="gms-eenheden-summary">
           <span>Totaal: {policeUnits.length} eenheden</span>
           <span>Beschikbaar: {policeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}</span>
-          <span>Bezig: {policeUnits.filter(u => u.status === '3 - Bezig').length}</span>
-          <span>Onderweg: {policeUnits.filter(u => u.status === '2 - Onderweg').length}</span>
+          <span>Ter plaatse: {policeUnits.filter(u => u.status === '3 - Ter plaatse').length}</span>
+          <span>Aanrijdend: {policeUnits.filter(u => u.status === '2 - Aanrijdend').length}</span>
         </div>
       </div>
     </div>
