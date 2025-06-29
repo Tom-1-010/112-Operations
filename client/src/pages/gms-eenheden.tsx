@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface PoliceUnit {
@@ -44,13 +44,57 @@ const createPoliceUnit = async (unit: Omit<PoliceUnit, 'id'>): Promise<PoliceUni
 
 export default function GMSEenheden() {
   const queryClient = useQueryClient();
+  const [isInitializing, setIsInitializing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Create table and import data function
+  const initializeDatabase = async () => {
+    try {
+      setIsInitializing(true);
+      console.log('🚀 Initializing police units database...');
+
+      // First create the table
+      const createResponse = await fetch('/api/police-units/create-table', {
+        method: 'POST',
+      });
+
+      if (createResponse.ok) {
+        console.log('✅ Table created successfully');
+
+        // Then import the data
+        const importResponse = await fetch('/api/police-units/import', {
+          method: 'POST',
+        });
+
+        if (importResponse.ok) {
+          const result = await importResponse.json();
+          console.log('✅ Data imported successfully:', result);
+
+          // Refresh the data
+          queryClient.invalidateQueries({ queryKey: ['police-units'] });
+        }
+      }
+    } catch (error) {
+      console.error('❌ Failed to initialize database:', error);
+    } finally {
+      setIsInitializing(false);
+    }
+  };
 
   // Fetch police units from database
   const { data: policeUnits = [], isLoading, error } = useQuery({
     queryKey: ['police-units'],
     queryFn: fetchPoliceUnits,
+    retry: false, // Don't retry on first load
   });
+
+  // Initialize database if no units found and not loading
+  useEffect(() => {
+    if (error && !isLoading && !isInitializing) {
+      console.log('🔧 Database needs initialization, starting setup...');
+      initializeDatabase();
+    }
+  }, [error, isLoading, isInitializing]);
 
   // Mutations
   const updateUnitMutation = useMutation({
@@ -122,7 +166,7 @@ export default function GMSEenheden() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isInitializing) {
     return (
       <div className="gms-eenheden-container">
         <div className="gms-eenheden-header">
@@ -131,7 +175,9 @@ export default function GMSEenheden() {
             <div className="gms-eenheden-time">Laden...</div>
           </div>
         </div>
-        <div className="loading-message">Database wordt geladen...</div>
+        <div className="loading-message">
+          {isInitializing ? 'Database wordt geïnitialiseerd...' : 'Database wordt geladen...'}
+        </div>
       </div>
     );
   }
