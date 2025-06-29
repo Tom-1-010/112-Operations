@@ -3064,7 +3064,7 @@ export default function GMS2() {
                           {/* Header row */}
                           <div className="gms2-status-header-row">
                             <div className="gms2-status-cell header-dp">D<br/>P</div>
-                            <div className="gms2-status-cell header-roepnaam">Roepnaam</div>
+                            <div className="gms2-status-cell header-roepnaam" style={{ minWidth: '120px' }}>Roepnaam</div>
                             <div className="gms2-status-cell header-soort">Soort voe</div>
                             <div className="gms2-status-cell header-ov">ov</div>
                             <div className="gms2-status-cell header-ar">ar</div>
@@ -3083,7 +3083,7 @@ export default function GMS2() {
                             selectedIncident.assignedUnits.map((unit, index) => (
                               <div key={`${unit.roepnummer}-${index}`} className="gms2-status-data-row">
                                 <div className="gms2-status-cell data-dp">P</div>
-                                <div className="gms2-status-cell data-roepnaam">{unit.roepnummer}</div>
+                                <div className="gms2-status-cell data-roepnaam" style={{ minWidth: '120px' }}>{unit.roepnummer}</div>
                                 <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
                                 <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
                                 <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
