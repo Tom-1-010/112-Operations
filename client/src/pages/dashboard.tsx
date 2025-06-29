@@ -845,22 +845,98 @@ export default function Dashboard() {
     ]
   };
 
-  // Function to generate realistic 112 scenarios
+  // Function to generate realistic 112 scenarios with police classification weighting
   const generateRealistic112Scenario = (address: string, gemeente: string) => {
-    const scenarios = realistic112Scenarios;
-    const selectedScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    // Create weighted scenario pool based on frequency
+    const weightedScenarios: any[] = [];
+    realistic112Scenarios.forEach(scenario => {
+      const frequency = scenario.frequency || 1;
+      for (let i = 0; i < frequency; i++) {
+        weightedScenarios.push(scenario);
+      }
+    });
+
+    // Select from weighted pool
+    const selectedScenario = weightedScenarios[Math.floor(Math.random() * weightedScenarios.length)];
     
     return {
       type: selectedScenario.type,
+      classification: selectedScenario.classification,
+      priority: selectedScenario.priority,
       initialMessage: selectedScenario.initialMessage(address, gemeente),
       responses: selectedScenario.responses
     };
   };
 
+  // Load police priority classifications for enhanced scenario generation
+  const [policeClassifications, setPoliceClassifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadPoliceClassifications = async () => {
+      try {
+        const response = await fetch('/politie_meldingen_prioriteit.json');
+        if (response.ok) {
+          const data = await response.json();
+          setPoliceClassifications(data.politie_meldingen || []);
+          console.log('Loaded police classifications:', data.politie_meldingen?.length || 0);
+        }
+      } catch (error) {
+        console.warn('Could not load police classifications:', error);
+      }
+    };
+
+    loadPoliceClassifications();
+  }, []);
+
   // Enhanced realistic 112 scenarios with official LMC classification support
   const realistic112Scenarios = [
+    // High-priority police incidents (weighted higher)
     {
-      type: "geweldsincident",
+      type: "beroving",
+      classification: "bzdsbr",
+      priority: 1,
+      frequency: 3, // Higher frequency
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Help! Ik word beroofd op ${address} in ${gemeente}! Hij heeft een mes!`,
+          `112? Iemand probeert mijn tas af te pakken op ${address} in ${gemeente}! Kom snel!`,
+          `Er wordt iemand beroofd vlakbij ${address} in ${gemeente}! Ze bedreigen hem!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`Op straat voor het station`, `Bij de bushalt`, `Op het plein, veel mensen aanwezig`],
+        "gewonden": [`Het slachtoffer ligt op de grond!`, `Hij bloeit uit zijn hoofd`, `Ze hebben hem geslagen!`],
+        "dader": [`Een man in donkere kleding`, `Twee mannen op een scooter`, `Jongeman met bivakmuts`],
+        "wapen": [`Hij heeft een mes!`, `Ik zie iets glimmends`, `Hij bedreigt met een voorwerp`],
+        "situatie": [`Ze zijn nog hier!`, `Ze zijn net weggerend`, `Ze staan nog bij het slachtoffer`]
+      }
+    },
+    {
+      type: "inbraak",
+      classification: "bzibwn",
+      priority: 2,
+      frequency: 2,
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Er wordt ingebroken in ${address} in ${gemeente}! Ik zie iemand rondlopen in het huis!`,
+          `112? Ik zie inbrekers in het huis op ${address} in ${gemeente}! Kom snel!`,
+          `Help! Er zijn mensen in mijn huis die er niet horen! ${address} in ${gemeente}!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`In het huis van de buren`, `Op de eerste verdieping`, `Via de achterdeur naar binnen`],
+        "dader": [`Twee personen in donkere kleding`, `Een man met een bivakmuts`, `Ik kan ze niet goed zien, maar ze hebben zaklampen`],
+        "situatie": [`Ze zijn nog binnen`, `Ik hoorde glas breken`, `Ze doorzoeken de kamers`],
+        "voertuig": [`Er staat een donkere auto voor de deur`, `Ik heb geen auto gezien`, `Er staat een busje om de hoek`]
+      }
+    },
+    {
+      type: "geweldsincident", 
+      classification: "vogwve",
+      priority: 1,
+      frequency: 3,
       initialMessage: (address: string, gemeente: string) => {
         const panicMessages = [
           `Help! Er wordt iemand mishandeld op ${address} in ${gemeente}! Kom snel!`,
@@ -878,7 +954,31 @@ export default function Dashboard() {
       }
     },
     {
+      type: "verdachte_situatie",
+      classification: "vovs",
+      priority: 2,
+      frequency: 2,
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Er gebeurt iets vreemds op ${address} in ${gemeente}. Ik zie verdachte personen`,
+          `112? Er zijn mensen aan het inbreken denk ik, op ${address} in ${gemeente}`,
+          `Verdachte situatie op ${address} in ${gemeente}. Mensen lopen rond een gebouw`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`Rond het gebouw`, `In de steeg`, `Bij de parkeerplaats`],
+        "personen": [`Drie mannen in donkere kleding`, `Twee vrouwen die rondkijken`, `Een groep jongeren`],
+        "gedrag": [`Ze kijken steeds om zich heen`, `Ze proberen ergens in te komen`, `Ze hebben tassen bij zich`],
+        "voertuigen": [`Er staat een busje`, `Twee auto's met draaiende motor`, `Een scooter`]
+      }
+    },
+    // Standard emergency scenarios (lower frequency)
+    {
       type: "verkeersongeval", 
+      classification: "ogwels",
+      priority: 2,
+      frequency: 1,
       initialMessage: (address: string, gemeente: string) => {
         const urgentMessages = [
           `112! Er is een zwaar ongeval op ${address} in ${gemeente}! Auto's zijn op elkaar gebotst!`,
