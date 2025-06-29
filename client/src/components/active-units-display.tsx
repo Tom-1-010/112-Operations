@@ -60,7 +60,7 @@ export default function ActiveUnitsDisplay() {
     });
   };
 
-  const handleKoppelen = () => {
+  const handleKoppelen = async () => {
     if (!contextMenu.unit) return;
 
     // Get current incident from GMS2 window if available
@@ -68,86 +68,113 @@ export default function ActiveUnitsDisplay() {
     const selectedIncident = (gms2Window as any).gms2SelectedIncident;
 
     if (!selectedIncident) {
-      alert('Geen incident geselecteerd om aan te koppelen');
+      console.log('Geen incident geselecteerd in GMS2');
       setContextMenu({ visible: false, x: 0, y: 0, unit: null });
       return;
     }
 
-    // Check if unit is already assigned
-    const existingAssignment = (selectedIncident.assignedUnits || []).find(
-      (unit: any) => unit.roepnummer === contextMenu.unit?.roepnummer
-    );
-
-    if (existingAssignment) {
-      alert(`Eenheid ${contextMenu.unit.roepnummer} is al gekoppeld aan dit incident`);
-      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
-      return;
-    }
-
-    // Create assignment record
+    // Create assignment object
     const assignment = {
       roepnummer: contextMenu.unit.roepnummer,
       soort_voertuig: contextMenu.unit.soort_auto,
-      ov_tijd: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-      ar_tijd: '',
-      tp_tijd: '',
-      nb_tijd: '',
-      am_tijd: '',
-      vr_tijd: '',
-      fd_tijd: '',
-      ga_tijd: ''
+      ov_tijd: new Date().toTimeString().slice(0, 5), // Current time as "HH:MM"
     };
 
-    // Update the incident with the new assignment
+    // Update incident with assigned unit
     const updatedIncident = {
       ...selectedIncident,
       assignedUnits: [...(selectedIncident.assignedUnits || []), assignment]
     };
 
-    // Update the parent window's incident data (this will now save to database)
-    if (gms2Window && (gms2Window as any).updateSelectedIncident) {
+    // Call the update function if available
+    if ((gms2Window as any).updateSelectedIncident) {
       (gms2Window as any).updateSelectedIncident(updatedIncident);
+    }
+
+    // Update unit status to "2 - Aanrijdend" automatically
+    try {
+      const updatedUnit = {
+        ...contextMenu.unit,
+        status: "2 - Aanrijdend",
+        incident: selectedIncident.nr?.toString() || ""
+      };
+
+      const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUnit),
+      });
+
+      if (response.ok) {
+        console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} status automatisch gewijzigd naar "2 - Aanrijdend"`);
+
+        // Update local units state if available
+        setUnits(prev => prev.map(unit => 
+          unit.id === contextMenu.unit?.id ? updatedUnit : unit
+        ));
+      } else {
+        console.error('Failed to update unit status');
+      }
+    } catch (error) {
+      console.error('Error updating unit status:', error);
     }
 
     console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} gekoppeld aan incident ${selectedIncident.nr}`);
     setContextMenu({ visible: false, x: 0, y: 0, unit: null });
   };
 
-  const handleOntkoppelen = () => {
+  const handleOntkoppelen = async () => {
     if (!contextMenu.unit) return;
 
     // Get current incident from GMS2 window if available
     const gms2Window = window.parent || window;
     const selectedIncident = (gms2Window as any).gms2SelectedIncident;
 
-    if (!selectedIncident) {
-      alert('Geen incident geselecteerd om van te ontkoppelen');
+    if (!selectedIncident || !selectedIncident.assignedUnits) {
+      console.log('Geen incident geselecteerd of geen toegewezen eenheden');
       setContextMenu({ visible: false, x: 0, y: 0, unit: null });
       return;
     }
 
-    // Check if unit is actually assigned
-    const isAssigned = (selectedIncident.assignedUnits || []).some(
-      (unit: any) => unit.roepnummer === contextMenu.unit?.roepnummer
-    );
-
-    if (!isAssigned) {
-      alert(`Eenheid ${contextMenu.unit.roepnummer} is niet gekoppeld aan dit incident`);
-      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
-      return;
-    }
-
-    // Remove assignment from incident
+    // Remove unit from assigned units
     const updatedIncident = {
       ...selectedIncident,
-      assignedUnits: (selectedIncident.assignedUnits || []).filter(
+      assignedUnits: selectedIncident.assignedUnits.filter(
         (unit: any) => unit.roepnummer !== contextMenu.unit?.roepnummer
       )
     };
 
-    // Update the parent window's incident data (this will now save to database)
-    if (gms2Window && (gms2Window as any).updateSelectedIncident) {
+    // Call the update function if available
+    if ((gms2Window as any).updateSelectedIncident) {
       (gms2Window as any).updateSelectedIncident(updatedIncident);
+    }
+
+    // Update unit status to "1 - Beschikbaar/vrij" automatically
+    try {
+      const updatedUnit = {
+        ...contextMenu.unit,
+        status: "1 - Beschikbaar/vrij",
+        incident: ""
+      };
+
+      const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUnit),
+      });
+
+      if (response.ok) {
+        console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} status automatisch gewijzigd naar "1 - Beschikbaar/vrij"`);
+
+        // Update local units state if available
+        setUnits(prev => prev.map(unit => 
+          unit.id === contextMenu.unit?.id ? updatedUnit : unit
+        ));
+      } else {
+        console.error('Failed to update unit status');
+      }
+    } catch (error) {
+      console.error('Error updating unit status:', error);
     }
 
     console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} ontkoppeld van incident ${selectedIncident.nr}`);

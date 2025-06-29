@@ -536,8 +536,45 @@ export default function GMS2() {
   };
 
   // Handle "Archiveer" button click
-  const handleArchiveer = () => {
+  const handleArchiveer = async () => {
     if (selectedIncident) {
+      // Update status of all assigned units to "1 - Beschikbaar/vrij"
+      if (selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0) {
+        try {
+          // Get all police units to find the ones that need updating
+          const response = await fetch('/api/police-units');
+          if (response.ok) {
+            const allUnits = await response.json();
+            
+            // Update each assigned unit's status
+            for (const assignedUnit of selectedIncident.assignedUnits) {
+              const unitToUpdate = allUnits.find((unit: any) => unit.roepnummer === assignedUnit.roepnummer);
+              
+              if (unitToUpdate) {
+                const updatedUnit = {
+                  ...unitToUpdate,
+                  status: "1 - Beschikbaar/vrij",
+                  incident: ""
+                };
+
+                await fetch(`/api/police-units/${unitToUpdate.id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(updatedUnit),
+                });
+
+                console.log(`✅ Eenheid ${assignedUnit.roepnummer} status automatisch gewijzigd naar "1 - Beschikbaar/vrij" na archivering`);
+              }
+            }
+
+            addLoggingEntry(`📋 Incident gearchiveerd - ${selectedIncident.assignedUnits.length} eenhe${selectedIncident.assignedUnits.length === 1 ? 'id' : 'den'} vrijgegeven`);
+          }
+        } catch (error) {
+          console.error('Error updating unit statuses after archiving:', error);
+          addLoggingEntry(`⚠️ Fout bij vrijgeven eenheden na archivering`);
+        }
+      }
+
       const updatedIncident = {
         ...selectedIncident,
         status: "Gearchiveerd"
@@ -550,8 +587,6 @@ export default function GMS2() {
 
       // Remove from openstaande incidenten by filtering out archived ones
       setIncidents(prev => prev.filter(inc => inc.id !== selectedIncident.id));
-
-
 
       // Select first remaining incident or clear selection
       const remainingIncidents = incidents.filter(inc => inc.id !== selectedIncident.id);
