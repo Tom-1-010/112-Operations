@@ -1,13 +1,7 @@
-import React, { useState, useEffect } from "react";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "./ui/context-menu";
+import React, { useState, useEffect } from 'react';
 
-interface Unit {
-  id?: number;
+interface PoliceUnit {
+  id: string;
   roepnummer: string;
   aantal_mensen: number;
   rollen: string[];
@@ -18,8 +12,22 @@ interface Unit {
   incident?: string;
 }
 
+interface ContextMenu {
+  visible: boolean;
+  x: number;
+  y: number;
+  unit: PoliceUnit | null;
+}
+
 export default function ActiveUnitsDisplay() {
+  const [policeUnits, setPoliceUnits] = useState<PoliceUnit[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [contextMenu, setContextMenu] = useState<ContextMenu>({
+    visible: false,
+    x: 0,
+    y: 0,
+    unit: null
+  });
   const [units, setUnits] = useState<Unit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,6 +39,98 @@ export default function ActiveUnitsDisplay() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Close context menu when clicking elsewhere
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const handleRightClick = (e: React.MouseEvent, unit: PoliceUnit) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      unit: unit
+    });
+  };
+
+  const handleKoppelen = () => {
+    if (!contextMenu.unit) return;
+
+    // Get current incident from GMS2 window if available
+    const gms2Window = window.parent || window;
+    const selectedIncident = (gms2Window as any).gms2SelectedIncident;
+
+    if (!selectedIncident) {
+      alert('Geen incident geselecteerd om aan te koppelen');
+      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+      return;
+    }
+
+    // Create assignment record
+    const assignment = {
+      roepnummer: contextMenu.unit.roepnummer,
+      soort_voertuig: contextMenu.unit.soort_auto,
+      ov_tijd: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+      ar_tijd: '',
+      tp_tijd: '',
+      nb_tijd: '',
+      am_tijd: '',
+      vr_tijd: '',
+      fd_tijd: '',
+      ga_tijd: ''
+    };
+
+    // Update the incident with the new assignment
+    const updatedIncident = {
+      ...selectedIncident,
+      assignedUnits: [...(selectedIncident.assignedUnits || []), assignment]
+    };
+
+    // Update the parent window's incident data
+    if (gms2Window && (gms2Window as any).updateSelectedIncident) {
+      (gms2Window as any).updateSelectedIncident(updatedIncident);
+    }
+
+    console.log(`Eenheid ${contextMenu.unit.roepnummer} gekoppeld aan incident ${selectedIncident.nr}`);
+    setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+  };
+
+  const handleOntkoppelen = () => {
+    if (!contextMenu.unit) return;
+
+    // Get current incident from GMS2 window if available
+    const gms2Window = window.parent || window;
+    const selectedIncident = (gms2Window as any).gms2SelectedIncident;
+
+    if (!selectedIncident) {
+      alert('Geen incident geselecteerd om van te ontkoppelen');
+      setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+      return;
+    }
+
+    // Remove assignment from incident
+    const updatedIncident = {
+      ...selectedIncident,
+      assignedUnits: (selectedIncident.assignedUnits || []).filter(
+        (unit: any) => unit.roepnummer !== contextMenu.unit?.roepnummer
+      )
+    };
+
+    // Update the parent window's incident data
+    if (gms2Window && (gms2Window as any).updateSelectedIncident) {
+      (gms2Window as any).updateSelectedIncident(updatedIncident);
+    }
+
+    console.log(`Eenheid ${contextMenu.unit.roepnummer} ontkoppeld van incident ${selectedIncident.nr}`);
+    setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+  };
 
   // Load units data
   useEffect(() => {
@@ -114,18 +214,6 @@ export default function ActiveUnitsDisplay() {
     }
   };
 
-  const handleKoppelen = (unit: Unit) => {
-    console.log('Koppelen:', unit.roepnummer);
-    // TODO: Implement koppelen functionality
-    alert(`Koppelen functionaliteit voor ${unit.roepnummer} nog niet geïmplementeerd`);
-  };
-
-  const handleOntkoppelen = (unit: Unit) => {
-    console.log('Ontkoppelen:', unit.roepnummer);
-    // TODO: Implement ontkoppelen functionality
-    alert(`Ontkoppelen functionaliteit voor ${unit.roepnummer} nog niet geïmplementeerd`);
-  };
-
   if (isLoading) {
     return (
       <div className="active-units-container">
@@ -207,17 +295,12 @@ export default function ActiveUnitsDisplay() {
           </thead>
           <tbody>
             {activeUnits.map((unit, index) => (
-              <ContextMenu key={unit.id}>
-                <ContextMenuTrigger asChild>
-                  <tr 
-                    className="unit-table-row"
-                    style={{ 
-                      borderLeft: `3px solid ${getStatusColor(unit.status)}`,
-                      backgroundColor: index % 2 === 0 ? '#fff' : '#f8f9fa',
-                      borderBottom: '1px solid #dee2e6',
-                      cursor: 'context-menu'
-                    }}
-                  >
+                <tr 
+                  key={`${unit.roepnummer}-${index}`} 
+                  className="unit-table-row"
+                  onContextMenu={(e) => handleRightClick(e, unit)}
+                  style={{ cursor: 'context-menu' }}
+                >
                     <td style={{ 
                       padding: '6px 12px',
                       borderRight: '1px solid #dee2e6',
@@ -278,16 +361,6 @@ export default function ActiveUnitsDisplay() {
                       </span>
                     </td>
                   </tr>
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem onClick={() => handleKoppelen(unit)}>
-                    🔗 Koppelen
-                  </ContextMenuItem>
-                  <ContextMenuItem onClick={() => handleOntkoppelen(unit)}>
-                    🔓 Ontkoppelen
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
             ))}
           </tbody>
         </table>
@@ -295,7 +368,55 @@ export default function ActiveUnitsDisplay() {
 
       {activeUnits.length === 0 && (
         <div className="no-active-units">
-          Geen actieve eenheden
+          Geen actieve eenheden beschikbaar
+        </div>
+      )}
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div 
+          className="context-menu"
+          style={{
+            position: 'fixed',
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+            zIndex: 1000,
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            padding: '4px 0',
+            minWidth: '120px'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div 
+            className="context-menu-item"
+            onClick={handleKoppelen}
+            style={{
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              borderBottom: '1px solid #eee'
+            }}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+          >
+            🔗 Koppelen
+          </div>
+          <div 
+            className="context-menu-item"
+            onClick={handleOntkoppelen}
+            style={{
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+          >
+            🔓 Ontkoppelen
+          </div>
         </div>
       )}
     </div>

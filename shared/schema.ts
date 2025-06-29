@@ -19,6 +19,19 @@ export const units = pgTable("units", {
   name: text("name").notNull(),
 });
 
+export interface AssignedUnit {
+  roepnummer: string;
+  soort_voertuig: string;
+  ov_tijd?: string;
+  ar_tijd?: string;
+  tp_tijd?: string;
+  nb_tijd?: string;
+  am_tijd?: string;
+  vr_tijd?: string;
+  fd_tijd?: string;
+  ga_tijd?: string;
+}
+
 // GMS incidents table for the dispatch simulator
 export const gmsIncidents = pgTable("gms_incidents", {
   id: serial("id").primaryKey(),
@@ -53,6 +66,9 @@ export const gmsIncidents = pgTable("gms_incidents", {
   // Metadata
   aangemaaktOp: timestamp("aangemaakt_op").notNull().defaultNow(),
   afgesloten: timestamp("afgesloten"),
+
+  // Assigned units
+  assignedUnits: jsonb("assigned_units").array().$type<AssignedUnit[]>(),
 });
 
 export const phoneNumbers = pgTable("phone_numbers", {

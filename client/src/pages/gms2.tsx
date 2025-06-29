@@ -841,10 +841,23 @@ export default function GMS2() {
     }
   };
 
-  // Expose state to popup windows for data sync
+  // Function to update selected incident from external components
+  const updateSelectedIncident = (updatedIncident: GmsIncident) => {
+    setSelectedIncident(updatedIncident);
+    
+    // Also update in the incidents list
+    setIncidents(prev => prev.map(inc => 
+      inc.id === updatedIncident.id ? updatedIncident : inc
+    ));
+    
+    console.log(`Incident ${updatedIncident.nr} updated with unit assignments`);
+  };
+
+  // Expose state and functions to popup windows and child components for data sync
   useEffect(() => {
     (window as any).gms2SelectedIncident = selectedIncident;
     (window as any).gms2Incidents = incidents;
+    (window as any).updateSelectedIncident = updateSelectedIncident;
   }, [selectedIncident, incidents]);
 
   // Enhanced shortcode mapping with official LMC codes
@@ -2942,21 +2955,31 @@ export default function GMS2() {
                           </div>
 
                           {/* Dynamic rows for assigned units from selected incident */}
-                          {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.map((unit, index) => (
-                            <div key={unit.roepnummer} className="gms2-status-data-row">
-                              <div className="gms2-status-cell data-dp">P</div>
-                              <div className="gms2-status-cell data-roepnaam">{unit.roepnummer}</div>
-                              <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
-                              <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
-                              <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
-                              <div className="gms2-status-cell data-tp">{unit.tp_tijd || ''}</div>
-                              <div className="gms2-status-cell data-nb">{unit.nb_tijd || ''}</div>
-                              <div className="gms2-status-cell data-am">{unit.am_tijd || ''}</div>
-                              <div className="gms2-status-cell data-vr">{unit.vr_tijd || ''}</div>
-                              <div className="gms2-status-cell data-fd">{unit.fd_tijd || ''}</div>
-                              <div className="gms2-status-cell data-ga">{unit.ga_tijd || ''}</div>
-                            </div>
-                          ))}
+                          {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
+                            selectedIncident.assignedUnits.map((unit, index) => (
+                              <div key={`${unit.roepnummer}-${index}`} className="gms2-status-data-row">
+                                <div className="gms2-status-cell data-dp">P</div>
+                                <div className="gms2-status-cell data-roepnaam">{unit.roepnummer}</div>
+                                <div className="gms2-status-cell data-soort">{unit.soort_voertuig || 'SurvBus'}</div>
+                                <div className="gms2-status-cell data-ov">{unit.ov_tijd || ''}</div>
+                                <div className="gms2-status-cell data-ar">{unit.ar_tijd || ''}</div>
+                                <div className="gms2-status-cell data-tp">{unit.tp_tijd || ''}</div>
+                                <div className="gms2-status-cell data-nb">{unit.nb_tijd || ''}</div>
+                                <div className="gms2-status-cell data-am">{unit.am_tijd || ''}</div>
+                                <div className="gms2-status-cell data-vr">{unit.vr_tijd || ''}</div>
+                                <div className="gms2-status-cell data-fd">{unit.fd_tijd || ''}</div>
+                                <div className="gms2-status-cell data-ga">{unit.ga_tijd || ''}</div>
+                              </div>
+                            ))
+                          ) : (
+                            selectedIncident && (
+                              <div className="gms2-status-data-row">
+                                <div className="gms2-status-cell" style={{ gridColumn: '1 / -1', textAlign: 'center', fontStyle: 'italic', color: '#666' }}>
+                                  Geen eenheden toegewezen aan dit incident
+                                </div>
+                              </div>
+                            )
+                          )}
                         </div>
                       </div>
                     </div>
