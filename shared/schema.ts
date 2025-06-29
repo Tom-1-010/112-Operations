@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, json, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -77,10 +77,10 @@ export const users = pgTable("users", {
 
 // Police units table for GMS-eenheden
 export const policeUnits = pgTable("police_units", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  roepnummer: text("roepnummer").unique().notNull(),
+  id: serial("id").primaryKey(),
+  roepnummer: text("roepnummer").notNull().unique(),
   aantal_mensen: integer("aantal_mensen").notNull().default(2),
-  rollen: json("rollen").$type<string[]>().notNull(),
+  rollen: jsonb("rollen").notNull(),
   soort_auto: text("soort_auto").notNull(),
   team: text("team").notNull(),
   status: text("status").notNull().default("5 - Afmelden"),
