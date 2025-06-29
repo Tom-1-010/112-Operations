@@ -4635,6 +4635,216 @@ body {
   transition: all 0.2s ease;
 }
 
+/* GMS Eenheden Page Styles */
+.gms-eenheden-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
+  background: #c0c0c0;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+}
+
+.gms-eenheden-header {
+  background: #c0c0c0;
+  border-bottom: 2px solid #808080;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+}
+
+.gms-eenheden-title {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.gms-eenheden-title h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+}
+
+.gms-eenheden-time {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  color: black;
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 4px 8px;
+  min-width: 80px;
+  text-align: center;
+}
+
+.gms-eenheden-scroll-container {
+  flex: 1;
+  overflow: hidden;
+  margin: 4px;
+  border: 2px inset #c0c0c0;
+  background: white;
+}
+
+.gms-eenheden-table-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.gms-eenheden-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  font-family: 'MS Sans Serif', sans-serif;
+}
+
+.gms-eenheden-header-row {
+  background: #c0c0c0;
+  border-bottom: 2px solid #808080;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.gms-eenheden-header-row th {
+  padding: 4px 6px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 10px;
+  border-right: 1px solid #808080;
+  color: black;
+}
+
+.gms-eenheden-header-row th:last-child {
+  border-right: none;
+}
+
+.gms-eenheden-data-row {
+  border-bottom: 1px solid #d0d0d0;
+  background: white;
+}
+
+.gms-eenheden-data-row:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.gms-eenheden-data-row:hover {
+  background: #e0e0ff;
+}
+
+.gms-eenheden-data-row td {
+  padding: 3px 6px;
+  border-right: 1px solid #d0d0d0;
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+.gms-eenheden-data-row td:last-child {
+  border-right: none;
+}
+
+.gms-eenheden-roepnummer {
+  font-weight: bold;
+  color: #000080;
+  min-width: 80px;
+}
+
+.gms-eenheden-status {
+  min-width: 90px;
+  text-align: center;
+}
+
+.gms-status-select {
+  width: 100%;
+  font-size: 9px;
+  border: 1px inset #c0c0c0;
+  background: inherit;
+  padding: 1px 2px;
+  font-family: inherit;
+}
+
+.gms-eenheden-mensen {
+  text-align: center;
+  min-width: 50px;
+}
+
+.gms-eenheden-voertuig {
+  min-width: 100px;
+  font-size: 9px;
+}
+
+.gms-eenheden-rollen {
+  min-width: 120px;
+  font-size: 9px;
+}
+
+.gms-location-input,
+.gms-incident-input {
+  width: 100%;
+  font-size: 9px;
+  border: 1px inset #c0c0c0;
+  padding: 1px 3px;
+  background: white;
+  font-family: inherit;
+}
+
+.gms-eenheden-locatie {
+  min-width: 120px;
+}
+
+.gms-eenheden-incident {
+  min-width: 120px;
+}
+
+.gms-eenheden-team {
+  min-width: 150px;
+  font-size: 9px;
+}
+
+.gms-eenheden-footer {
+  background: #c0c0c0;
+  border-top: 2px solid #808080;
+  padding: 6px 12px;
+  min-height: 30px;
+}
+
+.gms-eenheden-summary {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  color: black;
+}
+
+.gms-eenheden-summary span {
+  background: white;
+  border: 1px inset #c0c0c0;
+  padding: 2px 6px;
+}
+
+/* Scrollbar styling for table container */
+.gms-eenheden-table-container::-webkit-scrollbar {
+  width: 16px;
+}
+
+.gms-eenheden-table-container::-webkit-scrollbar-track {
+  background: #c0c0c0;
+  border: 1px inset #c0c0c0;
+}
+
+.gms-eenheden-table-container::-webkit-scrollbar-thumb {
+  background: #808080;
+  border: 1px outset #c0c0c0;
+}
+
+.gms-eenheden-table-container::-webkit-scrollbar-thumb:hover {
+  background: #606060;
+}
+
 /* Units Table Enhanced Styles */
 .units-table {
   width: 100%;
