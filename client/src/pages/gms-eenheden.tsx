@@ -21,7 +21,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.02",
@@ -29,7 +29,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.03",
@@ -37,7 +37,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.04",
@@ -45,7 +45,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.05",
@@ -53,7 +53,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp"],
     soort_auto: "BPV - bus",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.09",
@@ -61,7 +61,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Senior", "ACO"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.10",
@@ -69,7 +69,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Opr. Expert", "OPCO"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.16",
@@ -77,7 +77,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp", "Onopvallend"],
     soort_auto: "BPV-onopvallend",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.21",
@@ -85,7 +85,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp", "Motor"],
     soort_auto: "BPV-motor",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.26",
@@ -93,7 +93,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Voet/fiets"],
     soort_auto: "Fiets",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.34",
@@ -101,7 +101,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Noodhulp", "Studenten"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.50",
@@ -109,7 +109,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Opsporing"],
     soort_auto: "BPV-onopvallend",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.60",
@@ -117,7 +117,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Wijkagent"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.95",
@@ -125,7 +125,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["Reisnummer"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   },
   {
     roepnummer: "RT 11.99",
@@ -133,7 +133,7 @@ const defaultPoliceUnitsData: PoliceUnit[] = [
     rollen: ["teamchef"],
     soort_auto: "BPV-auto",
     team: "Basisteam Waterweg (A1)",
-    status: "1 - Beschikbaar/vrij"
+    status: "5 - Afmelden"
   }
 ];
 
@@ -193,16 +193,17 @@ export default function GMSEenheden() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'beschikbaar':
-      case 'vrij':
+      case '1 - beschikbaar/vrij':
         return '#90EE90'; // Light green
-      case 'onderweg':
+      case '2 - onderweg':
         return '#FFD700'; // Gold
-      case 'bezig':
-      case 'bezet':
+      case '3 - bezig':
+      case '4 - bezet':
         return '#FFA500'; // Orange
-      case 'onderhoud':
+      case '6 - onderhoud':
         return '#FFB6C1'; // Light pink
+      case '5 - afmelden':
+        return '#D3D3D3'; // Light Gray
       default:
         return '#FFFFFF'; // White
     }
@@ -251,10 +252,12 @@ export default function GMSEenheden() {
                       onChange={(e) => updateUnitStatus(unit.roepnummer, e.target.value)}
                       className="gms-status-select"
                     >
-                      <option value="Beschikbaar">Beschikbaar</option>
-                      <option value="Onderweg">Onderweg</option>
-                      <option value="Bezig">Bezig</option>
-                      <option value="Onderhoud">Onderhoud</option>
+                      <option value="1 - Beschikbaar/vrij">1 - Beschikbaar/vrij</option>
+                      <option value="2 - Onderweg">2 - Onderweg</option>
+                      <option value="3 - Bezig">3 - Bezig</option>
+                      <option value="4 - Bezet">4 - Bezet</option>
+                      <option value="5 - Afmelden">5 - Afmelden</option>
+                      <option value="6 - Onderhoud">6 - Onderhoud</option>
                     </select>
                   </td>
                   <td className="gms-eenheden-mensen">
@@ -298,9 +301,9 @@ export default function GMSEenheden() {
       <div className="gms-eenheden-footer">
         <div className="gms-eenheden-summary">
           <span>Totaal: {policeUnits.length} eenheden</span>
-          <span>Beschikbaar: {policeUnits.filter(u => u.status === 'Beschikbaar').length}</span>
-          <span>Bezig: {policeUnits.filter(u => u.status === 'Bezig').length}</span>
-          <span>Onderweg: {policeUnits.filter(u => u.status === 'Onderweg').length}</span>
+          <span>Beschikbaar: {policeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}</span>
+          <span>Bezig: {policeUnits.filter(u => u.status === '3 - Bezig').length}</span>
+          <span>Onderweg: {policeUnits.filter(u => u.status === '2 - Onderweg').length}</span>
         </div>
       </div>
     </div>
