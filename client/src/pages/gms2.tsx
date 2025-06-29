@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
+import ActiveUnitsDisplay from "../components/active-units-display";
 
 interface LMCClassification {
   MC1: string;
@@ -2553,6 +2554,11 @@ export default function GMS2() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Actieve Eenheden Display - positioned under Openstaande incidenten */}
+          <div className="gms2-section">
+            <ActiveUnitsDisplay />
           </div>
         </div>
 
