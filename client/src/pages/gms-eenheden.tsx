@@ -123,6 +123,9 @@ export default function GMSEenheden() {
   // Filter units based on status
   const filteredPoliceUnits = policeUnits.filter(unit => {
     if (statusFilter === 'all') return true;
+    if (statusFilter === 'in-dienst') {
+      return unit.status !== '5 - Afmelden';
+    }
     return unit.status === statusFilter;
   });
 
@@ -244,6 +247,13 @@ export default function GMSEenheden() {
             <option value="9 - Info">9 - Info</option>
             <option value="N - Noodoproep">N - Noodoproep</option>
           </select>
+          
+          <button
+            onClick={() => setStatusFilter('in-dienst')}
+            className={`gms-dienst-button ${statusFilter === 'in-dienst' ? 'active' : ''}`}
+          >
+            Toon in dienst
+          </button>
         </div>
       </div>
 
