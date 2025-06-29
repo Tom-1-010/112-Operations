@@ -12,6 +12,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     { id: 'dashboard', icon: 'speedometer2', label: 'Dashboard' },
     { id: 'incidents', icon: 'exclamation-triangle', label: 'Incidenten' },
     { id: 'units', icon: 'truck', label: 'Eenheden' },
+    { id: 'gms-eenheden', icon: 'people', label: 'GMS-eenheden' },
     { id: 'gms2', icon: 'window', label: 'GMS2' },
     { id: 'intake', icon: 'telephone', label: 'Intake' },
     { id: 'map', icon: 'geo-alt', label: 'Kaart' },
