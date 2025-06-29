@@ -22,12 +22,13 @@ interface ContextMenu {
 export default function ActiveUnitsDisplay() {
   const [policeUnits, setPoliceUnits] = useState<PoliceUnit[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [contextMenu, setContextMenu] = useState<ContextMenu>({
-    visible: false,
-    x: 0,
-    y: 0,
-    unit: null
-  });
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    unit: any;
+  }>({ visible: false, x: 0, y: 0, unit: null });
+  const [showStatusSubmenu, setShowStatusSubmenu] = useState(false);
   const [units, setUnits] = useState<Unit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,15 +41,18 @@ export default function ActiveUnitsDisplay() {
     return () => clearInterval(timer);
   }, []);
 
-  // Close context menu when clicking elsewhere
+  // Hide context menu when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+      setShowStatusSubmenu(false);
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+    if (contextMenu.visible) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [contextMenu.visible]);
 
   const handleRightClick = (e: React.MouseEvent, unit: PoliceUnit) => {
     e.preventDefault();
@@ -98,7 +102,7 @@ export default function ActiveUnitsDisplay() {
     // Update unit status to "2 - Aanrijdend" automatically with timestamp
     try {
       const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
-      
+
       const updatedUnit = {
         ...contextMenu.unit,
         status: "2 - Aanrijdend",
@@ -136,23 +140,23 @@ export default function ActiveUnitsDisplay() {
   };
 
   const handleOntkoppelen = async () => {
-    if (!contextMenu.unit) return;
+    console.log('Ontkoppelen van incident voor eenheid:', contextMenu.unit.roepnummer);
 
-    // Get current incident from GMS2 window if available
+    // Check if there's a selected incident in GMS2
     const gms2Window = window.parent || window;
     const selectedIncident = (gms2Window as any).gms2SelectedIncident;
 
-    if (!selectedIncident || !selectedIncident.assignedUnits) {
-      console.log('Geen incident geselecteerd of geen toegewezen eenheden');
+    if (!selectedIncident) {
+      console.log('Geen incident geselecteerd in GMS2');
       setContextMenu({ visible: false, x: 0, y: 0, unit: null });
       return;
     }
 
-    // Remove unit from assigned units
+    // Remove unit from incident's assigned units
     const updatedIncident = {
       ...selectedIncident,
-      assignedUnits: selectedIncident.assignedUnits.filter(
-        (unit: any) => unit.roepnummer !== contextMenu.unit?.roepnummer
+      assignedUnits: (selectedIncident.assignedUnits || []).filter(
+        (unit: any) => unit.roepnummer !== contextMenu.unit.roepnummer
       )
     };
 
@@ -171,17 +175,19 @@ export default function ActiveUnitsDisplay() {
 
       const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(updatedUnit),
       });
 
       if (response.ok) {
-        console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} status automatisch gewijzigd naar "1 - Beschikbaar/vrij"`);
+        console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} ontkoppeld en status gewijzigd naar "1 - Beschikbaar/vrij"`);
 
-        // Update local units state if available
-        setUnits(prev => prev.map(unit => 
-          unit.id === contextMenu.unit?.id ? updatedUnit : unit
-        ));
+        // Update unit status time if function is available
+        if ((gms2Window as any).updateUnitStatusTime) {
+          (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, "1 - Beschikbaar/vrij");
+        }
       } else {
         console.error('Failed to update unit status');
       }
@@ -189,8 +195,43 @@ export default function ActiveUnitsDisplay() {
       console.error('Error updating unit status:', error);
     }
 
-    console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} ontkoppeld van incident ${selectedIncident.nr}`);
     setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    console.log(`Status wijzigen voor eenheid ${contextMenu.unit.roepnummer} naar: ${newStatus}`);
+
+    try {
+      const updatedUnit = {
+        ...contextMenu.unit,
+        status: newStatus
+      };
+
+      const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUnit),
+      });
+
+      if (response.ok) {
+        console.log(`✅ Status van eenheid ${contextMenu.unit.roepnummer} gewijzigd naar: ${newStatus}`);
+
+        // Update unit status time if function is available
+        const gms2Window = window.parent || window;
+        if ((gms2Window as any).updateUnitStatusTime) {
+          (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, newStatus);
+        }
+      } else {
+        console.error('Failed to update unit status');
+      }
+    } catch (error) {
+      console.error('Error updating unit status:', error);
+    }
+
+    setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+    setShowStatusSubmenu(false);
   };
 
   // Load units data
@@ -471,12 +512,142 @@ export default function ActiveUnitsDisplay() {
             style={{
               padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '12px'
+              fontSize: '12px',
+              borderBottom: '1px solid #eee'
             }}
             onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
             onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
           >
             🔓 Ontkoppelen
+          </div>
+          <div 
+            className="context-menu-item gms2-submenu-parent"
+            style={{
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              position: 'relative'
+            }}
+            onMouseEnter={(e) => {
+              (e.target as HTMLElement).style.backgroundColor = '#f5f5f5';
+              setShowStatusSubmenu(true);
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLElement).style.backgroundColor = 'transparent';
+              // Don't hide submenu immediately to allow navigation
+            }}
+          >
+            Status ►
+            {showStatusSubmenu && (
+              <div 
+                className="gms2-status-submenu"
+                style={{
+                  position: 'absolute',
+                  left: '100%',
+                  top: '0',
+                  backgroundColor: 'white',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  padding: '4px 0',
+                  minWidth: '180px',
+                  zIndex: 1000
+                }}
+                onMouseEnter={() => setShowStatusSubmenu(true)}
+                onMouseLeave={() => setShowStatusSubmenu(false)}
+              >
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('1 - Beschikbaar/vrij')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  1 - Beschikbaar/vrij
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('2 - Aanrijdend')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  2 - Aanrijdend
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('3 - Ter plaatse')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  3 - Ter plaatse
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('4 - Niet inzetbaar')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  4 - Niet inzetbaar
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('5 - Afmelden')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  5 - Afmelden
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('6 - Spraakaanvraag')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  6 - Spraakaanvraag
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('7 - Spraakaanvraag urgent')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  7 - Spraakaanvraag urgent
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('8 - Eigen melding')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  8 - Eigen melding
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('9 - Info')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  9 - Info
+                </div>
+                <div 
+                  className="context-menu-item"
+                  onClick={() => handleStatusChange('N - Noodoproep')}
+                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+                >
+                  N - Noodoproep
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
