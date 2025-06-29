@@ -2540,30 +2540,52 @@ export default function GMS2() {
             <div className="gms2-section-header">Lopende incidenten</div>
             <div className="gms2-incidents-table">
               <div className="gms2-table-header">
-                <span>Nr</span>
-                <span>Pri</span>
-                <span>MC</span>
+                <span>Prio</span>
                 <span>Locatie (Object - Straat)</span>
                 <span>Plaats</span>
+                <span>Classificatie</span>
                 <span>Roepnr</span>
+                <span>Nr</span>
                 <span>Tijd</span>
-                <span>PC</span>
+                <span>Pos</span>
               </div>
-              {/* Empty rows for lopende incidenten */}
-              <div className="gms2-empty-rows">
-                {Array.from({ length: 8 }).map((_, index) => (
-                  <div key={`empty-lopend-${Date.now()}-${index}-${Math.random()}`} className="gms2-table-row">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
+              {/* Show incidents with assigned units */}
+              {incidents.filter(incident => incident.assignedUnits && incident.assignedUnits.length > 0).map((incident) => {
+                // Determine the most specific MC classification
+                const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || '';
+                // Get roepnummers of assigned units
+                const assignedRoepnummers = incident.assignedUnits?.map(unit => unit.roepnummer).join(', ') || '';
+
+                return (
+                  <div 
+                    key={incident.id} 
+                    className={`gms2-table-row priority-${incident.prio} ${selectedIncident?.id === incident.id ? 'selected' : ''}`}
+                    onClick={() => handleIncidentSelect(incident)}
+                  >
+                    <span>{incident.prio}</span>
+                    <span>{incident.locatie}</span>
+                    <span>{incident.plaatsnaam || incident.plaats}</span>
+                    <span className="gms2-mc-cell">{mcClassification}</span>
+                    <span>{assignedRoepnummers}</span>
+                    <span>{incident.nr}</span>
+                    <span>{incident.tijd}</span>
+                    <span>{incident.positie}</span>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+              {/* Fill remaining rows */}
+              {Array.from({ length: Math.max(0, 8 - incidents.filter(incident => incident.assignedUnits && incident.assignedUnits.length > 0).length) }).map((_, index) => (
+                <div key={`empty-lopend-${Date.now()}-${index}-${Math.random()}`} className="gms2-table-row">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -2581,7 +2603,7 @@ export default function GMS2() {
                 <span>Tijd</span>
                 <span>Pos</span>
               </div>
-              {incidents.map((incident) => {
+              {incidents.filter(incident => !incident.assignedUnits || incident.assignedUnits.length === 0).map((incident) => {
                 // Determine the most specific MC classification
                 const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || '';
 
@@ -2603,7 +2625,7 @@ export default function GMS2() {
                 );
               })}
               {/* Fill remaining rows */}
-              {Array.from({ length: Math.max(0, 15 - incidents.length) }).map((_, index) => (
+              {Array.from({ length: Math.max(0, 15 - incidents.filter(incident => !incident.assignedUnits || incident.assignedUnits.length === 0).length) }).map((_, index) => (
                 <div key={`empty-openstaand-${Date.now()}-${index}-${Math.random()}`} className="gms2-table-row">
                   <span></span>
                   <span></span>
