@@ -341,18 +341,20 @@ export default function ActiveUnitsDisplay() {
       <div className="active-units-table-wrapper" style={{ 
         overflowY: 'auto', 
         overflowX: 'auto',
-        maxHeight: '400px',
-        minHeight: '200px',
+        height: '350px',
         border: '1px solid #ddd',
         borderRadius: '4px',
         backgroundColor: '#fff',
-        scrollBehavior: 'smooth'
+        scrollBehavior: 'smooth',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         <table className="units-table" style={{ 
           width: '100%', 
           borderCollapse: 'collapse',
           fontSize: '12px',
-          minWidth: '600px'
+          minWidth: '700px',
+          flex: '1 1 auto'
         }}>
           <thead style={{ 
             position: 'sticky', 
