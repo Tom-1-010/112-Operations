@@ -781,80 +781,190 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, [callTimers]);
 
-  // Realistische Nederlandse adressen per gemeente in de meldkamer regio
+  // Enhanced realistic Dutch addresses for emergency scenarios - BAG API compatible
   const realisticAddresses = {
     "Rotterdam": [
       "Coolsingel 125", "Witte de Withstraat 87", "Lijnbaan 234", "Blaak 555",
       "Mauritsweg 78", "Westzeedijk 167", "Kralingseweg 234", "Bergweg 89",
-      "Oude Binnenweg 156", "Zuidplein 445", "Laan op Zuid 130", "Hobbemastraat 67"
+      "Oude Binnenweg 156", "Zuidplein 445", "Laan op Zuid 130", "Hobbemastraat 67",
+      "Markthal bij de ingang", "Centraal Station perron 3", "Erasmusbrug voetpad",
+      "Euromast parkeerplaats", "Diergaarde Blijdorp hoofdingang", "Feyenoord Stadion De Kuip"
     ],
     "Schiedam": [
       "Lange Haven 45", "Broersveld 123", "Korte Kerkstraat 78", "Marktplein 12",
-      "Maasboulevard 234", "Rotterdamseweg 567", "Vijf Eikenweg 89", "Parkweg 156"
+      "Maasboulevard 234", "Rotterdamseweg 567", "Vijf Eikenweg 89", "Parkweg 156",
+      "Grote Kerk voorplein", "Stedelijk Museum ingang", "Noletmolen parkeerplaats"
     ],
     "Vlaardingen": [
       "Oosthavenkade 89", "Maasboulevard 123", "Mathenesserlaan 456", "Hoflaan 234",
-      "Schiedamseweg 78", "Hugo de Grootstraat 167", "Vlaardingervaart 345"
+      "Schiedamseweg 78", "Hugo de Grootstraat 167", "Vlaardingervaart 345",
+      "Westzijde winkelcentrum", "Station Vlaardingen Oost", "Broekpolder recreatiegebied"
     ],
     "Barendrecht": [
       "Middenbaan Noord 123", "Carnisselaan 456", "Smitshoek 78", "Raadhuislaan 234",
-      "Wijngaardlaan 89", "Dorpsstraat 167", "Industrieweg 345"
+      "Wijngaardlaan 89", "Dorpsstraat 167", "Industrieweg 345",
+      "Promenade winkelcentrum", "Station Barendrecht", "Binnenmaas sportpark"
     ],
     "Ridderkerk": [
       "Ridderhaven 123", "Kerkplein 45", "Slinge 234", "Zwijndrechtseweg 567",
-      "Dr. Zamenhofstraat 89", "Donkerslootweg 156", "Molenlaan 78"
+      "Dr. Zamenhofstraat 89", "Donkerslootweg 156", "Molenlaan 78",
+      "De Ridderhof winkelcentrum", "Slikkerveer industrieterrein"
     ],
     "Capelle aan den IJssel": [
       "Hoofdweg 234", "Fascinatio Boulevard 123", "Kanaalpark 456", "Schollevaar 78",
-      "Terpenpad 167", "Beukendreef 89", "Molenstraat 234"
+      "Terpenpad 167", "Beukendreef 89", "Molenstraat 234",
+      "Passage winkelcentrum", "Station Capelle Schollevaar", "Hitland natuurgebied"
+    ],
+    "Albrandswaard": [
+      "Dorpsstraat 45", "Kerkplein 12", "Molenstraat 67", "Schoolstraat 89",
+      "Nieuweland 156", "Polderweg 234", "Gemeentehuis voorplein"
+    ],
+    "Maassluis": [
+      "Hoogstraat 78", "Markt 23", "Koningin Julianaweg 145", "Zuidbuurt 67",
+      "Havenstraat 89", "Station Maassluis ingang", "Futureland themapark"
+    ],
+    "Krimpen aan den IJssel": [
+      "Krimpenerhout 123", "Stormpolder 456", "Prinses Beatrixlaan 78",
+      "Kon. Wilhelminaweg 234", "Bergboezem natuurgebied", "Station Krimpen"
+    ],
+    "Lansingerland": [
+      "Dorpsstraat Berkel 45", "Bleiswijk centrum 123", "Bergschenhoek markt 67",
+      "Industrieweg 234", "Station Berkel-Westpolder", "Recreatiegebied Buytenland"
+    ],
+    "Nissewaard": [
+      "Lange Nieuwstraat Spijkenisse 89", "Bernisse dorpsplein 45",
+      "Heenvliet kerkstraat 123", "Industrieterrein Botlek", "Strand Rockanje"
+    ],
+    "Goeree-Overflakkee": [
+      "Voorstraat Middelharnis 67", "Markt Sommelsdijk 23", "Stellendam haven 145",
+      "Ouddorp boulevard 78", "Grevelingendam 234", "Vuurtoren Goedereede"
+    ],
+    "Voorne aan Zee": [
+      "Boulevard Rockanje 123", "Kustweg Oostvoorne 456", "Dorpsstraat Tinte 78",
+      "Strand Noordzeebad 234", "Voornse Duin natuurgebied", "Haven Stellendam"
     ]
   };
 
-  // Realistische 112 scenario's gebaseerd op officiële meldingclassificaties
+  // Enhanced realistic 112 scenarios with official LMC classification support
   const realistic112Scenarios = [
     {
       type: "geweldsincident",
-      initialMessage: (address: string, gemeente: string) => 
-        `Hallo, ik bel vanaf ${address} in ${gemeente}. Er is ruzie en iemand wordt mishandeld! Ik durf niet tussenbeide te komen!`,
+      initialMessage: (address: string, gemeente: string) => {
+        const panicMessages = [
+          `Help! Er wordt iemand mishandeld op ${address} in ${gemeente}! Kom snel!`,
+          `112? Er is een vechtpartij gaande op ${address} in ${gemeente}! Het is heel gewelddadig!`,
+          `Hallo... er is ruzie en nu slaan ze elkaar! ${address} in ${gemeente}. Ik ben bang!`
+        ];
+        return panicMessages[Math.floor(Math.random() * panicMessages.length)];
+      },
       responses: {
-        "locatie": (address: string, gemeente: string) => `${address} in ${gemeente}, voor het huis op straat`,
-        "gewonden": ["Ja, hij bloedt aan zijn hoofd", "Een man ligt op de grond, hij beweegt niet veel", "Er is veel geschreeuw, ik zie bloed"],
-        "dader": ["Zwarte hoodie, witte sneakers", "Blonde man, ongeveer 30 jaar", "Twee mannen, een met een rode jas"],
-        "wapen": ["Ik heb geen wapen gezien", "Hij had iets in zijn hand, misschien een mes", "Nee, alleen met vuisten"],
-        "situatie": ["Ze zijn nog aan het vechten", "De aanvaller is weggerend", "Er staan meer mensen omheen"]
+        "locatie": [`Op straat voor het huis`, `Bij de hoofdingang van het gebouw`, `Op het plein, iedereen kan het zien`],
+        "gewonden": [`Ja! Er ligt iemand op de grond met bloed aan zijn hoofd!`, `Iemand schreeuwt van de pijn... er is veel bloed`, `Er zijn gewonden! Een man beweegt niet meer!`],
+        "dader": [`Een man in donkere kleding, ik durfde niet goed te kijken`, `Twee mannen, een met een rode jas`, `Lange blonde man, ongeveer 25-30 jaar`],
+        "wapen": [`Ik heb iets glimmends gezien... misschien een mes?`, `Nee, alleen met vuisten en geschreeuw`, `Hij had iets in zijn hand maar ik weet niet wat`],
+        "situatie": [`Ze zijn nog steeds aan het vechten!`, `Een van hen is weggerend`, `Er staan veel mensen omheen die kijken`]
       }
     },
     {
       type: "verkeersongeval", 
-      initialMessage: (address: string, gemeente: string) =>
-        `112? Er is een auto-ongeval gebeurd op ${address} in ${gemeente}! Er liggen mensen op de weg!`,
+      initialMessage: (address: string, gemeente: string) => {
+        const urgentMessages = [
+          `112! Er is een zwaar ongeval op ${address} in ${gemeente}! Auto's zijn op elkaar gebotst!`,
+          `Help! Verkeersongeval op ${address} in ${gemeente}! Er liggen mensen op de weg!`,
+          `Er zijn auto's gecrasht op ${address} in ${gemeente}! Kom snel, er zijn gewonden!`
+        ];
+        return urgentMessages[Math.floor(Math.random() * urgentMessages.length)];
+      },
       responses: {
-        "locatie": (address: string, gemeente: string) => `${address} ter hoogte van het kruispunt in ${gemeente}`,
-        "gewonden": ["Ja, er liggen twee mensen naast de auto's", "Een persoon zit nog vast in de auto", "Ik zie veel bloed"],
-        "voertuigen": ["Twee personenauto's, een blauwe en een rode", "Een vrachtwagen en een kleine auto", "Drie auto's betrokken"],
-        "verkeer": ["De weg is volledig geblokkeerd", "Er ontstaat een file", "Andere auto's rijden er nog omheen"]
+        "locatie": [`Ter hoogte van het kruispunt`, `Vlak bij de verkeerslichten`, `Op de hoofdweg, de hele rijbaan is geblokkeerd`],
+        "gewonden": [`Ja! Er liggen twee mensen naast de auto's en ze bewegen niet`, `Iemand zit nog vast in de auto, hij reageert niet`, `Ik zie mensen die gewond zijn... er is bloed`],
+        "voertuigen": [`Een rode personenauto en een witte bestelwagen`, `Twee auto's, een ligt op zijn kant`, `Drie voertuigen betrokken, veel schade`],
+        "verkeer": [`De hele weg is afgesloten`, `Er ontstaat een lange file`, `Niemand kan er nog doorheen`]
       }
     },
     {
       type: "brand",
-      initialMessage: (address: string, gemeente: string) =>
-        `Er staat een huis in brand op ${address} in ${gemeente}! De vlammen slaan eruit!`,
+      initialMessage: (address: string, gemeente: string) => {
+        const fireMessages = [
+          `Brand! Brand! ${address} in ${gemeente} staat in lichterlaaie!`,
+          `112? Er is brand uitgebroken in ${address} in ${gemeente}! De vlammen slaan uit de ramen!`,
+          `Help! Het huis op ${address} in ${gemeente} staat in brand! Er zijn mensen binnen!`
+        ];
+        return fireMessages[Math.floor(Math.random() * fireMessages.length)];
+      },
       responses: {
-        "locatie": (address: string, gemeente: string) => `${address} in ${gemeente}, het is een rijtjeshuis`,
-        "gewonden": ["Ik weet niet of er mensen binnen zijn", "Er springen mensen uit de ramen!", "Mensen hoesten van de rook"],
-        "brand": ["De vlammen zijn nu 3 meter hoog!", "De hele begane grond staat in brand", "Er komt zwarte rook uit alle ramen"],
-        "verspreiding": ["Het vuur breidt zich uit naar andere huizen", "De buren evacueren hun huizen", "De wind waait de rook deze kant op"]
+        "locatie": [`Het is een rijtjeshuis in een woonwijk`, `Een appartementengebouw, derde verdieping`, `Een winkelpand met woningen erboven`],
+        "gewonden": [`Ik weet niet of er mensen binnen zijn!`, `Er zijn mensen die uit de ramen springen!`, `Mensen hoesten van de rook, ze kunnen niet ademen!`],
+        "brand": [`De vlammen zijn meters hoog!`, `Het hele huis staat nu in brand`, `Zwarte rook komt uit alle ramen`],
+        "verspreiding": [`Het vuur springt over naar de buurhuizen!`, `De buren evacueren hun huizen`, `De hele straat staat vol rook`]
       }
     },
     {
       type: "medische_noodsituatie",
-      initialMessage: (address: string, gemeente: string) =>
-        `Hallo, ik bel vanaf ${address} in ${gemeente}. Er ligt iemand bewusteloos op de grond!`,
+      initialMessage: (address: string, gemeente: string) => {
+        const medicalMessages = [
+          `Help! Er ligt iemand bewusteloos op ${address} in ${gemeente}!`,
+          `112? Iemand is zomaar in elkaar gezakt op ${address} in ${gemeente}! Hij reageert niet!`,
+          `Er is iemand flauwgevallen op ${address} in ${gemeente}! Stuur een ambulance!`
+        ];
+        return medicalMessages[Math.floor(Math.random() * medicalMessages.length)];
+      },
       responses: {
-        "locatie": (address: string, gemeente: string) => `${address} in ${gemeente}, op de stoep voor het huis`,
-        "gewonden": ["Hij beweegt niet en reageert niet", "Ze ademt nog maar heel zwak", "Er is bloed, ik denk door een val"],
-        "bewustzijn": ["Volledig bewusteloos", "Reageert niet op mijn stem", "Ogen zijn dicht, geen reactie"],
-        "ademhaling": ["Ik zie de borst nog bewegen", "Heel zwakke ademhaling", "Ik weet niet zeker of hij nog ademt"]
+        "locatie": [`Op de stoep voor het huis`, `In de winkel, bij de kassa`, `Op straat, mensen lopen eromheen`],
+        "gewonden": [`Hij beweegt helemaal niet en reageert op niets`, `Ze ademt nog maar heel zwak`, `Er is bloed... ik denk dat hij gevallen is`],
+        "bewustzijn": [`Helemaal bewusteloos`, `Reageert niet als ik zijn naam roep`, `Ogen zijn dicht, geen reactie op wat dan ook`],
+        "ademhaling": [`Ik zie zijn borst nog wel bewegen`, `Heel zwakke ademhaling`, `Ik weet niet zeker of hij nog ademt... stuur snel hulp!`]
+      }
+    },
+    {
+      type: "inbraak",
+      initialMessage: (address: string, gemeente: string) => {
+        const burglaryMessages = [
+          `Er wordt ingebroken in ${address} in ${gemeente}! Ik zie iemand rondlopen in het huis!`,
+          `112? Ik zie inbrekers in het huis op ${address} in ${gemeente}! Kom snel!`,
+          `Help! Er zijn mensen in mijn huis die er niet horen! ${address} in ${gemeente}!`
+        ];
+        return burglaryMessages[Math.floor(Math.random() * burglaryMessages.length)];
+      },
+      responses: {
+        "locatie": [`In het huis van de buren`, `Op de eerste verdieping`, `Via de achterdeur naar binnen`],
+        "dader": [`Twee personen in donkere kleding`, `Een man met een bivakmuts`, `Ik kan ze niet goed zien, maar ze hebben zaklampen`],
+        "situatie": [`Ze zijn nog binnen`, `Ik hoorde glas breken`, `Ze doorzoeken de kamers`],
+        "voertuig": [`Er staat een donkere auto voor de deur`, `Ik heb geen auto gezien`, `Er staat een busje om de hoek`]
+      }
+    },
+    {
+      type: "verdrinking",
+      initialMessage: (address: string, gemeente: string) => {
+        const drowningMessages = [
+          `Help! Iemand verdrinkt in het water bij ${address} in ${gemeente}!`,
+          `112! Er ligt iemand in het water bij ${address} in ${gemeente} en hij beweegt niet!`,
+          `Snel! Er is iemand in het water gevallen bij ${address} in ${gemeente}!`
+        ];
+        return drowningMessages[Math.floor(Math.random() * drowningMessages.length)];
+      },
+      responses: {
+        "locatie": [`In de rivier bij de brug`, `In de haven`, `Bij de waterkant, vlak bij het pad`],
+        "persoon": [`Een man, hij spartelt in het water`, `Iemand drijft roerloos`, `Een vrouw, ze roept om hulp maar gaat kopje onder`],
+        "situatie": [`Het water is hier diep`, `Er is sterke stroming`, `Ik durf niet het water in`],
+        "hulp": [`Andere mensen proberen te helpen`, `Niemand durft erin`, `Iemand gooit een reddingsboei`]
+      }
+    },
+    {
+      type: "overdosis",
+      initialMessage: (address: string, gemeente: string) => {
+        const overdoseMessages = [
+          `Er ligt iemand bewusteloos op ${address} in ${gemeente}! Ik denk drugs!`,
+          `112? Iemand heeft te veel gebruikt bij ${address} in ${gemeente}! Hij reageert nergens op!`,
+          `Help! Er ligt een persoon met schuim op de mond op ${address} in ${gemeente}!`
+        ];
+        return overdoseMessages[Math.floor(Math.random() * overdoseMessages.length)];
+      },
+      responses: {
+        "locatie": [`In het park op een bankje`, `In de steeg achter de winkels`, `Bij de bushalte`],
+        "persoon": [`Een jongeman, hij beweegt niet`, `Vrouw van middelbare leeftijd`, `Tiener, lijkt heel jong`],
+        "symptomen": [`Schuim uit de mond`, `Heel bleek en koud`, `Hijgt heel zwaar`],
+        "spullen": [`Er liggen spullen naast hem`, `Ik zie naalden en zakjes`, `Er ligt een lepel en andere dingen`]
       }
     }
   ];
@@ -864,7 +974,7 @@ export default function Dashboard() {
     console.log("🎭 simulateCallerMessage called but scenario already generated");
   };
 
-  // Generate realistic 112 caller responses with enhanced Dutch emergency protocol
+  // Enhanced 112 emergency caller AI - realistic Dutch civilian responses
   const generate112Response = (operatorMessage: string, conversationHistory: any[] = []) => {
     const message = operatorMessage.toLowerCase();
     
@@ -876,101 +986,264 @@ export default function Dashboard() {
     
     console.log("🤖 AI Response Context - Scenario:", scenarioType, "Address:", address, "Gemeente:", gemeente);
     
-    // Context-aware responses based on scenario and operator question
-    if (message.includes("locatie") || message.includes("waar") || message.includes("adres")) {
-      if (scenarioResponses?.locatie && Array.isArray(scenarioResponses.locatie)) {
-        return scenarioResponses.locatie[Math.floor(Math.random() * scenarioResponses.locatie.length)];
-      }
-      return address && gemeente ? `${address} in ${gemeente}, ter hoogte van de ingang` : "Bergweg 89 in Rotterdam, bij de bushalte";
-    }
+    // Enhanced emotion detection based on scenario urgency
+    const getEmotionalTone = () => {
+      const urgentScenarios = ["brand", "geweldsincident", "verkeersongeval", "verdrinking"];
+      const isUrgent = urgentScenarios.includes(scenarioType);
+      const conversationLength = conversationHistory.length;
+      
+      // Emotion evolves during conversation
+      if (conversationLength < 2 && isUrgent) return "panic";
+      if (conversationLength < 4 && isUrgent) return "urgent";
+      if (conversationLength >= 4) return "calming";
+      return "concerned";
+    };
     
-    if (message.includes("gewond") || message.includes("slachtoffer") || message.includes("letsel")) {
-      if (scenarioResponses?.gewonden) {
-        return scenarioResponses.gewonden[Math.floor(Math.random() * scenarioResponses.gewonden.length)];
-      }
-      return "Ja, er ligt iemand op de grond die niet beweegt!";
-    }
+    const emotionalTone = getEmotionalTone();
     
-    if (message.includes("personen") || message.includes("hoeveel") || message.includes("aantal")) {
-      const personCountResponses = [
-        "Ik zie twee personen",
-        "Er zijn drie mensen bij betrokken", 
-        "Eén persoon ligt op de grond",
-        "Ik tel vier personen hier",
-        "Er staan veel mensen omheen, maar twee zijn direct betrokken"
-      ];
-      return personCountResponses[Math.floor(Math.random() * personCountResponses.length)];
-    }
-    
-    if (message.includes("wapen") || message.includes("gevaarlijk") || message.includes("bedreig")) {
-      if (scenarioResponses?.wapen) {
-        return scenarioResponses.wapen[Math.floor(Math.random() * scenarioResponses.wapen.length)];
-      }
-      const weaponResponses = [
-        "Ik heb geen wapen gezien",
-        "Hij had iets glimmends in zijn hand!",
-        "Nee, alleen met vuisten",
-        "Ik durf niet goed te kijken, het is te gevaarlijk"
-      ];
-      return weaponResponses[Math.floor(Math.random() * weaponResponses.length)];
-    }
-    
-    if (message.includes("dader") || message.includes("beschrijv") || message.includes("persoon")) {
-      if (scenarioResponses?.dader) {
-        return scenarioResponses.dader[Math.floor(Math.random() * scenarioResponses.dader.length)];
-      }
-      return "Een man in donkere kleding, ik kon hem niet goed zien";
-    }
-    
-    if (message.includes("hulpdienst") || message.includes("ambulance") || message.includes("politie") || message.includes("brandweer")) {
-      const serviceMap = {
-        "geweldsincident": "Politie en ambulance allebei! Dit is heel gevaarlijk!",
-        "verkeersongeval": "Ambulance voor de gewonden en politie voor het verkeer!",
-        "brand": "Brandweer! En ambulance voor de mensen die rook hebben ingeademd!",
-        "medische_noodsituatie": "Snel een ambulance! Deze persoon heeft medische hulp nodig!"
+    // Dispatcher asking for location/address
+    if (message.includes("locatie") || message.includes("waar") || message.includes("adres") || 
+        message.includes("exacte") || message.includes("straat")) {
+      
+      const locationResponses = {
+        panic: [
+          `${address} in ${gemeente}! Ik sta hier vlakbij!`,
+          `Eh... ${address}, ${gemeente}! Kom snel!`,
+          `${gemeente}... eh... ${address}! Help ons!`
+        ],
+        urgent: [
+          `${address} in ${gemeente}, ter hoogte van de ingang`,
+          `Het is ${address} in ${gemeente}, bij de voorkant van het gebouw`,
+          `${gemeente}, ${address}. Ik zie jullie al aankomen?`
+        ],
+        concerned: [
+          `Het adres is ${address} in ${gemeente}`,
+          `${address}, dat is in ${gemeente}`,
+          `We zijn op ${address} in ${gemeente}`
+        ]
       };
-      return serviceMap[scenarioType] || "Alle hulpdiensten! Dit is een noodsituatie!";
+      
+      const responses = locationResponses[emotionalTone] || locationResponses.concerned;
+      return responses[Math.floor(Math.random() * responses.length)];
     }
     
-    if (message.includes("rustig") || message.includes("kalm") || message.includes("goed")) {
-      const calmingResponses = [
-        "Oké, ik probeer rustig te blijven... maar dit is zo eng!",
-        "Ja, ik blijf hier wachten op jullie",
-        "Dank je, ik doe mijn best om kalm te blijven",
-        "Oké... ik adem diep in en uit...",
-        "Ja, ik blijf in de buurt voor als jullie me nodig hebben"
+    // Asking about injuries/victims
+    if (message.includes("gewond") || message.includes("slachtoffer") || message.includes("letsel") || 
+        message.includes("pijn") || message.includes("beweegt")) {
+      
+      const injuryResponses = {
+        geweldsincident: [
+          "Ja! Hij ligt op de grond en beweegt niet veel!",
+          "Er is veel bloed... ik durf niet dichterbij te komen",
+          "Iemand schreeuwt van de pijn! Het ziet er erg uit!",
+          "Ja, er zijn gewonden! Stuur snel een ambulance!"
+        ],
+        verkeersongeval: [
+          "Ja, er liggen mensen naast de auto's!",
+          "Iemand zit nog vast in de auto, hij reageert niet",
+          "Er ligt iemand op straat, ik zie bloed",
+          "Twee mensen zijn uit de auto gestapt, maar een persoon beweegt niet"
+        ],
+        brand: [
+          "Mensen hoesten van de rook!",
+          "Ik zie mensen uit de ramen springen!",
+          "Er zijn mensen vast op de bovenste verdieping!",
+          "Iemand heeft rook ingeademd, hij hoest heel erg"
+        ],
+        medische_noodsituatie: [
+          "Ja! Deze persoon is bewusteloos!",
+          "Hij reageert helemaal niet, ook niet als ik roep",
+          "Ze ademt nog maar heel zwak",
+          "Er is iets heel ergs aan de hand, hij viel plotseling neer"
+        ]
+      };
+      
+      const responses = injuryResponses[scenarioType] || [
+        "Ik weet het niet zeker... het ziet er niet goed uit",
+        "Er zijn mensen die hulp nodig hebben",
+        "Ja, er zijn gewonden hier"
       ];
-      return calmingResponses[Math.floor(Math.random() * calmingResponses.length)];
+      
+      return responses[Math.floor(Math.random() * responses.length)];
     }
     
+    // Asking about number of people involved
+    if (message.includes("hoeveel") || message.includes("personen") || message.includes("mensen") || 
+        message.includes("aantal")) {
+      
+      const countResponses = [
+        "Ik zie... eh... twee, misschien drie personen",
+        "Er zijn een paar mensen betrokken, ik kan niet goed tellen",
+        "Moeilijk te zeggen... er staan veel mensen omheen",
+        "Twee mensen direct betrokken, maar er zijn meer omstanders",
+        "Ik tel ongeveer vier personen hier"
+      ];
+      
+      if (emotionalTone === "panic") {
+        return "Ik... ik weet het niet! Er zijn veel mensen! Help!";
+      }
+      
+      return countResponses[Math.floor(Math.random() * countResponses.length)];
+    }
+    
+    // Asking about weapons or danger
+    if (message.includes("wapen") || message.includes("gevaarlijk") || message.includes("bedreig") || 
+        message.includes("mes") || message.includes("vuurwapen")) {
+      
+      const weaponResponses = {
+        geweldsincident: [
+          "Ik heb iets glimmends gezien in zijn hand!",
+          "Het leek op een mes... ik ben weggerend!",
+          "Ik durf niet te kijken, maar het zag er gevaarlijk uit",
+          "Nee, alleen met vuisten en geschreeuw",
+          "Hij had iets vast, maar ik kon niet zien wat"
+        ],
+        default: [
+          "Ik heb geen wapen gezien",
+          "Nee, volgens mij niet",
+          "Ik durf niet goed te kijken",
+          "Het ging allemaal zo snel..."
+        ]
+      };
+      
+      const responses = weaponResponses[scenarioType] || weaponResponses.default;
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+    
+    // Asking for description of suspects/people involved
+    if (message.includes("beschrijv") || message.includes("dader") || message.includes("persoon") || 
+        message.includes("uiterlijk") || message.includes("kleding")) {
+      
+      const descriptionResponses = [
+        "Een man in donkere kleding, ik kon zijn gezicht niet goed zien",
+        "Blonde vrouw, ongeveer 30 jaar, zwarte jas",
+        "Lange man met een rode hoodie",
+        "Ik kon niet goed kijken... het ging zo snel",
+        "Twee mannen, een met een donkere jas, de ander in het wit",
+        "Het was een oudere man, grijs haar, donkere broek"
+      ];
+      
+      if (emotionalTone === "panic") {
+        return "Ik... ik weet het niet! Ik was zo bang!";
+      }
+      
+      return descriptionResponses[Math.floor(Math.random() * descriptionResponses.length)];
+    }
+    
+    // Dispatcher trying to calm the caller
+    if (message.includes("rustig") || message.includes("kalm") || message.includes("adem") || 
+        message.includes("goed") || message.includes("luister")) {
+      
+      const calmingResponses = {
+        panic: [
+          "Oké... oké... ik probeer rustig te blijven...",
+          "Het is moeilijk, maar ik doe mijn best...",
+          "Ja... ik adem diep in... en uit...",
+          "Oké, ik luister naar u"
+        ],
+        urgent: [
+          "Ja, ik probeer kalm te blijven",
+          "Oké, ik doe wat u zegt",
+          "Ik blijf hier wachten op jullie",
+          "Dank u, dat helpt"
+        ],
+        calming: [
+          "Ja, ik voel me al wat rustiger",
+          "Dank u, ik blijf kalm",
+          "Ik wacht hier op de hulpdiensten",
+          "Oké, ik snap het"
+        ]
+      };
+      
+      const responses = calmingResponses[emotionalTone] || calmingResponses.calming;
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+    
+    // Asking for personal details
     if (message.includes("naam") || message.includes("telefoonnummer") || message.includes("gegevens")) {
       const dutchNames = [
         "Sandra de Vries", "Mark Jansen", "Linda van der Berg", "Peter Willems", 
         "Fatima el Bakri", "Ahmed Hassan", "Marieke Visser", "Tom van Dijk",
-        "Nadia Oussama", "Dennis Bakker", "Yasmin Özdemir", "Jan Koster"
+        "Nadia Oussama", "Dennis Bakker", "Yasmin Özdemir", "Jan Koster",
+        "Emma Vermeulen", "Lars de Boer", "Sanne Hendriks", "Daan Mulder"
       ];
       const selectedName = dutchNames[Math.floor(Math.random() * dutchNames.length)];
-      return `Mijn naam is ${selectedName}, telefoonnummer ${currentConversation?.callerInfo}`;
+      return `Mijn naam is ${selectedName}, en dit nummer is ${currentConversation?.callerInfo}`;
     }
     
-    // Scenario-specific responses for current situation
-    if (scenarioResponses?.situatie && message.includes("gebeurd")) {
+    // Asking what happened
+    if (message.includes("gebeurd") || message.includes("situatie") || message.includes("wat is er")) {
+      const situationResponses = {
+        geweldsincident: [
+          "Er wordt gevochten! Twee mannen slaan elkaar!",
+          "Iemand wordt aangevallen! Er is veel geschreeuw!",
+          "Er is een vechtpartij gaande, het escaleert steeds meer!"
+        ],
+        verkeersongeval: [
+          "Er zijn auto's op elkaar gebotst!",
+          "Een auto heeft een fietser aangereden!",
+          "Er is een ongeval, auto's liggen op hun kant!"
+        ],
+        brand: [
+          "Er komen vlammen uit de ramen!",
+          "Het hele gebouw staat in brand!",
+          "Ik zie rook en vuur, het verspreidt zich snel!"
+        ],
+        medische_noodsituatie: [
+          "Iemand is plotseling neergevallen!",
+          "Een persoon is bewusteloos geraakt!",
+          "Er ligt iemand roerloos op de grond!"
+        ]
+      };
+      
+      const responses = situationResponses[scenarioType] || [
+        "Er is iets ergs gebeurd, stuur snel hulp!",
+        "Ik weet niet precies wat er aan de hand is, maar het ziet er slecht uit"
+      ];
+      
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+    
+    // Time-based emotional progression responses
+    const progressiveResponses = {
+      early: [
+        "Help! Er is iets vreselijks gebeurd!",
+        "Kom snel! Dit is een noodsituatie!",
+        "Ik weet niet wat ik moet doen!",
+        "Het is heel erg hier!"
+      ],
+      middle: [
+        "Wanneer komen jullie ongeveer?",
+        "Ik blijf hier in de buurt wachten",
+        "Moet ik nog iets doen tot jullie er zijn?",
+        "Ik hoor sirenes in de verte, zijn dat jullie?"
+      ],
+      late: [
+        "Ik zie jullie lichten! Zijn jullie dat?",
+        "De ambulance is er! Dank jullie wel!",
+        "Gelukkig, ik zie de brandweer aankomen!",
+        "Jullie zijn er snel! Dank u wel!"
+      ]
+    };
+    
+    const conversationStage = conversationHistory.length < 3 ? "early" : 
+                             conversationHistory.length < 6 ? "middle" : "late";
+    
+    // Scenario-specific final responses
+    if (scenarioResponses?.situatie && message.includes("nog")) {
       return scenarioResponses.situatie[Math.floor(Math.random() * scenarioResponses.situatie.length)];
     }
     
-    // Default emotional responses
-    const emotionalResponses = [
-      "Ik ben zo bang! Wanneer komen jullie?",
-      "Dit is verschrikkelijk! Help ons alsjeblieft!",
-      "Ik weet niet wat ik moet doen!",
-      "Kunnen jullie niet sneller komen?",
-      "Ik durf niet dichter bij te komen, het is te gevaarlijk",
-      "Wanneer komen jullie? Het duurt nu al zo lang!",
-      "Ik hoor sirenes! Zijn dat jullie?",
-      "Wat moet ik nu doen? Moet ik ergens op wachten?"
-    ];
-
-    return emotionalResponses[Math.floor(Math.random() * emotionalResponses.length)];
+    // Default responses based on conversation stage and emotion
+    const defaultResponses = progressiveResponses[conversationStage];
+    
+    // Add emotional stuttering for panic situations
+    if (emotionalTone === "panic" && Math.random() > 0.7) {
+      const response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+      return response.replace(/^(\w)/, "$1... $1");
+    }
+    
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
   };
 
   const sendMessageToColleague = (message: string) => {
