@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from "react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "./ui/context-menu";
 
 interface Unit {
   id?: number;
@@ -108,6 +114,18 @@ export default function ActiveUnitsDisplay() {
     }
   };
 
+  const handleKoppelen = (unit: Unit) => {
+    console.log('Koppelen:', unit.roepnummer);
+    // TODO: Implement koppelen functionality
+    alert(`Koppelen functionaliteit voor ${unit.roepnummer} nog niet geïmplementeerd`);
+  };
+
+  const handleOntkoppelen = (unit: Unit) => {
+    console.log('Ontkoppelen:', unit.roepnummer);
+    // TODO: Implement ontkoppelen functionality
+    alert(`Ontkoppelen functionaliteit voor ${unit.roepnummer} nog niet geïmplementeerd`);
+  };
+
   if (isLoading) {
     return (
       <div className="active-units-container">
@@ -189,75 +207,87 @@ export default function ActiveUnitsDisplay() {
           </thead>
           <tbody>
             {activeUnits.map((unit, index) => (
-              <tr 
-                key={unit.id} 
-                className="unit-table-row"
-                style={{ 
-                  borderLeft: `3px solid ${getStatusColor(unit.status)}`,
-                  backgroundColor: index % 2 === 0 ? '#fff' : '#f8f9fa',
-                  borderBottom: '1px solid #dee2e6'
-                }}
-              >
-                <td style={{ 
-                  padding: '6px 12px',
-                  borderRight: '1px solid #dee2e6',
-                  whiteSpace: 'nowrap'
-                }}>
-                  <strong>{unit.roepnummer}</strong>
-                </td>
-                <td style={{ 
-                  padding: '6px 12px',
-                  borderRight: '1px solid #dee2e6',
-                  whiteSpace: 'nowrap'
-                }}>
-                  <span 
-                    className="status-badge"
+              <ContextMenu key={unit.id}>
+                <ContextMenuTrigger asChild>
+                  <tr 
+                    className="unit-table-row"
                     style={{ 
-                      backgroundColor: getStatusColor(unit.status),
-                      color: '#000',
-                      padding: '2px 6px',
-                      borderRadius: '3px',
-                      fontSize: '10px',
-                      fontWeight: 'bold'
+                      borderLeft: `3px solid ${getStatusColor(unit.status)}`,
+                      backgroundColor: index % 2 === 0 ? '#fff' : '#f8f9fa',
+                      borderBottom: '1px solid #dee2e6',
+                      cursor: 'context-menu'
                     }}
                   >
-                    {getStatusAbbreviation(unit.status)}
-                  </span>
-                </td>
-                <td style={{ 
-                  padding: '6px 12px',
-                  borderRight: '1px solid #dee2e6',
-                  maxWidth: '120px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  <span title={unit.rollen.join(", ")}>
-                    {unit.rollen.join(", ")}
-                  </span>
-                </td>
-                <td style={{ 
-                  padding: '6px 12px',
-                  borderRight: '1px solid #dee2e6',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '80px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  <span title={unit.team}>
-                    {unit.team}
-                  </span>
-                </td>
-                <td style={{ 
-                  padding: '6px 12px',
-                  maxWidth: '150px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  <span title={unit.locatie || "-"}>
-                    {unit.locatie || "-"}
-                  </span>
-                </td>
-              </tr>
+                    <td style={{ 
+                      padding: '6px 12px',
+                      borderRight: '1px solid #dee2e6',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      <strong>{unit.roepnummer}</strong>
+                    </td>
+                    <td style={{ 
+                      padding: '6px 12px',
+                      borderRight: '1px solid #dee2e6',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      <span 
+                        className="status-badge"
+                        style={{ 
+                          backgroundColor: getStatusColor(unit.status),
+                          color: '#000',
+                          padding: '2px 6px',
+                          borderRadius: '3px',
+                          fontSize: '10px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {getStatusAbbreviation(unit.status)}
+                      </span>
+                    </td>
+                    <td style={{ 
+                      padding: '6px 12px',
+                      borderRight: '1px solid #dee2e6',
+                      maxWidth: '120px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      <span title={unit.rollen.join(", ")}>
+                        {unit.rollen.join(", ")}
+                      </span>
+                    </td>
+                    <td style={{ 
+                      padding: '6px 12px',
+                      borderRight: '1px solid #dee2e6',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '80px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      <span title={unit.team}>
+                        {unit.team}
+                      </span>
+                    </td>
+                    <td style={{ 
+                      padding: '6px 12px',
+                      maxWidth: '150px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      <span title={unit.locatie || "-"}>
+                        {unit.locatie || "-"}
+                      </span>
+                    </td>
+                  </tr>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem onClick={() => handleKoppelen(unit)}>
+                    🔗 Koppelen
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleOntkoppelen(unit)}>
+                    🔓 Ontkoppelen
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </tbody>
         </table>
