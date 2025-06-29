@@ -130,34 +130,44 @@ export default function ActiveUnitsDisplay() {
         <div className="active-units-time">{formatTime(currentTime)}</div>
       </div>
 
-      <div className="active-units-compact-list">
-        {activeUnits.map((unit) => (
-          <div 
-            key={unit.id} 
-            className="active-unit-row"
-            style={{ borderLeft: `3px solid ${getStatusColor(unit.status)}` }}
-          >
-            <div className="unit-roepnummer">{unit.roepnummer}</div>
-            <div 
-              className="unit-status-compact"
-              style={{ backgroundColor: getStatusColor(unit.status) }}
-            >
-              {getStatusAbbreviation(unit.status)}
-            </div>
-            <div className="unit-info-compact">
-              <span className="unit-mensen">{unit.aantal_mensen}p</span>
-              <span className="unit-vehicle">{unit.soort_auto.split(' - ')[1]?.substring(0, 8) || unit.soort_auto.substring(0, 8)}</span>
-            </div>
-            <div className="unit-team-compact">
-              {unit.team.replace('Basisteam ', '').replace(' (', ' ').replace(')', '').substring(0, 12)}
-            </div>
-            {unit.locatie && (
-              <div className="unit-location-compact">
-                📍 {unit.locatie.substring(0, 20)}
-              </div>
-            )}
-          </div>
-        ))}
+      <div className="active-units-table">
+        <table className="units-table">
+          <thead>
+            <tr>
+              <th>Roepnummer</th>
+              <th>Status</th>
+              <th>Inzetrol</th>
+              <th>Locatie</th>
+            </tr>
+          </thead>
+          <tbody>
+            {activeUnits.map((unit) => (
+              <tr 
+                key={unit.id} 
+                className="unit-table-row"
+                style={{ borderLeft: `3px solid ${getStatusColor(unit.status)}` }}
+              >
+                <td className="unit-roepnummer-cell">
+                  <strong>{unit.roepnummer}</strong>
+                </td>
+                <td className="unit-status-cell">
+                  <span 
+                    className="status-badge"
+                    style={{ backgroundColor: getStatusColor(unit.status) }}
+                  >
+                    {getStatusAbbreviation(unit.status)}
+                  </span>
+                </td>
+                <td className="unit-role-cell">
+                  {unit.rollen.join(", ")}
+                </td>
+                <td className="unit-location-cell">
+                  {unit.locatie || "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {activeUnits.length === 0 && (
