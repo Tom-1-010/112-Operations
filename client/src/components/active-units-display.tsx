@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -22,19 +21,45 @@ const fetchPoliceUnits = async (): Promise<PoliceUnit[]> => {
 
 export default function ActiveUnitsDisplay() {
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  const { data: policeUnits = [], isLoading } = useQuery({
-    queryKey: ['police-units'],
-    queryFn: fetchPoliceUnits,
-    refetchInterval: 5000, // Refresh every 5 seconds
-  });
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
+
     return () => clearInterval(timer);
+  }, []);
+
+  // Load units data
+  useEffect(() => {
+    const loadUnits = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/police-units');
+        if (response.ok) {
+          const data = await response.json();
+          setUnits(data || []);
+        } else {
+          console.warn('Failed to load units, using empty array');
+          setUnits([]);
+        }
+      } catch (error) {
+        console.error('Failed to load units:', error);
+        setUnits([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUnits();
+
+    // Refresh every 10 seconds (reduced frequency)
+    const refreshTimer = setInterval(loadUnits, 10000);
+
+    return () => clearInterval(refreshTimer);
   }, []);
 
   const formatTime = (date: Date) => {
@@ -108,7 +133,7 @@ export default function ActiveUnitsDisplay() {
         <h3>Actieve Eenheden</h3>
         <div className="active-units-time">{formatTime(currentTime)}</div>
       </div>
-      
+
       <div className="active-units-summary">
         <span>Actief: {activeUnits.length}</span>
         <span>Beschikbaar: {activeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}</span>
@@ -130,7 +155,7 @@ export default function ActiveUnitsDisplay() {
                 {getStatusAbbreviation(unit.status)}
               </div>
             </div>
-            
+
             <div className="unit-details">
               <div className="unit-info">
                 <i className="bi bi-people-fill"></i>
