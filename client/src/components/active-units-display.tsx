@@ -130,7 +130,7 @@ export default function ActiveUnitsDisplay() {
         <div className="active-units-time">{formatTime(currentTime)}</div>
       </div>
 
-      <div className="active-units-table">
+      <div className="active-units-table" style={{ overflowY: 'auto', maxHeight: '400px' }}>
         <table className="units-table">
           <thead>
             <tr>
