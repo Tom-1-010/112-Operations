@@ -1100,15 +1100,15 @@ export default function Dashboard() {
     
     // Enhanced emotion detection based on scenario urgency
     const getEmotionalTone = () => {
-      const urgentScenarios = ["brand", "geweldsincident", "verkeersongeval", "verdrinking"];
+      const urgentScenarios = ["brand", "geweldsincident", "verkeersongeval", "verdrinking", "beroving"];
       const isUrgent = urgentScenarios.includes(scenarioType);
       const conversationLength = conversationHistory.length;
       
-      // Emotion evolves during conversation
-      if (conversationLength < 2 && isUrgent) return "panic";
-      if (conversationLength < 4 && isUrgent) return "urgent";
-      if (conversationLength >= 4) return "calming";
-      return "concerned";
+      // Emotion evolves during conversation - more realistic progression
+      if (conversationLength === 0 && isUrgent) return "panic";
+      if (conversationLength <= 2 && isUrgent) return "urgent";
+      if (conversationLength <= 4) return "concerned";
+      return "calming";
     };
     
     const emotionalTone = getEmotionalTone();
@@ -1141,7 +1141,8 @@ export default function Dashboard() {
     
     // Asking about injuries/victims
     if (message.includes("gewond") || message.includes("slachtoffer") || message.includes("letsel") || 
-        message.includes("pijn") || message.includes("beweegt")) {
+        message.includes("pijn") || message.includes("beweegt") || message.includes("ademt") || 
+        message.includes("bewust")) {
       
       const injuryResponses = {
         geweldsincident: [
@@ -1149,6 +1150,12 @@ export default function Dashboard() {
           "Er is veel bloed... ik durf niet dichterbij te komen",
           "Iemand schreeuwt van de pijn! Het ziet er erg uit!",
           "Ja, er zijn gewonden! Stuur snel een ambulance!"
+        ],
+        beroving: [
+          "Het slachtoffer ligt op de grond!",
+          "Hij bloeit uit zijn hoofd",
+          "Ze hebben hem geslagen!",
+          "De man beweegt wel maar hij heeft pijn"
         ],
         verkeersongeval: [
           "Ja, er liggen mensen naast de auto's!",
@@ -1167,6 +1174,17 @@ export default function Dashboard() {
           "Hij reageert helemaal niet, ook niet als ik roep",
           "Ze ademt nog maar heel zwak",
           "Er is iets heel ergs aan de hand, hij viel plotseling neer"
+        ],
+        verdrinking: [
+          "Hij spartelt in het water maar gaat steeds kopje onder!",
+          "Iemand drijft roerloos in het water!",
+          "Ze roept om hulp maar ik kan haar niet bereiken!",
+          "Hij beweegt niet meer... ik denk dat hij bewusteloos is!"
+        ],
+        inbraak: [
+          "Nee, ik zie geen gewonden, maar de bewoners zijn niet thuis",
+          "Ik weet niet of er iemand gewond is, ik durf niet te kijken",
+          "De inbrekers zijn nog binnen, ik zie ze bewegen"
         ]
       };
       
@@ -1272,7 +1290,8 @@ export default function Dashboard() {
     }
     
     // Asking for personal details
-    if (message.includes("naam") || message.includes("telefoonnummer") || message.includes("gegevens")) {
+    if (message.includes("naam") || message.includes("telefoonnummer") || message.includes("gegevens") ||
+        message.includes("heet") || message.includes("bent u")) {
       const dutchNames = [
         "Sandra de Vries", "Mark Jansen", "Linda van der Berg", "Peter Willems", 
         "Fatima el Bakri", "Ahmed Hassan", "Marieke Visser", "Tom van Dijk",
@@ -1280,16 +1299,47 @@ export default function Dashboard() {
         "Emma Vermeulen", "Lars de Boer", "Sanne Hendriks", "Daan Mulder"
       ];
       const selectedName = dutchNames[Math.floor(Math.random() * dutchNames.length)];
-      return `Mijn naam is ${selectedName}, en dit nummer is ${currentConversation?.callerInfo}`;
+      return `Mijn naam is ${selectedName}, en u belt naar ${currentConversation?.callerInfo}`;
+    }
+
+    // Asking if they are safe
+    if (message.includes("veilig") || message.includes("veiligheid") || message.includes("gevaar") ||
+        message.includes("wegga") || message.includes("weggaan")) {
+      const safetyResponses = {
+        panic: [
+          "Ik... ik weet het niet! Moet ik wegrennen?",
+          "Nee, ik ben niet veilig! Wat moet ik doen?",
+          "Ik sta nog steeds hier, is dat gevaarlijk?"
+        ],
+        urgent: [
+          "Ik sta op afstand, maar ik zie alles",
+          "Ik ben weg van de gevaarlijke situatie",
+          "Ja, ik ben veilig maar ik kan het nog zien"
+        ],
+        concerned: [
+          "Ja, ik sta op veilige afstand",
+          "Ik ben veilig, maak je geen zorgen",
+          "Ik houd afstand zoals u zei"
+        ]
+      };
+      
+      const responses = safetyResponses[emotionalTone] || safetyResponses.concerned;
+      return responses[Math.floor(Math.random() * responses.length)];
     }
     
     // Asking what happened
-    if (message.includes("gebeurd") || message.includes("situatie") || message.includes("wat is er")) {
+    if (message.includes("gebeurd") || message.includes("situatie") || message.includes("wat is er") || 
+        message.includes("zie") || message.includes("wat zie")) {
       const situationResponses = {
         geweldsincident: [
           "Er wordt gevochten! Twee mannen slaan elkaar!",
           "Iemand wordt aangevallen! Er is veel geschreeuw!",
           "Er is een vechtpartij gaande, het escaleert steeds meer!"
+        ],
+        beroving: [
+          "Ze proberen zijn tas af te pakken!",
+          "Een man bedreigt iemand met een mes!",
+          "Twee mannen vallen een voorbijganger aan!"
         ],
         verkeersongeval: [
           "Er zijn auto's op elkaar gebotst!",
@@ -1305,6 +1355,21 @@ export default function Dashboard() {
           "Iemand is plotseling neergevallen!",
           "Een persoon is bewusteloos geraakt!",
           "Er ligt iemand roerloos op de grond!"
+        ],
+        verdrinking: [
+          "Er is iemand in het water gevallen!",
+          "Iemand spartelt in het water en gaat kopje onder!",
+          "Er drijft een persoon in het water die niet beweegt!"
+        ],
+        inbraak: [
+          "Er lopen mensen rond in het huis die er niet horen!",
+          "Ik zie zaklampen bewegen binnen, het zijn inbrekers!",
+          "Ze hebben de achterdeur opengebroken en zijn naar binnen!"
+        ],
+        verdachte_situatie: [
+          "Er staan mensen verdacht rond te kijken",
+          "Twee mannen proberen ergens in te breken denk ik",
+          "Ze hebben tassen bij zich en kijken steeds om zich heen"
         ]
       };
       
@@ -1316,11 +1381,41 @@ export default function Dashboard() {
       return responses[Math.floor(Math.random() * responses.length)];
     }
     
+    // More natural conversation flow based on operator questions
+    if (message.includes("rustig") || message.includes("kalm") || message.includes("blijf") || 
+        message.includes("adem")) {
+      const calmingResponses = {
+        panic: [
+          "Ik... ik probeer kalm te blijven maar het is zo eng!",
+          "Oké... oké... ik adem diep in...",
+          "Moeilijk om rustig te blijven maar ik doe mijn best"
+        ],
+        urgent: [
+          "Ja, ik probeer kalm te blijven",
+          "Oké, ik luister naar u",
+          "Ik doe wat u zegt"
+        ],
+        concerned: [
+          "Ja, ik ben wat rustiger nu",
+          "Dank u, dat helpt",
+          "Ik blijf hier wachten"
+        ],
+        calming: [
+          "Ik voel me al veel beter nu u er bent",
+          "Dank u wel voor uw hulp",
+          "Ik blijf kalm tot de hulpdiensten er zijn"
+        ]
+      };
+      
+      const responses = calmingResponses[emotionalTone] || calmingResponses.concerned;
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
     // Time-based emotional progression responses
     const progressiveResponses = {
       early: [
         "Help! Er is iets vreselijks gebeurd!",
-        "Kom snel! Dit is een noodsituatie!",
+        "Kom snel! Dit is een noodsituatie!", 
         "Ik weet niet wat ik moet doen!",
         "Het is heel erg hier!"
       ],
@@ -1332,14 +1427,14 @@ export default function Dashboard() {
       ],
       late: [
         "Ik zie jullie lichten! Zijn jullie dat?",
-        "De ambulance is er! Dank jullie wel!",
-        "Gelukkig, ik zie de brandweer aankomen!",
+        "De hulpdiensten zijn er! Dank jullie wel!",
+        "Gelukkig, ik zie ze aankomen!",
         "Jullie zijn er snel! Dank u wel!"
       ]
     };
     
-    const conversationStage = conversationHistory.length < 3 ? "early" : 
-                             conversationHistory.length < 6 ? "middle" : "late";
+    const conversationStage = conversationHistory.length < 2 ? "early" : 
+                             conversationHistory.length < 5 ? "middle" : "late";
     
     // Scenario-specific final responses
     if (scenarioResponses?.situatie && message.includes("nog")) {
