@@ -845,6 +845,18 @@ export default function Dashboard() {
     ]
   };
 
+  // Function to generate realistic 112 scenarios
+  const generateRealistic112Scenario = (address: string, gemeente: string) => {
+    const scenarios = realistic112Scenarios;
+    const selectedScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    
+    return {
+      type: selectedScenario.type,
+      initialMessage: selectedScenario.initialMessage(address, gemeente),
+      responses: selectedScenario.responses
+    };
+  };
+
   // Enhanced realistic 112 scenarios with official LMC classification support
   const realistic112Scenarios = [
     {
