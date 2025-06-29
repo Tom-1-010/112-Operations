@@ -2911,48 +2911,7 @@ export default function GMS2() {
                             <div className="gms2-status-cell header-ga">GA</div>
                           </div>
 
-                          {/* Sample data rows to match the photo */}
-                          <div className="gms2-status-data-row">```text
-                            <div className="gms2-status-cell data-dp">P</div>
-                            <div className="gms2-status-cell data-roepnaam">RTB101</div>
-                            <div className="gms2-status-cell data-soort">SurvBus</div>
-                            <div className="gms2-status-cell data-ov">13:19</div>
-                            <div className="gms2-status-cell data-ar">13:19</div>
-                            <div className="gms2-status-cell data-tp"></div>
-                            <div className="gms2-status-cell data-nb"></div>
-                            <div className="gms2-status-cell data-am"></div>
-                            <div className="gms2-status-cell data-vr"></div>
-                            <div className="gms2-status-cell data-fd"></div>
-                            <div className="gms2-status-cell data-ga"></div>
-                          </div>
-
-                          <div className="gms2-status-data-row">
-                            <div className="gms2-status-cell data-dp">P</div>
-                            <div className="gms2-status-cell data-roepnaam">RTB160</div>
-                            <div className="gms2-status-cell data-soort">WykAuto</div>
-                            <div className="gms2-status-cell data-ov">13:22</div>
-                            <div className="gms2-status-cell data-ar"></div>
-                            <div className="gms2-status-cell data-tp"></div>
-                            <div className="gms2-status-cell data-nb"></div>
-                            <div className="gms2-status-cell data-am"></div>
-                            <div className="gms2-status-cell data-vr"></div>
-                            <div className="gms2-status-cell data-fd"></div>
-                            <div className="gms2-status-cell data-ga"></div>
-                          </div>
-
-                          <div className="gms2-status-data-row">
-                            <div className="gms2-status-cell data-dp">P</div>
-                            <div className="gms2-status-cell data-roepnaam">RTB188</div>
-                            <div className="gms2-status-cell data-soort">SurvAut</div>
-                            <div className="gms2-status-cell data-ov">13:22</div>
-                            <div className="gms2-status-cell data-ar">13:24</div>
-                            <div className="gms2-status-cell data-tp">13:24</div>
-                            <div className="gms2-status-cell data-nb"></div>
-                            <div className="gms2-status-cell data-am"></div>
-                            <div className="gms2-status-cell data-vr">13:47</div>
-                            <div className="gms2-status-cell data-fd"></div>
-                            <div className="gms2-status-cell data-ga"></div>
-                          </div>
+                          
 
                           {/* Dynamic rows for assigned units from selected incident */}
                           {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
