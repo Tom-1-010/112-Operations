@@ -124,59 +124,38 @@ export default function ActiveUnitsDisplay() {
     <div className="active-units-container">
       <div className="active-units-header">
         <h3>Actieve Eenheden</h3>
+        <div className="active-units-summary">
+          Actief: {activeUnits.length} | Beschikbaar: {activeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}
+        </div>
         <div className="active-units-time">{formatTime(currentTime)}</div>
       </div>
 
-      <div className="active-units-summary">
-        <span>Actief: {activeUnits.length}</span>
-        <span>Beschikbaar: {activeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}</span>
-      </div>
-
-      <div className="active-units-grid">
+      <div className="active-units-compact-list">
         {activeUnits.map((unit) => (
           <div 
             key={unit.id} 
-            className="active-unit-card"
-            style={{ borderLeft: `4px solid ${getStatusColor(unit.status)}` }}
+            className="active-unit-row"
+            style={{ borderLeft: `3px solid ${getStatusColor(unit.status)}` }}
           >
-            <div className="unit-header">
-              <div className="unit-roepnummer">{unit.roepnummer}</div>
-              <div 
-                className="unit-status-badge"
-                style={{ backgroundColor: getStatusColor(unit.status) }}
-              >
-                {getStatusAbbreviation(unit.status)}
-              </div>
+            <div className="unit-roepnummer">{unit.roepnummer}</div>
+            <div 
+              className="unit-status-compact"
+              style={{ backgroundColor: getStatusColor(unit.status) }}
+            >
+              {getStatusAbbreviation(unit.status)}
             </div>
-
-            <div className="unit-details">
-              <div className="unit-info">
-                <i className="bi bi-people-fill"></i>
-                {unit.aantal_mensen}
-              </div>
-              <div className="unit-info">
-                <i className="bi bi-truck"></i>
-                {unit.soort_auto.split(' - ')[1] || unit.soort_auto}
-              </div>
+            <div className="unit-info-compact">
+              <span className="unit-mensen">{unit.aantal_mensen}p</span>
+              <span className="unit-vehicle">{unit.soort_auto.split(' - ')[1]?.substring(0, 8) || unit.soort_auto.substring(0, 8)}</span>
             </div>
-
+            <div className="unit-team-compact">
+              {unit.team.replace('Basisteam ', '').replace(' (', ' ').replace(')', '').substring(0, 12)}
+            </div>
             {unit.locatie && (
-              <div className="unit-location">
-                <i className="bi bi-geo-alt-fill"></i>
-                {unit.locatie}
+              <div className="unit-location-compact">
+                📍 {unit.locatie.substring(0, 20)}
               </div>
             )}
-
-            {unit.incident && (
-              <div className="unit-incident">
-                <i className="bi bi-exclamation-triangle-fill"></i>
-                {unit.incident}
-              </div>
-            )}
-
-            <div className="unit-team">
-              {unit.team.replace('Basisteam ', '').replace(' (', ' ').replace(')', '')}
-            </div>
           </div>
         ))}
       </div>
