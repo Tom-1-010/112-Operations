@@ -914,7 +914,7 @@ export default function BasisteamsPage() {
                   <MapPin className="w-4 h-4 mr-2" />
                   Gebied Bewerken
                 </Button>
-                <Button onClick={() => setIsEditing(true)}>
+                <Button onClick={() => handleEditBasisteam(selectedBasisteam)}>
                   <Edit className="w-4 h-4 mr-2" />
                   Bewerken
                 </Button>
