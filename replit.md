@@ -110,6 +110,7 @@ The application follows Dutch police operational procedures and terminology, sup
 
 ## Changelog
 
+- July 1, 2025. Completed Rotterdam region geographical coverage with 20+ locations including Rotterdam wijken (Centrum, Delfshaven, Charlois, Feijenoord, Noord, Alexandrium, Kralingen-Crooswijk, Overschie, Pernis, Hoek van Holland) and surrounding cities (Maassluis, Schiedam, Vlaardingen, Capelle aan den IJssel, Ridderkerk, Barendrecht, Albrandswaard, Spijkenisse, Rozenburg, Hellevoetsluis). Improved polygon positioning and sizing for better map visibility.
 - June 24, 2025. Initial setup
 
 ## User Preferences
