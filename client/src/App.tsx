@@ -15,7 +15,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Switch>
-          <Route path="/" component={DashboardPage} />
+          <Route path="/" component={() => <DashboardPage />} />
           <Route path="/dashboard" component={DashboardPage} />
           <Route path="/gms-eenheden" component={GmsEenhedenPage} />
           <Route path="/gms2" component={Gms2Page} />
