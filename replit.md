@@ -110,8 +110,6 @@ The application follows Dutch police operational procedures and terminology, sup
 
 ## Changelog
 
-- July 1, 2025 (Latest). Implemented authentic municipality boundary data for three key Rotterdam region cities. Updated polygons with official coordinates: Hoek van Holland (6 points), Maassluis (6 points), and Vlaardingen (6 points). Replaced estimated polygon shapes with precise municipality boundaries based on official geographical data. Added comprehensive manual polygon editor with lat/lng input fields, quick location buttons, and direct database integration for custom area creation.
-- July 1, 2025. Completed Rotterdam region geographical coverage with 20+ locations including Rotterdam wijken (Centrum, Delfshaven, Charlois, Feijenoord, Noord, Alexandrium, Kralingen-Crooswijk, Overschie, Pernis, Hoek van Holland) and surrounding cities (Maassluis, Schiedam, Vlaardingen, Capelle aan den IJssel, Ridderkerk, Barendrecht, Albrandswaard, Spijkenisse, Rozenburg, Hellevoetsluis). Improved polygon positioning and sizing for better map visibility.
 - June 24, 2025. Initial setup
 
 ## User Preferences
