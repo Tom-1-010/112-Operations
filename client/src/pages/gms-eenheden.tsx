@@ -125,7 +125,7 @@ export default function GMSEenheden() {
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
                   soort_auto: unit.soort_auto,
                   team: shortTeamName,
-                  status: unit.primair ? '1 - Beschikbaar/vrij' : '1 - Beschikbaar/vrij',
+                  status: unit.primair === true ? '1 - Beschikbaar/vrij' : '5 - Afmelden',
                   locatie: '',
                   incident: ''
                 });
