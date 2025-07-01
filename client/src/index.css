@@ -1674,6 +1674,23 @@ body {
   margin-bottom: 4px;
 }
 
+/* Leaflet map custom marker styling */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Leaflet popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+  line-height: 1.4;
+}
+
 .chat-message.incoming .message-sender {
   color: #1976d2;
 }
