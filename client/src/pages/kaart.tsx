@@ -1,16 +1,34 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
+
+// Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default markers in React Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Dynamic import for React Leaflet components to ensure client-side rendering
+let MapContainer: any;
+let TileLayer: any;
+let Marker: any;
+let Popup: any;
+let Polyline: any;
+
+// Fix for default markers in React Leaflet - with error handling
+try {
+  // Delete the default _getIconUrl method if it exists
+  if (L.Icon.Default.prototype._getIconUrl) {
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+  }
+  
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
+  
+  console.log('✅ Leaflet icons configured successfully');
+} catch (error) {
+  console.error('❌ Error configuring Leaflet icons:', error);
+}
 
 // Custom icons for different incident types and units
 const createCustomIcon = (color: string, iconType: string) => {
@@ -65,7 +83,32 @@ const KaartPage: React.FC = () => {
   const [disciplineFilter, setDisciplineFilter] = useState('alle');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
+
+  // Load React Leaflet components dynamically
+  useEffect(() => {
+    const loadMapComponents = async () => {
+      try {
+        console.log('🗺️ Loading React Leaflet components...');
+        const reactLeaflet = await import('react-leaflet');
+        MapContainer = reactLeaflet.MapContainer;
+        TileLayer = reactLeaflet.TileLayer;
+        Marker = reactLeaflet.Marker;
+        Popup = reactLeaflet.Popup;
+        Polyline = reactLeaflet.Polyline;
+        setMapLoaded(true);
+        console.log('✅ React Leaflet components loaded successfully');
+      } catch (error) {
+        console.error('❌ Error loading React Leaflet components:', error);
+        setError('Fout bij laden kaartcomponenten');
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      loadMapComponents();
+    }
+  }, []);
 
   // Sample data - in real implementation this would come from API
   useEffect(() => {
@@ -264,11 +307,13 @@ const KaartPage: React.FC = () => {
     windowExists: typeof window !== 'undefined'
   });
 
-  if (isLoading) {
+  if (isLoading || !mapLoaded) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
         <div className="text-xl">🗺️ Kaart wordt geladen...</div>
-        <div className="text-sm text-gray-600 mt-2">Even geduld, de kaartcomponenten worden geïnitialiseerd</div>
+        <div className="text-sm text-gray-600 mt-2">
+          {!mapLoaded ? 'Kaartcomponenten worden geladen...' : 'Data wordt geladen...'}
+        </div>
       </div>
     );
   }
@@ -344,12 +389,15 @@ const KaartPage: React.FC = () => {
 
       {/* Map */}
       <div className="flex-1" style={{ minHeight: '400px' }}>
-        {typeof window !== 'undefined' ? (
+        {typeof window !== 'undefined' && mapLoaded && MapContainer ? (
           <MapContainer
             center={[51.9225, 4.4792]} // Rotterdam center
             zoom={12}
             style={{ height: '100%', width: '100%', minHeight: '400px' }}
-            ref={mapRef}
+            whenCreated={(mapInstance) => {
+              mapRef.current = mapInstance;
+              console.log('✅ Map instance created successfully');
+            }}
           >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
