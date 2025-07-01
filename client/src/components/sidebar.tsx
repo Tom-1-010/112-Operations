@@ -27,10 +27,6 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
   const handleSettingsClick = () => {
     setSettingsExpanded(!settingsExpanded);
-    // Navigeer naar de instellingenpagina als deze nog niet open is
-    if (!settingsExpanded) {
-      window.location.href = '/instellingen';
-    }
   };
 
   const isSettingsActive = activeSection === 'basisteams' || activeSection === 'classificaties';
