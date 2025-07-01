@@ -7,7 +7,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const [settingsExpanded, setSettingsExpanded] = useState(false);
-  
+
   const menuItems = [
     { id: 'dashboard', icon: 'speedometer2', label: 'Dashboard' },
     { id: 'incidents', icon: 'exclamation-triangle', label: 'Incidenten' },
@@ -21,7 +21,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   ];
 
   const settingsSubItems = [
-    { id: 'settings', icon: 'table', label: 'Basisteams' },
+    { id: 'basisteams', icon: 'table', label: 'Basisteams' },
     { id: 'classificaties', icon: 'tags', label: 'Classificaties' },
   ];
 
@@ -29,7 +29,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     setSettingsExpanded(!settingsExpanded);
   };
 
-  const isSettingsActive = activeSection === 'settings' || activeSection === 'classificaties';
+  const isSettingsActive = activeSection === 'basisteams' || activeSection === 'classificaties';
 
   return (
     <nav className="sidebar">
@@ -48,7 +48,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <span>{item.label}</span>
           </div>
         ))}
-        
+
         {/* Settings menu with dropdown */}
         <div className={`nav-item nav-dropdown ${isSettingsActive ? 'active' : ''}`}>
           <div className="nav-item-main" onClick={handleSettingsClick}>

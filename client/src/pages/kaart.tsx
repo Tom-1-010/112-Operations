@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
+import { basisteamRegistry } from '../lib/basisteam-registry';
+import { Basisteam } from '../../../shared/basisteam-schema';
 
 // Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
@@ -11,6 +13,7 @@ let TileLayer: any;
 let Marker: any;
 let Popup: any;
 let Polyline: any;
+let Polygon: any;
 
 // Fix for default markers in React Leaflet - with error handling
 try {
@@ -84,6 +87,8 @@ const KaartPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [basisteams, setBasisteams] = useState<Basisteam[]>([]);
+  const [showBasisteams, setShowBasisteams] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
 
   // Load React Leaflet components dynamically
@@ -97,6 +102,7 @@ const KaartPage: React.FC = () => {
         Marker = reactLeaflet.Marker;
         Popup = reactLeaflet.Popup;
         Polyline = reactLeaflet.Polyline;
+        Polygon = reactLeaflet.Polygon;
         setMapLoaded(true);
         console.log('✅ React Leaflet components loaded successfully');
       } catch (error) {
@@ -148,14 +154,15 @@ const KaartPage: React.FC = () => {
       }
     ];
 
-    const sampleEenheden: Eenheid[] = [
+    const sampleEenheden: any[] = [
       {
         id: 'POL-101',
         type: 'Politie',
         status: 'Onderweg',
         locatie: [51.9200, 4.4780],
         bestemming: 'P-20250101-001',
-        naam: 'Alpha-01'
+        naam: 'Alpha-01',
+        basisteam_id: 'BT-RotterdamCentrum'
       },
       {
         id: 'POL-102',
@@ -163,7 +170,8 @@ const KaartPage: React.FC = () => {
         status: 'Bezig',
         locatie: [51.9225, 4.4792],
         bestemming: 'P-20250101-001',
-        naam: 'Alpha-02'
+        naam: 'Alpha-02',
+        basisteam_id: 'BT-RotterdamCentrum'
       },
       {
         id: 'BRW-201',
@@ -171,7 +179,8 @@ const KaartPage: React.FC = () => {
         status: 'Onderweg',
         locatie: [51.9230, 4.4785],
         bestemming: 'B-20250101-002',
-        naam: 'TS-201'
+        naam: 'TS-201',
+        basisteam_id: 'BT-RotterdamCentrum'
       },
       {
         id: 'AMB-301',
@@ -179,7 +188,8 @@ const KaartPage: React.FC = () => {
         status: 'Onderweg',
         locatie: [51.9240, 4.4770],
         bestemming: 'B-20250101-002',
-        naam: '17-101'
+        naam: '17-101',
+        basisteam_id: 'BT-RotterdamCentrum'
       },
       {
         id: 'AMB-302',
@@ -187,19 +197,22 @@ const KaartPage: React.FC = () => {
         status: 'Bezig',
         locatie: [51.9094, 4.4829],
         bestemming: 'A-20250101-003',
-        naam: '17-102'
+        naam: '17-102',
+        basisteam_id: 'BT-RotterdamZuid'
       },
       {
         id: 'POL-103',
         type: 'Politie',
         status: 'Beschikbaar',
         locatie: [51.9100, 4.4820],
-        naam: 'Bravo-01'
+        naam: 'Bravo-01',
+        basisteam_id: 'BT-RotterdamNoord'
       }
     ];
 
     setMeldingen(sampleMeldingen);
       setEenheden(sampleEenheden);
+      setBasisteams(basisteamRegistry.getAllTeams());
       setIsLoading(false);
       console.log('✅ Kaart data loaded successfully');
     } catch (error) {
@@ -380,6 +393,19 @@ const KaartPage: React.FC = () => {
             </select>
           </div>
           
+          {/* Basisteam Toggle */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm">
+              <input
+                type="checkbox"
+                checked={showBasisteams}
+                onChange={(e) => setShowBasisteams(e.target.checked)}
+                className="mr-1"
+              />
+              Toon basisteams
+            </label>
+          </div>
+          
           {/* Stats */}
           <div className="text-sm ml-auto">
             Meldingen: {filteredMeldingen.length} | Eenheden: {filteredEenheden.length}
@@ -404,6 +430,33 @@ const KaartPage: React.FC = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
+          {/* Basisteam polygonen */}
+          {showBasisteams && basisteams
+            .filter(team => team.actief && team.instellingen.zichtbaar_op_kaart)
+            .map((team) => (
+            <Polygon
+              key={team.id}
+              positions={team.polygon}
+              color="#2563eb"
+              fillColor="#dbeafe"
+              fillOpacity={0.2}
+              weight={2}
+              dashArray="5, 5"
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold text-sm">{team.naam}</h3>
+                  <p className="text-xs text-gray-600">{team.adres}</p>
+                  <p className="text-xs">Gemeentes: {team.gemeentes.join(', ')}</p>
+                  <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
+                  <p className="text-xs">
+                    Inzet buiten gebied: {team.instellingen.kan_inzetten_buiten_gebied ? 'Ja' : 'Nee'}
+                  </p>
+                </div>
+              </Popup>
+            </Polygon>
+          ))}
+
           {/* Connection lines between units and incidents */}
           {getConnectionLines()}
           
@@ -455,6 +508,11 @@ const KaartPage: React.FC = () => {
                       {eenheid.status}
                     </span>
                   </p>
+                  {eenheid.basisteam_id && (
+                    <p className="text-xs mb-1">
+                      <strong>Basisteam:</strong> {basisteamRegistry.getTeamById(eenheid.basisteam_id)?.naam || eenheid.basisteam_id}
+                    </p>
+                  )}
                   {eenheid.bestemming && (
                     <p className="text-xs"><strong>Bestemming:</strong> {eenheid.bestemming}</p>
                   )}
@@ -498,6 +556,12 @@ const KaartPage: React.FC = () => {
             <span className="text-red-600"> B</span>=Brandweer, 
             <span className="text-green-600"> A</span>=Ambulance
           </div>
+          {showBasisteams && (
+            <div className="border-l pl-4 ml-4">
+              <span className="font-semibold">Basisteams: </span>
+              <span className="text-blue-600">━━━</span> Teamgrenzen
+            </div>
+          )}
         </div>
       </div>
     </div>

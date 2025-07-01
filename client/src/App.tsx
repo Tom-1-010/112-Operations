@@ -2,8 +2,12 @@ import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Router, Route, Switch } from 'wouter';
-import Dashboard from './pages/dashboard';
-import NotFound from './pages/not-found';
+import DashboardPage from "./pages/dashboard";
+import GmsEenhedenPage from "./pages/gms-eenheden";
+import Gms2Page from "./pages/gms2";
+import KaartPage from "./pages/kaart";
+import InstellingenPage from "./pages/instellingen";
+import NotFoundPage from "./pages/not-found";
 import "./index.css";
 
 function App() {
@@ -11,9 +15,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Switch>
-          <Route path="/" component={() => <Dashboard />} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route component={NotFound} />
+          <Route path="/" component={() => <DashboardPage />} />
+          <Route path="/dashboard" component={DashboardPage} />
+          <Route path="/gms-eenheden" component={GmsEenhedenPage} />
+          <Route path="/gms2" component={Gms2Page} />
+          <Route path="/kaart" component={KaartPage} />
+          <Route path="/instellingen" component={InstellingenPage} />
+          <Route component={NotFoundPage} />
         </Switch>
       </Router>
     </QueryClientProvider>
