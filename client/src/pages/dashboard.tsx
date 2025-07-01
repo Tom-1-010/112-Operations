@@ -3675,8 +3675,8 @@ export default function Dashboard() {
                     "ongeval spoorvervoer letsel": "ogspls",
                     "wegongeval letsel": "ogwels",
                     "spoorwegongeval letsel": "ogspls",
-                    "ogwels": "ogwels",
-                    "wegvervoer letsel": "ogwels",
+                    "auto ongeval letsel": "ogwels",
+                    "verkeersongeval letsel": "ogwels",
                     
                     // Property crimes
                     "bz": "bzdsbr",
