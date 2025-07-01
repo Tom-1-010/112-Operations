@@ -387,6 +387,7 @@ function EditBasisteamForm({
     naam: basisteam.naam,
     adres: basisteam.adres,
     gemeentes: basisteam.gemeentes.join(', '),
+    polygon: basisteam.polygon || [],
     actief: basisteam.actief,
     instellingen: {
       kan_inzetten_buiten_gebied: basisteam.instellingen.kan_inzetten_buiten_gebied,
@@ -401,6 +402,7 @@ function EditBasisteamForm({
       naam: formData.naam,
       adres: formData.adres,
       gemeentes: formData.gemeentes.split(',').map(g => g.trim()).filter(g => g),
+      polygon: formData.polygon,
       actief: formData.actief,
       instellingen: formData.instellingen,
     });
@@ -479,10 +481,45 @@ function EditBasisteamForm({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-500 rounded border border-blue-600"></div>
                 <span>Huidige gebied grenzen</span>
+                {formData.polygon && formData.polygon.length > 0 && (
+                  <Badge variant="secondary" className="text-xs">
+                    {formData.polygon.length} punten
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // Voorbeeld polygon voor Rotterdam centrum
+                    const examplePolygon = [
+                      [51.9050, 4.4500],
+                      [51.9150, 4.4500], 
+                      [51.9150, 4.4700],
+                      [51.9050, 4.4700],
+                      [51.9050, 4.4500]
+                    ];
+                    setFormData(prev => ({ ...prev, polygon: examplePolygon }));
+                  }}
+                >
+                  Voorbeeld gebied
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, polygon: [] }));
+                  }}
+                >
+                  Wis gebied
+                </Button>
               </div>
               <p className="text-xs">
-                💡 Het gebied wordt automatisch bepaald op basis van de ingevoerde wijken. 
-                Handmatige aanpassingen komen in een toekomstige versie beschikbaar.
+                💡 Gebruik de knoppen om een voorbeeld gebied te tonen of het gebied te wissen. 
+                Handmatige aanpassingen door klikken op de kaart komen in een toekomstige versie.
               </p>
             </div>
           </div>
