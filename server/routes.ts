@@ -10,7 +10,10 @@ import {
   insertPhoneNumberSchema,
   karakteristieken,
   insertKarakteristiekSchema,
-  policeUnits
+  policeUnits,
+  basisteams,
+  insertPoliceUnitSchema,
+  insertBasisteamSchema
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -147,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/gms-incidents/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      
+
       // Handle the data more flexibly to support assigned units
       const incidentData = {
         melderNaam: req.body.melderNaam || "",
@@ -175,11 +178,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set(incidentData)
         .where(eq(gmsIncidents.id, id))
         .returning();
-        
+
       if (!updatedGmsIncident) {
         return res.status(404).json({ error: "GMS incident not found" });
       }
-      
+
       console.log(`Updated incident ${id} with ${incidentData.assignedUnits.length} assigned units`);
       res.json(updatedGmsIncident);
     } catch (error) {
@@ -529,10 +532,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const body = req.body;
-      
+
       // Remove timestamp fields and let the database handle them
       const { createdAt, updatedAt, ...updateData } = body;
-      
+
       const [updatedUnit] = await db
         .update(policeUnits)
         .set(updateData)
@@ -561,22 +564,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const fs = await import('fs');
       const path = await import('path');
-      
+
       console.log('🚀 Starting import of police units...');
 
       // Load the team data from JSON file
       const filePath = path.join(process.cwd(), 'attached_assets', 'rooster_eenheden_per_team_detailed_1751227112307.json');
-      
+
       let unitsToImport = [];
-      
+
       if (fs.existsSync(filePath)) {
         const teamsData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        
+
         // Process each team and convert to police units
         for (const [teamName, units] of Object.entries(teamsData)) {
           for (const unit of units) {
             const status = unit.primair ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
-            
+
             unitsToImport.push({
               roepnummer: unit.roepnummer,
               aantal_mensen: unit.aantal_mensen,
@@ -611,7 +614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Clear existing data
       await pool.query('DELETE FROM police_units');
-      
+
       // Insert new data
       let imported = 0;
       for (const unit of unitsToImport) {
@@ -644,7 +647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verify import
       const result = await pool.query('SELECT COUNT(*) FROM police_units');
       console.log(`✅ Successfully imported ${imported} police units`);
-      
+
       res.json({ 
         success: true, 
         imported: imported,

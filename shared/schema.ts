@@ -1,74 +1,54 @@
-import { pgTable, text, serial, integer, timestamp, boolean, json, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb, timestamp, boolean, real } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const incidents = pgTable("incidents", {
   id: serial("id").primaryKey(),
-  type: text("type").notNull(),
-  location: text("location").notNull(),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
-  unitsAssigned: integer("units_assigned").notNull().default(1),
-  priority: text("priority").notNull(), // 'low', 'medium', 'high'
-  status: text("status").notNull().default("active"), // 'active', 'accepted', 'closed'
+  meldnummer: text("meldnummer").notNull(),
+  prioriteit: text("prioriteit").notNull(),
+  classificatie: text("classificatie").notNull(),
+  omschrijving: text("omschrijving").notNull(),
+  locatie: text("locatie").notNull(),
+  melder: text("melder"),
+  telefoon: text("telefoon"),
+  toegewezen_eenheden: jsonb("toegewezen_eenheden").$type<string[]>().default([]),
+  status: text("status").notNull().default("Open"),
+  tijdstip: timestamp("tijdstip").defaultNow().notNull(),
+  afgehandeld_op: timestamp("afgehandeld_op"),
+  opmerkingen: text("opmerkingen"),
+  kenmerken: jsonb("kenmerken").$type<string[]>().default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const units = pgTable("units", {
-  id: text("id").primaryKey(),
-  type: text("type").notNull(), // 'patrol', 'motorcycle', 'dog', 'riot'
-  status: text("status").notNull(), // 'active', 'inactive', 'busy'
-  name: text("name").notNull(),
-});
-
-export interface AssignedUnit {
-  roepnummer: string;
-  soort_voertuig: string;
-  ov_tijd?: string;
-  ar_tijd?: string;
-  tp_tijd?: string;
-  nb_tijd?: string;
-  am_tijd?: string;
-  vr_tijd?: string;
-  fd_tijd?: string;
-  ga_tijd?: string;
-}
-
-// GMS incidents table for the dispatch simulator
-export const gmsIncidents = pgTable("gms_incidents", {
+export const basisteams = pgTable("basisteams", {
   id: serial("id").primaryKey(),
+  naam: text("naam").notNull(),
+  code: text("code").notNull().unique(), // A1, A2, A3, B1, B2
+  adres: text("adres"),
+  polygon: jsonb("polygon").$type<[number, number][]>().notNull(),
+  gemeentes: jsonb("gemeentes").$type<string[]>().default([]),
+  actief: boolean("actief").default(true).notNull(),
+  kan_inzetten_buiten_gebied: boolean("kan_inzetten_buiten_gebied").default(false).notNull(),
+  max_aantal_eenheden: integer("max_aantal_eenheden").default(20).notNull(),
+  zichtbaar_op_kaart: boolean("zichtbaar_op_kaart").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
-  // Meldergegevens
-  melderNaam: text("melder_naam"),
-  melderAdres: text("melder_adres"),
-  telefoonnummer: text("telefoonnummer"),
-
-  // Meldingslocatie
-  straatnaam: text("straatnaam"),
-  huisnummer: text("huisnummer"),
-  toevoeging: text("toevoeging"),
-  postcode: text("postcode"),
-  plaatsnaam: text("plaatsnaam"),
-  gemeente: text("gemeente"),
-
-  // Classificaties
-  mc1: text("mc1"),
-  mc2: text("mc2"),
-  mc3: text("mc3"),
-
-  // Tijdstip en prioriteit
-  tijdstip: text("tijdstip").notNull(),
-  prioriteit: integer("prioriteit").notNull().default(3),
-
-  // Status en logging
-  status: text("status").notNull().default("Nieuw"),
-  meldingslogging: text("meldingslogging"),
-  notities: text("notities"),
-
-  // Metadata
-  aangemaaktOp: timestamp("aangemaakt_op").notNull().defaultNow(),
-  afgesloten: timestamp("afgesloten"),
-
-  // Assigned units
-  assignedUnits: jsonb("assigned_units").array().$type<AssignedUnit[]>(),
+export const policeUnits = pgTable("police_units", {
+  id: serial("id").primaryKey(),
+  roepnummer: text("roepnummer").notNull().unique(),
+  aantal_mensen: integer("aantal_mensen").notNull().default(2),
+  rollen: jsonb("rollen").$type<string[]>().notNull(),
+  soort_auto: text("soort_auto").notNull(),
+  team: text("team").notNull(),
+  basisteam_id: integer("basisteam_id").references(() => basisteams.id),
+  status: text("status").notNull().default("5 - Afmelden"),
+  locatie: text("locatie"),
+  incident: text("incident"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const phoneNumbers = pgTable("phone_numbers", {
@@ -91,54 +71,6 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Police units table for GMS-eenheden
-export const policeUnits = pgTable("police_units", {
-  id: serial("id").primaryKey(),
-  roepnummer: text("roepnummer").notNull().unique(),
-  aantal_mensen: integer("aantal_mensen").notNull().default(2),
-  rollen: jsonb("rollen").notNull(),
-  soort_auto: text("soort_auto").notNull(),
-  team: text("team").notNull(),
-  status: text("status").notNull().default("5 - Afmelden"),
-  locatie: text("locatie"),
-  incident: text("incident"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export const insertIncidentSchema = createInsertSchema(incidents).omit({
-  id: true,
-  timestamp: true,
-});
-
-export const insertUnitSchema = createInsertSchema(units);
-
-export const insertGmsIncidentSchema = createInsertSchema(gmsIncidents).omit({
-  id: true,
-  aangemaaktOp: true,
-  afgesloten: true,
-});
-
-export const insertPhoneNumberSchema = createInsertSchema(phoneNumbers).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
-
-export const insertPoliceUnitSchema = createInsertSchema(policeUnits);
-export const selectPoliceUnitSchema = createSelectSchema(policeUnits);
-
-export type InsertIncident = z.infer<typeof insertIncidentSchema>;
-export type Incident = typeof incidents.$inferSelect;
-export type InsertUnit = z.infer<typeof insertUnitSchema>;
-export type Unit = typeof units.$inferSelect;
-export type InsertGmsIncident = z.infer<typeof insertGmsIncidentSchema>;
-export type GmsIncident = typeof gmsIncidents.$inferSelect;
-export type InsertPhoneNumber = z.infer<typeof insertPhoneNumberSchema>;
-export type PhoneNumber = typeof phoneNumbers.$inferSelect;
 export const karakteristieken = pgTable("karakteristieken", {
   id: serial("id").primaryKey(),
   ktNaam: text("kt_naam").notNull(),
@@ -150,16 +82,33 @@ export const karakteristieken = pgTable("karakteristieken", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const insertIncidentSchema = createInsertSchema(incidents);
+export const selectIncidentSchema = createSelectSchema(incidents);
+export const insertBasisteamSchema = createInsertSchema(basisteams);
+export const selectBasisteamSchema = createSelectSchema(basisteams);
+export const insertPoliceUnitSchema = createInsertSchema(policeUnits);
+export const selectPoliceUnitSchema = createSelectSchema(policeUnits);
+export const insertPhoneNumberSchema = createInsertSchema(phoneNumbers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
 export const insertKarakteristiekSchema = createInsertSchema(karakteristieken).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
+export type InsertIncident = z.infer<typeof insertIncidentSchema>;
+export type Incident = z.infer<typeof selectIncidentSchema>;
+export type InsertBasisteam = z.infer<typeof insertBasisteamSchema>;
+export type Basisteam = z.infer<typeof selectBasisteamSchema>;
+export type InsertPoliceUnit = z.infer<typeof insertPoliceUnitSchema>;
+export type PoliceUnit = z.infer<typeof selectPoliceUnitSchema>;
+export type PhoneNumber = typeof phoneNumbers.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type SelectUser = typeof users.$inferSelect;
-
-export type InsertPoliceUnit = typeof policeUnits.$inferInsert;
-export type SelectPoliceUnit = typeof policeUnits.$inferSelect;
 export type InsertKarakteristiek = z.infer<typeof insertKarakteristiekSchema>;
 export type Karakteristiek = typeof karakteristieken.$inferSelect;

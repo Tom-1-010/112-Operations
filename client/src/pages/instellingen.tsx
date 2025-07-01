@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Polygon, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { basisteamRegistry } from '../lib/basisteam-registry';
-import { Basisteam } from '../../../shared/basisteam-schema';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Fix voor Leaflet icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -14,15 +13,88 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+interface Basisteam {
+  id: number;
+  naam: string;
+  code: string;
+  adres?: string;
+  polygon: [number, number][];
+  gemeentes: string[];
+  actief: boolean;
+  kan_inzetten_buiten_gebied: boolean;
+  max_aantal_eenheden: number;
+  zichtbaar_op_kaart: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// API functions
+const fetchBasisteams = async (): Promise<Basisteam[]> => {
+  const response = await fetch('/api/basisteams');
+  if (!response.ok) throw new Error('Failed to fetch basisteams');
+  return response.json();
+};
+
+const createBasisteam = async (team: Omit<Basisteam, 'id' | 'createdAt' | 'updatedAt'>): Promise<Basisteam> => {
+  const response = await fetch('/api/basisteams', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(team),
+  });
+  if (!response.ok) throw new Error('Failed to create basisteam');
+  return response.json();
+};
+
+const updateBasisteam = async (team: Basisteam): Promise<Basisteam> => {
+  const response = await fetch(`/api/basisteams/${team.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(team),
+  });
+  if (!response.ok) throw new Error('Failed to update basisteam');
+  return response.json();
+};
+
+const deleteBasisteam = async (id: number): Promise<void> => {
+  const response = await fetch(`/api/basisteams/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete basisteam');
+};
+
 const InstellingenPage: React.FC = () => {
-  const [basisteams, setBasisteams] = useState<Basisteam[]>([]);
+  const queryClient = useQueryClient();
   const [selectedTeam, setSelectedTeam] = useState<Basisteam | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Basisteam>>({});
 
-  useEffect(() => {
-    setBasisteams(basisteamRegistry.getAllTeams());
-  }, []);
+  // Query for basisteams
+  const { data: basisteams = [], isLoading, error } = useQuery({
+    queryKey: ['basisteams'],
+    queryFn: fetchBasisteams,
+  });
+
+  // Mutations
+  const createMutation = useMutation({
+    mutationFn: createBasisteam,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['basisteams'] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: updateBasisteam,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['basisteams'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteBasisteam,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['basisteams'] });
+    },
+  });
 
   const handleSelectTeam = (team: Basisteam) => {
     setSelectedTeam(team);
@@ -33,17 +105,16 @@ const InstellingenPage: React.FC = () => {
   const handleSaveTeam = () => {
     if (selectedTeam && editForm) {
       const updated = { ...selectedTeam, ...editForm };
-      basisteamRegistry.updateTeam(selectedTeam.id, updated);
-      setBasisteams(basisteamRegistry.getAllTeams());
+      updateMutation.mutate(updated as Basisteam);
       setSelectedTeam(updated as Basisteam);
       setIsEditing(false);
     }
   };
 
   const handleAddTeam = () => {
-    const newTeam: Basisteam = {
-      id: `BT-${Date.now()}`,
+    const newTeam = {
       naam: 'Nieuw Basisteam',
+      code: `BT${Date.now()}`,
       adres: '',
       polygon: [
         [51.9225, 4.4792],
@@ -51,34 +122,42 @@ const InstellingenPage: React.FC = () => {
         [51.9215, 4.4812],
         [51.9205, 4.4782],
         [51.9225, 4.4792]
-      ],
+      ] as [number, number][],
       gemeentes: [],
       actief: true,
-      instellingen: {
-        kan_inzetten_buiten_gebied: false,
-        max_aantal_eenheden: 20,
-        zichtbaar_op_kaart: true
-      },
-      created_at: new Date().toISOString()
+      kan_inzetten_buiten_gebied: false,
+      max_aantal_eenheden: 20,
+      zichtbaar_op_kaart: true
     };
 
-    basisteamRegistry.addTeam(newTeam);
-    setBasisteams(basisteamRegistry.getAllTeams());
-    setSelectedTeam(newTeam);
-    setEditForm(newTeam);
-    setIsEditing(true);
+    createMutation.mutate(newTeam);
   };
 
-  const handleDeleteTeam = (teamId: string) => {
+  const handleDeleteTeam = (teamId: number) => {
     if (confirm('Weet je zeker dat je dit basisteam wilt verwijderen?')) {
-      basisteamRegistry.deleteTeam(teamId);
-      setBasisteams(basisteamRegistry.getAllTeams());
+      deleteMutation.mutate(teamId);
       if (selectedTeam?.id === teamId) {
         setSelectedTeam(null);
         setEditForm({});
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-xl">Laden van basisteams...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-xl text-red-600">Fout bij laden van basisteams: {error.message}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex bg-gray-50">
@@ -89,7 +168,8 @@ const InstellingenPage: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-700 mt-4">Basisteams</h2>
           <button
             onClick={handleAddTeam}
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            disabled={createMutation.isPending}
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50"
           >
             + Nieuw Basisteam
           </button>
@@ -107,6 +187,7 @@ const InstellingenPage: React.FC = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-medium text-gray-900">{team.naam}</h3>
+                  <p className="text-sm text-gray-600">{team.code}</p>
                   <p className="text-sm text-gray-600">{team.adres}</p>
                   <div className="flex gap-2 mt-1">
                     <span className={`px-2 py-1 rounded text-xs ${
@@ -124,7 +205,8 @@ const InstellingenPage: React.FC = () => {
                     e.stopPropagation();
                     handleDeleteTeam(team.id);
                   }}
-                  className="text-red-600 hover:text-red-800 text-sm"
+                  disabled={deleteMutation.isPending}
+                  className="text-red-600 hover:text-red-800 text-sm disabled:opacity-50"
                 >
                   🗑️
                 </button>
@@ -143,14 +225,15 @@ const InstellingenPage: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">{selectedTeam.naam}</h2>
-                  <p className="text-gray-600">{selectedTeam.id}</p>
+                  <p className="text-gray-600">{selectedTeam.code}</p>
                 </div>
                 <div className="flex gap-2">
                   {isEditing ? (
                     <>
                       <button
                         onClick={handleSaveTeam}
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        disabled={updateMutation.isPending}
+                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                       >
                         Opslaan
                       </button>
@@ -183,6 +266,17 @@ const InstellingenPage: React.FC = () => {
                       type="text"
                       value={editForm.naam || ''}
                       onChange={(e) => setEditForm({ ...editForm, naam: e.target.value })}
+                      disabled={!isEditing}
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Code</label>
+                    <input
+                      type="text"
+                      value={editForm.code || ''}
+                      onChange={(e) => setEditForm({ ...editForm, code: e.target.value })}
                       disabled={!isEditing}
                       className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                     />
@@ -234,13 +328,10 @@ const InstellingenPage: React.FC = () => {
                       <label className="flex items-center">
                         <input
                           type="checkbox"
-                          checked={editForm.instellingen?.kan_inzetten_buiten_gebied ?? false}
+                          checked={editForm.kan_inzetten_buiten_gebied ?? false}
                           onChange={(e) => setEditForm({ 
                             ...editForm, 
-                            instellingen: { 
-                              ...editForm.instellingen!, 
-                              kan_inzetten_buiten_gebied: e.target.checked 
-                            }
+                            kan_inzetten_buiten_gebied: e.target.checked 
                           })}
                           disabled={!isEditing}
                           className="rounded border-gray-300 text-blue-600 mr-2"
@@ -251,13 +342,10 @@ const InstellingenPage: React.FC = () => {
                       <label className="flex items-center">
                         <input
                           type="checkbox"
-                          checked={editForm.instellingen?.zichtbaar_op_kaart ?? true}
+                          checked={editForm.zichtbaar_op_kaart ?? true}
                           onChange={(e) => setEditForm({ 
                             ...editForm, 
-                            instellingen: { 
-                              ...editForm.instellingen!, 
-                              zichtbaar_op_kaart: e.target.checked 
-                            }
+                            zichtbaar_op_kaart: e.target.checked 
                           })}
                           disabled={!isEditing}
                           className="rounded border-gray-300 text-blue-600 mr-2"
@@ -269,13 +357,10 @@ const InstellingenPage: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700">Max aantal eenheden</label>
                         <input
                           type="number"
-                          value={editForm.instellingen?.max_aantal_eenheden || 20}
+                          value={editForm.max_aantal_eenheden || 20}
                           onChange={(e) => setEditForm({ 
                             ...editForm, 
-                            instellingen: { 
-                              ...editForm.instellingen!, 
-                              max_aantal_eenheden: parseInt(e.target.value) 
-                            }
+                            max_aantal_eenheden: parseInt(e.target.value) 
                           })}
                           disabled={!isEditing}
                           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
@@ -300,7 +385,7 @@ const InstellingenPage: React.FC = () => {
                   
                   {/* Toon alle basisteam polygonen */}
                   {basisteams
-                    .filter(team => team.instellingen.zichtbaar_op_kaart)
+                    .filter(team => team.zichtbaar_op_kaart)
                     .map((team) => (
                     <Polygon
                       key={team.id}
@@ -315,14 +400,14 @@ const InstellingenPage: React.FC = () => {
                           <h3 className="font-bold text-sm">{team.naam}</h3>
                           <p className="text-xs text-gray-600">{team.adres}</p>
                           <p className="text-xs">Gemeentes: {team.gemeentes.join(', ')}</p>
-                          <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
+                          <p className="text-xs">Max eenheden: {team.max_aantal_eenheden}</p>
                         </div>
                       </Popup>
                     </Polygon>
                   ))}
 
                   {/* Toon adres marker voor geselecteerd team */}
-                  {selectedTeam && (
+                  {selectedTeam && selectedTeam.polygon.length > 0 && (
                     <Marker position={selectedTeam.polygon[0]}>
                       <Popup>
                         <div className="p-2">
