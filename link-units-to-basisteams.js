@@ -38,6 +38,12 @@ async function linkUnitsToBasisteams() {
     let unmapped = 0;
 
     for (const unit of allUnits) {
+      // Skip if already linked
+      if (unit.basisteam_id) {
+        console.log(`⏭️  ${unit.roepnummer} already linked to ${unit.basisteam_id}`);
+        continue;
+      }
+
       const basisteamId = teamToBasisteamMapping[unit.team];
       
       if (basisteamId) {
