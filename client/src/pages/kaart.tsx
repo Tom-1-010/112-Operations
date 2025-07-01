@@ -4,12 +4,16 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import L from 'leaflet';
 
 // Fix for default markers in React Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+try {
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
+} catch (error) {
+  console.warn('Leaflet icon setup failed:', error);
+}
 
 // Custom icons for different incident types and units
 const createCustomIcon = (color: string, iconType: string) => {
@@ -68,7 +72,10 @@ const KaartPage: React.FC = () => {
 
   // Sample data - in real implementation this would come from API
   useEffect(() => {
-    const sampleMeldingen: Melding[] = [
+    try {
+      console.log('🗺️ Initializing kaart page...');
+      
+      const sampleMeldingen: Melding[] = [
       {
         id: 'P-20250101-001',
         classificatie: 'Diefstal met geweld',
@@ -152,8 +159,14 @@ const KaartPage: React.FC = () => {
     ];
 
     setMeldingen(sampleMeldingen);
-    setEenheden(sampleEenheden);
-    setIsLoading(false);
+      setEenheden(sampleEenheden);
+      setIsLoading(false);
+      console.log('✅ Kaart data loaded successfully');
+    } catch (error) {
+      console.error('❌ Error loading kaart data:', error);
+      setError(`Fout bij laden kaartgegevens: ${error}`);
+      setIsLoading(false);
+    }
   }, []);
 
   // Simulate unit movement every 5 seconds
@@ -325,12 +338,13 @@ const KaartPage: React.FC = () => {
 
       {/* Map */}
       <div className="flex-1">
-        <MapContainer
-          center={[52.1326, 5.2913]} // Center of Netherlands
-          zoom={8}
-          style={{ height: '100%', width: '100%' }}
-          ref={mapRef}
-        >
+        {typeof window !== 'undefined' && (
+          <MapContainer
+            center={[52.1326, 5.2913]} // Center of Netherlands
+            zoom={8}
+            style={{ height: '100%', width: '100%' }}
+            ref={mapRef}
+          >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -394,7 +408,8 @@ const KaartPage: React.FC = () => {
               </Popup>
             </Marker>
           ))}
-        </MapContainer>
+          </MapContainer>
+        )}
       </div>
       
       {/* Legend */}
