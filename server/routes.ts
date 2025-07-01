@@ -4,8 +4,6 @@ import { db, pool } from "./db";
 import { 
   incidents, 
   insertIncidentSchema, 
-  gmsIncidents, 
-  insertGmsIncidentSchema,
   phoneNumbers,
   insertPhoneNumberSchema,
   karakteristieken,
@@ -71,134 +69,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GMS incidents routes
-  // Get all GMS incidents
+  // GMS incidents routes - Temporarily commented out until gmsIncidents table is added to schema
+  // TODO: Add gmsIncidents table to shared/schema.ts and uncomment these routes
+  
+  // Placeholder GMS incidents endpoint to prevent frontend errors
   app.get("/api/gms-incidents", async (req, res) => {
-    try {
-      const allGmsIncidents = await db.select().from(gmsIncidents).orderBy(desc(gmsIncidents.aangemaaktOp)).catch(() => []);
-      res.json(allGmsIncidents);
-    } catch (error) {
-      console.error("Error fetching GMS incidents:", error);
-      res.json([]); // Return empty array instead of error
-    }
+    res.json([]); // Return empty array until table is implemented
   });
 
-  // Get single GMS incident
   app.get("/api/gms-incidents/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "Invalid incident ID" });
-      }
-
-      const [gmsIncident] = await db
-        .select()
-        .from(gmsIncidents)
-        .where(eq(gmsIncidents.id, id))
-        .catch(() => []);
-
-      if (!gmsIncident) {
-        return res.status(404).json({ error: "GMS incident not found" });
-      }
-      res.json(gmsIncident);
-    } catch (error) {
-      console.error("Error fetching GMS incident:", error);
-      res.status(500).json({ error: "Failed to fetch GMS incident" });
-    }
+    res.status(404).json({ error: "GMS incident not found - table not implemented yet" });
   });
 
-  // Create new GMS incident
   app.post("/api/gms-incidents", async (req, res) => {
-    try {
-      // Create incident with basic validation
-      const incidentData = {
-        melderNaam: req.body.melderNaam || "",
-        melderAdres: req.body.melderAdres || "",
-        telefoonnummer: req.body.telefoonnummer || "",
-        straatnaam: req.body.straatnaam || "",
-        huisnummer: req.body.huisnummer || "",
-        toevoeging: req.body.toevoeging || "",
-        postcode: req.body.postcode || "",
-        plaatsnaam: req.body.plaatsnaam || "",
-        gemeente: req.body.gemeente || "",
-        mc1: req.body.mc1 || "",
-        mc2: req.body.mc2 || "",
-        mc3: req.body.mc3 || "",
-        tijdstip: req.body.tijdstip || new Date().toISOString(),
-        prioriteit: req.body.prioriteit || 3,
-        status: req.body.status || "Nieuw",
-        meldingslogging: req.body.meldingslogging || "",
-        notities: req.body.notities || ""
-      };
-
-      const [newGmsIncident] = await db
-        .insert(gmsIncidents)
-        .values(incidentData)
-        .returning()
-        .catch((error) => {
-          console.error("Database insert error:", error);
-          throw error;
-        });
-
-      res.json(newGmsIncident);
-    } catch (error) {
-      console.error("Error creating GMS incident:", error);
-      res.status(400).json({ error: "Failed to create GMS incident" });
-    }
+    res.status(501).json({ error: "GMS incidents creation not implemented yet" });
   });
 
   app.put("/api/gms-incidents/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-
-      // Handle the data more flexibly to support assigned units
-      const incidentData = {
-        melderNaam: req.body.melderNaam || "",
-        melderAdres: req.body.melderAdres || "",
-        telefoonnummer: req.body.telefoonnummer || "",
-        straatnaam: req.body.straatnaam || "",
-        huisnummer: req.body.huisnummer || "",
-        toevoeging: req.body.toevoeging || "",
-        postcode: req.body.postcode || "",
-        plaatsnaam: req.body.plaatsnaam || "",
-        gemeente: req.body.gemeente || "",
-        mc1: req.body.mc1 || "",
-        mc2: req.body.mc2 || "",
-        mc3: req.body.mc3 || "",
-        tijdstip: req.body.tijdstip || new Date().toISOString(),
-        prioriteit: req.body.prioriteit || 3,
-        status: req.body.status || "Nieuw",
-        meldingslogging: req.body.meldingslogging || "",
-        notities: req.body.notities || "",
-        assignedUnits: req.body.assignedUnits || []
-      };
-
-      const [updatedGmsIncident] = await db
-        .update(gmsIncidents)
-        .set(incidentData)
-        .where(eq(gmsIncidents.id, id))
-        .returning();
-
-      if (!updatedGmsIncident) {
-        return res.status(404).json({ error: "GMS incident not found" });
-      }
-
-      console.log(`Updated incident ${id} with ${incidentData.assignedUnits.length} assigned units`);
-      res.json(updatedGmsIncident);
-    } catch (error) {
-      console.error("Error updating GMS incident:", error);
-      res.status(400).json({ error: "Failed to update GMS incident" });
-    }
+    res.status(501).json({ error: "GMS incidents update not implemented yet" });
   });
 
   app.delete("/api/gms-incidents/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      await db.delete(gmsIncidents).where(eq(gmsIncidents.id, id));
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to delete GMS incident" });
-    }
+    res.status(501).json({ error: "GMS incidents deletion not implemented yet" });
   });
 
   // BAG API proxy endpoint
