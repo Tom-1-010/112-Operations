@@ -13,6 +13,52 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Settings, Users, MapPin, Trash2, Edit, Map } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
+// Rotterdam wijken en hun geschatte coördinaten
+const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
+  'Hoek van Holland': [
+    [51.9770, 4.1200],
+    [51.9820, 4.1400],
+    [51.9800, 4.1500],
+    [51.9750, 4.1300],
+    [51.9770, 4.1200]
+  ],
+  'Maassluis': [
+    [51.9200, 4.2400],
+    [51.9300, 4.2600],
+    [51.9280, 4.2700],
+    [51.9180, 4.2500],
+    [51.9200, 4.2400]
+  ],
+  'Centrum': [
+    [51.9180, 4.4700],
+    [51.9280, 4.4900],
+    [51.9260, 4.5000],
+    [51.9160, 4.4800],
+    [51.9180, 4.4700]
+  ],
+  'Delfshaven': [
+    [51.9100, 4.4400],
+    [51.9200, 4.4600],
+    [51.9180, 4.4700],
+    [51.9080, 4.4500],
+    [51.9100, 4.4400]
+  ],
+  'Charlois': [
+    [51.8900, 4.4800],
+    [51.9000, 4.5000],
+    [51.8980, 4.5100],
+    [51.8880, 4.4900],
+    [51.8900, 4.4800]
+  ],
+  'Alexandrium': [
+    [51.9500, 4.5100],
+    [51.9600, 4.5300],
+    [51.9580, 4.5400],
+    [51.9480, 4.5200],
+    [51.9500, 4.5100]
+  ]
+};
+
 interface Basisteam {
   id: string;
   naam: string;
@@ -396,6 +442,22 @@ function EditBasisteamForm({
     }
   });
 
+  // Functie om automatisch polygon te genereren op basis van wijknamen
+  const generatePolygonFromWijken = () => {
+    const wijken = formData.gemeentes.split(',').map(w => w.trim());
+    const matchedAreas: number[][] = [];
+    
+    wijken.forEach(wijk => {
+      if (ROTTERDAM_AREAS[wijk]) {
+        matchedAreas.push(...ROTTERDAM_AREAS[wijk]);
+      }
+    });
+
+    if (matchedAreas.length > 0) {
+      setFormData(prev => ({ ...prev, polygon: matchedAreas as any }));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
@@ -492,19 +554,9 @@ function EditBasisteamForm({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    // Voorbeeld polygon voor Rotterdam centrum
-                    const examplePolygon = [
-                      [51.9050, 4.4500],
-                      [51.9150, 4.4500], 
-                      [51.9150, 4.4700],
-                      [51.9050, 4.4700],
-                      [51.9050, 4.4500]
-                    ];
-                    setFormData(prev => ({ ...prev, polygon: examplePolygon }));
-                  }}
+                  onClick={generatePolygonFromWijken}
                 >
-                  Voorbeeld gebied
+                  Genereer gebied uit wijken
                 </Button>
                 <Button
                   type="button"
@@ -517,10 +569,17 @@ function EditBasisteamForm({
                   Wis gebied
                 </Button>
               </div>
-              <p className="text-xs">
-                💡 Gebruik de knoppen om een voorbeeld gebied te tonen of het gebied te wissen. 
-                Handmatige aanpassingen door klikken op de kaart komen in een toekomstige versie.
-              </p>
+              <div className="text-xs space-y-1">
+                <p>
+                  💡 Klik op "Genereer gebied uit wijken" om automatisch gebieden te tonen voor:
+                </p>
+                <div className="text-gray-500 text-xs">
+                  Hoek van Holland, Maassluis, Centrum, Delfshaven, Charlois, Alexandrium
+                </div>
+                <p className="text-gray-600">
+                  Het systeem herkent deze wijknamen automatisch en toont de bijbehorende gebieden op de kaart.
+                </p>
+              </div>
             </div>
           </div>
         </div>
