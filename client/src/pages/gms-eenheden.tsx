@@ -95,9 +95,14 @@ export default function GMSEenheden() {
   useEffect(() => {
     const loadBasisteamsUnits = async () => {
       try {
+        console.log('🔄 Attempting to load basisteams data from JSON file...');
         const response = await fetch('/attached_assets/basisteams_eenheden_4_1751399608589.json');
+        console.log('📡 Response status:', response.status, response.statusText);
+        
         if (response.ok) {
           const basisteamsData = await response.json();
+          console.log('📊 Loaded basisteams data:', Object.keys(basisteamsData));
+          console.log('📊 Sample data:', Object.entries(basisteamsData).slice(0, 1));
           const units: PoliceUnit[] = [];
 
           // Define team order for sorting
@@ -117,7 +122,7 @@ export default function GMSEenheden() {
               teamUnits.forEach((unit: any) => {
                 const shortTeamName = teamMap[teamName] || teamName;
                 units.push({
-                  id: `bt-${unit.roepnummer}`, // Prefix to distinguish from DB units
+                  id: `bt-${unit.roepnummer}` as any, // Prefix to distinguish from DB units
                   roepnummer: unit.roepnummer,
                   aantal_mensen: unit.aantal_mensen,
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
@@ -146,9 +151,68 @@ export default function GMSEenheden() {
           });
 
           setBasisteamsUnits(units);
+          console.log('✅ Successfully loaded', units.length, 'basisteams units');
+        } else {
+          console.error('❌ Failed to fetch JSON file:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Failed to load basisteams units:', error);
+        // Also try the rooster JSON file as fallback
+        try {
+          console.log('🔄 Trying fallback rooster file...');
+          const fallbackResponse = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
+          if (fallbackResponse.ok) {
+            const roosterData = await fallbackResponse.json();
+            console.log('📊 Loaded rooster data:', Object.keys(roosterData));
+            
+            const units: PoliceUnit[] = [];
+            const teamOrder = ['A1', 'A2', 'A3', 'B1', 'B2'];
+            const teamMap: { [key: string]: string } = {
+              'Basisteam Waterweg (A1)': 'A1',
+              'Basisteam Schiedam (A2)': 'A2', 
+              'Basisteam Midden-Schieland (A3)': 'A3',
+              'Basisteam Delfshaven (B1)': 'B1',
+              'Basisteam Centrum (B2)': 'B2'
+            };
+
+            Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
+              if (Array.isArray(teamUnits)) {
+                teamUnits.forEach((unit: any) => {
+                  const shortTeamName = teamMap[teamName] || teamName;
+                  units.push({
+                    id: `bt-${unit.roepnummer}` as any,
+                    roepnummer: unit.roepnummer,
+                    aantal_mensen: unit.aantal_mensen,
+                    rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
+                    soort_auto: unit.soort_auto,
+                    team: shortTeamName,
+                    status: unit.primair ? '1 - Beschikbaar/vrij' : '1 - Beschikbaar/vrij',
+                    locatie: '',
+                    incident: ''
+                  });
+                });
+              }
+            });
+
+            units.sort((a, b) => {
+              const aTeamIndex = teamOrder.indexOf(a.team);
+              const bTeamIndex = teamOrder.indexOf(b.team);
+
+              if (aTeamIndex !== bTeamIndex) {
+                if (aTeamIndex === -1) return 1;
+                if (bTeamIndex === -1) return -1;
+                return aTeamIndex - bTeamIndex;
+              }
+
+              return a.roepnummer.localeCompare(b.roepnummer);
+            });
+
+            setBasisteamsUnits(units);
+            console.log('✅ Successfully loaded', units.length, 'units from fallback rooster file');
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError);
+        }
       }
     };
 
@@ -211,10 +275,25 @@ export default function GMSEenheden() {
     if (typeof unit.id === 'number') {
       updateUnitMutation.mutate({ ...unit, status: newStatus });
     } else {
-      // For basisteams units, update local state
+      // For basisteams units, update local state and sync to database
+      const updatedUnit = { ...unit, status: newStatus };
       setBasisteamsUnits(prev => 
-        prev.map(u => u.id === unit.id ? { ...u, status: newStatus } : u)
+        prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
+      
+      // Also try to sync to database by creating/updating a database entry
+      const dbUnit = {
+        roepnummer: unit.roepnummer,
+        aantal_mensen: unit.aantal_mensen,
+        rollen: unit.rollen,
+        soort_auto: unit.soort_auto,
+        team: unit.team,
+        status: newStatus,
+        locatie: unit.locatie || '',
+        incident: unit.incident || ''
+      };
+      
+      createUnitMutation.mutate(dbUnit);
     }
   };
 
@@ -223,10 +302,25 @@ export default function GMSEenheden() {
     if (typeof unit.id === 'number') {
       updateUnitMutation.mutate({ ...unit, locatie: newLocation });
     } else {
-      // For basisteams units, update local state
+      // For basisteams units, update local state and sync to database
+      const updatedUnit = { ...unit, locatie: newLocation };
       setBasisteamsUnits(prev => 
-        prev.map(u => u.id === unit.id ? { ...u, locatie: newLocation } : u)
+        prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
+      
+      // Also try to sync to database by creating/updating a database entry
+      const dbUnit = {
+        roepnummer: unit.roepnummer,
+        aantal_mensen: unit.aantal_mensen,
+        rollen: unit.rollen,
+        soort_auto: unit.soort_auto,
+        team: unit.team,
+        status: unit.status,
+        locatie: newLocation,
+        incident: unit.incident || ''
+      };
+      
+      createUnitMutation.mutate(dbUnit);
     }
   };
 
@@ -235,10 +329,25 @@ export default function GMSEenheden() {
     if (typeof unit.id === 'number') {
       updateUnitMutation.mutate({ ...unit, incident: newIncident });
     } else {
-      // For basisteams units, update local state
+      // For basisteams units, update local state and sync to database
+      const updatedUnit = { ...unit, incident: newIncident };
       setBasisteamsUnits(prev => 
-        prev.map(u => u.id === unit.id ? { ...u, incident: newIncident } : u)
+        prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
+      
+      // Also try to sync to database by creating/updating a database entry
+      const dbUnit = {
+        roepnummer: unit.roepnummer,
+        aantal_mensen: unit.aantal_mensen,
+        rollen: unit.rollen,
+        soort_auto: unit.soort_auto,
+        team: unit.team,
+        status: unit.status,
+        locatie: unit.locatie || '',
+        incident: newIncident
+      };
+      
+      createUnitMutation.mutate(dbUnit);
     }
   };
 
