@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { basisteamRegistry } from '../lib/basisteam-registry';
@@ -42,32 +43,6 @@ const createCustomIcon = (color: string, iconType: string) => {
   });
 };
 
-// Create priority-based icons
-const createPriorityIcon = (priority: number) => {
-  const colors = {
-    1: '#ff0000', // Zeer Hoog - Rood
-    2: '#ff6600', // Hoog - Oranje
-    3: '#ffaa00', // Middel - Geel
-    4: '#00aa00', // Laag - Groen
-    5: '#00aa00'  // Laag - Groen
-  };
-  
-  const color = colors[priority as keyof typeof colors] || '#888888';
-  return createCustomIcon(color, priority.toString());
-};
-
-// Helper function to convert priority number to urgency label
-const getPriorityUrgency = (priorityNumber: number): 'Laag' | 'Middel' | 'Hoog' | 'Zeer Hoog' => {
-  switch (priorityNumber) {
-    case 1: return 'Zeer Hoog';
-    case 2: return 'Hoog';
-    case 3: return 'Middel';
-    case 4:
-    case 5:
-    default: return 'Laag';
-  }
-};
-
 const incidentIcons = {
   'brand': createCustomIcon('#ff4444', '🔥'),
   'medisch': createCustomIcon('#44ff44', '🏥'),
@@ -92,7 +67,6 @@ interface Melding {
   tijdstip: string;
   eenheden: string[];
   details?: string;
-  prioriteit?: number;
 }
 
 interface Eenheid {
@@ -130,7 +104,7 @@ const KaartPage: React.FC = () => {
         Polyline = reactLeaflet.Polyline;
         Polygon = reactLeaflet.Polygon;
         setMapLoaded(true);
-        console.log('✅ React Leaflet components loaded');
+        console.log('✅ React Leaflet components loaded successfully');
       } catch (error) {
         console.error('❌ Error loading React Leaflet components:', error);
         setError('Fout bij laden kaartcomponenten');
@@ -142,76 +116,71 @@ const KaartPage: React.FC = () => {
     }
   }, []);
 
-  // Load GMS2 incidents from API
+  // Sample data - in real implementation this would come from API
   useEffect(() => {
-    const loadGMSIncidents = async () => {
-      try {
-        console.log('🗺️ Loading GMS incidents for map...');
-        
-        const response = await fetch('/api/gms-incidents');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const gmsIncidents = await response.json();
-        console.log('✅ Fetched GMS incidents for map:', gmsIncidents.length);
-        
-        // Convert GMS incidents to map format
-        const mapIncidents: Melding[] = gmsIncidents
-          .filter((incident: any) => incident.locatie && incident.locatie.coordinates)
-          .map((incident: any) => {
-            const priorityNumber = typeof incident.prioriteit === 'string' ? 
-              parseInt(incident.prioriteit) : incident.prioriteit;
-            
-            return {
-              id: incident.id?.toString() || `gms-${Math.random()}`,
-              classificatie: [incident.mc1, incident.mc2, incident.mc3].filter(Boolean).join(' / ') || 'Onbekend',
-              adres: `${incident.straat || ''} ${incident.huisnummer || ''}`.trim() || 
-                     incident.locatie?.address || 'Onbekende locatie',
-              coordinaten: [
-                incident.locatie.coordinates[1], // lat
-                incident.locatie.coordinates[0]  // lng
-              ] as [number, number],
-              urgentie: getPriorityUrgency(priorityNumber),
-              tijdstip: incident.tijdstip ? 
-                new Date(incident.tijdstip).toLocaleTimeString('nl-NL') : 'Onbekend',
-              eenheden: incident.toegewezenEenheden || [],
-              details: incident.omschrijving || '',
-              prioriteit: priorityNumber
-            };
-          });
-        
-        setMeldingen(mapIncidents);
-        console.log('✅ Set map incidents:', mapIncidents.length);
-        
-      } catch (error) {
-        console.error('❌ Error loading GMS incidents:', error);
-        setError('Fout bij laden meldingen');
-        // Set empty array on error
-        setMeldingen([]);
+    try {
+      console.log('🗺️ Initializing kaart page...');
+      
+      const sampleMeldingen: Melding[] = [
+      {
+        id: 'P-20250101-001',
+        classificatie: 'Diefstal met geweld',
+        adres: 'Coolsingel 101, Rotterdam',
+        coordinaten: [51.9225, 4.4792],
+        urgentie: 'Hoog',
+        tijdstip: new Date().toISOString(),
+        eenheden: ['POL-101', 'POL-102'],
+        details: 'Overval bij juwelier, dader nog ter plaatse'
+      },
+      {
+        id: 'B-20250101-002',
+        classificatie: 'Woningbrand',
+        adres: 'Weena 505, Rotterdam',
+        coordinaten: [51.9244, 4.4777],
+        urgentie: 'Zeer Hoog',
+        tijdstip: new Date().toISOString(),
+        eenheden: ['BRW-201', 'AMB-301'],
+        details: 'Brand op tweede verdieping, mogelijk personen binnen'
+      },
+      {
+        id: 'A-20250101-003',
+        classificatie: 'Verkeersongeval letsel',
+        adres: 'Erasmusbrug, Rotterdam',
+        coordinaten: [51.9094, 4.4829],
+        urgentie: 'Middel',
+        tijdstip: new Date().toISOString(),
+        eenheden: ['AMB-302', 'POL-103'],
+        details: 'Aanrijding tussen twee voertuigen, één gewonde'
       }
-    };
-    
-    loadGMSIncidents();
-  }, []);
+    ];
 
-  // Load sample units data
-  useEffect(() => {
-    const sampleEenheden: Eenheid[] = [
+    const sampleEenheden: any[] = [
       {
         id: 'POL-101',
         type: 'Politie',
-        status: 'Beschikbaar',
-        locatie: [51.9200, 4.4700],
-        naam: 'Alpha-01'
+        status: 'Onderweg',
+        locatie: [51.9200, 4.4780],
+        bestemming: 'P-20250101-001',
+        naam: 'Alpha-01',
+        basisteam_id: 'BT-RotterdamCentrum'
+      },
+      {
+        id: 'POL-102',
+        type: 'Politie',
+        status: 'Bezig',
+        locatie: [51.9225, 4.4792],
+        bestemming: 'P-20250101-001',
+        naam: 'Alpha-02',
+        basisteam_id: 'BT-RotterdamCentrum'
       },
       {
         id: 'BRW-201',
         type: 'Brandweer',
         status: 'Onderweg',
-        locatie: [51.9250, 4.4750],
+        locatie: [51.9230, 4.4785],
         bestemming: 'B-20250101-002',
-        naam: 'TS-201'
+        naam: 'TS-201',
+        basisteam_id: 'BT-RotterdamCentrum'
       },
       {
         id: 'AMB-301',
@@ -219,14 +188,38 @@ const KaartPage: React.FC = () => {
         status: 'Onderweg',
         locatie: [51.9240, 4.4770],
         bestemming: 'B-20250101-002',
-        naam: '17-101'
+        naam: '17-101',
+        basisteam_id: 'BT-RotterdamCentrum'
+      },
+      {
+        id: 'AMB-302',
+        type: 'Ambulance',
+        status: 'Bezig',
+        locatie: [51.9094, 4.4829],
+        bestemming: 'A-20250101-003',
+        naam: '17-102',
+        basisteam_id: 'BT-RotterdamZuid'
+      },
+      {
+        id: 'POL-103',
+        type: 'Politie',
+        status: 'Beschikbaar',
+        locatie: [51.9100, 4.4820],
+        naam: 'Bravo-01',
+        basisteam_id: 'BT-RotterdamNoord'
       }
     ];
 
-    setEenheden(sampleEenheden);
-    setBasisteams(basisteamRegistry.getAllTeams());
-    setIsLoading(false);
-    console.log('✅ Kaart data loaded successfully');
+    setMeldingen(sampleMeldingen);
+      setEenheden(sampleEenheden);
+      setBasisteams(basisteamRegistry.getAllTeams());
+      setIsLoading(false);
+      console.log('✅ Kaart data loaded successfully');
+    } catch (error) {
+      console.error('❌ Error loading kaart data:', error);
+      setError(`Fout bij laden kaartgegevens: ${error}`);
+      setIsLoading(false);
+    }
   }, []);
 
   // Simulate unit movement every 5 seconds
@@ -261,23 +254,26 @@ const KaartPage: React.FC = () => {
     return () => clearInterval(interval);
   }, [meldingen]);
 
-  const getIncidentIcon = (melding: Melding) => {
-    // Use priority-based icon if available
-    if (melding.prioriteit) {
-      return createPriorityIcon(melding.prioriteit);
-    }
-    
-    // Fallback to type-based icons
-    const classificatie = melding.classificatie.toLowerCase();
-    if (classificatie.includes('brand')) return incidentIcons.brand;
-    if (classificatie.includes('medisch') || classificatie.includes('ambulance')) return incidentIcons.medisch;
-    if (classificatie.includes('politie') || classificatie.includes('diefstal') || classificatie.includes('geweld')) return incidentIcons.politie;
-    if (classificatie.includes('verkeer') || classificatie.includes('ongeval')) return incidentIcons.verkeer;
+  const getIncidentIcon = (classificatie: string) => {
+    if (classificatie.toLowerCase().includes('brand')) return incidentIcons.brand;
+    if (classificatie.toLowerCase().includes('medisch') || classificatie.toLowerCase().includes('ambulance')) return incidentIcons.medisch;
+    if (classificatie.toLowerCase().includes('politie') || classificatie.toLowerCase().includes('diefstal') || classificatie.toLowerCase().includes('geweld')) return incidentIcons.politie;
+    if (classificatie.toLowerCase().includes('verkeer') || classificatie.toLowerCase().includes('ongeval')) return incidentIcons.verkeer;
     return incidentIcons.default;
   };
 
   const getUnitIcon = (type: string) => {
-    return unitIcons[type as keyof typeof unitIcons] || unitIcons.default;
+    return unitIcons[type] || unitIcons.default;
+  };
+
+  const getUrgentieColor = (urgentie: string) => {
+    switch (urgentie) {
+      case 'Zeer Hoog': return '#ff0000';
+      case 'Hoog': return '#ff6600';
+      case 'Middel': return '#ffaa00';
+      case 'Laag': return '#00aa00';
+      default: return '#888888';
+    }
   };
 
   const filteredMeldingen = meldingen.filter(melding => {
@@ -302,9 +298,9 @@ const KaartPage: React.FC = () => {
             <Polyline
               key={`${eenheid.id}-${melding.id}`}
               positions={[eenheid.locatie, melding.coordinaten]}
-              color="#007bff"
+              color="#666666"
               weight={2}
-              opacity={0.7}
+              opacity={0.6}
               dashArray="5, 5"
             />
           );
@@ -315,165 +311,182 @@ const KaartPage: React.FC = () => {
     return lines;
   };
 
-  if (!mapLoaded || isLoading) {
+  // Debug logging
+  console.log('🗺️ Kaart component render state:', {
+    isLoading,
+    error,
+    meldingen: meldingen.length,
+    eenheden: eenheden.length,
+    windowExists: typeof window !== 'undefined'
+  });
+
+  if (isLoading || !mapLoaded) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg">Kaart wordt geladen...</div>
+      <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
+        <div className="text-xl">🗺️ Kaart wordt geladen...</div>
+        <div className="text-sm text-gray-600 mt-2">
+          {!mapLoaded ? 'Kaartcomponenten worden geladen...' : 'Data wordt geladen...'}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg text-red-600">{error}</div>
+      <div className="h-screen flex flex-col items-center justify-center bg-red-50">
+        <div className="text-xl text-red-600">❌ Fout bij laden kaart</div>
+        <div className="text-sm text-red-500 mt-2">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar with filters */}
-      <div className="w-80 bg-white border-r border-gray-200 p-4 overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Kaart Filters</h2>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type incident
-            </label>
-            <select
-              value={selectedFilter}
+    <div className="h-screen flex flex-col bg-white">
+      {/* Header */}
+      <div className="bg-blue-600 text-white p-4">
+        <h1 className="text-xl font-bold">📍 Operationele Kaart</h1>
+        <div className="mt-2 flex gap-4 flex-wrap">
+          {/* Classificatie Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm">Classificatie:</label>
+            <select 
+              value={selectedFilter} 
               onChange={(e) => setSelectedFilter(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="text-black px-2 py-1 rounded text-xs"
             >
-              <option value="alle">Alle incidenten</option>
+              <option value="alle">Alle</option>
               <option value="brand">Brand</option>
-              <option value="medisch">Medisch</option>
-              <option value="politie">Politie</option>
+              <option value="diefstal">Diefstal</option>
               <option value="verkeer">Verkeer</option>
+              <option value="medisch">Medisch</option>
             </select>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Prioriteit
-            </label>
-            <select
-              value={urgentieFilter}
+          
+          {/* Urgentie Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm">Urgentie:</label>
+            <select 
+              value={urgentieFilter} 
               onChange={(e) => setUrgentieFilter(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="text-black px-2 py-1 rounded text-xs"
             >
-              <option value="alle">Alle prioriteiten</option>
-              <option value="Zeer Hoog">Zeer Hoog (1)</option>
-              <option value="Hoog">Hoog (2)</option>
-              <option value="Middel">Middel (3)</option>
-              <option value="Laag">Laag (4-5)</option>
+              <option value="alle">Alle</option>
+              <option value="Zeer Hoog">Zeer Hoog</option>
+              <option value="Hoog">Hoog</option>
+              <option value="Middel">Middel</option>
+              <option value="Laag">Laag</option>
             </select>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Eenheden
-            </label>
-            <select
-              value={disciplineFilter}
+          
+          {/* Discipline Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm">Discipline:</label>
+            <select 
+              value={disciplineFilter} 
               onChange={(e) => setDisciplineFilter(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="text-black px-2 py-1 rounded text-xs"
             >
-              <option value="alle">Alle eenheden</option>
+              <option value="alle">Alle</option>
               <option value="Politie">Politie</option>
               <option value="Brandweer">Brandweer</option>
               <option value="Ambulance">Ambulance</option>
             </select>
           </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="showBasisteams"
-              checked={showBasisteams}
-              onChange={(e) => setShowBasisteams(e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor="showBasisteams" className="text-sm font-medium text-gray-700">
+          
+          {/* Basisteam Toggle */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm">
+              <input
+                type="checkbox"
+                checked={showBasisteams}
+                onChange={(e) => setShowBasisteams(e.target.checked)}
+                className="mr-1"
+              />
               Toon basisteams
             </label>
           </div>
-        </div>
-
-        {/* Stats */}
-        <div className="mt-6 space-y-2">
-          <div className="text-sm text-gray-600">
-            <strong>Actieve meldingen:</strong> {filteredMeldingen.length}
-          </div>
-          <div className="text-sm text-gray-600">
-            <strong>Actieve eenheden:</strong> {filteredEenheden.length}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="mt-6">
-          <h3 className="text-sm font-bold mb-2">Legenda - Prioriteiten</h3>
-          <div className="space-y-1 text-xs">
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full bg-red-600 mr-2"></div>
-              <span>Prio 1 - Zeer Hoog</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full bg-orange-600 mr-2"></div>
-              <span>Prio 2 - Hoog</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full bg-yellow-600 mr-2"></div>
-              <span>Prio 3 - Middel</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded-full bg-green-600 mr-2"></div>
-              <span>Prio 4-5 - Laag</span>
-            </div>
+          
+          {/* Stats */}
+          <div className="text-sm ml-auto">
+            Meldingen: {filteredMeldingen.length} | Eenheden: {filteredEenheden.length}
           </div>
         </div>
       </div>
 
-      {/* Map container */}
-      <div className="flex-1 relative">
-        <MapContainer
-          center={[51.9225, 4.4792]}
-          zoom={12}
-          style={{ height: '100%', width: '100%' }}
-          ref={mapRef}
-        >
+      {/* Map */}
+      <div className="flex-1" style={{ minHeight: '400px' }}>
+        {typeof window !== 'undefined' && mapLoaded && MapContainer ? (
+          <MapContainer
+            center={[51.9225, 4.4792]} // Rotterdam center
+            zoom={12}
+            style={{ height: '100%', width: '100%', minHeight: '400px' }}
+            whenCreated={(mapInstance) => {
+              mapRef.current = mapInstance;
+              console.log('✅ Map instance created successfully');
+            }}
+          >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          
+          {/* Basisteam polygonen */}
+          {showBasisteams && basisteams
+            .filter(team => team.actief && team.instellingen.zichtbaar_op_kaart)
+            .map((team) => (
+            <Polygon
+              key={team.id}
+              positions={team.polygon}
+              color="#2563eb"
+              fillColor="#dbeafe"
+              fillOpacity={0.2}
+              weight={2}
+              dashArray="5, 5"
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold text-sm">{team.naam}</h3>
+                  <p className="text-xs text-gray-600">{team.adres}</p>
+                  <p className="text-xs">Gemeentes: {team.gemeentes.join(', ')}</p>
+                  <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
+                  <p className="text-xs">
+                    Inzet buiten gebied: {team.instellingen.kan_inzetten_buiten_gebied ? 'Ja' : 'Nee'}
+                  </p>
+                </div>
+              </Popup>
+            </Polygon>
+          ))}
 
-          {/* GMS2 Incidents with priority-based icons */}
+          {/* Connection lines between units and incidents */}
+          {getConnectionLines()}
+          
+          {/* Incident markers */}
           {filteredMeldingen.map((melding) => (
             <Marker
               key={melding.id}
               position={melding.coordinaten}
-              icon={getIncidentIcon(melding)}
+              icon={getIncidentIcon(melding.classificatie)}
             >
               <Popup>
                 <div className="p-2">
-                  <h3 className="font-bold text-sm mb-1">{melding.classificatie}</h3>
+                  <h3 className="font-bold text-sm mb-1">{melding.id}</h3>
+                  <p className="text-xs mb-1"><strong>Type:</strong> {melding.classificatie}</p>
                   <p className="text-xs mb-1"><strong>Adres:</strong> {melding.adres}</p>
-                  <p className="text-xs mb-1"><strong>Prioriteit:</strong> {melding.prioriteit || 'Onbekend'} ({melding.urgentie})</p>
-                  <p className="text-xs mb-1"><strong>Tijd:</strong> {melding.tijdstip}</p>
+                  <p className="text-xs mb-1">
+                    <strong>Urgentie:</strong> 
+                    <span style={{ color: getUrgentieColor(melding.urgentie) }}> {melding.urgentie}</span>
+                  </p>
+                  <p className="text-xs mb-1"><strong>Tijd:</strong> {new Date(melding.tijdstip).toLocaleTimeString('nl-NL')}</p>
                   {melding.details && (
                     <p className="text-xs mb-1"><strong>Details:</strong> {melding.details}</p>
                   )}
-                  {melding.eenheden.length > 0 && (
-                    <p className="text-xs"><strong>Eenheden:</strong> {melding.eenheden.join(', ')}</p>
-                  )}
+                  <p className="text-xs"><strong>Eenheden:</strong> {melding.eenheden.join(', ')}</p>
                 </div>
               </Popup>
             </Marker>
           ))}
-
-          {/* Units */}
+          
+          {/* Unit markers */}
           {filteredEenheden.map((eenheid) => (
             <Marker
               key={eenheid.id}
@@ -482,9 +495,24 @@ const KaartPage: React.FC = () => {
             >
               <Popup>
                 <div className="p-2">
-                  <h3 className="font-bold text-sm mb-1">{eenheid.naam || eenheid.id}</h3>
+                  <h3 className="font-bold text-sm mb-1">{eenheid.id}</h3>
+                  <p className="text-xs mb-1"><strong>Naam:</strong> {eenheid.naam}</p>
                   <p className="text-xs mb-1"><strong>Type:</strong> {eenheid.type}</p>
-                  <p className="text-xs mb-1"><strong>Status:</strong> {eenheid.status}</p>
+                  <p className="text-xs mb-1">
+                    <strong>Status:</strong> 
+                    <span className={`ml-1 ${
+                      eenheid.status === 'Beschikbaar' ? 'text-green-600' :
+                      eenheid.status === 'Onderweg' ? 'text-yellow-600' :
+                      eenheid.status === 'Bezig' ? 'text-red-600' : 'text-gray-600'
+                    }`}>
+                      {eenheid.status}
+                    </span>
+                  </p>
+                  {eenheid.basisteam_id && (
+                    <p className="text-xs mb-1">
+                      <strong>Basisteam:</strong> {basisteamRegistry.getTeamById(eenheid.basisteam_id)?.naam || eenheid.basisteam_id}
+                    </p>
+                  )}
                   {eenheid.bestemming && (
                     <p className="text-xs"><strong>Bestemming:</strong> {eenheid.bestemming}</p>
                   )}
@@ -492,31 +520,49 @@ const KaartPage: React.FC = () => {
               </Popup>
             </Marker>
           ))}
-
-          {/* Connection lines between units and destinations */}
-          {getConnectionLines()}
-
-          {/* Basisteams polygons */}
-          {showBasisteams && basisteams.map((team) => (
-            <Polygon
-              key={team.id}
-              positions={team.polygon}
-              color="#007bff"
-              weight={2}
-              opacity={0.6}
-              fillColor="#007bff"
-              fillOpacity={0.1}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold text-sm mb-1">{team.naam}</h3>
-                  <p className="text-xs mb-1"><strong>Adres:</strong> {team.adres}</p>
-                  <p className="text-xs"><strong>Gemeentes:</strong> {team.gemeentes.join(', ')}</p>
-                </div>
-              </Popup>
-            </Polygon>
-          ))}
-        </MapContainer>
+          </MapContainer>
+        ) : (
+          <div className="flex items-center justify-center h-full bg-gray-100">
+            <div className="text-center">
+              <div className="text-xl mb-2">🗺️</div>
+              <div className="text-sm text-gray-600">Kaart wordt geladen...</div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Legend */}
+      <div className="bg-gray-100 p-2 border-t">
+        <div className="flex flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">🔥</div>
+            <span>Brand</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">👮</div>
+            <span>Politie</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">🏥</div>
+            <span>Medisch</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs">🚗</div>
+            <span>Verkeer</span>
+          </div>
+          <div className="border-l pl-4 ml-4">
+            <span className="font-semibold">Eenheden: </span>
+            <span className="text-blue-600">P</span>=Politie, 
+            <span className="text-red-600"> B</span>=Brandweer, 
+            <span className="text-green-600"> A</span>=Ambulance
+          </div>
+          {showBasisteams && (
+            <div className="border-l pl-4 ml-4">
+              <span className="font-semibold">Basisteams: </span>
+              <span className="text-blue-600">━━━</span> Teamgrenzen
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

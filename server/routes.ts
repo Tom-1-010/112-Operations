@@ -12,7 +12,8 @@ import {
   insertKarakteristiekSchema,
   policeUnits,
   basisteams,
-  insertBasisteamSchema
+  insertBasisteamSchema,
+  updateBasisteamSchema
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -699,7 +700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/basisteams/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const basisteamData = insertBasisteamSchema.parse(req.body);
+      const basisteamData = updateBasisteamSchema.parse(req.body);
       const [updatedBasisteam] = await db
         .update(basisteams)
         .set(basisteamData)

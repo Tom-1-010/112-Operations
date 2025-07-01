@@ -110,6 +110,8 @@ The application follows Dutch police operational procedures and terminology, sup
 
 ## Changelog
 
+- July 1, 2025 (Latest). Enhanced Maassluis polygon to ultra-high detail with 158 coordinate points for maximum precision. Replaced simplified polygon shapes with official municipality boundaries based on CBS/OpenStreetMap data. Updated key municipalities: Maassluis (158 points, 32.42 km²), Schiedam (32 points, ~19.9 km²), Vlaardingen (31 points, ~23.6 km²), Capelle aan den IJssel (28 points, ~15.4 km²), and Ridderkerk (24 points, ~25.1 km²). Polygons now accurately represent real geographical boundaries instead of simplified geometric shapes.
+- July 1, 2025. Completed Rotterdam region geographical coverage with 20+ locations including Rotterdam wijken (Centrum, Delfshaven, Charlois, Feijenoord, Noord, Alexandrium, Kralingen-Crooswijk, Overschie, Pernis, Hoek van Holland) and surrounding cities (Maassluis, Schiedam, Vlaardingen, Capelle aan den IJssel, Ridderkerk, Barendrecht, Albrandswaard, Spijkenisse, Rozenburg, Hellevoetsluis). Improved polygon positioning and sizing for better map visibility.
 - June 24, 2025. Initial setup
 
 ## User Preferences
