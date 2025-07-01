@@ -99,7 +99,7 @@ export default function GMSEenheden() {
         if (response.ok) {
           const basisteamsData = await response.json();
           const units: PoliceUnit[] = [];
-          
+
           // Define team order for sorting
           const teamOrder = ['A1', 'A2', 'A3', 'B1', 'B2'];
           const teamMap: { [key: string]: string } = {
@@ -130,21 +130,21 @@ export default function GMSEenheden() {
               });
             }
           });
-          
+
           // Sort units by team order, then by roepnummer
           units.sort((a, b) => {
             const aTeamIndex = teamOrder.indexOf(a.team);
             const bTeamIndex = teamOrder.indexOf(b.team);
-            
+
             if (aTeamIndex !== bTeamIndex) {
               if (aTeamIndex === -1) return 1;
               if (bTeamIndex === -1) return -1;
               return aTeamIndex - bTeamIndex;
             }
-            
+
             return a.roepnummer.localeCompare(b.roepnummer);
           });
-          
+
           setBasisteamsUnits(units);
         }
       } catch (error) {
@@ -380,7 +380,7 @@ export default function GMSEenheden() {
                       value={unit.status}
                       onChange={(e) => updateUnitStatus(unit, e.target.value)}
                       className="gms-status-select"
-                      disabled={updateUnitMutation.isPending || typeof unit.id !== 'number'}
+                      disabled={updateUnitMutation.isPending}
                     >
                       <option value="1 - Beschikbaar/vrij">1 - Beschikbaar/vrij</option>
                       <option value="2 - Aanrijdend">2 - Aanrijdend</option>
@@ -410,7 +410,7 @@ export default function GMSEenheden() {
                       onChange={(e) => updateUnitLocation(unit, e.target.value)}
                       className="gms-location-input"
                       placeholder="Locatie..."
-                      disabled={updateUnitMutation.isPending || typeof unit.id !== 'number'}
+                      disabled={updateUnitMutation.isPending}
                     />
                   </td>
                   <td className="gms-eenheden-incident">
