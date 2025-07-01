@@ -10,7 +10,9 @@ import {
   insertPhoneNumberSchema,
   karakteristieken,
   insertKarakteristiekSchema,
-  policeUnits
+  policeUnits,
+  basisteams,
+  insertBasisteamSchema
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -655,6 +657,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error importing police units:', error);
       res.status(500).json({ error: 'Failed to import police units' });
+    }
+  });
+
+  // Basisteams routes
+  app.get("/api/basisteams", async (req, res) => {
+    try {
+      const allBasisteams = await db.select().from(basisteams);
+      res.json(allBasisteams);
+    } catch (error) {
+      console.error('Error fetching basisteams:', error);
+      res.status(500).json({ error: "Failed to fetch basisteams" });
+    }
+  });
+
+  app.post("/api/basisteams", async (req, res) => {
+    try {
+      const basisteamData = insertBasisteamSchema.parse(req.body);
+      const [newBasisteam] = await db.insert(basisteams).values(basisteamData).returning();
+      res.status(201).json(newBasisteam);
+    } catch (error) {
+      console.error('Error creating basisteam:', error);
+      res.status(500).json({ error: "Failed to create basisteam" });
+    }
+  });
+
+  app.get("/api/basisteams/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [basisteam] = await db.select().from(basisteams).where(eq(basisteams.id, id));
+      if (!basisteam) {
+        return res.status(404).json({ error: "Basisteam not found" });
+      }
+      res.json(basisteam);
+    } catch (error) {
+      console.error('Error fetching basisteam:', error);
+      res.status(500).json({ error: "Failed to fetch basisteam" });
+    }
+  });
+
+  app.put("/api/basisteams/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const basisteamData = insertBasisteamSchema.parse(req.body);
+      const [updatedBasisteam] = await db
+        .update(basisteams)
+        .set(basisteamData)
+        .where(eq(basisteams.id, id))
+        .returning();
+      
+      if (!updatedBasisteam) {
+        return res.status(404).json({ error: "Basisteam not found" });
+      }
+      res.json(updatedBasisteam);
+    } catch (error) {
+      console.error('Error updating basisteam:', error);
+      res.status(500).json({ error: "Failed to update basisteam" });
+    }
+  });
+
+  app.delete("/api/basisteams/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [deletedBasisteam] = await db
+        .delete(basisteams)
+        .where(eq(basisteams.id, id))
+        .returning();
+      
+      if (!deletedBasisteam) {
+        return res.status(404).json({ error: "Basisteam not found" });
+      }
+      res.json({ message: "Basisteam deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting basisteam:', error);
+      res.status(500).json({ error: "Failed to delete basisteam" });
+    }
+  });
+
+  // Route to get police units with their basisteam information
+  app.get("/api/police-units-with-basisteam", async (req, res) => {
+    try {
+      const unitsWithBasisteam = await db
+        .select({
+          unit: policeUnits,
+          basisteam: basisteams
+        })
+        .from(policeUnits)
+        .leftJoin(basisteams, eq(policeUnits.basisteam_id, basisteams.id));
+      
+      res.json(unitsWithBasisteam);
+    } catch (error) {
+      console.error('Error fetching units with basisteam:', error);
+      res.status(500).json({ error: "Failed to fetch units with basisteam" });
     }
   });
 

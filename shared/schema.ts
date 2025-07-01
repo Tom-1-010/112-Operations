@@ -1,5 +1,6 @@
 import { pgTable, text, serial, integer, timestamp, boolean, json, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
 export const incidents = pgTable("incidents", {
@@ -91,6 +92,23 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Basisteams table
+export const basisteams = pgTable("basisteams", {
+  id: text("id").primaryKey(),
+  naam: text("naam").notNull(),
+  adres: text("adres").notNull(),
+  polygon: jsonb("polygon").notNull(), // Array van coördinaten voor polygoon
+  gemeentes: text("gemeentes").array().notNull(),
+  actief: boolean("actief").notNull().default(true),
+  instellingen: jsonb("instellingen").notNull().default({
+    kan_inzetten_buiten_gebied: false,
+    max_aantal_eenheden: 10,
+    zichtbaar_op_kaart: true
+  }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Police units table for GMS-eenheden
 export const policeUnits = pgTable("police_units", {
   id: serial("id").primaryKey(),
@@ -99,6 +117,7 @@ export const policeUnits = pgTable("police_units", {
   rollen: jsonb("rollen").notNull(),
   soort_auto: text("soort_auto").notNull(),
   team: text("team").notNull(),
+  basisteam_id: text("basisteam_id").references(() => basisteams.id),
   status: text("status").notNull().default("5 - Afmelden"),
   locatie: text("locatie"),
   incident: text("incident"),
@@ -156,8 +175,27 @@ export const insertKarakteristiekSchema = createInsertSchema(karakteristieken).o
   updatedAt: true,
 });
 
+// Basisteams schema's
+export const insertBasisteamSchema = createInsertSchema(basisteams);
+export const selectBasisteamSchema = createSelectSchema(basisteams);
+
+// Relations
+export const basisteamsRelations = relations(basisteams, ({ many }) => ({
+  policeUnits: many(policeUnits),
+}));
+
+export const policeUnitsRelations = relations(policeUnits, ({ one }) => ({
+  basisteam: one(basisteams, {
+    fields: [policeUnits.basisteam_id],
+    references: [basisteams.id],
+  }),
+}));
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type SelectUser = typeof users.$inferSelect;
+
+export type InsertBasisteam = z.infer<typeof insertBasisteamSchema>;
+export type SelectBasisteam = typeof basisteams.$inferSelect;
 
 export type InsertPoliceUnit = typeof policeUnits.$inferInsert;
 export type SelectPoliceUnit = typeof policeUnits.$inferSelect;
