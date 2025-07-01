@@ -95,7 +95,7 @@ export default function GMSEenheden() {
   useEffect(() => {
     const loadBasisteamsUnits = async () => {
       try {
-        const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
+        const response = await fetch('/attached_assets/basisteams_eenheden_4_1751399608589.json');
         if (response.ok) {
           const basisteamsData = await response.json();
           const units: PoliceUnit[] = [];
