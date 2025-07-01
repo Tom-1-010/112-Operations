@@ -10,10 +10,7 @@ import {
   insertPhoneNumberSchema,
   karakteristieken,
   insertKarakteristiekSchema,
-  policeUnits,
-  basisteams,
-  insertPoliceUnitSchema,
-  insertBasisteamSchema
+  policeUnits
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -150,7 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/gms-incidents/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-
+      
       // Handle the data more flexibly to support assigned units
       const incidentData = {
         melderNaam: req.body.melderNaam || "",
@@ -178,11 +175,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set(incidentData)
         .where(eq(gmsIncidents.id, id))
         .returning();
-
+        
       if (!updatedGmsIncident) {
         return res.status(404).json({ error: "GMS incident not found" });
       }
-
+      
       console.log(`Updated incident ${id} with ${incidentData.assignedUnits.length} assigned units`);
       res.json(updatedGmsIncident);
     } catch (error) {
@@ -507,148 +504,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Police units routes
-  app.get('/api/police-units', async (c) => {
+  app.get("/api/police-units", async (req, res) => {
     try {
       const units = await db.select().from(policeUnits).orderBy(policeUnits.roepnummer);
-      return c.json(units);
+      return res.json(units);
     } catch (error) {
-      console.error('Error fetching police units:', error);
-      return c.json({ error: 'Failed to fetch police units' }, 500);
+        console.error("Error fetching police units:", error);
+        return res.status(500).json({ error: "Failed to fetch police units" });
     }
   });
 
-  app.post('/api/police-units', async (c) => {
+  app.post("/api/police-units", async (req, res) => {
     try {
-      const unitData = await c.req.json();
-      console.log('📝 Creating/updating police unit:', unitData);
-
-      // Check if unit already exists
-      const existingUnit = await db.select().from(policeUnits).where(eq(policeUnits.roepnummer, unitData.roepnummer)).limit(1);
-
-      if (existingUnit.length > 0) {
-        // Update existing unit
-        const updated = await db.update(policeUnits)
-          .set({
-            aantal_mensen: unitData.aantal_mensen,
-            rollen: unitData.rollen,
-            soort_auto: unitData.soort_auto,
-            team: unitData.team,
-            status: unitData.status,
-            locatie: unitData.locatie,
-            incident: unitData.incident,
-            basisteam_id: unitData.basisteam_id,
-            updated_at: new Date()
-          })
-          .where(eq(policeUnits.roepnummer, unitData.roepnummer))
-          .returning();
-
-        console.log('✅ Updated police unit:', updated[0]);
-        return c.json(updated[0]);
-      } else {
-        // Insert new unit
-        const newUnit = await db.insert(policeUnits).values({
-          roepnummer: unitData.roepnummer,
-          aantal_mensen: unitData.aantal_mensen,
-          rollen: unitData.rollen,
-          soort_auto: unitData.soort_auto,
-          team: unitData.team,
-          status: unitData.status,
-          locatie: unitData.locatie || '',
-          incident: unitData.incident || '',
-          basisteam_id: unitData.basisteam_id,
-          created_at: new Date(),
-          updated_at: new Date()
-        }).returning();
-
-        console.log('✅ Created police unit:', newUnit[0]);
-        return c.json(newUnit[0]);
-      }
+      const body = req.body;
+      const [newUnit] = await db.insert(policeUnits).values(body).returning();
+      return res.json(newUnit);
     } catch (error) {
-      console.error('Error creating/updating police unit:', error);
-      return c.json({ error: 'Failed to create/update police unit' }, 500);
+        console.error("Error creating police unit:", error);
+        return res.status(400).json({ error: "Invalid police unit data" });
     }
   });
 
-  // Basisteams routes
-  app.get('/api/basisteams', async (c) => {
+  app.put("/api/police-units/:id", async (req, res) => {
     try {
-      const teams = await db.select().from(basisteams);
-      return c.json(teams);
-    } catch (error) {
-      console.error('Error fetching basisteams:', error);
-      return c.json({ error: 'Failed to fetch basisteams' }, 500);
-    }
-  });
-
-  app.post('/api/basisteams', async (c) => {
-    try {
-      const teamData = await c.req.json();
-      console.log('📝 Creating basisteam:', teamData);
-
-      // Check if basisteam already exists
-      const existingTeam = await db.select().from(basisteams).where(eq(basisteams.naam, teamData.naam)).limit(1);
-
-      if (existingTeam.length > 0) {
-        console.log('⚠️ Basisteam already exists:', existingTeam[0]);
-        return c.json(existingTeam[0]);
-      }
-
-      // Insert new basisteam
-      const newTeam = await db.insert(basisteams).values({
-        naam: teamData.naam,
-        code: teamData.code,
-        kan_inzetten_buiten_gebied: teamData.kan_inzetten_buiten_gebied,
-        max_aantal_eenheden: teamData.max_aantal_eenheden,
-        zichtbaar_op_kaart: teamData.zichtbaar_op_kaart,
-        created_at: new Date(),
-        updated_at: new Date()
-      }).returning();
-
-      console.log('✅ Created basisteam:', newTeam[0]);
-      return c.json(newTeam[0]);
-    } catch (error) {
-      console.error('Error creating basisteam:', error);
-      return c.json({ error: 'Failed to create basisteam' }, 500);
-    }
-  });
-
-  app.put('/api/basisteams/:id', async (c) => {
-    try {
-      const id = c.req.param('id');
-      const teamData = await c.req.json();
-      console.log('📝 Updating basisteam:', id, teamData);
-
-      const updated = await db.update(basisteams)
-        .set({
-          naam: teamData.naam,
-          code: teamData.code,
-          kan_inzetten_buiten_gebied: teamData.kan_inzetten_buiten_gebied,
-          max_aantal_eenheden: teamData.max_aantal_eenheden,
-          zichtbaar_op_kaart: teamData.zichtbaar_op_kaart,
-          updated_at: new Date()
-        })
-        .where(eq(basisteams.id, id))
+      const id = parseInt(req.params.id);
+      const body = req.body;
+      
+      // Remove timestamp fields and let the database handle them
+      const { createdAt, updatedAt, ...updateData } = body;
+      
+      const [updatedUnit] = await db
+        .update(policeUnits)
+        .set(updateData)
+        .where(eq(policeUnits.id, id))
         .returning();
-
-      if (updated.length === 0) {
-        return c.json({ error: 'Basisteam not found' }, 404);
-      }
-
-      console.log('✅ Updated basisteam:', updated[0]);
-      return c.json(updated[0]);
+      return res.json(updatedUnit);
     } catch (error) {
-      console.error('Error updating basisteam:', error);
-      return c.json({ error: 'Failed to update basisteam' }, 500);
+        console.error("Error updating police unit:", error);
+        return res.status(400).json({ error: "Failed to update police unit" });
     }
   });
 
-  // Incidents routes
-  app.get('/api/incidents', async (c) => {
+  app.delete("/api/police-units/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(policeUnits).where(eq(policeUnits.id, id));
+      return res.json({ success: true });
+    } catch (error) {
+        console.error("Error deleting police unit:", error);
+        return res.status(500).json({ error: "Failed to delete police unit" });
+    }
+  });
+
+  // Import police units data
+  app.post("/api/police-units/import", async (req, res) => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      console.log('🚀 Starting import of police units...');
+
+      // Load the team data from JSON file
+      const filePath = path.join(process.cwd(), 'attached_assets', 'rooster_eenheden_per_team_detailed_1751227112307.json');
+      
+      let unitsToImport = [];
+      
+      if (fs.existsSync(filePath)) {
+        const teamsData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        
+        // Process each team and convert to police units
+        for (const [teamName, units] of Object.entries(teamsData)) {
+          for (const unit of units) {
+            const status = unit.primair ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
+            
+            unitsToImport.push({
+              roepnummer: unit.roepnummer,
+              aantal_mensen: unit.aantal_mensen,
+              rollen: JSON.stringify(unit.rollen),
+              soort_auto: unit.soort_auto,
+              team: teamName,
+              status: status
+            });
+          }
+        }
+      } else {
+        // Use default data if file doesn't exist
+        unitsToImport = [
+          {
+            roepnummer: "RT 11.01",
+            aantal_mensen: 2,
+            rollen: JSON.stringify(["Noodhulp"]),
+            soort_auto: "BPV - bus",
+            team: "Basisteam Waterweg (A1)",
+            status: "1 - Beschikbaar/vrij"
+          },
+          {
+            roepnummer: "RT 11.02", 
+            aantal_mensen: 2,
+            rollen: JSON.stringify(["Noodhulp"]),
+            soort_auto: "BPV - bus",
+            team: "Basisteam Waterweg (A1)",
+            status: "1 - Beschikbaar/vrij"
+          }
+        ];
+      }
+
+      // Clear existing data
+      await pool.query('DELETE FROM police_units');
+      
+      // Insert new data
+      let imported = 0;
+      for (const unit of unitsToImport) {
+        try {
+          await pool.query(`
+            INSERT INTO police_units (roepnummer, aantal_mensen, rollen, soort_auto, team, status)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            ON CONFLICT (roepnummer) 
+            DO UPDATE SET 
+              aantal_mensen = EXCLUDED.aantal_mensen,
+              rollen = EXCLUDED.rollen,
+              soort_auto = EXCLUDED.soort_auto,
+              team = EXCLUDED.team,
+              status = EXCLUDED.status,
+              updated_at = NOW()
+          `, [
+            unit.roepnummer,
+            unit.aantal_mensen,
+            unit.rollen,
+            unit.soort_auto,
+            unit.team,
+            unit.status
+          ]);
+          imported++;
+        } catch (error) {
+          console.error(`❌ Error importing unit ${unit.roepnummer}:`, error);
+        }
+      }
+
+      // Verify import
+      const result = await pool.query('SELECT COUNT(*) FROM police_units');
+      console.log(`✅ Successfully imported ${imported} police units`);
+      
+      res.json({ 
+        success: true, 
+        imported: imported,
+        total: result.rows[0].count,
+        message: `Successfully imported ${imported} police units` 
+      });
+
+    } catch (error) {
+      console.error('Error importing police units:', error);
+      res.status(500).json({ error: 'Failed to import police units' });
+    }
+  });
 
   const httpServer = createServer(app);
 
   return httpServer;
 }
-```
-
-Refactored code to include basisteam_id in police units and implemented basisteams API routes.

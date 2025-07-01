@@ -8,25 +8,9 @@ interface PoliceUnit {
   rollen: string[];
   soort_auto: string;
   team: string;
-  basisteam_id?: number;
   status: string;
   locatie?: string;
   incident?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface Basisteam {
-  id: number;
-  naam: string;
-  code: string;
-  adres?: string;
-  polygon: [number, number][];
-  gemeentes: string[];
-  actief: boolean;
-  kan_inzetten_buiten_gebied: boolean;
-  max_aantal_eenheden: number;
-  zichtbaar_op_kaart: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -58,32 +42,11 @@ const createPoliceUnit = async (unit: Omit<PoliceUnit, 'id'>): Promise<PoliceUni
   return response.json();
 };
 
-const fetchBasisteams = async (): Promise<Basisteam[]> => {
-  const response = await fetch('/api/basisteams');
-  if (!response.ok) throw new Error('Failed to fetch basisteams');
-  return response.json();
-};
-
-const createBasisteamsTable = async () => {
-  const response = await fetch('/api/basisteams/create-table', {
-    method: 'POST',
-  });
-  if (!response.ok) throw new Error('Failed to create basisteams table');
-  return response.json();
-};
-
 export default function GMSEenheden() {
   const queryClient = useQueryClient();
   const [isInitializing, setIsInitializing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  // Fetch basisteams from database
-  const { data: basisteams = [], isLoading: basisteamsLoading } = useQuery({
-    queryKey: ['basisteams'],
-    queryFn: fetchBasisteams,
-    retry: false,
-  });
 
   // Create table and import data function
   const initializeDatabase = async () => {
@@ -91,17 +54,13 @@ export default function GMSEenheden() {
       setIsInitializing(true);
       console.log('🚀 Initializing police units database...');
 
-      // First create basisteams table
-      const createBasisteamsResponse = await createBasisteamsTable();
-      console.log('✅ Basisteams table created successfully');
-
-      // Then create the police units table
+      // First create the table
       const createResponse = await fetch('/api/police-units/create-table', {
         method: 'POST',
       });
 
       if (createResponse.ok) {
-        console.log('✅ Police units table created successfully');
+        console.log('✅ Table created successfully');
 
         // Then import the data
         const importResponse = await fetch('/api/police-units/import', {
@@ -114,7 +73,6 @@ export default function GMSEenheden() {
 
           // Refresh the data
           queryClient.invalidateQueries({ queryKey: ['police-units'] });
-          queryClient.invalidateQueries({ queryKey: ['basisteams'] });
         }
       }
     } catch (error) {
@@ -160,11 +118,6 @@ export default function GMSEenheden() {
 
             if (Array.isArray(teamUnits)) {
               teamUnits.forEach((unit: any) => {
-                // Find matching basisteam
-                const matchingBasisteam = basisteams.find(bt => 
-                  teamName.includes(bt.code) || bt.naam === teamName
-                );
-
                 units.push({
                   id: `bt-${unit.roepnummer}` as any,
                   roepnummer: unit.roepnummer,
@@ -172,7 +125,6 @@ export default function GMSEenheden() {
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
                   soort_auto: unit.soort_auto,
                   team: teamName,
-                  basisteam_id: matchingBasisteam?.id,
                   status: unit.primair === true ? '1 - Beschikbaar/vrij' : '5 - Afmelden',
                   locatie: '',
                   incident: ''
@@ -210,7 +162,7 @@ export default function GMSEenheden() {
     };
 
     loadBasisteamsUnits();
-  }, [basisteams]);
+  }, []);
 
   // Combine database units with basisteams units
   const policeUnits = [...dbPoliceUnits, ...basisteamsUnits];
@@ -378,7 +330,7 @@ export default function GMSEenheden() {
     return () => clearInterval(interval);
   }, []);
 
-  if (isLoading || isInitializing || basisteamsLoading) {
+  if (isLoading || isInitializing) {
     return (
       <div className="gms-eenheden-container">
         <div className="gms-eenheden-header">
