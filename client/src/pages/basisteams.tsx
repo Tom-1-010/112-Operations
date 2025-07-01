@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Settings, Users, MapPin, Trash2, Edit, Map } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
 
 interface Basisteam {
   id: string;
@@ -450,25 +452,39 @@ function EditBasisteamForm({
           <Map className="w-4 h-4" />
           Gebied op Kaart
         </Label>
-        <div className="border rounded-lg p-4 bg-gray-50">
-          <div className="text-sm text-muted-foreground space-y-2">
-            <p>🗺️ Automatische gebied suggestie op basis van wijken/stadsdelen:</p>
-            <div className="space-y-1">
-              {formData.gemeentes.split(',').map((wijk, index) => {
-                const trimmedWijk = wijk.trim();
-                return trimmedWijk ? (
-                  <div key={index} className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>{trimmedWijk}</span>
-                    <span className="text-gray-400">→ Zoekt automatisch gebied grenzen</span>
-                  </div>
-                ) : null;
-              })}
+        <div className="border rounded-lg overflow-hidden">
+          <div className="h-80 w-full">
+            <MapContainer
+              center={[51.9225, 4.47917]} // Rotterdam centrum
+              zoom={11}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              {formData.polygon && formData.polygon.length > 0 && (
+                <Polygon
+                  positions={formData.polygon}
+                  color="blue"
+                  weight={2}
+                  fillColor="blue"
+                  fillOpacity={0.2}
+                />
+              )}
+            </MapContainer>
+          </div>
+          <div className="p-3 bg-gray-50 border-t">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded border border-blue-600"></div>
+                <span>Huidige gebied grenzen</span>
+              </div>
+              <p className="text-xs">
+                💡 Het gebied wordt automatisch bepaald op basis van de ingevoerde wijken. 
+                Handmatige aanpassingen komen in een toekomstige versie beschikbaar.
+              </p>
             </div>
-            <p className="text-xs mt-2 p-2 bg-blue-50 rounded">
-              💡 Het systeem zoekt automatisch de geografische grenzen van de ingevoerde wijken. 
-              In een toekomstige versie kun je deze handmatig aanpassen op een interactieve kaart.
-            </p>
           </div>
         </div>
       </div>
