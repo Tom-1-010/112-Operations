@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { basisteamRegistry } from '../lib/basisteam-registry';
@@ -58,6 +57,30 @@ const unitIcons = {
   'default': createCustomIcon('#666666', 'E'),
 };
 
+interface GmsIncident {
+  id: number;
+  melderNaam: string;
+  melderAdres: string;
+  telefoonnummer: string;
+  straatnaam: string;
+  huisnummer: string;
+  toevoeging: string;
+  postcode: string;
+  plaatsnaam: string;
+  gemeente: string;
+  mc1: string;
+  mc2: string;
+  mc3: string;
+  tijdstip: string;
+  prioriteit: number;
+  status: string;
+  meldingslogging: string;
+  notities: string;
+  aangemaaktOp: string;
+  afgesloten: string | null;
+  assignedUnits: string | null;
+}
+
 interface Melding {
   id: string;
   classificatie: string;
@@ -104,7 +127,7 @@ const KaartPage: React.FC = () => {
         Polyline = reactLeaflet.Polyline;
         Polygon = reactLeaflet.Polygon;
         setMapLoaded(true);
-        console.log('✅ React Leaflet components loaded successfully');
+        console.log('✅ React Leaflet components loaded');
       } catch (error) {
         console.error('❌ Error loading React Leaflet components:', error);
         setError('Fout bij laden kaartcomponenten');
@@ -116,166 +139,102 @@ const KaartPage: React.FC = () => {
     }
   }, []);
 
-  // Sample data - in real implementation this would come from API
-  useEffect(() => {
-    try {
-      console.log('🗺️ Initializing kaart page...');
-      
-      const sampleMeldingen: Melding[] = [
-      {
-        id: 'P-20250101-001',
-        classificatie: 'Diefstal met geweld',
-        adres: 'Coolsingel 101, Rotterdam',
-        coordinaten: [51.9225, 4.4792],
-        urgentie: 'Hoog',
-        tijdstip: new Date().toISOString(),
-        eenheden: ['POL-101', 'POL-102'],
-        details: 'Overval bij juwelier, dader nog ter plaatse'
-      },
-      {
-        id: 'B-20250101-002',
-        classificatie: 'Woningbrand',
-        adres: 'Weena 505, Rotterdam',
-        coordinaten: [51.9244, 4.4777],
-        urgentie: 'Zeer Hoog',
-        tijdstip: new Date().toISOString(),
-        eenheden: ['BRW-201', 'AMB-301'],
-        details: 'Brand op tweede verdieping, mogelijk personen binnen'
-      },
-      {
-        id: 'A-20250101-003',
-        classificatie: 'Verkeersongeval letsel',
-        adres: 'Erasmusbrug, Rotterdam',
-        coordinaten: [51.9094, 4.4829],
-        urgentie: 'Middel',
-        tijdstip: new Date().toISOString(),
-        eenheden: ['AMB-302', 'POL-103'],
-        details: 'Aanrijding tussen twee voertuigen, één gewonde'
-      }
+  // Helper functions
+  const generateCoordinatesForLocation = (straat: string, huisnummer: string, plaats: string): [number, number] => {
+    // Simple coordinate generation for Rotterdam area based on location
+    const baseCoords: [number, number] = [51.9225, 4.4792]; // Rotterdam center
+    
+    // Add some variation based on street name and house number
+    const streetHash = straat.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    const houseNumber = parseInt(huisnummer) || 1;
+    
+    const latOffset = ((streetHash % 100) - 50) * 0.001; // ±0.05 degrees
+    const lonOffset = ((houseNumber % 100) - 50) * 0.001; // ±0.05 degrees
+    
+    return [
+      baseCoords[0] + latOffset,
+      baseCoords[1] + lonOffset
     ];
+  };
 
-    const sampleEenheden: any[] = [
-      {
-        id: 'POL-101',
-        type: 'Politie',
-        status: 'Onderweg',
-        locatie: [51.9200, 4.4780],
-        bestemming: 'P-20250101-001',
-        naam: 'Alpha-01',
-        basisteam_id: 'BT-RotterdamCentrum'
-      },
-      {
-        id: 'POL-102',
-        type: 'Politie',
-        status: 'Bezig',
-        locatie: [51.9225, 4.4792],
-        bestemming: 'P-20250101-001',
-        naam: 'Alpha-02',
-        basisteam_id: 'BT-RotterdamCentrum'
-      },
-      {
-        id: 'BRW-201',
-        type: 'Brandweer',
-        status: 'Onderweg',
-        locatie: [51.9230, 4.4785],
-        bestemming: 'B-20250101-002',
-        naam: 'TS-201',
-        basisteam_id: 'BT-RotterdamCentrum'
-      },
-      {
-        id: 'AMB-301',
-        type: 'Ambulance',
-        status: 'Onderweg',
-        locatie: [51.9240, 4.4770],
-        bestemming: 'B-20250101-002',
-        naam: '17-101',
-        basisteam_id: 'BT-RotterdamCentrum'
-      },
-      {
-        id: 'AMB-302',
-        type: 'Ambulance',
-        status: 'Bezig',
-        locatie: [51.9094, 4.4829],
-        bestemming: 'A-20250101-003',
-        naam: '17-102',
-        basisteam_id: 'BT-RotterdamZuid'
-      },
-      {
-        id: 'POL-103',
-        type: 'Politie',
-        status: 'Beschikbaar',
-        locatie: [51.9100, 4.4820],
-        naam: 'Bravo-01',
-        basisteam_id: 'BT-RotterdamNoord'
-      }
-    ];
-
-    setMeldingen(sampleMeldingen);
-      setEenheden(sampleEenheden);
-      setBasisteams(basisteamRegistry.getAllTeams());
-      setIsLoading(false);
-      console.log('✅ Kaart data loaded successfully');
-    } catch (error) {
-      console.error('❌ Error loading kaart data:', error);
-      setError(`Fout bij laden kaartgegevens: ${error}`);
-      setIsLoading(false);
+  const mapPriorityToUrgency = (priority: number): 'Laag' | 'Middel' | 'Hoog' | 'Zeer Hoog' => {
+    switch (priority) {
+      case 1: return 'Zeer Hoog';
+      case 2: return 'Hoog';
+      case 3: return 'Middel';
+      default: return 'Laag';
     }
+  };
+
+  // Load GMS incidents from API
+  useEffect(() => {
+    const loadGmsIncidents = async () => {
+      try {
+        console.log('🗺️ Loading GMS incidents for map...');
+        
+        const response = await fetch('/api/gms-incidents');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const gmsIncidents: GmsIncident[] = await response.json();
+        console.log('✅ Fetched GMS incidents for map:', gmsIncidents.length);
+        
+        // Convert GMS incidents to map format with coordinates
+        const convertedIncidents: Melding[] = gmsIncidents
+          .filter((incident) => incident.straatnaam && incident.plaatsnaam)
+          .map((incident) => {
+            // Generate coordinates based on location for Rotterdam area
+            const coords = generateCoordinatesForLocation(
+              incident.straatnaam, 
+              incident.huisnummer, 
+              incident.plaatsnaam
+            );
+            
+            return {
+              id: `GMS-${incident.id}`,
+              classificatie: `${incident.mc1} - ${incident.mc2}`,
+              adres: `${incident.straatnaam} ${incident.huisnummer}, ${incident.plaatsnaam}`,
+              coordinaten: coords,
+              urgentie: mapPriorityToUrgency(incident.prioriteit),
+              tijdstip: incident.tijdstip,
+              eenheden: incident.assignedUnits ? JSON.parse(incident.assignedUnits).map((u: any) => u.roepnummer) : [],
+              details: incident.notities || `${incident.mc3} incident`
+            };
+          });
+        
+        console.log('✅ Set map incidents:', convertedIncidents.length);
+        setMeldingen(convertedIncidents);
+        setIsLoading(false);
+        
+      } catch (error) {
+        console.error('❌ Error loading GMS incidents:', error);
+        setError('Fout bij laden van GMS meldingen');
+        setIsLoading(false);
+      }
+    };
+    
+    loadGmsIncidents();
   }, []);
 
-  // Simulate unit movement every 5 seconds
+  // Load basisteams data
   useEffect(() => {
-    const interval = setInterval(() => {
-      setEenheden(prevEenheden => 
-        prevEenheden.map(eenheid => {
-          if (eenheid.status === 'Onderweg' && eenheid.bestemming) {
-            const melding = meldingen.find(m => m.id === eenheid.bestemming);
-            if (melding) {
-              // Simulate movement towards destination
-              const [currentLat, currentLng] = eenheid.locatie;
-              const [targetLat, targetLng] = melding.coordinaten;
-              
-              const deltaLat = (targetLat - currentLat) * 0.1;
-              const deltaLng = (targetLng - currentLng) * 0.1;
-              
-              return {
-                ...eenheid,
-                locatie: [
-                  currentLat + deltaLat + (Math.random() - 0.5) * 0.001,
-                  currentLng + deltaLng + (Math.random() - 0.5) * 0.001
-                ] as [number, number]
-              };
-            }
-          }
-          return eenheid;
-        })
-      );
-    }, 5000);
+    const loadBasisteams = async () => {
+      try {
+        const response = await fetch('/api/basisteams');
+        if (response.ok) {
+          const basisteamsData = await response.json();
+          setBasisteams(basisteamsData);
+        }
+      } catch (error) {
+        console.error('Error loading basisteams:', error);
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, [meldingen]);
+    loadBasisteams();
+  }, []);
 
-  const getIncidentIcon = (classificatie: string) => {
-    if (classificatie.toLowerCase().includes('brand')) return incidentIcons.brand;
-    if (classificatie.toLowerCase().includes('medisch') || classificatie.toLowerCase().includes('ambulance')) return incidentIcons.medisch;
-    if (classificatie.toLowerCase().includes('politie') || classificatie.toLowerCase().includes('diefstal') || classificatie.toLowerCase().includes('geweld')) return incidentIcons.politie;
-    if (classificatie.toLowerCase().includes('verkeer') || classificatie.toLowerCase().includes('ongeval')) return incidentIcons.verkeer;
-    return incidentIcons.default;
-  };
-
-  const getUnitIcon = (type: string) => {
-    return unitIcons[type] || unitIcons.default;
-  };
-
-  const getUrgentieColor = (urgentie: string) => {
-    switch (urgentie) {
-      case 'Zeer Hoog': return '#ff0000';
-      case 'Hoog': return '#ff6600';
-      case 'Middel': return '#ffaa00';
-      case 'Laag': return '#00aa00';
-      default: return '#888888';
-    }
-  };
-
+  // Filter functions
   const filteredMeldingen = meldingen.filter(melding => {
     if (selectedFilter !== 'alle' && !melding.classificatie.toLowerCase().includes(selectedFilter)) return false;
     if (urgentieFilter !== 'alle' && melding.urgentie !== urgentieFilter) return false;
@@ -287,45 +246,25 @@ const KaartPage: React.FC = () => {
     return true;
   });
 
-  const getConnectionLines = () => {
-    const lines: JSX.Element[] = [];
-    
-    filteredEenheden.forEach(eenheid => {
-      if (eenheid.bestemming) {
-        const melding = meldingen.find(m => m.id === eenheid.bestemming);
-        if (melding) {
-          lines.push(
-            <Polyline
-              key={`${eenheid.id}-${melding.id}`}
-              positions={[eenheid.locatie, melding.coordinaten]}
-              color="#666666"
-              weight={2}
-              opacity={0.6}
-              dashArray="5, 5"
-            />
-          );
-        }
-      }
-    });
-    
-    return lines;
+  const getIncidentIcon = (melding: Melding) => {
+    const classificatie = melding.classificatie.toLowerCase();
+    if (classificatie.includes('brand')) return incidentIcons.brand;
+    if (classificatie.includes('medisch') || classificatie.includes('ambulance')) return incidentIcons.medisch;
+    if (classificatie.includes('politie') || classificatie.includes('diefstal')) return incidentIcons.politie;
+    if (classificatie.includes('verkeer') || classificatie.includes('ongeval')) return incidentIcons.verkeer;
+    return incidentIcons.default;
   };
 
-  // Debug logging
-  console.log('🗺️ Kaart component render state:', {
-    isLoading,
-    error,
-    meldingen: meldingen.length,
-    eenheden: eenheden.length,
-    windowExists: typeof window !== 'undefined'
-  });
+  const getUnitIcon = (eenheid: Eenheid) => {
+    return unitIcons[eenheid.type] || unitIcons.default;
+  };
 
-  if (isLoading || !mapLoaded) {
+  if (!mapLoaded || isLoading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
-        <div className="text-xl">🗺️ Kaart wordt geladen...</div>
-        <div className="text-sm text-gray-600 mt-2">
-          {!mapLoaded ? 'Kaartcomponenten worden geladen...' : 'Data wordt geladen...'}
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-lg">Kaart wordt geladen...</p>
         </div>
       </div>
     );
@@ -333,235 +272,196 @@ const KaartPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-red-50">
-        <div className="text-xl text-red-600">❌ Fout bij laden kaart</div>
-        <div className="text-sm text-red-500 mt-2">{error}</div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center text-red-600">
+          <p className="text-lg mb-4">Er is een fout opgetreden:</p>
+          <p>{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white">
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-4">
-        <h1 className="text-xl font-bold">📍 Operationele Kaart</h1>
-        <div className="mt-2 flex gap-4 flex-wrap">
-          {/* Classificatie Filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm">Classificatie:</label>
+    <div className="relative h-screen w-full">
+      {/* Map Container */}
+      <div className="h-full w-full">
+        <MapContainer
+          center={[51.9225, 4.4792]}
+          zoom={12}
+          className="h-full w-full"
+          ref={(map: any) => {
+            if (map) mapRef.current = map;
+          }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+
+          {/* GMS Incident Markers */}
+          {filteredMeldingen.map((melding) => (
+            <Marker
+              key={melding.id}
+              position={melding.coordinaten}
+              icon={getIncidentIcon(melding)}
+            >
+              <Popup>
+                <div className="p-2 min-w-[200px]">
+                  <h3 className="font-bold text-sm mb-2">{melding.classificatie}</h3>
+                  <p className="text-xs mb-1"><strong>Adres:</strong> {melding.adres}</p>
+                  <p className="text-xs mb-1"><strong>Urgentie:</strong> {melding.urgentie}</p>
+                  <p className="text-xs mb-1"><strong>Tijd:</strong> {new Date(melding.tijdstip).toLocaleTimeString()}</p>
+                  {melding.eenheden.length > 0 && (
+                    <p className="text-xs mb-1"><strong>Eenheden:</strong> {melding.eenheden.join(', ')}</p>
+                  )}
+                  {melding.details && (
+                    <p className="text-xs mt-2 italic">{melding.details}</p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {/* Unit Markers */}
+          {filteredEenheden.map((eenheid) => (
+            <Marker
+              key={eenheid.id}
+              position={eenheid.locatie}
+              icon={getUnitIcon(eenheid)}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold text-sm mb-2">{eenheid.naam || eenheid.id}</h3>
+                  <p className="text-xs mb-1"><strong>Type:</strong> {eenheid.type}</p>
+                  <p className="text-xs mb-1"><strong>Status:</strong> {eenheid.status}</p>
+                  {eenheid.bestemming && (
+                    <p className="text-xs mb-1"><strong>Bestemming:</strong> {eenheid.bestemming}</p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {/* Basisteam Polygons */}
+          {showBasisteams && basisteams.map((basisteam) => (
+            basisteam.polygon && basisteam.polygon.length > 0 && (
+              <Polygon
+                key={basisteam.id}
+                positions={basisteam.polygon}
+                pathOptions={{
+                  fillColor: basisteam.actief ? '#3388ff' : '#888888',
+                  fillOpacity: 0.1,
+                  color: basisteam.actief ? '#3388ff' : '#888888',
+                  weight: 2,
+                  opacity: 0.8,
+                }}
+              >
+                <Popup>
+                  <div className="p-2">
+                    <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
+                    <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
+                    <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
+                    {basisteam.gemeentes && basisteam.gemeentes.length > 0 && (
+                      <p className="text-xs"><strong>Gemeentes:</strong> {basisteam.gemeentes.join(', ')}</p>
+                    )}
+                  </div>
+                </Popup>
+              </Polygon>
+            )
+          ))}
+        </MapContainer>
+      </div>
+
+      {/* Filter Controls */}
+      <div className="absolute top-4 left-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-xs">
+        <h3 className="font-bold text-sm mb-3">Kaart Filters</h3>
+        
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium mb-1">Incident Type:</label>
             <select 
               value={selectedFilter} 
               onChange={(e) => setSelectedFilter(e.target.value)}
-              className="text-black px-2 py-1 rounded text-xs"
+              className="w-full text-xs border rounded px-2 py-1"
             >
-              <option value="alle">Alle</option>
+              <option value="alle">Alle Incidents</option>
               <option value="brand">Brand</option>
-              <option value="diefstal">Diefstal</option>
-              <option value="verkeer">Verkeer</option>
               <option value="medisch">Medisch</option>
+              <option value="politie">Politie</option>
+              <option value="verkeer">Verkeer</option>
             </select>
           </div>
-          
-          {/* Urgentie Filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm">Urgentie:</label>
+
+          <div>
+            <label className="block text-xs font-medium mb-1">Urgentie:</label>
             <select 
               value={urgentieFilter} 
               onChange={(e) => setUrgentieFilter(e.target.value)}
-              className="text-black px-2 py-1 rounded text-xs"
+              className="w-full text-xs border rounded px-2 py-1"
             >
-              <option value="alle">Alle</option>
+              <option value="alle">Alle Urgentie</option>
               <option value="Zeer Hoog">Zeer Hoog</option>
               <option value="Hoog">Hoog</option>
               <option value="Middel">Middel</option>
               <option value="Laag">Laag</option>
             </select>
           </div>
-          
-          {/* Discipline Filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm">Discipline:</label>
+
+          <div>
+            <label className="block text-xs font-medium mb-1">Discipline:</label>
             <select 
               value={disciplineFilter} 
               onChange={(e) => setDisciplineFilter(e.target.value)}
-              className="text-black px-2 py-1 rounded text-xs"
+              className="w-full text-xs border rounded px-2 py-1"
             >
-              <option value="alle">Alle</option>
+              <option value="alle">Alle Eenheden</option>
               <option value="Politie">Politie</option>
               <option value="Brandweer">Brandweer</option>
               <option value="Ambulance">Ambulance</option>
             </select>
           </div>
-          
-          {/* Basisteam Toggle */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm">
-              <input
-                type="checkbox"
-                checked={showBasisteams}
-                onChange={(e) => setShowBasisteams(e.target.checked)}
-                className="mr-1"
-              />
-              Toon basisteams
-            </label>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="showBasisteams"
+              checked={showBasisteams}
+              onChange={(e) => setShowBasisteams(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="showBasisteams" className="text-xs">Toon Basisteam Gebieden</label>
           </div>
-          
-          {/* Stats */}
-          <div className="text-sm ml-auto">
-            Meldingen: {filteredMeldingen.length} | Eenheden: {filteredEenheden.length}
+        </div>
+
+        <div className="mt-4 pt-3 border-t">
+          <div className="text-xs text-gray-600">
+            <p><strong>Statistieken:</strong></p>
+            <p>Actieve Incidents: {filteredMeldingen.length}</p>
+            <p>Zichtbare Eenheden: {filteredEenheden.length}</p>
           </div>
         </div>
       </div>
 
-      {/* Map */}
-      <div className="flex-1" style={{ minHeight: '400px' }}>
-        {typeof window !== 'undefined' && mapLoaded && MapContainer ? (
-          <MapContainer
-            center={[51.9225, 4.4792]} // Rotterdam center
-            zoom={12}
-            style={{ height: '100%', width: '100%', minHeight: '400px' }}
-            whenCreated={(mapInstance) => {
-              mapRef.current = mapInstance;
-              console.log('✅ Map instance created successfully');
-            }}
-          >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          
-          {/* Basisteam polygonen */}
-          {showBasisteams && basisteams
-            .filter(team => team.actief && team.instellingen.zichtbaar_op_kaart)
-            .map((team) => (
-            <Polygon
-              key={team.id}
-              positions={team.polygon}
-              color="#2563eb"
-              fillColor="#dbeafe"
-              fillOpacity={0.2}
-              weight={2}
-              dashArray="5, 5"
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold text-sm">{team.naam}</h3>
-                  <p className="text-xs text-gray-600">{team.adres}</p>
-                  <p className="text-xs">Gemeentes: {team.gemeentes.join(', ')}</p>
-                  <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
-                  <p className="text-xs">
-                    Inzet buiten gebied: {team.instellingen.kan_inzetten_buiten_gebied ? 'Ja' : 'Nee'}
-                  </p>
-                </div>
-              </Popup>
-            </Polygon>
-          ))}
-
-          {/* Connection lines between units and incidents */}
-          {getConnectionLines()}
-          
-          {/* Incident markers */}
-          {filteredMeldingen.map((melding) => (
-            <Marker
-              key={melding.id}
-              position={melding.coordinaten}
-              icon={getIncidentIcon(melding.classificatie)}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold text-sm mb-1">{melding.id}</h3>
-                  <p className="text-xs mb-1"><strong>Type:</strong> {melding.classificatie}</p>
-                  <p className="text-xs mb-1"><strong>Adres:</strong> {melding.adres}</p>
-                  <p className="text-xs mb-1">
-                    <strong>Urgentie:</strong> 
-                    <span style={{ color: getUrgentieColor(melding.urgentie) }}> {melding.urgentie}</span>
-                  </p>
-                  <p className="text-xs mb-1"><strong>Tijd:</strong> {new Date(melding.tijdstip).toLocaleTimeString('nl-NL')}</p>
-                  {melding.details && (
-                    <p className="text-xs mb-1"><strong>Details:</strong> {melding.details}</p>
-                  )}
-                  <p className="text-xs"><strong>Eenheden:</strong> {melding.eenheden.join(', ')}</p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-          
-          {/* Unit markers */}
-          {filteredEenheden.map((eenheid) => (
-            <Marker
-              key={eenheid.id}
-              position={eenheid.locatie}
-              icon={getUnitIcon(eenheid.type)}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold text-sm mb-1">{eenheid.id}</h3>
-                  <p className="text-xs mb-1"><strong>Naam:</strong> {eenheid.naam}</p>
-                  <p className="text-xs mb-1"><strong>Type:</strong> {eenheid.type}</p>
-                  <p className="text-xs mb-1">
-                    <strong>Status:</strong> 
-                    <span className={`ml-1 ${
-                      eenheid.status === 'Beschikbaar' ? 'text-green-600' :
-                      eenheid.status === 'Onderweg' ? 'text-yellow-600' :
-                      eenheid.status === 'Bezig' ? 'text-red-600' : 'text-gray-600'
-                    }`}>
-                      {eenheid.status}
-                    </span>
-                  </p>
-                  {eenheid.basisteam_id && (
-                    <p className="text-xs mb-1">
-                      <strong>Basisteam:</strong> {basisteamRegistry.getTeamById(eenheid.basisteam_id)?.naam || eenheid.basisteam_id}
-                    </p>
-                  )}
-                  {eenheid.bestemming && (
-                    <p className="text-xs"><strong>Bestemming:</strong> {eenheid.bestemming}</p>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-          </MapContainer>
-        ) : (
-          <div className="flex items-center justify-center h-full bg-gray-100">
-            <div className="text-center">
-              <div className="text-xl mb-2">🗺️</div>
-              <div className="text-sm text-gray-600">Kaart wordt geladen...</div>
-            </div>
-          </div>
-        )}
-      </div>
-      
       {/* Legend */}
-      <div className="bg-gray-100 p-2 border-t">
-        <div className="flex flex-wrap gap-4 text-xs">
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">🔥</div>
+      <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000]">
+        <h4 className="font-bold text-xs mb-2">Legenda</h4>
+        <div className="space-y-1 text-xs">
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
             <span>Brand</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">👮</div>
-            <span>Politie</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">🏥</div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
             <span>Medisch</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs">🚗</div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
+            <span>Politie</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded-full bg-orange-500 mr-2"></div>
             <span>Verkeer</span>
           </div>
-          <div className="border-l pl-4 ml-4">
-            <span className="font-semibold">Eenheden: </span>
-            <span className="text-blue-600">P</span>=Politie, 
-            <span className="text-red-600"> B</span>=Brandweer, 
-            <span className="text-green-600"> A</span>=Ambulance
-          </div>
-          {showBasisteams && (
-            <div className="border-l pl-4 ml-4">
-              <span className="font-semibold">Basisteams: </span>
-              <span className="text-blue-600">━━━</span> Teamgrenzen
-            </div>
-          )}
         </div>
       </div>
     </div>
