@@ -116,6 +116,14 @@ export default function GMSEenheden() {
             
             if (Array.isArray(teamUnits)) {
               teamUnits.forEach((unit: any) => {
+                console.log(`🔍 Unit ${unit.roepnummer}: primair=${unit.primair}, type=${typeof unit.primair}`);
+                
+                // Determine status based on primair value
+                let status = '5 - Afmelden'; // Default to afgemeld
+                if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
+                  status = '1 - Beschikbaar/vrij';
+                }
+                
                 units.push({
                   id: `bt-${unit.roepnummer}` as any,
                   roepnummer: unit.roepnummer,
@@ -123,10 +131,12 @@ export default function GMSEenheden() {
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
                   soort_auto: unit.soort_auto,
                   team: teamName,
-                  status: unit.primair === true ? '1 - Beschikbaar/vrij' : '5 - Afmelden',
+                  status: status,
                   locatie: '',
                   incident: ''
                 });
+                
+                console.log(`✅ Unit ${unit.roepnummer} assigned status: ${status}`);
               });
             }
           });
