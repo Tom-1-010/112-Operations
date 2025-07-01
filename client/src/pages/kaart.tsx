@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in React Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -63,6 +62,8 @@ const KaartPage: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('alle');
   const [urgentieFilter, setUrgentieFilter] = useState('alle');
   const [disciplineFilter, setDisciplineFilter] = useState('alle');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const mapRef = useRef<L.Map | null>(null);
 
   // Sample data - in real implementation this would come from API
@@ -152,6 +153,7 @@ const KaartPage: React.FC = () => {
 
     setMeldingen(sampleMeldingen);
     setEenheden(sampleEenheden);
+    setIsLoading(false);
   }, []);
 
   // Simulate unit movement every 5 seconds
@@ -243,8 +245,26 @@ const KaartPage: React.FC = () => {
     return lines;
   };
 
+  if (isLoading) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
+        <div className="text-xl">🗺️ Kaart wordt geladen...</div>
+        <div className="text-sm text-gray-600 mt-2">Even geduld, de kaartcomponenten worden geïnitialiseerd</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-red-50">
+        <div className="text-xl text-red-600">❌ Fout bij laden kaart</div>
+        <div className="text-sm text-red-500 mt-2">{error}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-white">
       {/* Header */}
       <div className="bg-blue-600 text-white p-4">
         <h1 className="text-xl font-bold">📍 Operationele Kaart</h1>
