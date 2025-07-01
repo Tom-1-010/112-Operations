@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Settings, Users, MapPin, Trash2, Edit, Map } from 'lucide-react';
+import { Plus, Settings, Users, MapPin, Trash2, Edit, Map, X, Save } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 // Rotterdam wijken, steden en gebieden met hun geschatte coördinaten
@@ -949,6 +949,16 @@ export default function BasisteamsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Polygon Editor Dialog */}
+      <PolygonEditor 
+        isOpen={isPolygonEditorOpen}
+        onClose={() => setIsPolygonEditorOpen(false)}
+        polygon={editingPolygon}
+        onPolygonChange={setEditingPolygon}
+        onSave={savePolygon}
+        mode={polygonEditMode}
+      />
     </div>
   );
 }
@@ -1404,7 +1414,7 @@ function PolygonEditor({
                     size="sm"
                     onClick={() => removePoint(index)}
                   >
-                    <X className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
@@ -1432,7 +1442,7 @@ function PolygonEditor({
             onClick={onSave} 
             disabled={polygon.length < 3}
           >
-            <Save className="w-4 h-4 mr-2" />
+            <MapPin className="w-4 h-4 mr-2" />
             Gebied Opslaan
           </Button>
         </div>
