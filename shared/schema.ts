@@ -177,6 +177,11 @@ export const insertKarakteristiekSchema = createInsertSchema(karakteristieken).o
 
 // Basisteams schema's
 export const insertBasisteamSchema = createInsertSchema(basisteams);
+export const updateBasisteamSchema = createInsertSchema(basisteams).partial().omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export const selectBasisteamSchema = createSelectSchema(basisteams);
 
 // Relations

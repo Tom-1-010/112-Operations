@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Settings, Users, MapPin, Trash2, Edit } from 'lucide-react';
+import { Plus, Settings, Users, MapPin, Trash2, Edit, Map } from 'lucide-react';
 
 interface Basisteam {
   id: string;
@@ -431,14 +431,17 @@ function EditBasisteamForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="gemeentes">Gemeentes (gescheiden door komma's)</Label>
+        <Label htmlFor="gemeentes">Wijken/Stadsdelen (gescheiden door komma's)</Label>
         <Textarea
           id="gemeentes"
           value={formData.gemeentes}
           onChange={(e) => setFormData(prev => ({ ...prev, gemeentes: e.target.value }))}
-          placeholder="Rotterdam, Schiedam, Vlaardingen"
-          className="min-h-[60px]"
+          placeholder="Hoek van Holland, Alexandrium, Centrum, Delfshaven, Charlois, Feijenoord"
+          className="min-h-[100px]"
         />
+        <p className="text-sm text-muted-foreground">
+          Voer de wijken en stadsdelen in die onder dit basisteam vallen. Bijvoorbeeld voor Rotterdam: Centrum, Delfshaven, Charlois, Feijenoord, Kralingen-Crooswijk, Noord, Overschie, Pernis, Prins Alexander, Hillegersberg-Schiebroek.
+        </p>
       </div>
 
       <div className="space-y-4">
