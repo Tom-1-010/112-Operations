@@ -171,6 +171,190 @@ const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
     [51.8380, 4.1600],
     [51.8280, 4.1400],
     [51.8300, 4.1300]
+  ],
+  'Krimpen aan den IJssel': [
+    [51.9150, 4.5950],
+    [51.9350, 4.5950],
+    [51.9350, 4.6350],
+    [51.9150, 4.6350],
+    [51.9150, 4.5950]
+  ],
+  'Lansingerland': [
+    [51.9850, 4.4450],
+    [52.0050, 4.4450],
+    [52.0050, 4.4850],
+    [51.9850, 4.4850],
+    [51.9850, 4.4450]
+  ],
+  'Nissewaard': [
+    [51.8200, 4.2200],
+    [51.8500, 4.2200],
+    [51.8500, 4.2800],
+    [51.8200, 4.2800],
+    [51.8200, 4.2200]
+  ],
+  'Goeree-Overflakkee': [
+    [51.7500, 3.8500],
+    [51.7800, 3.8500],
+    [51.7800, 4.0500],
+    [51.7500, 4.0500],
+    [51.7500, 3.8500]
+  ],
+  'Voorne aan Zee': [
+    [51.8350, 3.9200],
+    [51.8650, 3.9200],
+    [51.8650, 4.1200],
+    [51.8350, 4.1200],
+    [51.8350, 3.9200]
+  ],
+  
+  // Plaatsnamen binnen gemeentes
+  'Poortugaal': [
+    [51.8550, 4.4650],
+    [51.8750, 4.4650],
+    [51.8750, 4.5050],
+    [51.8550, 4.5050],
+    [51.8550, 4.4650]
+  ],
+  'Rhoon': [
+    [51.8550, 4.4650],
+    [51.8750, 4.4650],
+    [51.8750, 4.5050],
+    [51.8550, 4.5050],
+    [51.8550, 4.4650]
+  ],
+  'Smitshoek': [
+    [51.8450, 4.5200],
+    [51.8650, 4.5200],
+    [51.8650, 4.5600],
+    [51.8450, 4.5600],
+    [51.8450, 4.5200]
+  ],
+  'Capelle-West': [
+    [51.9250, 4.5650],
+    [51.9400, 4.5650],
+    [51.9400, 4.6050],
+    [51.9250, 4.6050],
+    [51.9250, 4.5650]
+  ],
+  'Middelharnis': [
+    [51.7500, 3.8500],
+    [51.7800, 3.8500],
+    [51.7800, 4.0500],
+    [51.7500, 4.0500],
+    [51.7500, 3.8500]
+  ],
+  'Sommelsdijk': [
+    [51.7500, 3.8500],
+    [51.7800, 3.8500],
+    [51.7800, 4.0500],
+    [51.7500, 4.0500],
+    [51.7500, 3.8500]
+  ],
+  'Dirksland': [
+    [51.7500, 3.8500],
+    [51.7800, 3.8500],
+    [51.7800, 4.0500],
+    [51.7500, 4.0500],
+    [51.7500, 3.8500]
+  ],
+  'Stellendam': [
+    [51.7500, 3.8500],
+    [51.7800, 3.8500],
+    [51.7800, 4.0500],
+    [51.7500, 4.0500],
+    [51.7500, 3.8500]
+  ],
+  'Goedereede': [
+    [51.7500, 3.8500],
+    [51.7800, 3.8500],
+    [51.7800, 4.0500],
+    [51.7500, 4.0500],
+    [51.7500, 3.8500]
+  ],
+  'Stormpolder': [
+    [51.9150, 4.5950],
+    [51.9350, 4.5950],
+    [51.9350, 4.6350],
+    [51.9150, 4.6350],
+    [51.9150, 4.5950]
+  ],
+  'Zoetermeer': [
+    [51.9850, 4.4450],
+    [52.0050, 4.4450],
+    [52.0050, 4.4850],
+    [51.9850, 4.4850],
+    [51.9850, 4.4450]
+  ],
+  'Bleiswijk': [
+    [51.9850, 4.4450],
+    [52.0050, 4.4450],
+    [52.0050, 4.4850],
+    [51.9850, 4.4850],
+    [51.9850, 4.4450]
+  ],
+  'Bergschenhoek': [
+    [51.9850, 4.4450],
+    [52.0050, 4.4450],
+    [52.0050, 4.4850],
+    [51.9850, 4.4850],
+    [51.9850, 4.4450]
+  ],
+  'Bernisse': [
+    [51.8200, 4.2200],
+    [51.8500, 4.2200],
+    [51.8500, 4.2800],
+    [51.8200, 4.2800],
+    [51.8200, 4.2200]
+  ],
+  'Geervliet': [
+    [51.8200, 4.2200],
+    [51.8500, 4.2200],
+    [51.8500, 4.2800],
+    [51.8200, 4.2800],
+    [51.8200, 4.2200]
+  ],
+  'Bolnes': [
+    [51.8650, 4.5950],
+    [51.8850, 4.5950],
+    [51.8850, 4.6350],
+    [51.8650, 4.6350],
+    [51.8650, 4.5950]
+  ],
+  'Slikkerveer': [
+    [51.8650, 4.5950],
+    [51.8850, 4.5950],
+    [51.8850, 4.6350],
+    [51.8650, 4.6350],
+    [51.8650, 4.5950]
+  ],
+  'Kethel': [
+    [51.9050, 4.3850],
+    [51.9200, 4.4050],
+    [51.9150, 4.4200],
+    [51.9000, 4.4000],
+    [51.9050, 4.3850]
+  ],
+  'Rockanje': [
+    [51.8350, 3.9200],
+    [51.8650, 3.9200],
+    [51.8650, 4.1200],
+    [51.8350, 4.1200],
+    [51.8350, 3.9200]
+  ],
+  'Oostvoorne': [
+    [51.8350, 3.9200],
+    [51.8650, 3.9200],
+    [51.8650, 4.1200],
+    [51.8350, 4.1200],
+    [51.8350, 3.9200]
+  ],
+  'Tinte': [
+    [51.8350, 3.9200],
+    [51.8650, 3.9200],
+    [51.8650, 4.1200],
+    [51.8350, 4.1200],
+    [51.8350, 3.9200]
   ]
 };
 
@@ -620,8 +804,32 @@ function EditBasisteamForm({
           placeholder="Hoek van Holland, Alexandrium, Centrum, Delfshaven, Charlois, Feijenoord"
           className="min-h-[100px]"
         />
+        <div className="text-xs text-gray-500">
+          💡 Snelkeuze gemeentes: 
+          <div className="flex flex-wrap gap-1 mt-1">
+            {['Rotterdam', 'Schiedam', 'Vlaardingen', 'Maassluis', 'Barendrecht', 'Ridderkerk', 'Capelle aan den IJssel', 'Albrandswaard', 'Spijkenisse', 'Krimpen aan den IJssel', 'Lansingerland', 'Nissewaard', 'Goeree-Overflakkee', 'Voorne aan Zee'].map(gemeente => (
+              <button
+                key={gemeente}
+                type="button"
+                onClick={() => {
+                  const current = formData.gemeentes;
+                  const toAdd = current ? `, ${gemeente}` : gemeente;
+                  if (!current.includes(gemeente)) {
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      gemeentes: current + toAdd
+                    }));
+                  }
+                }}
+                className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded border"
+              >
+                {gemeente}
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground">
-          Voer de wijken en stadsdelen in die onder dit basisteam vallen. Bijvoorbeeld voor Rotterdam: Centrum, Delfshaven, Charlois, Feijenoord, Kralingen-Crooswijk, Noord, Overschie, Pernis, Prins Alexander, Hillegersberg-Schiebroek.
+          Voer de wijken en stadsdelen in die onder dit basisteam vallen. Klik op de knopjes hierboven om snel gemeentes toe te voegen.
         </p>
       </div>
 
@@ -686,22 +894,53 @@ function EditBasisteamForm({
               </div>
               <div className="text-xs space-y-2">
                 <p>
-                  💡 Klik op "Genereer gebied uit wijken" om automatisch gebieden te tonen voor:
+                  💡 Gemeentes en plaatsnamen in de regio Rotterdam-Rijnmond:
                 </p>
-                <div className="space-y-1">
-                  <div className="text-gray-700 font-medium">Rotterdam wijken:</div>
-                  <div className="text-gray-500 text-xs leading-relaxed">
+                <div className="space-y-1 max-h-48 overflow-y-auto">
+                  <div className="text-gray-700 font-medium">Rotterdam:</div>
+                  <div className="text-gray-500 text-xs leading-relaxed pl-2">
                     Centrum, Delfshaven, Charlois, Feijenoord, Noord, Alexandrium, 
                     Kralingen-Crooswijk, Overschie, Pernis, Hoek van Holland
                   </div>
-                  <div className="text-gray-700 font-medium">Omliggende steden:</div>
-                  <div className="text-gray-500 text-xs leading-relaxed">
-                    Maassluis, Schiedam, Vlaardingen, Capelle aan den IJssel, 
-                    Ridderkerk, Barendrecht, Albrandswaard, Spijkenisse, Rozenburg, Hellevoetsluis
-                  </div>
+                  
+                  <div className="text-gray-700 font-medium">Albrandswaard:</div>
+                  <div className="text-gray-500 text-xs pl-2">Poortugaal, Rhoon</div>
+                  
+                  <div className="text-gray-700 font-medium">Barendrecht:</div>
+                  <div className="text-gray-500 text-xs pl-2">Barendrecht, Smitshoek</div>
+                  
+                  <div className="text-gray-700 font-medium">Capelle aan den IJssel:</div>
+                  <div className="text-gray-500 text-xs pl-2">Capelle aan den IJssel, Capelle-West</div>
+                  
+                  <div className="text-gray-700 font-medium">Goeree-Overflakkee:</div>
+                  <div className="text-gray-500 text-xs pl-2">Middelharnis, Sommelsdijk, Dirksland, Stellendam, Goedereede</div>
+                  
+                  <div className="text-gray-700 font-medium">Krimpen aan den IJssel:</div>
+                  <div className="text-gray-500 text-xs pl-2">Krimpen aan den IJssel, Stormpolder</div>
+                  
+                  <div className="text-gray-700 font-medium">Lansingerland:</div>
+                  <div className="text-gray-500 text-xs pl-2">Zoetermeer, Bleiswijk, Bergschenhoek</div>
+                  
+                  <div className="text-gray-700 font-medium">Maassluis:</div>
+                  <div className="text-gray-500 text-xs pl-2">Maassluis</div>
+                  
+                  <div className="text-gray-700 font-medium">Nissewaard:</div>
+                  <div className="text-gray-500 text-xs pl-2">Spijkenisse, Bernisse, Geervliet</div>
+                  
+                  <div className="text-gray-700 font-medium">Ridderkerk:</div>
+                  <div className="text-gray-500 text-xs pl-2">Ridderkerk, Bolnes, Slikkerveer</div>
+                  
+                  <div className="text-gray-700 font-medium">Schiedam:</div>
+                  <div className="text-gray-500 text-xs pl-2">Schiedam, Kethel</div>
+                  
+                  <div className="text-gray-700 font-medium">Vlaardingen:</div>
+                  <div className="text-gray-500 text-xs pl-2">Vlaardingen, Vlaardingen Noord, Vlaardingen Centrum</div>
+                  
+                  <div className="text-gray-700 font-medium">Voorne aan Zee:</div>
+                  <div className="text-gray-500 text-xs pl-2">Rockanje, Oostvoorne, Tinte</div>
                 </div>
                 <p className="text-gray-600">
-                  Het systeem herkent deze namen automatisch en toont de bijbehorende gebieden op de kaart.
+                  Voer gemeente- of plaatsnamen in en klik op "Genereer gebied uit wijken" om gebieden te tonen.
                 </p>
               </div>
             </div>
