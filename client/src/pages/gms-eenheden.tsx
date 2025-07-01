@@ -83,11 +83,53 @@ export default function GMSEenheden() {
   };
 
   // Fetch police units from database
-  const { data: policeUnits = [], isLoading, error } = useQuery({
+  const { data: dbPoliceUnits = [], isLoading, error } = useQuery({
     queryKey: ['police-units'],
     queryFn: fetchPoliceUnits,
     retry: false, // Don't retry on first load
   });
+
+  // Load basisteams units from attached assets
+  const [basisteamsUnits, setBasisteamsUnits] = useState<PoliceUnit[]>([]);
+
+  useEffect(() => {
+    const loadBasisteamsUnits = async () => {
+      try {
+        const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
+        if (response.ok) {
+          const basisteamsData = await response.json();
+          const units: PoliceUnit[] = [];
+          
+          Object.entries(basisteamsData).forEach(([teamName, teamUnits]: [string, any]) => {
+            if (Array.isArray(teamUnits)) {
+              teamUnits.forEach((unit: any) => {
+                units.push({
+                  id: `bt-${unit.roepnummer}`, // Prefix to distinguish from DB units
+                  roepnummer: unit.roepnummer,
+                  aantal_mensen: unit.aantal_mensen,
+                  rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
+                  soort_auto: unit.soort_auto,
+                  team: teamName,
+                  status: unit.primair ? '1 - Beschikbaar/vrij' : '1 - Beschikbaar/vrij',
+                  locatie: '',
+                  incident: ''
+                });
+              });
+            }
+          });
+          
+          setBasisteamsUnits(units);
+        }
+      } catch (error) {
+        console.error('Failed to load basisteams units:', error);
+      }
+    };
+
+    loadBasisteamsUnits();
+  }, []);
+
+  // Combine database units with basisteams units
+  const policeUnits = [...dbPoliceUnits, ...basisteamsUnits];
 
   // Initialize database if no units found and not loading
   useEffect(() => {
@@ -138,15 +180,39 @@ export default function GMSEenheden() {
   };
 
   const updateUnitStatus = (unit: PoliceUnit, newStatus: string) => {
-    updateUnitMutation.mutate({ ...unit, status: newStatus });
+    // Only update database units, not basisteams units
+    if (typeof unit.id === 'number') {
+      updateUnitMutation.mutate({ ...unit, status: newStatus });
+    } else {
+      // For basisteams units, update local state
+      setBasisteamsUnits(prev => 
+        prev.map(u => u.id === unit.id ? { ...u, status: newStatus } : u)
+      );
+    }
   };
 
   const updateUnitLocation = (unit: PoliceUnit, newLocation: string) => {
-    updateUnitMutation.mutate({ ...unit, locatie: newLocation });
+    // Only update database units, not basisteams units
+    if (typeof unit.id === 'number') {
+      updateUnitMutation.mutate({ ...unit, locatie: newLocation });
+    } else {
+      // For basisteams units, update local state
+      setBasisteamsUnits(prev => 
+        prev.map(u => u.id === unit.id ? { ...u, locatie: newLocation } : u)
+      );
+    }
   };
 
   const updateUnitIncident = (unit: PoliceUnit, newIncident: string) => {
-    updateUnitMutation.mutate({ ...unit, incident: newIncident });
+    // Only update database units, not basisteams units
+    if (typeof unit.id === 'number') {
+      updateUnitMutation.mutate({ ...unit, incident: newIncident });
+    } else {
+      // For basisteams units, update local state
+      setBasisteamsUnits(prev => 
+        prev.map(u => u.id === unit.id ? { ...u, incident: newIncident } : u)
+      );
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -287,7 +353,7 @@ export default function GMSEenheden() {
                       value={unit.status}
                       onChange={(e) => updateUnitStatus(unit, e.target.value)}
                       className="gms-status-select"
-                      disabled={updateUnitMutation.isPending}
+                      disabled={updateUnitMutation.isPending || typeof unit.id !== 'number'}
                     >
                       <option value="1 - Beschikbaar/vrij">1 - Beschikbaar/vrij</option>
                       <option value="2 - Aanrijdend">2 - Aanrijdend</option>
@@ -317,7 +383,7 @@ export default function GMSEenheden() {
                       onChange={(e) => updateUnitLocation(unit, e.target.value)}
                       className="gms-location-input"
                       placeholder="Locatie..."
-                      disabled={updateUnitMutation.isPending}
+                      disabled={updateUnitMutation.isPending || typeof unit.id !== 'number'}
                     />
                   </td>
                   <td className="gms-eenheden-incident">
