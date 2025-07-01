@@ -95,34 +95,31 @@ export default function GMSEenheden() {
   useEffect(() => {
     const loadBasisteamsUnits = async () => {
       try {
-        console.log('🔄 Attempting to load basisteams data from JSON file...');
-        const response = await fetch('/attached_assets/basisteams_eenheden_4_1751399608589.json');
-        console.log('📡 Response status:', response.status, response.statusText);
+        console.log('🔄 Loading rooster data directly...');
+        const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
         
         if (response.ok) {
-          const basisteamsData = await response.json();
-          console.log('📊 Loaded basisteams data:', Object.keys(basisteamsData));
-          console.log('📊 Sample data:', Object.entries(basisteamsData).slice(0, 1));
+          const roosterData = await response.json();
+          console.log('📊 Loaded rooster data with teams:', Object.keys(roosterData));
+          
           const units: PoliceUnit[] = [];
-
-          // Define team order for sorting
           const teamOrder = ['A1', 'A2', 'A3', 'B1', 'B2'];
           const teamMap: { [key: string]: string } = {
             'Basisteam Waterweg (A1)': 'A1',
             'Basisteam Schiedam (A2)': 'A2', 
             'Basisteam Midden-Schieland (A3)': 'A3',
             'Basisteam Delfshaven (B1)': 'B1',
-            'Basisteam Centrum (B2)': 'B2',
-            'District Stad': 'Stad',
-            'District Rijnmond-Noord': 'Rijnmond-Noord'
+            'Basisteam Centrum (B2)': 'B2'
           };
 
-          Object.entries(basisteamsData).forEach(([teamName, teamUnits]: [string, any]) => {
+          Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
+            const shortTeamName = teamMap[teamName] || teamName;
+            console.log(`🔍 Processing ${teamName} -> ${shortTeamName} with ${Array.isArray(teamUnits) ? teamUnits.length : 0} units`);
+            
             if (Array.isArray(teamUnits)) {
               teamUnits.forEach((unit: any) => {
-                const shortTeamName = teamMap[teamName] || teamName;
                 units.push({
-                  id: `bt-${unit.roepnummer}` as any, // Prefix to distinguish from DB units
+                  id: `bt-${unit.roepnummer}` as any,
                   roepnummer: unit.roepnummer,
                   aantal_mensen: unit.aantal_mensen,
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
@@ -151,68 +148,16 @@ export default function GMSEenheden() {
           });
 
           setBasisteamsUnits(units);
-          console.log('✅ Successfully loaded', units.length, 'basisteams units');
+          console.log('✅ Successfully loaded', units.length, 'units from rooster file');
+          console.log('📋 Teams loaded:', units.reduce((acc, unit) => {
+            acc[unit.team] = (acc[unit.team] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>));
         } else {
-          console.error('❌ Failed to fetch JSON file:', response.status, response.statusText);
+          console.error('❌ Failed to fetch rooster file:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Failed to load basisteams units:', error);
-        // Also try the rooster JSON file as fallback
-        try {
-          console.log('🔄 Trying fallback rooster file...');
-          const fallbackResponse = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
-          if (fallbackResponse.ok) {
-            const roosterData = await fallbackResponse.json();
-            console.log('📊 Loaded rooster data:', Object.keys(roosterData));
-            
-            const units: PoliceUnit[] = [];
-            const teamOrder = ['A1', 'A2', 'A3', 'B1', 'B2'];
-            const teamMap: { [key: string]: string } = {
-              'Basisteam Waterweg (A1)': 'A1',
-              'Basisteam Schiedam (A2)': 'A2', 
-              'Basisteam Midden-Schieland (A3)': 'A3',
-              'Basisteam Delfshaven (B1)': 'B1',
-              'Basisteam Centrum (B2)': 'B2'
-            };
-
-            Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
-              if (Array.isArray(teamUnits)) {
-                teamUnits.forEach((unit: any) => {
-                  const shortTeamName = teamMap[teamName] || teamName;
-                  units.push({
-                    id: `bt-${unit.roepnummer}` as any,
-                    roepnummer: unit.roepnummer,
-                    aantal_mensen: unit.aantal_mensen,
-                    rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
-                    soort_auto: unit.soort_auto,
-                    team: shortTeamName,
-                    status: unit.primair ? '1 - Beschikbaar/vrij' : '1 - Beschikbaar/vrij',
-                    locatie: '',
-                    incident: ''
-                  });
-                });
-              }
-            });
-
-            units.sort((a, b) => {
-              const aTeamIndex = teamOrder.indexOf(a.team);
-              const bTeamIndex = teamOrder.indexOf(b.team);
-
-              if (aTeamIndex !== bTeamIndex) {
-                if (aTeamIndex === -1) return 1;
-                if (bTeamIndex === -1) return -1;
-                return aTeamIndex - bTeamIndex;
-              }
-
-              return a.roepnummer.localeCompare(b.roepnummer);
-            });
-
-            setBasisteamsUnits(units);
-            console.log('✅ Successfully loaded', units.length, 'units from fallback rooster file');
-          }
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
-        }
+        console.error('❌ Failed to load rooster units:', error);
       }
     };
 
