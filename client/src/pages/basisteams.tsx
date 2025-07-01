@@ -444,6 +444,35 @@ function EditBasisteamForm({
         </p>
       </div>
 
+      {/* Kaart Gebied Sectie */}
+      <div className="space-y-2">
+        <Label className="text-base font-semibold flex items-center gap-2">
+          <Map className="w-4 h-4" />
+          Gebied op Kaart
+        </Label>
+        <div className="border rounded-lg p-4 bg-gray-50">
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>🗺️ Automatische gebied suggestie op basis van wijken/stadsdelen:</p>
+            <div className="space-y-1">
+              {formData.gemeentes.split(',').map((wijk, index) => {
+                const trimmedWijk = wijk.trim();
+                return trimmedWijk ? (
+                  <div key={index} className="flex items-center gap-2 text-xs">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>{trimmedWijk}</span>
+                    <span className="text-gray-400">→ Zoekt automatisch gebied grenzen</span>
+                  </div>
+                ) : null;
+              })}
+            </div>
+            <p className="text-xs mt-2 p-2 bg-blue-50 rounded">
+              💡 Het systeem zoekt automatisch de geografische grenzen van de ingevoerde wijken. 
+              In een toekomstige versie kun je deze handmatig aanpassen op een interactieve kaart.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <Label className="text-base font-semibold">Instellingen</Label>
         
