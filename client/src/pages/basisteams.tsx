@@ -13,21 +13,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Settings, Users, MapPin, Trash2, Edit, Map } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
-// Rotterdam wijken en hun geschatte coördinaten
+// Rotterdam wijken, steden en gebieden met hun geschatte coördinaten
 const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
+  // Rotterdam wijken
   'Hoek van Holland': [
     [51.9770, 4.1200],
     [51.9820, 4.1400],
     [51.9800, 4.1500],
     [51.9750, 4.1300],
     [51.9770, 4.1200]
-  ],
-  'Maassluis': [
-    [51.9200, 4.2400],
-    [51.9300, 4.2600],
-    [51.9280, 4.2700],
-    [51.9180, 4.2500],
-    [51.9200, 4.2400]
   ],
   'Centrum': [
     [51.9180, 4.4700],
@@ -50,12 +44,133 @@ const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
     [51.8880, 4.4900],
     [51.8900, 4.4800]
   ],
+  'Feijenoord': [
+    [51.9050, 4.4850],
+    [51.9150, 4.5050],
+    [51.9130, 4.5150],
+    [51.9030, 4.4950],
+    [51.9050, 4.4850]
+  ],
+  'Noord': [
+    [51.9400, 4.4700],
+    [51.9500, 4.4900],
+    [51.9480, 4.5000],
+    [51.9380, 4.4800],
+    [51.9400, 4.4700]
+  ],
   'Alexandrium': [
     [51.9500, 4.5100],
     [51.9600, 4.5300],
     [51.9580, 4.5400],
     [51.9480, 4.5200],
     [51.9500, 4.5100]
+  ],
+  'Kralingen-Crooswijk': [
+    [51.9300, 4.5200],
+    [51.9400, 4.5400],
+    [51.9380, 4.5500],
+    [51.9280, 4.5300],
+    [51.9300, 4.5200]
+  ],
+  'Overschie': [
+    [51.9450, 4.4200],
+    [51.9550, 4.4400],
+    [51.9530, 4.4500],
+    [51.9430, 4.4300],
+    [51.9450, 4.4200]
+  ],
+  'Pernis': [
+    [51.8950, 4.3800],
+    [51.9050, 4.4000],
+    [51.9030, 4.4100],
+    [51.8930, 4.3900],
+    [51.8950, 4.3800]
+  ],
+  
+  // Omliggende steden
+  'Maassluis': [
+    [51.9200, 4.2400],
+    [51.9300, 4.2600],
+    [51.9280, 4.2700],
+    [51.9180, 4.2500],
+    [51.9200, 4.2400]
+  ],
+  'Schiedam': [
+    [51.9100, 4.3800],
+    [51.9200, 4.4000],
+    [51.9180, 4.4100],
+    [51.9080, 4.3900],
+    [51.9100, 4.3800]
+  ],
+  'Vlaardingen': [
+    [51.9000, 4.3400],
+    [51.9100, 4.3600],
+    [51.9080, 4.3700],
+    [51.8980, 4.3500],
+    [51.9000, 4.3400]
+  ],
+  'Vlaardingen Centrum': [
+    [51.9100, 4.3400],
+    [51.9150, 4.3600],
+    [51.9130, 4.3700],
+    [51.9080, 4.3500],
+    [51.9100, 4.3400]
+  ],
+  'Vlaardingen Noord': [
+    [51.9200, 4.3300],
+    [51.9250, 4.3500],
+    [51.9230, 4.3600],
+    [51.9180, 4.3400],
+    [51.9200, 4.3300]
+  ],
+  'Capelle aan den IJssel': [
+    [51.9300, 4.5800],
+    [51.9400, 4.6000],
+    [51.9380, 4.6100],
+    [51.9280, 4.5900],
+    [51.9300, 4.5800]
+  ],
+  'Ridderkerk': [
+    [51.8700, 4.6000],
+    [51.8800, 4.6200],
+    [51.8780, 4.6300],
+    [51.8680, 4.6100],
+    [51.8700, 4.6000]
+  ],
+  'Barendrecht': [
+    [51.8500, 4.5300],
+    [51.8600, 4.5500],
+    [51.8580, 4.5600],
+    [51.8480, 4.5400],
+    [51.8500, 4.5300]
+  ],
+  'Albrandswaard': [
+    [51.8600, 4.4800],
+    [51.8700, 4.5000],
+    [51.8680, 4.5100],
+    [51.8580, 4.4900],
+    [51.8600, 4.4800]
+  ],
+  'Spijkenisse': [
+    [51.8400, 4.3200],
+    [51.8500, 4.3400],
+    [51.8480, 4.3500],
+    [51.8380, 4.3300],
+    [51.8400, 4.3200]
+  ],
+  'Rozenburg': [
+    [51.9050, 4.2500],
+    [51.9150, 4.2700],
+    [51.9130, 4.2800],
+    [51.9030, 4.2600],
+    [51.9050, 4.2500]
+  ],
+  'Hellevoetsluis': [
+    [51.8300, 4.1300],
+    [51.8400, 4.1500],
+    [51.8380, 4.1600],
+    [51.8280, 4.1400],
+    [51.8300, 4.1300]
   ]
 };
 
@@ -569,15 +684,24 @@ function EditBasisteamForm({
                   Wis gebied
                 </Button>
               </div>
-              <div className="text-xs space-y-1">
+              <div className="text-xs space-y-2">
                 <p>
                   💡 Klik op "Genereer gebied uit wijken" om automatisch gebieden te tonen voor:
                 </p>
-                <div className="text-gray-500 text-xs">
-                  Hoek van Holland, Maassluis, Centrum, Delfshaven, Charlois, Alexandrium
+                <div className="space-y-1">
+                  <div className="text-gray-700 font-medium">Rotterdam wijken:</div>
+                  <div className="text-gray-500 text-xs leading-relaxed">
+                    Centrum, Delfshaven, Charlois, Feijenoord, Noord, Alexandrium, 
+                    Kralingen-Crooswijk, Overschie, Pernis, Hoek van Holland
+                  </div>
+                  <div className="text-gray-700 font-medium">Omliggende steden:</div>
+                  <div className="text-gray-500 text-xs leading-relaxed">
+                    Maassluis, Schiedam, Vlaardingen, Capelle aan den IJssel, 
+                    Ridderkerk, Barendrecht, Albrandswaard, Spijkenisse, Rozenburg, Hellevoetsluis
+                  </div>
                 </div>
                 <p className="text-gray-600">
-                  Het systeem herkent deze wijknamen automatisch en toont de bijbehorende gebieden op de kaart.
+                  Het systeem herkent deze namen automatisch en toont de bijbehorende gebieden op de kaart.
                 </p>
               </div>
             </div>
