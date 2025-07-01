@@ -47,6 +47,8 @@ export default function BasisteamsPage() {
   const [selectedBasisteam, setSelectedBasisteam] = useState<Basisteam | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [editingBasisteam, setEditingBasisteam] = useState<Basisteam | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -80,6 +82,33 @@ export default function BasisteamsPage() {
     setIsEditing(true);
     setIsDialogOpen(true);
   };
+
+  const handleEditBasisteam = (basisteam: Basisteam) => {
+    setEditingBasisteam(basisteam);
+    setIsEditDialogOpen(true);
+  };
+
+  // Update basisteam mutation
+  const updateBasisteamMutation = useMutation({
+    mutationFn: async (data: { id: string; basisteam: Partial<Basisteam> }) => {
+      const response = await fetch(`/api/basisteams/${data.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data.basisteam),
+      });
+      if (!response.ok) throw new Error('Failed to update basisteam');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/basisteams'] });
+      toast({ title: 'Basisteam succesvol bijgewerkt' });
+      setIsEditDialogOpen(false);
+      setEditingBasisteam(null);
+    },
+    onError: () => {
+      toast({ title: 'Fout bij bijwerken basisteam', variant: 'destructive' });
+    },
+  });
 
   const getStatusBadge = (actief: boolean) => {
     return (
@@ -122,16 +151,30 @@ export default function BasisteamsPage() {
           return (
             <Card 
               key={basisteam.id} 
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => handleBasisteamClick(basisteam)}
+              className="hover:shadow-lg transition-shadow"
             >
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div 
+                    className="cursor-pointer flex-1"
+                    onClick={() => handleBasisteamClick(basisteam)}
+                  >
                     <CardTitle className="text-lg">{basisteam.naam}</CardTitle>
                     <CardDescription>{basisteam.id}</CardDescription>
                   </div>
-                  {getStatusBadge(basisteam.actief)}
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(basisteam.actief)}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditBasisteam(basisteam);
+                      }}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -296,6 +339,174 @@ export default function BasisteamsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Edit Basisteam Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Basisteam Bewerken</DialogTitle>
+            <DialogDescription>
+              Wijzig de gegevens van {editingBasisteam?.naam}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingBasisteam && (
+            <EditBasisteamForm 
+              basisteam={editingBasisteam}
+              onSave={(updatedData) => {
+                updateBasisteamMutation.mutate({
+                  id: editingBasisteam.id,
+                  basisteam: updatedData
+                });
+              }}
+              onCancel={() => setIsEditDialogOpen(false)}
+              isLoading={updateBasisteamMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Edit Basisteam Form Component
+function EditBasisteamForm({ 
+  basisteam, 
+  onSave, 
+  onCancel, 
+  isLoading 
+}: {
+  basisteam: Basisteam;
+  onSave: (data: Partial<Basisteam>) => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}) {
+  const [formData, setFormData] = useState({
+    naam: basisteam.naam,
+    adres: basisteam.adres,
+    gemeentes: basisteam.gemeentes.join(', '),
+    actief: basisteam.actief,
+    instellingen: {
+      kan_inzetten_buiten_gebied: basisteam.instellingen.kan_inzetten_buiten_gebied,
+      max_aantal_eenheden: basisteam.instellingen.max_aantal_eenheden,
+      zichtbaar_op_kaart: basisteam.instellingen.zichtbaar_op_kaart,
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave({
+      naam: formData.naam,
+      adres: formData.adres,
+      gemeentes: formData.gemeentes.split(',').map(g => g.trim()).filter(g => g),
+      actief: formData.actief,
+      instellingen: formData.instellingen,
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="naam">Naam</Label>
+          <Input
+            id="naam"
+            value={formData.naam}
+            onChange={(e) => setFormData(prev => ({ ...prev, naam: e.target.value }))}
+            placeholder="Basisteam naam"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="adres">Adres</Label>
+          <Input
+            id="adres"
+            value={formData.adres}
+            onChange={(e) => setFormData(prev => ({ ...prev, adres: e.target.value }))}
+            placeholder="Hoofdadres"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="gemeentes">Gemeentes (gescheiden door komma's)</Label>
+        <Textarea
+          id="gemeentes"
+          value={formData.gemeentes}
+          onChange={(e) => setFormData(prev => ({ ...prev, gemeentes: e.target.value }))}
+          placeholder="Rotterdam, Schiedam, Vlaardingen"
+          className="min-h-[60px]"
+        />
+      </div>
+
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Instellingen</Label>
+        
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="actief"
+            checked={formData.actief}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, actief: checked }))}
+          />
+          <Label htmlFor="actief">Basisteam actief</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="inzetten-buiten"
+            checked={formData.instellingen.kan_inzetten_buiten_gebied}
+            onCheckedChange={(checked) => 
+              setFormData(prev => ({ 
+                ...prev, 
+                instellingen: { ...prev.instellingen, kan_inzetten_buiten_gebied: checked }
+              }))
+            }
+          />
+          <Label htmlFor="inzetten-buiten">Kan inzetten buiten gebied</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="zichtbaar-kaart"
+            checked={formData.instellingen.zichtbaar_op_kaart}
+            onCheckedChange={(checked) => 
+              setFormData(prev => ({ 
+                ...prev, 
+                instellingen: { ...prev.instellingen, zichtbaar_op_kaart: checked }
+              }))
+            }
+          />
+          <Label htmlFor="zichtbaar-kaart">Zichtbaar op kaart</Label>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="max-eenheden">Maximum aantal eenheden</Label>
+          <Input
+            id="max-eenheden"
+            type="number"
+            min="1"
+            max="200"
+            value={formData.instellingen.max_aantal_eenheden}
+            onChange={(e) => 
+              setFormData(prev => ({ 
+                ...prev, 
+                instellingen: { ...prev.instellingen, max_aantal_eenheden: parseInt(e.target.value) || 50 }
+              }))
+            }
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          Annuleren
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Opslaan...' : 'Opslaan'}
+        </Button>
+      </div>
+    </form>
   );
 }
