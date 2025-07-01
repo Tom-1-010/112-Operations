@@ -5,6 +5,7 @@ import IncidentTable from "../components/incident-table";
 import UnitsPanel from "../components/units-panel";
 import GMS2 from "./gms2";
 import GMSEenheden from "./gms-eenheden";
+import BasisteamsPage from "./basisteams";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { Incident, Unit, Stats } from "../types";
 import L from 'leaflet';
@@ -9187,6 +9188,9 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        )}
+        {activeSection === "basisteams" && (
+          <BasisteamsPage />
         )}
         {activeSection === "settings" && (
           <div className="content-section active">
