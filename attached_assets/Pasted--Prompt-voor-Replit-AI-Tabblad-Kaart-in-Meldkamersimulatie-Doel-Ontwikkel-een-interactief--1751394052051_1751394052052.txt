@@ -1,0 +1,94 @@
+🧠 Prompt voor Replit AI – Tabblad “Kaart” in Meldkamersimulatie
+📍 Doel: Ontwikkel een interactief "Kaart"-tabblad in een meldkamersimulatie. Het tabblad toont live meldingen en eenheden (zoals politie, brandweer en ambulance) op een kaart van Nederland. De data komt uit een API of een lokale JSON-bron. De kaart moet realtime updates ondersteunen, klikbare iconen tonen, en overzicht bieden voor centralisten.
+
+✅ Functionele eisen:
+Kaartweergave
+
+Gebruik een kaartbibliotheek zoals Leaflet.js of Mapbox GL JS.
+
+Startpositie: Nederland (middelste coördinaten).
+
+Kaart moet kunnen zoomen, slepen en automatisch inzoomen op meldingen.
+
+Meldingen
+
+Elke melding heeft: classificatie, adres, coördinaten, urgentie, tijdstip, en eventueel betrokken eenheden.
+
+Meldingen worden getoond als iconen op de kaart (kleur en vorm afhankelijk van type).
+
+Klik op een melding → toon popup met details (adres, situatie, melder, prioriteit).
+
+Mogelijkheid om meldingen te filteren op classificatie en urgentie.
+
+Eenheden
+
+Eenheden worden getoond met herkenbare iconen (politie, brandweer, ambulance).
+
+Elke eenheid heeft: ID, status (beschikbaar, onderweg, bezig), locatie (live), en gekoppelde melding-ID.
+
+Verplaats eenheden automatisch op basis van live GPS of gesimuleerde beweging (update elke 5 sec).
+
+Klik op een eenheid → toon status, naam, bestemming.
+
+Interactie
+
+Als een eenheid gekoppeld is aan een melding: toon een lijn tussen de twee.
+
+Selecteer een eenheid → focus op bijbehorende melding.
+
+Selecteer melding → focus op eenheden die reageren.
+
+Gebruik filters: op discipline, status, of postcodegebied.
+
+Live data
+
+Meldingen en eenheden worden via JSON geladen of opgehaald via een interne API.
+
+Structuur voorbeeld:
+
+json
+Kopiëren
+Bewerken
+{
+  "meldingen": [
+    {
+      "id": "P-20250701-001",
+      "classificatie": "Diefstal met geweld",
+      "adres": "Burgemeester de Raadtsingel 67, Dordrecht",
+      "coordinaten": [51.8133, 4.6725],
+      "urgentie": "Hoog",
+      "tijdstip": "2025-07-01T15:03:00Z",
+      "eenheden": ["POL-101", "POL-302"]
+    }
+  ],
+  "eenheden": [
+    {
+      "id": "POL-101",
+      "type": "Politie",
+      "status": "Onderweg",
+      "locatie": [51.8120, 4.6701],
+      "bestemming": "P-20250701-001"
+    }
+  ]
+}
+🛠 Technische suggesties:
+Gebruik Leaflet + OpenStreetMap (gratis).
+
+Voor simulatie: update eenheden via setInterval() met gesimuleerde coördinaten.
+
+Voeg knoppen toe om de kaart te resetten of om handmatig te filteren op status/disciplines.
+
+Bonus: voeg clustering toe voor veel meldingen op één plek.
+
+📦 Doeloutput:
+Eén interactieve kaartpagina met:
+
+Live meldingen
+
+Live eenheden
+
+Klikbare iconen en detailpopups
+
+Filters
+
+Realtime updates (of gesimuleerd)
