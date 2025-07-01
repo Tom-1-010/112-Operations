@@ -1,4 +1,114 @@
 
+/* Kaart (Map) styling */
+.kaart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.kaart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.kaart-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.kaart-filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.kaart-filters select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.kaart-stats {
+  display: flex;
+  gap: 2rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.stat-item {
+  color: #666;
+}
+
+.stat-item strong {
+  color: #333;
+}
+
+.kaart-map {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.kaart-loading,
+.kaart-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.kaart-error {
+  color: #d32f2f;
+}
+
+.popup-content {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.popup-content h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.popup-content p {
+  margin: 0.25rem 0;
+}
+
+.custom-marker {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Leaflet popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.leaflet-popup-tip {
+  background: white;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
 /* Scrollbar styling for active units table */
 .active-units-table-wrapper::-webkit-scrollbar {
   width: 14px;

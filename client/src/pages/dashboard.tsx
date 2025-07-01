@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/sidebar";
 import StatsGrid from "../components/stats-grid";
 import IncidentTable from "../components/incident-table";
@@ -7,6 +7,396 @@ import GMS2 from "./gms2";
 import GMSEenheden from "./gms-eenheden";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { Incident, Unit, Stats } from "../types";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Dynamic import for React Leaflet components
+let MapContainer: any;
+let TileLayer: any;  
+let Marker: any;
+let Popup: any;
+let Polyline: any;
+
+// Fix for default markers in React Leaflet
+try {
+  if (L.Icon.Default.prototype._getIconUrl) {
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+  }
+  
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
+} catch (error) {
+  console.error('Error configuring Leaflet icons:', error);
+}
+
+// Custom icons for different incident types and units
+const createCustomIcon = (color: string, iconType: string) => {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; font-weight: bold;">${iconType}</div>`,
+    iconSize: [25, 25],
+    iconAnchor: [12, 12],
+  });
+};
+
+const incidentIcons = {
+  'brand': createCustomIcon('#ff4444', '🔥'),
+  'medisch': createCustomIcon('#44ff44', '🏥'),
+  'politie': createCustomIcon('#4444ff', '👮'),
+  'verkeer': createCustomIcon('#ffaa44', '🚗'),
+  'default': createCustomIcon('#888888', '⚠️'),
+};
+
+const unitIcons = {
+  'Politie': createCustomIcon('#0066cc', 'P'),
+  'Brandweer': createCustomIcon('#cc0000', 'B'),
+  'Ambulance': createCustomIcon('#00cc66', 'A'),
+  'default': createCustomIcon('#666666', 'E'),
+};
+
+interface Melding {
+  id: string;
+  classificatie: string;
+  adres: string;
+  coordinaten: [number, number];
+  urgentie: 'Laag' | 'Middel' | 'Hoog' | 'Zeer Hoog';
+  tijdstip: string;
+  eenheden: string[];
+  details?: string;
+}
+
+interface Eenheid {
+  id: string;
+  type: 'Politie' | 'Brandweer' | 'Ambulance';
+  status: 'Beschikbaar' | 'Onderweg' | 'Bezig' | 'Uitruk';
+  locatie: [number, number];
+  bestemming?: string;
+  naam?: string;
+}
+
+// Kaart Section Component
+function KaartSection() {
+  const [meldingen, setMeldingen] = useState<Melding[]>([]);
+  const [eenheden, setEenheden] = useState<Eenheid[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState('alle');
+  const [urgentieFilter, setUrgentieFilter] = useState('alle');
+  const [disciplineFilter, setDisciplineFilter] = useState('alle');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const mapRef = useRef<L.Map | null>(null);
+
+  // Load React Leaflet components dynamically
+  useEffect(() => {
+    const loadMapComponents = async () => {
+      try {
+        const reactLeaflet = await import('react-leaflet');
+        MapContainer = reactLeaflet.MapContainer;
+        TileLayer = reactLeaflet.TileLayer;
+        Marker = reactLeaflet.Marker;
+        Popup = reactLeaflet.Popup;
+        Polyline = reactLeaflet.Polyline;
+        setMapLoaded(true);
+      } catch (error) {
+        console.error('Failed to load map components:', error);
+        setError('Failed to load map components');
+      }
+    };
+
+    loadMapComponents();
+  }, []);
+
+  // Load mock data
+  useEffect(() => {
+    if (!mapLoaded) return;
+
+    const loadData = () => {
+      try {
+        setIsLoading(true);
+        
+        // Mock incidents data
+        const mockMeldingen: Melding[] = [
+          {
+            id: "2025001234",
+            classificatie: "Verkeersongeval",
+            adres: "A16 ter hoogte van Breda Noord",
+            coordinaten: [51.6000, 4.7500],
+            urgentie: "Hoog",
+            tijdstip: new Date().toISOString(),
+            eenheden: ["1601", "1602"],
+            details: "Aanrijding tussen 2 voertuigen, mogelijk gewonden"
+          },
+          {
+            id: "2025001235", 
+            classificatie: "Inbraak",
+            adres: "Hoofdstraat 123, Rotterdam",
+            coordinaten: [51.9225, 4.4792],
+            urgentie: "Middel",
+            tijdstip: new Date(Date.now() - 30000).toISOString(),
+            eenheden: ["1603"],
+            details: "Inbraak winkel, verdachte mogelijk nog aanwezig"
+          },
+          {
+            id: "2025001236",
+            classificatie: "Brand",
+            adres: "Industrie terrein Botlek",  
+            coordinaten: [51.8833, 4.2500],
+            urgentie: "Zeer Hoog",
+            tijdstip: new Date(Date.now() - 60000).toISOString(),
+            eenheden: ["1604", "1605", "1606"],
+            details: "Brand in chemische fabriek"
+          }
+        ];
+
+        // Mock units data
+        const mockEenheden: Eenheid[] = [
+          {
+            id: "1601",
+            type: "Politie",
+            status: "Onderweg",
+            locatie: [51.5900, 4.7400],
+            bestemming: "A16 ter hoogte van Breda Noord",
+            naam: "Team Rotterdam Noord"
+          },
+          {
+            id: "1602", 
+            type: "Ambulance",
+            status: "Onderweg",
+            locatie: [51.5950, 4.7450],
+            bestemming: "A16 ter hoogte van Breda Noord",
+            naam: "AMB-16-01"
+          },
+          {
+            id: "1603",
+            type: "Politie", 
+            status: "Bezig",
+            locatie: [51.9200, 4.4800],
+            naam: "Team Rotterdam Centrum"
+          },
+          {
+            id: "1604",
+            type: "Brandweer",
+            status: "Bezig", 
+            locatie: [51.8830, 4.2505],
+            naam: "BW Rotterdam-Rijnmond"
+          },
+          {
+            id: "1605",
+            type: "Politie",
+            status: "Bezig",
+            locatie: [51.8840, 4.2490],
+            naam: "Team Westland"
+          },
+          {
+            id: "1606",   
+            type: "Ambulance",
+            status: "Beschikbaar",
+            locatie: [51.8900, 4.2600],
+            naam: "AMB-17-03"
+          }
+        ];
+
+        setMeldingen(mockMeldingen);
+        setEenheden(mockEenheden);
+        setError(null);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError('Failed to load map data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [mapLoaded]);
+
+  // Filter incidents and units
+  const filteredMeldingen = meldingen.filter(melding => {
+    if (selectedFilter !== 'alle' && !melding.classificatie.toLowerCase().includes(selectedFilter)) return false;
+    if (urgentieFilter !== 'alle' && melding.urgentie !== urgentieFilter) return false;
+    return true;
+  });
+
+  const filteredEenheden = eenheden.filter(eenheid => {
+    if (disciplineFilter !== 'alle' && eenheid.type !== disciplineFilter) return false;
+    return true;
+  });
+
+  // Get incident icon based on classification
+  const getIncidentIcon = (classification: string) => {
+    const lowerClass = classification.toLowerCase();
+    if (lowerClass.includes('brand')) return incidentIcons.brand;
+    if (lowerClass.includes('medisch') || lowerClass.includes('ambulance')) return incidentIcons.medisch;
+    if (lowerClass.includes('politie') || lowerClass.includes('inbraak')) return incidentIcons.politie;
+    if (lowerClass.includes('verkeer') || lowerClass.includes('ongeval')) return incidentIcons.verkeer;
+    return incidentIcons.default;
+  };
+
+  // Get unit icon
+  const getUnitIcon = (type: string) => {
+    return unitIcons[type as keyof typeof unitIcons] || unitIcons.default;
+  };
+
+  // Get urgency color
+  const getUrgentieColor = (urgentie: string) => {
+    switch (urgentie) {
+      case 'Zeer Hoog': return '#ff0000';
+      case 'Hoog': return '#ff6600';
+      case 'Middel': return '#ffaa00';
+      case 'Laag': return '#00aa00';
+      default: return '#666666';
+    }
+  };
+
+  // Get connection lines between units and incidents
+  const getConnectionLines = () => {
+    const lines: JSX.Element[] = [];
+    
+    filteredMeldingen.forEach(melding => {
+      melding.eenheden.forEach(eenheidId => {
+        const eenheid = filteredEenheden.find(e => e.id === eenheidId);
+        if (eenheid && eenheid.status === 'Onderweg') {
+          lines.push(
+            <Polyline
+              key={`${melding.id}-${eenheid.id}`}
+              positions={[eenheid.locatie, melding.coordinaten]}
+              color="#007acc"
+              weight={2}
+              opacity={0.7}
+              dashArray="5, 10"
+            />
+          );
+        }
+      });
+    });
+    
+    return lines;
+  };
+
+  if (!mapLoaded) {
+    return (
+      <div className="kaart-loading">
+        <div>Kaart wordt geladen...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="kaart-error">
+        <div>Fout bij laden van kaart: {error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="kaart-container">
+      {/* Header with filters */}
+      <div className="kaart-header">
+        <h3>Situatiekaart</h3>
+        <div className="kaart-filters">
+          <select value={selectedFilter} onChange={(e) => setSelectedFilter(e.target.value)}>
+            <option value="alle">Alle incidenten</option>
+            <option value="verkeer">Verkeer</option>
+            <option value="brand">Brand</option>
+            <option value="inbraak">Inbraak</option>
+            <option value="medisch">Medisch</option>
+          </select>
+          
+          <select value={urgentieFilter} onChange={(e) => setUrgentieFilter(e.target.value)}>
+            <option value="alle">Alle urgentie</option>
+            <option value="Zeer Hoog">Zeer Hoog</option>
+            <option value="Hoog">Hoog</option>
+            <option value="Middel">Middel</option>
+            <option value="Laag">Laag</option>
+          </select>
+          
+          <select value={disciplineFilter} onChange={(e) => setDisciplineFilter(e.target.value)}>
+            <option value="alle">Alle eenheden</option>
+            <option value="Politie">Politie</option>
+            <option value="Brandweer">Brandweer</option>
+            <option value="Ambulance">Ambulance</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      <div className="kaart-stats">
+        <div className="stat-item">
+          <strong>Meldingen:</strong> {filteredMeldingen.length}
+        </div>
+        <div className="stat-item">
+          <strong>Eenheden:</strong> {filteredEenheden.length}
+        </div>
+        <div className="stat-item">
+          <strong>Onderweg:</strong> {filteredEenheden.filter(e => e.status === 'Onderweg').length}
+        </div>
+      </div>
+
+      {/* Map */}
+      <div className="kaart-map">
+        <MapContainer
+          center={[51.9225, 4.4792]} // Rotterdam center
+          zoom={10}
+          style={{ height: '100%', width: '100%' }}
+          ref={mapRef}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          
+          {/* Connection lines between units and incidents */}
+          {getConnectionLines()}
+          
+          {/* Incident markers */}
+          {filteredMeldingen.map((melding) => (
+            <Marker
+              key={melding.id}
+              position={melding.coordinaten}
+              icon={getIncidentIcon(melding.classificatie)}
+            >
+              <Popup>
+                <div className="popup-content">
+                  <h4>{melding.id}</h4>
+                  <p><strong>Type:</strong> {melding.classificatie}</p>
+                  <p><strong>Adres:</strong> {melding.adres}</p>
+                  <p><strong>Urgentie:</strong> 
+                    <span style={{ color: getUrgentieColor(melding.urgentie) }}> {melding.urgentie}</span>
+                  </p>
+                  <p><strong>Tijd:</strong> {new Date(melding.tijdstip).toLocaleTimeString()}</p>
+                  {melding.details && <p><strong>Details:</strong> {melding.details}</p>}
+                  <p><strong>Eenheden:</strong> {melding.eenheden.join(', ')}</p>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+          
+          {/* Unit markers */}
+          {filteredEenheden.map((eenheid) => (
+            <Marker
+              key={eenheid.id}
+              position={eenheid.locatie}
+              icon={getUnitIcon(eenheid.type)}
+            >
+              <Popup>
+                <div className="popup-content">
+                  <h4>{eenheid.naam || eenheid.id}</h4>
+                  <p><strong>Type:</strong> {eenheid.type}</p>
+                  <p><strong>Status:</strong> {eenheid.status}</p>
+                  {eenheid.bestemming && <p><strong>Bestemming:</strong> {eenheid.bestemming}</p>}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -8755,8 +9145,11 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-        {activeSection === "map" &&
-          renderPlaceholderSection("Kaart Overzicht", "geo-alt")}
+        {activeSection === "kaart" && (
+          <div className="content-section active">
+            <KaartSection />
+          </div>
+        )}
         {activeSection === "archive" &&
           renderPlaceholderSection("Archief", "archive")}
         {activeSection === "reports" &&
