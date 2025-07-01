@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
-import { basisteamRegistry } from '../lib/basisteam-registry';
 import { Basisteam } from '../../../shared/basisteam-schema';
 
 // Import Leaflet CSS
@@ -11,12 +10,10 @@ let MapContainer: any;
 let TileLayer: any;
 let Marker: any;
 let Popup: any;
-let Polyline: any;
 let Polygon: any;
 
-// Fix for default markers in React Leaflet - with error handling
+// Fix for default markers in React Leaflet
 try {
-  // Delete the default _getIconUrl method if it exists
   if (L.Icon.Default.prototype._getIconUrl) {
     delete (L.Icon.Default.prototype as any)._getIconUrl;
   }
@@ -32,29 +29,47 @@ try {
   console.error('❌ Error configuring Leaflet icons:', error);
 }
 
-// Custom icons for different incident types and units
-const createCustomIcon = (color: string, iconType: string) => {
+// Create numbered incident markers with different colors based on incident type
+const createIncidentIcon = (incidentNumber: number, incidentType: string, priority: number) => {
+  // Color mapping based on MC1 classification
+  const getColorForIncident = (type: string) => {
+    const lowerType = type.toLowerCase();
+    if (lowerType.includes('brand')) return '#ff4444'; // Red for fire
+    if (lowerType.includes('geweld') || lowerType.includes('diefstal')) return '#4444ff'; // Blue for police
+    if (lowerType.includes('medisch') || lowerType.includes('ambulance')) return '#44ff44'; // Green for medical
+    if (lowerType.includes('verkeer') || lowerType.includes('ongeval')) return '#ff8800'; // Orange for traffic
+    if (lowerType.includes('overlast')) return '#88ff44'; // Light green for public nuisance
+    return '#888888'; // Gray for unknown
+  };
+
+  // Priority affects the border
+  const borderColor = priority === 1 ? '#ff0000' : priority === 2 ? '#ffaa00' : '#888888';
+  const borderWidth = priority === 1 ? 4 : priority === 2 ? 3 : 2;
+  
+  const color = getColorForIncident(incidentType);
+  
   return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; font-weight: bold;">${iconType}</div>`,
-    iconSize: [25, 25],
-    iconAnchor: [12, 12],
+    className: 'incident-marker',
+    html: `
+      <div style="
+        background-color: ${color}; 
+        width: 35px; 
+        height: 35px; 
+        border-radius: 50%; 
+        border: ${borderWidth}px solid ${borderColor}; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 14px; 
+        color: white; 
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        transition: all 0.3s ease;
+      ">${incidentNumber}</div>
+    `,
+    iconSize: [35, 35],
+    iconAnchor: [17, 17],
   });
-};
-
-const incidentIcons = {
-  'brand': createCustomIcon('#ff4444', '🔥'),
-  'medisch': createCustomIcon('#44ff44', '🏥'),
-  'politie': createCustomIcon('#4444ff', '👮'),
-  'verkeer': createCustomIcon('#ffaa44', '🚗'),
-  'default': createCustomIcon('#888888', '⚠️'),
-};
-
-const unitIcons = {
-  'Politie': createCustomIcon('#0066cc', 'P'),
-  'Brandweer': createCustomIcon('#cc0000', 'B'),
-  'Ambulance': createCustomIcon('#00cc66', 'A'),
-  'default': createCustomIcon('#666666', 'E'),
 };
 
 interface GmsIncident {
@@ -81,38 +96,33 @@ interface GmsIncident {
   assignedUnits: string | null;
 }
 
-interface Melding {
-  id: string;
-  classificatie: string;
-  adres: string;
-  coordinaten: [number, number];
-  urgentie: 'Laag' | 'Middel' | 'Hoog' | 'Zeer Hoog';
-  tijdstip: string;
-  eenheden: string[];
-  details?: string;
-}
-
-interface Eenheid {
-  id: string;
-  type: 'Politie' | 'Brandweer' | 'Ambulance';
-  status: 'Beschikbaar' | 'Onderweg' | 'Bezig' | 'Uitruk';
-  locatie: [number, number];
-  bestemming?: string;
-  naam?: string;
+interface ProcessedIncident {
+  id: number;
+  number: number;
+  type: string;
+  classification: string;
+  address: string;
+  coordinates: [number, number];
+  priority: number;
+  status: string;
+  timestamp: string;
+  units: string[];
+  notes: string;
+  isNew?: boolean;
 }
 
 const KaartPage: React.FC = () => {
-  const [meldingen, setMeldingen] = useState<Melding[]>([]);
-  const [eenheden, setEenheden] = useState<Eenheid[]>([]);
+  const [incidents, setIncidents] = useState<ProcessedIncident[]>([]);
+  const [basisteams, setBasisteams] = useState<Basisteam[]>([]);
+  const [showBasisteams, setShowBasisteams] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState('alle');
-  const [urgentieFilter, setUrgentieFilter] = useState('alle');
-  const [disciplineFilter, setDisciplineFilter] = useState('alle');
+  const [priorityFilter, setPriorityFilter] = useState('alle');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [basisteams, setBasisteams] = useState<Basisteam[]>([]);
-  const [showBasisteams, setShowBasisteams] = useState(true);
+  const [newIncidentIds, setNewIncidentIds] = useState<Set<number>>(new Set());
   const mapRef = useRef<L.Map | null>(null);
+  const lastFetchTime = useRef<Date>(new Date());
 
   // Load React Leaflet components dynamically
   useEffect(() => {
@@ -124,7 +134,6 @@ const KaartPage: React.FC = () => {
         TileLayer = reactLeaflet.TileLayer;
         Marker = reactLeaflet.Marker;
         Popup = reactLeaflet.Popup;
-        Polyline = reactLeaflet.Polyline;
         Polygon = reactLeaflet.Polygon;
         setMapLoaded(true);
         console.log('✅ React Leaflet components loaded');
@@ -139,17 +148,30 @@ const KaartPage: React.FC = () => {
     }
   }, []);
 
-  // Helper functions
-  const generateCoordinatesForLocation = (straat: string, huisnummer: string, plaats: string): [number, number] => {
-    // Simple coordinate generation for Rotterdam area based on location
-    const baseCoords: [number, number] = [51.9225, 4.4792]; // Rotterdam center
+  // Generate coordinates for Rotterdam area based on incident data
+  const generateCoordinatesForIncident = (incident: GmsIncident): [number, number] => {
+    // Base coordinates for Rotterdam center
+    const baseCoords: [number, number] = [51.9225, 4.4792];
     
-    // Add some variation based on street name and house number
-    const streetHash = straat.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-    const houseNumber = parseInt(huisnummer) || 1;
+    // If we have address data, create variation based on it
+    if (incident.straatnaam || incident.huisnummer) {
+      const streetHash = (incident.straatnaam || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+      const houseNumber = parseInt(incident.huisnummer) || incident.id;
+      
+      // Create reasonable spread across Rotterdam metropolitan area
+      const latOffset = ((streetHash % 200) - 100) * 0.002; // ±0.2 degrees
+      const lonOffset = ((houseNumber % 200) - 100) * 0.002;
+      
+      return [
+        Math.max(51.85, Math.min(52.0, baseCoords[0] + latOffset)),
+        Math.max(4.3, Math.min(4.6, baseCoords[1] + lonOffset))
+      ];
+    }
     
-    const latOffset = ((streetHash % 100) - 50) * 0.001; // ±0.05 degrees
-    const lonOffset = ((houseNumber % 100) - 50) * 0.001; // ±0.05 degrees
+    // Fallback: spread incidents around Rotterdam area based on ID
+    const idOffset = incident.id * 137; // Prime number for better distribution
+    const latOffset = ((idOffset % 100) - 50) * 0.003;
+    const lonOffset = (((idOffset * 7) % 100) - 50) * 0.003;
     
     return [
       baseCoords[0] + latOffset,
@@ -157,65 +179,91 @@ const KaartPage: React.FC = () => {
     ];
   };
 
-  const mapPriorityToUrgency = (priority: number): 'Laag' | 'Middel' | 'Hoog' | 'Zeer Hoog' => {
-    switch (priority) {
-      case 1: return 'Zeer Hoog';
-      case 2: return 'Hoog';
-      case 3: return 'Middel';
-      default: return 'Laag';
-    }
+  // Process raw GMS incidents into map-ready format
+  const processIncidents = (rawIncidents: GmsIncident[]): ProcessedIncident[] => {
+    return rawIncidents.map((incident) => {
+      const address = incident.straatnaam && incident.huisnummer 
+        ? `${incident.straatnaam} ${incident.huisnummer}${incident.toevoeging ? incident.toevoeging : ''}, ${incident.plaatsnaam || 'Rotterdam'}`
+        : incident.melderAdres || `Incident ${incident.id}`;
+
+      const units = incident.assignedUnits 
+        ? JSON.parse(incident.assignedUnits).map((u: any) => u.roepnummer || u.id) 
+        : [];
+
+      return {
+        id: incident.id,
+        number: incident.id,
+        type: incident.mc1,
+        classification: `${incident.mc1} - ${incident.mc2}`,
+        address,
+        coordinates: generateCoordinatesForIncident(incident),
+        priority: incident.prioriteit,
+        status: incident.status,
+        timestamp: incident.tijdstip,
+        units,
+        notes: incident.notities || `${incident.mc3} ${incident.mc2}`.trim()
+      };
+    });
   };
 
-  // Load GMS incidents from API
-  useEffect(() => {
-    const loadGmsIncidents = async () => {
-      try {
-        console.log('🗺️ Loading GMS incidents for map...');
+  // Load incidents with real-time polling
+  const loadIncidents = useCallback(async () => {
+    try {
+      console.log('🗺️ Loading GMS incidents for map...');
+      
+      const response = await fetch('/api/gms-incidents');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const rawIncidents: GmsIncident[] = await response.json();
+      console.log('✅ Fetched GMS incidents for map:', rawIncidents.length);
+      
+      const processedIncidents = processIncidents(rawIncidents);
+      
+      // Detect new incidents
+      setIncidents(prevIncidents => {
+        const prevIds = new Set(prevIncidents.map(i => i.id));
+        const newIds = processedIncidents
+          .filter(incident => !prevIds.has(incident.id))
+          .map(incident => incident.id);
         
-        const response = await fetch('/api/gms-incidents');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (newIds.length > 0) {
+          console.log('🚨 New incidents detected:', newIds);
+          setNewIncidentIds(prev => new Set([...prev, ...newIds]));
+          
+          // Clear new incident highlighting after 10 seconds
+          setTimeout(() => {
+            setNewIncidentIds(prev => {
+              const updated = new Set(prev);
+              newIds.forEach(id => updated.delete(id));
+              return updated;
+            });
+          }, 10000);
         }
         
-        const gmsIncidents: GmsIncident[] = await response.json();
-        console.log('✅ Fetched GMS incidents for map:', gmsIncidents.length);
-        
-        // Convert GMS incidents to map format with coordinates
-        const convertedIncidents: Melding[] = gmsIncidents
-          .filter((incident) => incident.straatnaam && incident.plaatsnaam)
-          .map((incident) => {
-            // Generate coordinates based on location for Rotterdam area
-            const coords = generateCoordinatesForLocation(
-              incident.straatnaam, 
-              incident.huisnummer, 
-              incident.plaatsnaam
-            );
-            
-            return {
-              id: `GMS-${incident.id}`,
-              classificatie: `${incident.mc1} - ${incident.mc2}`,
-              adres: `${incident.straatnaam} ${incident.huisnummer}, ${incident.plaatsnaam}`,
-              coordinaten: coords,
-              urgentie: mapPriorityToUrgency(incident.prioriteit),
-              tijdstip: incident.tijdstip,
-              eenheden: incident.assignedUnits ? JSON.parse(incident.assignedUnits).map((u: any) => u.roepnummer) : [],
-              details: incident.notities || `${incident.mc3} incident`
-            };
-          });
-        
-        console.log('✅ Set map incidents:', convertedIncidents.length);
-        setMeldingen(convertedIncidents);
-        setIsLoading(false);
-        
-      } catch (error) {
-        console.error('❌ Error loading GMS incidents:', error);
-        setError('Fout bij laden van GMS meldingen');
-        setIsLoading(false);
-      }
-    };
-    
-    loadGmsIncidents();
+        return processedIncidents;
+      });
+      
+      lastFetchTime.current = new Date();
+      setIsLoading(false);
+      
+    } catch (error) {
+      console.error('❌ Error loading GMS incidents:', error);
+      setError('Fout bij laden van GMS meldingen');
+      setIsLoading(false);
+    }
   }, []);
+
+  // Initial load and setup polling
+  useEffect(() => {
+    loadIncidents();
+    
+    // Poll for updates every 5 seconds
+    const interval = setInterval(loadIncidents, 5000);
+    
+    return () => clearInterval(interval);
+  }, [loadIncidents]);
 
   // Load basisteams data
   useEffect(() => {
@@ -234,30 +282,16 @@ const KaartPage: React.FC = () => {
     loadBasisteams();
   }, []);
 
-  // Filter functions
-  const filteredMeldingen = meldingen.filter(melding => {
-    if (selectedFilter !== 'alle' && !melding.classificatie.toLowerCase().includes(selectedFilter)) return false;
-    if (urgentieFilter !== 'alle' && melding.urgentie !== urgentieFilter) return false;
+  // Filter incidents based on user selection
+  const filteredIncidents = incidents.filter(incident => {
+    if (selectedFilter !== 'alle' && !incident.type.toLowerCase().includes(selectedFilter.toLowerCase())) {
+      return false;
+    }
+    if (priorityFilter !== 'alle' && incident.priority.toString() !== priorityFilter) {
+      return false;
+    }
     return true;
   });
-
-  const filteredEenheden = eenheden.filter(eenheid => {
-    if (disciplineFilter !== 'alle' && eenheid.type !== disciplineFilter) return false;
-    return true;
-  });
-
-  const getIncidentIcon = (melding: Melding) => {
-    const classificatie = melding.classificatie.toLowerCase();
-    if (classificatie.includes('brand')) return incidentIcons.brand;
-    if (classificatie.includes('medisch') || classificatie.includes('ambulance')) return incidentIcons.medisch;
-    if (classificatie.includes('politie') || classificatie.includes('diefstal')) return incidentIcons.politie;
-    if (classificatie.includes('verkeer') || classificatie.includes('ongeval')) return incidentIcons.verkeer;
-    return incidentIcons.default;
-  };
-
-  const getUnitIcon = (eenheid: Eenheid) => {
-    return unitIcons[eenheid.type] || unitIcons.default;
-  };
 
   if (!mapLoaded || isLoading) {
     return (
@@ -287,7 +321,7 @@ const KaartPage: React.FC = () => {
       <div className="h-full w-full">
         <MapContainer
           center={[51.9225, 4.4792]}
-          zoom={12}
+          zoom={11}
           className="h-full w-full"
           ref={(map: any) => {
             if (map) mapRef.current = map;
@@ -298,62 +332,68 @@ const KaartPage: React.FC = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* GMS Incident Markers */}
-          {filteredMeldingen.map((melding) => (
-            <Marker
-              key={melding.id}
-              position={melding.coordinaten}
-              icon={getIncidentIcon(melding)}
-            >
-              <Popup>
-                <div className="p-2 min-w-[200px]">
-                  <h3 className="font-bold text-sm mb-2">{melding.classificatie}</h3>
-                  <p className="text-xs mb-1"><strong>Adres:</strong> {melding.adres}</p>
-                  <p className="text-xs mb-1"><strong>Urgentie:</strong> {melding.urgentie}</p>
-                  <p className="text-xs mb-1"><strong>Tijd:</strong> {new Date(melding.tijdstip).toLocaleTimeString()}</p>
-                  {melding.eenheden.length > 0 && (
-                    <p className="text-xs mb-1"><strong>Eenheden:</strong> {melding.eenheden.join(', ')}</p>
-                  )}
-                  {melding.details && (
-                    <p className="text-xs mt-2 italic">{melding.details}</p>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-
-          {/* Unit Markers */}
-          {filteredEenheden.map((eenheid) => (
-            <Marker
-              key={eenheid.id}
-              position={eenheid.locatie}
-              icon={getUnitIcon(eenheid)}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold text-sm mb-2">{eenheid.naam || eenheid.id}</h3>
-                  <p className="text-xs mb-1"><strong>Type:</strong> {eenheid.type}</p>
-                  <p className="text-xs mb-1"><strong>Status:</strong> {eenheid.status}</p>
-                  {eenheid.bestemming && (
-                    <p className="text-xs mb-1"><strong>Bestemming:</strong> {eenheid.bestemming}</p>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {/* Incident Markers */}
+          {filteredIncidents.map((incident) => {
+            const isNew = newIncidentIds.has(incident.id);
+            
+            return (
+              <Marker
+                key={`incident-${incident.id}`}
+                position={incident.coordinates}
+                icon={createIncidentIcon(incident.number, incident.type, incident.priority)}
+              >
+                <Popup>
+                  <div className={`p-3 min-w-[250px] ${isNew ? 'bg-yellow-50 border-yellow-300 border-2' : ''}`}>
+                    {isNew && (
+                      <div className="bg-red-500 text-white text-xs px-2 py-1 rounded mb-2 animate-pulse">
+                        🚨 NIEUWE MELDING
+                      </div>
+                    )}
+                    <h3 className="font-bold text-base mb-2 text-gray-800">
+                      Incident #{incident.number}
+                    </h3>
+                    <div className="space-y-2 text-sm">
+                      <p><strong>Type:</strong> {incident.classification}</p>
+                      <p><strong>Adres:</strong> {incident.address}</p>
+                      <p><strong>Prioriteit:</strong> 
+                        <span className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                          incident.priority === 1 ? 'bg-red-500 text-white' :
+                          incident.priority === 2 ? 'bg-orange-500 text-white' :
+                          incident.priority === 3 ? 'bg-yellow-500 text-black' :
+                          'bg-gray-500 text-white'
+                        }`}>
+                          P{incident.priority}
+                        </span>
+                      </p>
+                      <p><strong>Status:</strong> {incident.status}</p>
+                      <p><strong>Tijd:</strong> {new Date(incident.timestamp).toLocaleString('nl-NL')}</p>
+                      {incident.units.length > 0 && (
+                        <p><strong>Eenheden:</strong> {incident.units.join(', ')}</p>
+                      )}
+                      {incident.notes && (
+                        <div className="mt-2 p-2 bg-gray-100 rounded">
+                          <strong>Details:</strong> {incident.notes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
 
           {/* Basisteam Polygons */}
           {showBasisteams && basisteams.map((basisteam) => (
             basisteam.polygon && basisteam.polygon.length > 0 && (
               <Polygon
-                key={basisteam.id}
+                key={`basisteam-${basisteam.id}`}
                 positions={basisteam.polygon}
                 pathOptions={{
                   fillColor: basisteam.actief ? '#3388ff' : '#888888',
                   fillOpacity: 0.1,
                   color: basisteam.actief ? '#3388ff' : '#888888',
                   weight: 2,
-                  opacity: 0.8,
+                  opacity: 0.6,
                 }}
               >
                 <Popup>
@@ -372,52 +412,39 @@ const KaartPage: React.FC = () => {
         </MapContainer>
       </div>
 
-      {/* Filter Controls */}
+      {/* Control Panel */}
       <div className="absolute top-4 left-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-xs">
-        <h3 className="font-bold text-sm mb-3">Kaart Filters</h3>
+        <h3 className="font-bold text-sm mb-3">GMS Incidents Kaart</h3>
         
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium mb-1">Incident Type:</label>
+            <label className="block text-xs font-medium mb-1">Filter Type:</label>
             <select 
               value={selectedFilter} 
               onChange={(e) => setSelectedFilter(e.target.value)}
               className="w-full text-xs border rounded px-2 py-1"
             >
-              <option value="alle">Alle Incidents</option>
+              <option value="alle">Alle Types</option>
               <option value="brand">Brand</option>
+              <option value="geweld">Geweld</option>
               <option value="medisch">Medisch</option>
-              <option value="politie">Politie</option>
               <option value="verkeer">Verkeer</option>
+              <option value="overlast">Overlast</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-medium mb-1">Urgentie:</label>
+            <label className="block text-xs font-medium mb-1">Prioriteit:</label>
             <select 
-              value={urgentieFilter} 
-              onChange={(e) => setUrgentieFilter(e.target.value)}
+              value={priorityFilter} 
+              onChange={(e) => setPriorityFilter(e.target.value)}
               className="w-full text-xs border rounded px-2 py-1"
             >
-              <option value="alle">Alle Urgentie</option>
-              <option value="Zeer Hoog">Zeer Hoog</option>
-              <option value="Hoog">Hoog</option>
-              <option value="Middel">Middel</option>
-              <option value="Laag">Laag</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium mb-1">Discipline:</label>
-            <select 
-              value={disciplineFilter} 
-              onChange={(e) => setDisciplineFilter(e.target.value)}
-              className="w-full text-xs border rounded px-2 py-1"
-            >
-              <option value="alle">Alle Eenheden</option>
-              <option value="Politie">Politie</option>
-              <option value="Brandweer">Brandweer</option>
-              <option value="Ambulance">Ambulance</option>
+              <option value="alle">Alle Prioriteiten</option>
+              <option value="1">P1 - Zeer Hoog</option>
+              <option value="2">P2 - Hoog</option>
+              <option value="3">P3 - Normaal</option>
+              <option value="4">P4 - Laag</option>
             </select>
           </div>
 
@@ -434,10 +461,14 @@ const KaartPage: React.FC = () => {
         </div>
 
         <div className="mt-4 pt-3 border-t">
-          <div className="text-xs text-gray-600">
-            <p><strong>Statistieken:</strong></p>
-            <p>Actieve Incidents: {filteredMeldingen.length}</p>
-            <p>Zichtbare Eenheden: {filteredEenheden.length}</p>
+          <div className="text-xs text-gray-600 space-y-1">
+            <p><strong>Live Statistieken:</strong></p>
+            <p>Actieve Incidents: {filteredIncidents.length}</p>
+            <p>Totaal: {incidents.length}</p>
+            <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
+            {newIncidentIds.size > 0 && (
+              <p className="text-red-600 font-bold">🚨 {newIncidentIds.size} nieuwe melding(en)</p>
+            )}
           </div>
         </div>
       </div>
@@ -447,22 +478,30 @@ const KaartPage: React.FC = () => {
         <h4 className="font-bold text-xs mb-2">Legenda</h4>
         <div className="space-y-1 text-xs">
           <div className="flex items-center">
-            <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
-            <span>Brand</span>
+            <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold mr-2">1</div>
+            <span>Brand (Rood)</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
-            <span>Medisch</span>
+            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold mr-2">2</div>
+            <span>Politie (Blauw)</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
-            <span>Politie</span>
+            <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold mr-2">3</div>
+            <span>Medisch (Groen)</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 rounded-full bg-orange-500 mr-2"></div>
-            <span>Verkeer</span>
+            <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold mr-2">4</div>
+            <span>Verkeer (Oranje)</span>
+          </div>
+          <div className="text-xs text-gray-600 mt-2">
+            Randkleur: Rood=P1, Oranje=P2, Grijs=P3+
           </div>
         </div>
+      </div>
+
+      {/* Auto-refresh indicator */}
+      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-[1000]">
+        🔄 LIVE
       </div>
     </div>
   );
