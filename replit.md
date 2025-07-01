@@ -34,6 +34,8 @@ This is a Dutch Police Emergency Dispatch System (GMS - Gemeenschappelijk Meldka
 - `gms_incidents` - Complete GMS incident records with full Dutch police workflow
 - `phone_numbers` - Emergency contact management
 - `karakteristieken` - Incident characteristics/properties
+- `basisteams` - Police team management with geographic areas and settings
+- `police_units` - Extended police unit management with basisteam relationships
 
 **Frontend Components:**
 - Dashboard with real-time stats and incident overview
