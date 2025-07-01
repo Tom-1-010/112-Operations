@@ -47,8 +47,6 @@ export default function BasisteamsPage() {
   const [selectedBasisteam, setSelectedBasisteam] = useState<Basisteam | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<Basisteam>>({});
-  const [newGemeente, setNewGemeente] = useState('');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -63,69 +61,6 @@ export default function BasisteamsPage() {
     queryKey: ['/api/police-units-with-basisteam'],
   });
 
-  // Mutations for basisteam operations
-  const createBasisteamMutation = useMutation({
-    mutationFn: async (data: Omit<Basisteam, 'createdAt' | 'updatedAt'>) => {
-      const response = await fetch('/api/basisteams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to create basisteam');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/basisteams'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/police-units-with-basisteam'] });
-      toast({ title: 'Basisteam aangemaakt', description: 'Het nieuwe basisteam is succesvol aangemaakt.' });
-      setIsDialogOpen(false);
-    },
-    onError: () => {
-      toast({ title: 'Fout', description: 'Er is een fout opgetreden bij het aanmaken van het basisteam.', variant: 'destructive' });
-    },
-  });
-
-  const updateBasisteamMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<Basisteam> }) => {
-      const response = await fetch(`/api/basisteams/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to update basisteam');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/basisteams'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/police-units-with-basisteam'] });
-      toast({ title: 'Basisteam bijgewerkt', description: 'Het basisteam is succesvol bijgewerkt.' });
-      setIsDialogOpen(false);
-      setIsEditing(false);
-    },
-    onError: () => {
-      toast({ title: 'Fout', description: 'Er is een fout opgetreden bij het bijwerken van het basisteam.', variant: 'destructive' });
-    },
-  });
-
-  const deleteBasisteamMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/basisteams/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete basisteam');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/basisteams'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/police-units-with-basisteam'] });
-      toast({ title: 'Basisteam verwijderd', description: 'Het basisteam is succesvol verwijderd.' });
-      setIsDialogOpen(false);
-    },
-    onError: () => {
-      toast({ title: 'Fout', description: 'Er is een fout opgetreden bij het verwijderen van het basisteam.', variant: 'destructive' });
-    },
-  });
-
   // Group units by basisteam
   const unitsByBasisteam = unitsWithBasisteam.reduce((acc, item) => {
     const basisteamId = item.basisteam?.id || 'unassigned';
@@ -136,75 +71,14 @@ export default function BasisteamsPage() {
 
   const handleBasisteamClick = (basisteam: Basisteam) => {
     setSelectedBasisteam(basisteam);
-    setFormData(basisteam);
     setIsEditing(false);
     setIsDialogOpen(true);
   };
 
   const handleNewBasisteam = () => {
     setSelectedBasisteam(null);
-    setFormData({
-      id: '',
-      naam: '',
-      adres: '',
-      polygon: [],
-      gemeentes: [],
-      actief: true,
-      instellingen: {
-        kan_inzetten_buiten_gebied: false,
-        max_aantal_eenheden: 20,
-        zichtbaar_op_kaart: true,
-      },
-    });
     setIsEditing(true);
     setIsDialogOpen(true);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleSave = () => {
-    if (!formData.naam || !formData.id) {
-      toast({ title: 'Fout', description: 'Naam en ID zijn verplicht.', variant: 'destructive' });
-      return;
-    }
-
-    if (selectedBasisteam) {
-      updateBasisteamMutation.mutate({ id: selectedBasisteam.id, data: formData });
-    } else {
-      createBasisteamMutation.mutate(formData as Omit<Basisteam, 'createdAt' | 'updatedAt'>);
-    }
-  };
-
-  const handleDelete = () => {
-    if (selectedBasisteam && window.confirm('Weet je zeker dat je dit basisteam wilt verwijderen?')) {
-      deleteBasisteamMutation.mutate(selectedBasisteam.id);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    if (selectedBasisteam) {
-      setFormData(selectedBasisteam);
-    }
-  };
-
-  const addGemeente = () => {
-    if (newGemeente.trim() && !formData.gemeentes?.includes(newGemeente.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        gemeentes: [...(prev.gemeentes || []), newGemeente.trim()]
-      }));
-      setNewGemeente('');
-    }
-  };
-
-  const removeGemeente = (gemeente: string) => {
-    setFormData(prev => ({
-      ...prev,
-      gemeentes: prev.gemeentes?.filter(g => g !== gemeente) || []
-    }));
   };
 
   const getStatusBadge = (actief: boolean) => {
@@ -331,234 +205,95 @@ export default function BasisteamsPage() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-6">
-            {isEditing ? (
-              // Edit Form
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="id">Basisteam ID</Label>
-                    <Input
-                      id="id"
-                      value={formData.id || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
-                      placeholder="Bijv. A1, B2, etc."
-                      disabled={!!selectedBasisteam}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="actief"
-                      checked={formData.actief || false}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, actief: checked }))}
-                    />
-                    <Label htmlFor="actief">Actief</Label>
-                  </div>
-                </div>
-
+          {selectedBasisteam && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="naam">Naam</Label>
-                  <Input
-                    id="naam"
-                    value={formData.naam || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, naam: e.target.value }))}
-                    placeholder="Bijv. Basisteam Waterweg (A1)"
-                  />
+                  <Label className="text-sm font-medium">Basisteam ID</Label>
+                  <div className="text-lg font-mono">{selectedBasisteam.id}</div>
                 </div>
-
                 <div>
-                  <Label htmlFor="adres">Adres</Label>
-                  <Input
-                    id="adres"
-                    value={formData.adres || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, adres: e.target.value }))}
-                    placeholder="Hoofdadres van het basisteam"
-                  />
-                </div>
-
-                <div>
-                  <Label>Gemeentes</Label>
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        value={newGemeente}
-                        onChange={(e) => setNewGemeente(e.target.value)}
-                        placeholder="Gemeente toevoegen"
-                        onKeyPress={(e) => e.key === 'Enter' && addGemeente()}
-                      />
-                      <Button type="button" onClick={addGemeente} size="sm">
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {formData.gemeentes?.map((gemeente) => (
-                        <Badge key={gemeente} variant="outline" className="gap-1">
-                          {gemeente}
-                          <button onClick={() => removeGemeente(gemeente)} className="ml-1">
-                            ×
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Label>Instellingen</Label>
-                  <div className="space-y-3 pl-4 border-l-2">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="kan_inzetten_buiten_gebied"
-                        checked={formData.instellingen?.kan_inzetten_buiten_gebied || false}
-                        onCheckedChange={(checked) => 
-                          setFormData(prev => ({
-                            ...prev,
-                            instellingen: { ...prev.instellingen!, kan_inzetten_buiten_gebied: checked }
-                          }))
-                        }
-                      />
-                      <Label htmlFor="kan_inzetten_buiten_gebied">Kan inzetten buiten gebied</Label>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="max_aantal_eenheden">Maximaal aantal eenheden</Label>
-                      <Input
-                        id="max_aantal_eenheden"
-                        type="number"
-                        value={formData.instellingen?.max_aantal_eenheden || 20}
-                        onChange={(e) => 
-                          setFormData(prev => ({
-                            ...prev,
-                            instellingen: { ...prev.instellingen!, max_aantal_eenheden: parseInt(e.target.value) }
-                          }))
-                        }
-                      />
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="zichtbaar_op_kaart"
-                        checked={formData.instellingen?.zichtbaar_op_kaart || false}
-                        onCheckedChange={(checked) => 
-                          setFormData(prev => ({
-                            ...prev,
-                            instellingen: { ...prev.instellingen!, zichtbaar_op_kaart: checked }
-                          }))
-                        }
-                      />
-                      <Label htmlFor="zichtbaar_op_kaart">Zichtbaar op kaart</Label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={handleCancel}>
-                    Annuleren
-                  </Button>
-                  {selectedBasisteam && (
-                    <Button variant="destructive" onClick={handleDelete}>
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Verwijderen
-                    </Button>
-                  )}
-                  <Button onClick={handleSave}>
-                    Opslaan
-                  </Button>
+                  <Label className="text-sm font-medium">Status</Label>
+                  <div>{getStatusBadge(selectedBasisteam.actief)}</div>
                 </div>
               </div>
-            ) : (
-              // View Mode
-              selectedBasisteam && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium">Basisteam ID</Label>
-                      <div className="text-lg font-mono">{selectedBasisteam.id}</div>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Status</Label>
-                      <div>{getStatusBadge(selectedBasisteam.actief)}</div>
-                    </div>
-                  </div>
 
-                  <div>
-                    <Label className="text-sm font-medium">Adres</Label>
-                    <div className="text-sm text-muted-foreground">
-                      {selectedBasisteam.adres}
-                    </div>
-                  </div>
+              <div>
+                <Label className="text-sm font-medium">Adres</Label>
+                <div className="text-sm text-muted-foreground">
+                  {selectedBasisteam.adres}
+                </div>
+              </div>
 
-                  <div>
-                    <Label className="text-sm font-medium">Gemeentes</Label>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {selectedBasisteam.gemeentes.map((gemeente) => (
-                        <Badge key={gemeente} variant="outline">
-                          {gemeente}
+              <div>
+                <Label className="text-sm font-medium">Gemeentes</Label>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {selectedBasisteam.gemeentes.map((gemeente) => (
+                    <Badge key={gemeente} variant="outline">
+                      {gemeente}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label className="text-sm font-medium">Instellingen</Label>
+                <div className="grid grid-cols-1 gap-4 pl-4 border-l-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Kan inzetten buiten gebied</span>
+                    <Badge variant={selectedBasisteam.instellingen.kan_inzetten_buiten_gebied ? "default" : "secondary"}>
+                      {selectedBasisteam.instellingen.kan_inzetten_buiten_gebied ? "Ja" : "Nee"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Maximaal aantal eenheden</span>
+                    <span className="font-medium">
+                      {selectedBasisteam.instellingen.max_aantal_eenheden}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Zichtbaar op kaart</span>
+                    <Badge variant={selectedBasisteam.instellingen.zichtbaar_op_kaart ? "default" : "secondary"}>
+                      {selectedBasisteam.instellingen.zichtbaar_op_kaart ? "Ja" : "Nee"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Toegewezen Eenheden</Label>
+                <div className="mt-2 max-h-32 overflow-y-auto">
+                  {unitsByBasisteam[selectedBasisteam.id] ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      {unitsByBasisteam[selectedBasisteam.id].map((unit) => (
+                        <Badge 
+                          key={unit.id} 
+                          variant={unit.status !== "5 - Afmelden" ? "default" : "secondary"}
+                          className="justify-center text-xs"
+                        >
+                          {unit.roepnummer}
                         </Badge>
                       ))}
                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-sm font-medium">Instellingen</Label>
-                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Kan inzetten buiten gebied</span>
-                        <Badge variant={selectedBasisteam.instellingen.kan_inzetten_buiten_gebied ? "default" : "secondary"}>
-                          {selectedBasisteam.instellingen.kan_inzetten_buiten_gebied ? "Ja" : "Nee"}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Maximaal aantal eenheden</span>
-                        <span className="font-medium">
-                          {selectedBasisteam.instellingen.max_aantal_eenheden}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Zichtbaar op kaart</span>
-                        <Badge variant={selectedBasisteam.instellingen.zichtbaar_op_kaart ? "default" : "secondary"}>
-                          {selectedBasisteam.instellingen.zichtbaar_op_kaart ? "Ja" : "Nee"}
-                        </Badge>
-                      </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">
+                      Geen eenheden toegewezen
                     </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Toegewezen Eenheden</Label>
-                    <div className="mt-2 max-h-32 overflow-y-auto">
-                      {unitsByBasisteam[selectedBasisteam.id] ? (
-                        <div className="grid grid-cols-3 gap-2">
-                          {unitsByBasisteam[selectedBasisteam.id].map((unit) => (
-                            <Badge 
-                              key={unit.id} 
-                              variant={unit.status !== "5 - Afmelden" ? "default" : "secondary"}
-                              className="justify-center text-xs"
-                            >
-                              {unit.roepnummer}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-sm text-muted-foreground">
-                          Geen eenheden toegewezen
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Sluiten
-                    </Button>
-                    <Button onClick={handleEdit}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Bewerken
-                    </Button>
-                  </div>
+                  )}
                 </div>
-              )
-            )}
-          </div>
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Sluiten
+                </Button>
+                <Button onClick={() => setIsEditing(true)}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Bewerken
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
