@@ -162,8 +162,11 @@ export default function GMSEenheden() {
     loadBasisteamsUnits();
   }, []);
 
-  // Combine database units with basisteams units
-  const policeUnits = [...dbPoliceUnits, ...basisteamsUnits];
+  // Combine database units with basisteams units, removing duplicates by roepnummer
+  const allUnits = [...dbPoliceUnits, ...basisteamsUnits];
+  const policeUnits = allUnits.filter((unit, index, self) => 
+    index === self.findIndex(u => u.roepnummer === unit.roepnummer)
+  );
 
   // Initialize database if no units found and not loading
   useEffect(() => {
