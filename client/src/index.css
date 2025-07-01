@@ -1674,9 +1674,6 @@ body {
   margin-bottom: 4px;
 }
 
-/* Leaflet CSS - Required for map display */
-@import 'leaflet/dist/leaflet.css';
-
 /* Leaflet map custom marker styling */
 .custom-marker {
   background: transparent !important;
