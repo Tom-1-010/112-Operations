@@ -1,0 +1,83 @@
+🧠 Prompt voor Replit AI – Uitbreiding van Basisteams (Instellingen + Koppeling Eenheden)
+📍Doel: Breid het systeem van basisteams uit zodat deze onder het tabblad “Instellingen” volledig beheerbaar zijn. Elk basisteam moet een uniek ID, een adres, een lijst van gemeenten (polygoon/gebied), en instelbare eigenschappen krijgen. Deze basisteams moeten consistent en naadloos gekoppeld zijn aan de eenheden in de simulator.
+
+✅ Functionele vereisten
+🔹 1. Basisteam Structuur
+Implementeer een nieuw objecttype basisteam met de volgende eigenschappen:
+
+json
+Kopiëren
+Bewerken
+{
+  "id": "BT-RotterdamZuid",
+  "naam": "Basisteam Rotterdam Zuid",
+  "adres": "Groene Hilledijk 275, 3074 AE Rotterdam",
+  "polygon": [[51.8901, 4.4852], [51.8855, 4.5103], [51.8800, 4.4872]],  // voorbeeld-coördinaten
+  "gemeentes": ["Rotterdam", "Barendrecht"],
+  "actief": true,
+  "instellingen": {
+    "kan_inzetten_buiten_gebied": false,
+    "max_aantal_eenheden": 25,
+    "zichtbaar_op_kaart": true
+  }
+}
+🔹 2. Instellingen-tabblad: beheerinterface
+Onder het tabblad “Instellingen”:
+
+Voeg een sectie toe voor het beheer van basisteams
+
+Maak het mogelijk om:
+
+Een nieuw basisteam aan te maken
+
+Polygonen te tekenen op een kaart (gemeentegrenzen)
+
+Gemeenten te koppelen aan het team
+
+Instellingen zoals “kan inzetten buiten gebied” en “zichtbaar op kaart” te wijzigen
+
+Het adres van het team aan te passen
+
+Een team te verwijderen of te deactiveren
+
+🔹 3. Koppeling aan eenheden
+Elke eenheid moet een basisteam_id bevatten dat verwijst naar een bestaand basisteam. Bijvoorbeeld:
+
+json
+Kopiëren
+Bewerken
+{
+  "id": "POL-301",
+  "type": "Politie",
+  "status": "Beschikbaar",
+  "locatie": [51.9225, 4.4792],
+  "basisteam_id": "BT-RotterdamZuid"
+}
+Koppel dit zodanig dat:
+
+Eenheden automatisch vallen binnen het gebied van hun basisteam (aan de hand van de polygon)
+
+Als een eenheid een melding krijgt buiten het teamgebied, dit opvalt of beperkt wordt (afhankelijk van instelling kan_inzetten_buiten_gebied)
+
+In het kaartoverzicht, basisteamgrenzen zichtbaar zijn (optioneel als overlay)
+
+🔹 4. Consistentie en integratie
+Zorg dat wijzigingen aan een basisteam in Instellingen direct effect hebben op gekoppelde eenheden (bijv. als een team gedeactiveerd wordt, toon dit bij eenheden)
+
+Bij het tonen van eenheden op de kaart of in lijsten, haal automatisch de naam en instellingen op van het gekoppelde basisteam
+
+In dropdowns/selecties (zoals bij het toevoegen van een eenheid), toon alleen actieve basisteams
+
+🛠 Technisch advies
+Gebruik GeoJSON of eenvoudige array van coördinaten voor polygons.
+
+Gebruik een kaartcomponent (Leaflet.js of Mapbox) om polygonen visueel aan te maken in het instellingenpaneel.
+
+Maak een centraal basisteamRegistry waarin alle teams worden beheerd, zodat duplicatie tussen eenheden en instellingen wordt voorkomen.
+
+Zet basisteamgegevens op één centrale plek in JSON of een database, niet per eenheid.
+
+🧪 Bonusfuncties (optioneel)
+Mogelijkheid om polygonen te importeren vanuit een gemeentegrenzen-dataset (GeoJSON per gemeente)
+
+Statistieken per basisteam (aantal eenheden, meldingen afgehandeld, inzet buiten gebied)
