@@ -100,22 +100,49 @@ export default function GMSEenheden() {
           const basisteamsData = await response.json();
           const units: PoliceUnit[] = [];
           
+          // Define team order for sorting
+          const teamOrder = ['A1', 'A2', 'A3', 'B1', 'B2'];
+          const teamMap: { [key: string]: string } = {
+            'Basisteam Waterweg (A1)': 'A1',
+            'Basisteam Schiedam (A2)': 'A2', 
+            'Basisteam Midden-Schieland (A3)': 'A3',
+            'Basisteam Delfshaven (B1)': 'B1',
+            'Basisteam Centrum (B2)': 'B2',
+            'District Stad': 'Stad',
+            'District Rijnmond-Noord': 'Rijnmond-Noord'
+          };
+
           Object.entries(basisteamsData).forEach(([teamName, teamUnits]: [string, any]) => {
             if (Array.isArray(teamUnits)) {
               teamUnits.forEach((unit: any) => {
+                const shortTeamName = teamMap[teamName] || teamName;
                 units.push({
                   id: `bt-${unit.roepnummer}`, // Prefix to distinguish from DB units
                   roepnummer: unit.roepnummer,
                   aantal_mensen: unit.aantal_mensen,
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
                   soort_auto: unit.soort_auto,
-                  team: teamName,
+                  team: shortTeamName,
                   status: unit.primair ? '1 - Beschikbaar/vrij' : '1 - Beschikbaar/vrij',
                   locatie: '',
                   incident: ''
                 });
               });
             }
+          });
+          
+          // Sort units by team order, then by roepnummer
+          units.sort((a, b) => {
+            const aTeamIndex = teamOrder.indexOf(a.team);
+            const bTeamIndex = teamOrder.indexOf(b.team);
+            
+            if (aTeamIndex !== bTeamIndex) {
+              if (aTeamIndex === -1) return 1;
+              if (bTeamIndex === -1) return -1;
+              return aTeamIndex - bTeamIndex;
+            }
+            
+            return a.roepnummer.localeCompare(b.roepnummer);
           });
           
           setBasisteamsUnits(units);
