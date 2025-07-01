@@ -2,18 +2,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in React Leaflet
-try {
-  delete (L.Icon.Default.prototype as any)._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  });
-} catch (error) {
-  console.warn('Leaflet icon setup failed:', error);
-}
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 // Custom icons for different incident types and units
 const createCustomIcon = (color: string, iconType: string) => {
@@ -346,12 +343,12 @@ const KaartPage: React.FC = () => {
       </div>
 
       {/* Map */}
-      <div className="flex-1">
+      <div className="flex-1" style={{ minHeight: '400px' }}>
         {typeof window !== 'undefined' ? (
           <MapContainer
             center={[51.9225, 4.4792]} // Rotterdam center
             zoom={12}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: '100%', width: '100%', minHeight: '400px' }}
             ref={mapRef}
           >
           <TileLayer
