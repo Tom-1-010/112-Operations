@@ -2217,3 +2217,12 @@ export default function Dashboard() {
       team: "Basisteam Rotterdam",
       status: "Beschikbaar"
     }
+  ];
+
+  return (
+    <div className="dashboard">
+      <h1>Dashboard</h1>
+      <p>Welcome to the Dutch Police Emergency Dispatch System</p>
+    </div>
+  );
+}
