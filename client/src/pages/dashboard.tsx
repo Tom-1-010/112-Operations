@@ -2214,4 +2214,6 @@ export default function Dashboard() {
       aantal_mensen: 2,
       rollen: ["Noodhulp", "Studenten"],
       soort_auto: "BPV-auto",
-      team:Basisteams tab content is added in settings section.
+      team: "Basisteam Rotterdam",
+      status: "Beschikbaar"
+    }
