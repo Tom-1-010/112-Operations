@@ -1674,10 +1674,24 @@ body {
   margin-bottom: 4px;
 }
 
+/* Leaflet CSS - Required for map display */
+@import 'leaflet/dist/leaflet.css';
+
 /* Leaflet map custom marker styling */
 .custom-marker {
   background: transparent !important;
   border: none !important;
+}
+
+/* Leaflet map container styling */
+.leaflet-container {
+  height: 400px;
+  width: 100%;
+}
+
+/* Fix for missing marker icons */
+.leaflet-default-icon-path {
+  background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
 }
 
 /* Leaflet popup styling */

@@ -258,6 +258,15 @@ const KaartPage: React.FC = () => {
     return lines;
   };
 
+  // Debug logging
+  console.log('🗺️ Kaart component render state:', {
+    isLoading,
+    error,
+    meldingen: meldingen.length,
+    eenheden: eenheden.length,
+    windowExists: typeof window !== 'undefined'
+  });
+
   if (isLoading) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
@@ -338,10 +347,10 @@ const KaartPage: React.FC = () => {
 
       {/* Map */}
       <div className="flex-1">
-        {typeof window !== 'undefined' && (
+        {typeof window !== 'undefined' ? (
           <MapContainer
-            center={[52.1326, 5.2913]} // Center of Netherlands
-            zoom={8}
+            center={[51.9225, 4.4792]} // Rotterdam center
+            zoom={12}
             style={{ height: '100%', width: '100%' }}
             ref={mapRef}
           >
@@ -409,6 +418,13 @@ const KaartPage: React.FC = () => {
             </Marker>
           ))}
           </MapContainer>
+        ) : (
+          <div className="flex items-center justify-center h-full bg-gray-100">
+            <div className="text-center">
+              <div className="text-xl mb-2">🗺️</div>
+              <div className="text-sm text-gray-600">Kaart wordt geladen...</div>
+            </div>
+          </div>
         )}
       </div>
       
