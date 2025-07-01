@@ -97,11 +97,11 @@ export default function GMSEenheden() {
       try {
         console.log('🔄 Loading rooster data directly...');
         const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
-
+        
         if (response.ok) {
           const roosterData = await response.json();
           console.log('📊 Loaded rooster data with teams:', Object.keys(roosterData));
-
+          
           const units: PoliceUnit[] = [];
           const teamOrder = ['A1', 'A2', 'A3', 'B1', 'B2'];
           const teamMap: { [key: string]: string } = {
@@ -115,7 +115,7 @@ export default function GMSEenheden() {
           Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
             const shortTeamName = teamMap[teamName] || teamName;
             console.log(`🔍 Processing ${teamName} -> ${shortTeamName} with ${Array.isArray(teamUnits) ? teamUnits.length : 0} units`);
-
+            
             if (Array.isArray(teamUnits)) {
               teamUnits.forEach((unit: any) => {
                 units.push({
@@ -124,7 +124,7 @@ export default function GMSEenheden() {
                   aantal_mensen: unit.aantal_mensen,
                   rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
                   soort_auto: unit.soort_auto,
-                  team: teamName,
+                  team: shortTeamName,
                   status: unit.primair === true ? '1 - Beschikbaar/vrij' : '5 - Afmelden',
                   locatie: '',
                   incident: ''
@@ -225,7 +225,7 @@ export default function GMSEenheden() {
       setBasisteamsUnits(prev => 
         prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
-
+      
       // Also try to sync to database by creating/updating a database entry
       const dbUnit = {
         roepnummer: unit.roepnummer,
@@ -237,7 +237,7 @@ export default function GMSEenheden() {
         locatie: unit.locatie || '',
         incident: unit.incident || ''
       };
-
+      
       createUnitMutation.mutate(dbUnit);
     }
   };
@@ -252,7 +252,7 @@ export default function GMSEenheden() {
       setBasisteamsUnits(prev => 
         prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
-
+      
       // Also try to sync to database by creating/updating a database entry
       const dbUnit = {
         roepnummer: unit.roepnummer,
@@ -264,7 +264,7 @@ export default function GMSEenheden() {
         locatie: newLocation,
         incident: unit.incident || ''
       };
-
+      
       createUnitMutation.mutate(dbUnit);
     }
   };
@@ -279,7 +279,7 @@ export default function GMSEenheden() {
       setBasisteamsUnits(prev => 
         prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
-
+      
       // Also try to sync to database by creating/updating a database entry
       const dbUnit = {
         roepnummer: unit.roepnummer,
@@ -291,7 +291,7 @@ export default function GMSEenheden() {
         locatie: unit.locatie || '',
         incident: newIncident
       };
-
+      
       createUnitMutation.mutate(dbUnit);
     }
   };
