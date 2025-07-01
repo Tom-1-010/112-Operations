@@ -2214,15 +2214,4 @@ export default function Dashboard() {
       aantal_mensen: 2,
       rollen: ["Noodhulp", "Studenten"],
       soort_auto: "BPV-auto",
-      team: "Basisteam Rotterdam",
-      status: "Beschikbaar"
-    }
-  ];
-
-  return (
-    <div className="dashboard">
-      <h1>Dashboard</h1>
-      <p>Welcome to the Dutch Police Emergency Dispatch System</p>
-    </div>
-  );
-}
+      team:Basisteams tab content is added in settings section.
