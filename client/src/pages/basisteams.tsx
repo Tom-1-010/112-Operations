@@ -564,6 +564,9 @@ export default function BasisteamsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingBasisteam, setEditingBasisteam] = useState<Basisteam | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isPolygonEditorOpen, setIsPolygonEditorOpen] = useState(false);
+  const [editingPolygon, setEditingPolygon] = useState<[number, number][]>([]);
+  const [polygonEditMode, setPolygonEditMode] = useState<'draw' | 'edit'>('draw');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -601,6 +604,68 @@ export default function BasisteamsPage() {
   const handleEditBasisteam = (basisteam: Basisteam) => {
     setEditingBasisteam(basisteam);
     setIsEditDialogOpen(true);
+  };
+
+  const openPolygonEditor = (basisteam: Basisteam) => {
+    setSelectedBasisteam(basisteam);
+    setEditingPolygon(basisteam.polygon || []);
+    setPolygonEditMode('edit');
+    setIsPolygonEditorOpen(true);
+    setIsDialogOpen(false);
+  };
+
+  const startNewPolygon = () => {
+    setEditingPolygon([]);
+    setPolygonEditMode('draw');
+    setIsPolygonEditorOpen(true);
+  };
+
+  const addPolygonPoint = (lat: number, lng: number) => {
+    const newPoint: [number, number] = [lat, lng];
+    setEditingPolygon(prev => [...prev, newPoint]);
+  };
+
+  const removePolygonPoint = (index: number) => {
+    setEditingPolygon(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const savePolygon = async () => {
+    if (!selectedBasisteam || editingPolygon.length < 3) {
+      toast({
+        title: "Fout",
+        description: "Een polygoon heeft minimaal 3 punten nodig.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/basisteams/${selectedBasisteam.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...selectedBasisteam,
+          polygon: editingPolygon,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update polygon');
+
+      await queryClient.invalidateQueries({ queryKey: ['/api/basisteams'] });
+      setIsPolygonEditorOpen(false);
+      toast({
+        title: "Succes",
+        description: "Polygoon succesvol opgeslagen.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Kon polygoon niet opslaan.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Update basisteam mutation
@@ -844,6 +909,10 @@ export default function BasisteamsPage() {
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Sluiten
+                </Button>
+                <Button variant="outline" onClick={() => openPolygonEditor(selectedBasisteam)}>
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Gebied Bewerken
                 </Button>
                 <Button onClick={() => setIsEditing(true)}>
                   <Edit className="w-4 h-4 mr-2" />
@@ -1183,5 +1252,191 @@ function EditBasisteamForm({
         </Button>
       </div>
     </form>
+  );
+}
+
+// Polygon Editor Dialog Component
+function PolygonEditor({ 
+  isOpen, 
+  onClose, 
+  polygon, 
+  onPolygonChange, 
+  onSave, 
+  mode 
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  polygon: [number, number][];
+  onPolygonChange: (polygon: [number, number][]) => void;
+  onSave: () => void;
+  mode: 'draw' | 'edit';
+}) {
+  const [currentPoint, setCurrentPoint] = useState<{ lat: string; lng: string }>({ lat: '', lng: '' });
+
+  const addPoint = () => {
+    const lat = parseFloat(currentPoint.lat);
+    const lng = parseFloat(currentPoint.lng);
+    
+    if (isNaN(lat) || isNaN(lng)) {
+      return;
+    }
+
+    onPolygonChange([...polygon, [lat, lng]]);
+    setCurrentPoint({ lat: '', lng: '' });
+  };
+
+  const removePoint = (index: number) => {
+    onPolygonChange(polygon.filter((_, i) => i !== index));
+  };
+
+  const clearPolygon = () => {
+    onPolygonChange([]);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {mode === 'draw' ? 'Nieuw Gebied Tekenen' : 'Gebied Bewerken'}
+          </DialogTitle>
+          <DialogDescription>
+            Voeg coördinaten toe om het gebied te definiëren. Een gebied heeft minimaal 3 punten nodig.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Point Input */}
+          <div className="space-y-4">
+            <div className="space-y-4 p-4 border rounded-lg">
+              <h3 className="font-semibold">Nieuw Punt Toevoegen</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="lat">Latitude</Label>
+                  <Input
+                    id="lat"
+                    type="number"
+                    step="0.0001"
+                    placeholder="51.9266"
+                    value={currentPoint.lat}
+                    onChange={(e) => setCurrentPoint(prev => ({ ...prev, lat: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lng">Longitude</Label>
+                  <Input
+                    id="lng"
+                    type="number"
+                    step="0.0001"
+                    placeholder="4.2527"
+                    value={currentPoint.lng}
+                    onChange={(e) => setCurrentPoint(prev => ({ ...prev, lng: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <Button onClick={addPoint} className="flex-1">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Punt Toevoegen
+                </Button>
+                <Button variant="outline" onClick={clearPolygon}>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Alles Wissen
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Location Buttons */}
+            <div className="space-y-2 p-4 border rounded-lg">
+              <h3 className="font-semibold">Snelle Locaties</h3>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPoint({ lat: '51.9266', lng: '4.2527' })}
+                >
+                  Maassluis Centrum
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPoint({ lat: '51.9194', lng: '4.4061' })}
+                >
+                  Schiedam Centrum
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPoint({ lat: '51.9122', lng: '4.3897' })}
+                >
+                  Vlaardingen Centrum
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPoint({ lat: '51.9244', lng: '4.5833' })}
+                >
+                  Rotterdam Centrum
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Points List */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Punten ({polygon.length})</h3>
+              <Badge variant={polygon.length >= 3 ? "default" : "secondary"}>
+                {polygon.length >= 3 ? "Geldig" : "Ongeldig"}
+              </Badge>
+            </div>
+            
+            <div className="max-h-60 overflow-y-auto space-y-2">
+              {polygon.map((point, index) => (
+                <div key={index} className="flex items-center justify-between p-2 border rounded">
+                  <div className="flex-1">
+                    <span className="text-sm font-mono">
+                      {index + 1}: [{point[0].toFixed(4)}, {point[1].toFixed(4)}]
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removePoint(index)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+              
+              {polygon.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  Nog geen punten toegevoegd
+                </div>
+              )}
+            </div>
+
+            {polygon.length > 0 && (
+              <div className="text-xs text-muted-foreground">
+                Het gebied wordt automatisch gesloten door het eerste en laatste punt te verbinden.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4 border-t">
+          <Button variant="outline" onClick={onClose}>
+            Annuleren
+          </Button>
+          <Button 
+            onClick={onSave} 
+            disabled={polygon.length < 3}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Gebied Opslaan
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
