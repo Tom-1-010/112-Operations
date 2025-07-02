@@ -681,10 +681,21 @@ const KaartPage: React.FC = () => {
             // Check for noodoproep (N)
             const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
             
+            // Debug logging for problematic units
+            if (unit.roepnummer === 'RT 12.08') {
+              console.log(`🔍 RT 12.08 Debug - Status: "${unit.status}", StatusNum: ${statusNum}, IsNoodoproep: ${isNoodoproep}`);
+            }
+            
             // Only show units with status 1,2,3,4,6,7,8,9 or N (noodoproep)
-            const shouldShow = (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+            // Explicitly exclude status 5
+            const shouldShow = statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
 
-            if (!shouldShow) return null;
+            if (!shouldShow) {
+              if (unit.roepnummer === 'RT 12.08') {
+                console.log(`❌ RT 12.08 Hidden - Status ${statusNum} not allowed`);
+              }
+              return null;
+            }
 
             return (
               <Marker
@@ -837,7 +848,7 @@ const KaartPage: React.FC = () => {
                 const statusMatch = unit.status.match(/^(\d+)/);
                 const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
                 const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-                return (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+                return statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
               }).length})</label>
             </div>
           </div>
@@ -851,13 +862,13 @@ const KaartPage: React.FC = () => {
               const statusMatch = unit.status.match(/^(\d+)/);
               const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
               const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-              return (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+              return statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
             }).length}</p>
             <p>In beweging: {policeUnits.filter(u => {
               const statusMatch = u.status.match(/^(\d+)/);
               const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
               const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
-              const shouldShow = (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+              const shouldShow = statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
               return shouldShow && u.isMoving;
             }).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
