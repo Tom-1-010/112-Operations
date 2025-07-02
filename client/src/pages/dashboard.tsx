@@ -1091,54 +1091,67 @@ export default function Dashboard() {
     console.log("FORCING TAB SWITCH TO BURGERS");
     setActiveChatTab("burgers");
     
-    // Generate scenario data immediately for 112 calls
-    setTimeout(() => {
+    // Generate scenario data immediately for 112 calls using BAG API
+    setTimeout(async () => {
       console.log("🎯 Setting 112 conversation data");
       
-      // Generate realistic scenario context based on LMC classifications
-      const gemeenten = Object.keys(realisticAddresses);
-      const selectedGemeente = gemeenten[Math.floor(Math.random() * gemeenten.length)];
-      const addresses = realisticAddresses[selectedGemeente];
-      const selectedAddress = addresses[Math.floor(Math.random() * addresses.length)];
-      const scenario = generateRealistic112Scenario(selectedAddress, selectedGemeente);
-      
-      console.log("📍 Generated address:", selectedAddress, "in", selectedGemeente);
-      console.log("🚨 Generated scenario:", scenario.type);
-      
-      // Set conversation with complete scenario data
-      setCurrentConversation({
-        id: callId,
-        type: "112-gesprek",
-        callerInfo: call.phoneNumber,
-        priority: call.priority,
-        startTime: Date.now(),
-        isEmergencyCall: true,
-        scenarioType: scenario.type,
-        address: selectedAddress,
-        gemeente: selectedGemeente,
-        scenarioResponses: scenario.responses
-      });
+      try {
+        // Generate realistic scenario with real address from BAG API
+        const scenario = await generateRealistic112Scenario();
+        
+        console.log("📍 Generated real address:", scenario.address, "in", scenario.gemeente);
+        console.log("🚨 Generated scenario:", scenario.type);
+        
+        // Set conversation with complete scenario data
+        setCurrentConversation({
+          id: callId,
+          type: "112-gesprek",
+          callerInfo: call.phoneNumber,
+          priority: call.priority,
+          startTime: Date.now(),
+          isEmergencyCall: true,
+          scenarioType: scenario.type,
+          address: scenario.address,
+          gemeente: scenario.gemeente,
+          scenarioResponses: scenario.responses
+        });
 
-      showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
-      
-      // Generate initial caller message
-      const initialMessage = scenario.initialMessage;
-      console.log("💬 Generated initial message:", initialMessage);
-      
-      // Add caller message after brief delay
-      setTimeout(() => {
-        const callerMessage = {
-          id: Date.now(),
-          sender: `Melder - ${call.phoneNumber}`,
-          content: initialMessage,
-          timestamp: new Date().toLocaleTimeString("nl-NL", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          type: "incoming",
-        };
-        setChatMessages([callerMessage]);
-      }, 800);
+        showNotificationMessage(`112-gesprek aangenomen - lijn ${call.line}`);
+        
+        // Generate initial caller message
+        const initialMessage = scenario.initialMessage;
+        console.log("💬 Generated initial message:", initialMessage);
+        
+        // Add caller message after brief delay
+        setTimeout(() => {
+          const callerMessage = {
+            id: Date.now(),
+            sender: `Melder - ${call.phoneNumber}`,
+            content: initialMessage,
+            timestamp: new Date().toLocaleTimeString("nl-NL", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            type: "incoming",
+          };
+          setChatMessages([callerMessage]);
+        }, 800);
+      } catch (error) {
+        console.error("Error generating 112 scenario:", error);
+        // Fallback scenario
+        setCurrentConversation({
+          id: callId,
+          type: "112-gesprek",
+          callerInfo: call.phoneNumber,
+          priority: call.priority,
+          startTime: Date.now(),
+          isEmergencyCall: true,
+          scenarioType: "algemeen",
+          address: "Hoofdstraat 1",
+          gemeente: "Rotterdam",
+          scenarioResponses: {}
+        });
+      }
     }, 200);
   };
 
@@ -1173,157 +1186,10 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, [callTimers]);
 
-  // Real Dutch addresses verified with BAG API - Specific Rotterdam-Rijnmond region municipalities
-  const realisticAddresses = {
-    "Poortugaal": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Rhoon": [
-      "Dorpsstraat 1", "Kerkstraat 15", "Provincialeweg 50", "Essendijk 10"
-    ],
-    "Rotterdam": [
-      "Coolsingel 60", "Witte de Withstraat 25", "Lijnbaan 150", "Blaak 34",
-      "Mauritsweg 32", "Westzeedijk 341", "Kralingseweg 179", "Bergweg 201",
-      "Oude Binnenweg 75", "Zuidplein 180", "Laan op Zuid 585", "Hobbemastraat 25",
-      "Weena 505", "Centraal Station", "Erasmusbrug", "Euromast 20"
-    ],
-    "Hoek van Holland": [
-      "Strandweg 1", "Prins Hendrikstraat 10", "Hoekse Brink 5", "De Cordesstraat 25"
-    ],
-    "Hoogvliet Rotterdam": [
-      "Galerij 1", "Lengweg 50", "Zalmweg 10", "Binnenland 25"
-    ],
-    "Pernis Rotterdam": [
-      "Industrieweg 1", "Koninginneweg 15", "Bernisse 10", "Vulcaanweg 50"
-    ],
-    "Rozenburg": [
-      "Molenstraat 1", "Schoolstraat 10", "Kerkstraat 5", "Nieuwlandseweg 25"
-    ],
-    "Botlek Rotterdam": [
-      "Botlekweg 1", "Vondelingenweg 50", "Petroleumhaven 10", "Chemieweg 25"
-    ],
-    "Europoort Rotterdam": [
-      "Europaweg 1", "Maasvlakteboulevard 50", "Brittanniëhaven 10", "Calandkanaal 25"
-    ],
-    "Maasvlakte Rotterdam": [
-      "Maasvlakteboulevard 1", "Yangtzehaven 50", "Amazonehaven 10", "Prinses Alexiahaven 25"
-    ],
-    "Barendrecht": [
-      "Middenbaan Noord 1", "Carnisselaan 1", "Boezemkade 1", "Raadhuislaan 1",
-      "Wijngaardlaan 1", "Dorpsstraat 1", "Industrieweg 1", "Promenade 1"
-    ],
-    "Capelle aan den IJssel": [
-      "Hoofdweg 750", "Fascinatio Boulevard 1", "Kanaalpark 100", "Schollevaar 200",
-      "Terpenpad 50", "Beukendreef 25", "Molenstraat 75", "Passage 1"
-    ],
-    "Dirksland": [
-      "Voorstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Havenweg 25"
-    ],
-    "Herkingen": [
-      "Dorpsstraat 1", "Kerkweg 10", "Havendijk 5", "Zeedijk 25"
-    ],
-    "Melissant": [
-      "Kerkstraat 1", "Schoolstraat 10", "Dorpsweg 5", "Polderweg 25"
-    ],
-    "Goedereede": [
-      "Markt 1", "Kerkstraat 10", "Havenstraat 5", "Zuidwal 25"
-    ],
-    "Ouddorp": [
-      "Duinweg 1", "Strandweg 10", "Kerkstraat 5", "Schoolstraat 25"
-    ],
-    "Stellendam": [
-      "Voorstraat 1", "Havenweg 10", "Kerkstraat 5", "Zeestraat 25"
-    ],
-    "Middelharnis": [
-      "Voorstraat 1", "Raadhuisplein 10", "Kerkstraat 5", "Schoolstraat 25"
-    ],
-    "Nieuwe-Tonge": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Sommelsdijk": [
-      "Voorstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Havenweg 25"
-    ],
-    "Stad aan 't Haringvliet": [
-      "Voorstraat 1", "Havenweg 10", "Kerkstraat 5", "Polderweg 25"
-    ],
-    "Achthuizen": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Zeedijk 25"
-    ],
-    "Den Bommel": [
-      "Dorpsstraat 1", "Kerkweg 10", "Polderweg 5", "Zeedijk 25"
-    ],
-    "Krimpen aan den IJssel": [
-      "Hoofdstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Stationsplein 25"
-    ],
-    "Bergschenhoek": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Bergseplein 25"
-    ],
-    "Berkel en Rodenrijs": [
-      "Dorpsstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Stationsplein 25"
-    ],
-    "Bleiswijk": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Stationsplein 25"
-    ],
-    "Maassluis": [
-      "Hoogstraat 1", "Markt 1", "Koningin Julianaweg 1", "Noordhof 1",
-      "Havenstraat 1", "Stationsplein 1", "Maasboulevard 1"
-    ],
-    "Spijkenisse": [
-      "Lange Nieuwstraat 1", "Markt 1", "Heemraadlaan 1", "Canadastraat 1",
-      "Havenstraat 1", "Stationsplein 1", "Bernisse Oostdijk 1"
-    ],
-    "Hekelingen": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Abbenbroek": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Zuidland": [
-      "Dorpsstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Geervliet": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Heenvliet": [
-      "Dorpsstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Simonshaven": [
-      "Dorpsstraat 1", "Havenweg 10", "Kerkstraat 5", "Zeedijk 25"
-    ],
-    "Ridderkerk": [
-      "Ridderhaven 50", "Kerkplein 1", "Slinge 200", "Zwijndrechtseweg 300",
-      "Dr. Zamenhofstraat 25", "Donkerslootweg 100", "Molenlaan 50", "Ridderhof 1"
-    ],
-    "Schiedam": [
-      "Lange Haven 101", "Broersveld 230", "Korte Kerkstraat 12", "Markt 1",
-      "Maasboulevard 15", "Rotterdamseweg 200", "Vijf Eikenweg 45", "Parkweg 75"
-    ],
-    "Vlaardingen": [
-      "Oosthavenkade 65", "Maasboulevard 100", "Mathenesserlaan 200", "Hoflaan 150",
-      "Schiedamseweg 300", "Hugo de Grootstraat 50", "Vlaardingervaart 200", "Westzijde 10"
-    ],
-    "Oostvoorne": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Duinweg 25"
-    ],
-    "Rockanje": [
-      "Voorstraat 1", "Kerkstraat 10", "Duinweg 5", "Strandweg 25"
-    ],
-    "Tinte": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Brielle": [
-      "Voorstraat 1", "Markt 10", "Kerkstraat 5", "Havenstraat 25"
-    ],
-    "Vierpolders": [
-      "Dorpsstraat 1", "Kerkweg 10", "Schoolstraat 5", "Polderweg 25"
-    ],
-    "Zwartewaal": [
-      "Dorpsstraat 1", "Kerkstraat 10", "Schoolstraat 5", "Polderweg 25"
-    ]
-  };
+  // Note: Real addresses are now generated dynamically via BAG API
 
-  // Function to generate realistic 112 scenarios with police classification weighting
-  const generateRealistic112Scenario = (address: string, gemeente: string) => {
+  // Function to generate realistic 112 scenarios with BAG API address integration
+  const generateRealistic112Scenario = async () => {
     // Create weighted scenario pool based on frequency
     const weightedScenarios: any[] = [];
     realistic112Scenarios.forEach(scenario => {
@@ -1336,11 +1202,46 @@ export default function Dashboard() {
     // Select from weighted pool
     const selectedScenario = weightedScenarios[Math.floor(Math.random() * weightedScenarios.length)];
     
+    // Get random real address from BAG API
+    const rotterdamGemeenten = [
+      "Rotterdam", "Barendrecht", "Capelle aan den IJssel", "Maassluis", 
+      "Spijkenisse", "Vlaardingen", "Schiedam", "Ridderkerk", "Delft",
+      "Westland", "Lansingerland", "Krimpen aan den IJssel"
+    ];
+    
+    const randomGemeente = rotterdamGemeenten[Math.floor(Math.random() * rotterdamGemeenten.length)];
+    let realAddress = "Hoofdstraat 1"; // Fallback
+    let gemeente = randomGemeente;
+    
+    try {
+      // Search for real addresses in the gemeente
+      const searchQuery = `${randomGemeente} hoofdstraat`;
+      const response = await fetch(`/api/bag/search?q=${encodeURIComponent(searchQuery)}&limit=10`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.features && data.features.length > 0) {
+          const randomResult = data.features[Math.floor(Math.random() * data.features.length)];
+          const props = randomResult.properties;
+          
+          if (props.straatnaam && props.huisnummer) {
+            const fullHuisnummer = `${props.huisnummer}${props.huisletter || ''}${props.huisnummertoevoeging ? '-' + props.huisnummertoevoeging : ''}`;
+            realAddress = `${props.straatnaam} ${fullHuisnummer}`;
+            gemeente = props.gemeentenaam || props.plaatsnaam || gemeente;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('BAG API fallback to default address:', error);
+    }
+    
     return {
       type: selectedScenario.type,
       classification: selectedScenario.classification,
       priority: selectedScenario.priority,
-      initialMessage: selectedScenario.initialMessage(address, gemeente),
+      address: realAddress,
+      gemeente: gemeente,
+      initialMessage: selectedScenario.initialMessage(realAddress, gemeente),
       responses: selectedScenario.responses
     };
   };
