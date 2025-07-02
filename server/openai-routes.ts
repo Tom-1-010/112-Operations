@@ -4,10 +4,16 @@ import OpenAI from 'openai';
 
 const router = express.Router();
 
-// Initialize OpenAI client (API key should be set via environment variable)
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize OpenAI client only if API key is available
+let openai: OpenAI | null = null;
+
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+} else {
+  console.log('⚠️ OpenAI API key not found. OpenAI routes will return errors.');
+}
 
 // Enhanced Dutch emergency caller prompt
 const DUTCH_EMERGENCY_CALLER_PROMPT = `Je bent een Nederlandse burger die 112 belt in een noodsituatie. Je bent getraind om realistische en authentieke gesprekken te voeren volgens Nederlandse normen en cultuur.
@@ -34,7 +40,7 @@ router.post('/chat', async (req, res) => {
   try {
     const { message, conversationHistory = [], scenarioType = 'algemeen' } = req.body;
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!openai) {
       return res.status(500).json({ 
         error: 'OpenAI API key not configured. Set OPENAI_API_KEY environment variable.' 
       });

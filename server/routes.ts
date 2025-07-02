@@ -16,6 +16,7 @@ import {
   updateBasisteamSchema
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
+import openaiRoutes from "./openai-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
@@ -33,6 +34,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to load LMC classifications' });
     }
   });
+  // OpenAI routes
+  app.use('/api/openai', openaiRoutes);
+
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
@@ -204,14 +208,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // BAG API proxy endpoint
   app.get('/api/bag/search', async (req, res) => {
     try {
-      const query = req.query.q;
-      const limit = req.query.limit || '20';
+      const query = String(req.query.q || '');
+      const limit = String(req.query.limit || '20');
 
       if (!query) {
         return res.status(400).json({ error: 'Query parameter q is required' });
       }
 
-      const encodedQuery = encodeURIComponent(query);
+      const encodedQuery = encodeURIComponent(String(query));
       // Use the correct PDOK Locatieserver endpoint for address search
       const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodedQuery}&rows=${limit}&fq=type:adres`;
 
@@ -291,19 +295,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           data: data,
           features: data.features?.length || 0
         });
-      } catch (parseError) {
+      } catch (parseError: any) {
         res.json({
           status: 'parse_error',
           url: url,
           responseStatus: response.status,
           responseText: responseText.substring(0, 1000),
-          parseError: parseError.message
+          parseError: parseError?.message || 'Unknown parse error'
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({
         status: 'fetch_error',
-        error: error.message
+        error: error?.message || 'Unknown error'
       });
     }
   });
@@ -317,11 +321,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Transform to match expected format with proper field mapping
       const formattedKarakteristieken = allKarakteristieken.map(k => ({
-        ktNaam: k.ktNaam || k.kt_naam || '',
-        ktType: k.ktType || k.kt_type || '', 
-        ktWaarde: k.ktWaarde || k.kt_waarde || '',
-        ktCode: k.ktCode || k.kt_code || '',
-        ktParser: k.ktParser || k.kt_paser || k.kt_parser || ''
+        ktNaam: k.ktNaam || '',
+        ktType: k.ktType || '', 
+        ktWaarde: k.ktWaarde || '',
+        ktCode: k.ktCode || '',
+        ktParser: k.ktParser || ''
       }));
 
       console.log(`Returning ${formattedKarakteristieken.length} formatted karakteristieken`);
@@ -380,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🗑️ Cleared existing karakteristieken');
 
       // Transform data to match schema
-      const transformedData = karakteristiekenData.map(item => ({
+      const transformedData = karakteristiekenData.map((item: any) => ({
         ktNaam: item['kt_naam'] || item['kt-naam'],
         ktType: item['kt_type'] || item['kt-type'],
         ktWaarde: item['kt_waarde'] === null || item['kt_waarde'] === undefined || 
@@ -443,7 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🗑️ Cleared existing karakteristieken');
 
       // Transform data to match schema
-      const transformedData = karakteristiekenData.map(item => ({
+      const transformedData = karakteristiekenData.map((item: any) => ({
         ktNaam: item['kt_naam'] || item['kt-naam'],
         ktType: item['kt_type'] || item['kt-type'],
         ktWaarde: item['kt_waarde'] === null || item['kt_waarde'] === undefined || 
@@ -1003,11 +1007,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   return httpServer;
-}
-import { registerRoutes as registerApiRoutes } from "./routes";
-import openaiRoutes from "./openai-routes";
-
-export function registerRoutes(app: Express) {
-  app.use('/api/openai', openaiRoutes);
-  registerApiRoutes(app);
 }
