@@ -72,6 +72,60 @@ const createIncidentIcon = (incidentNumber: number, incidentType: string, priori
   });
 };
 
+// Create police unit markers with different colors based on status
+const createUnitIcon = (unit: PoliceUnit) => {
+  const getColorForStatus = (status: string) => {
+    const statusNum = parseInt(status.split(' ')[0]);
+    switch (statusNum) {
+      case 1: return '#00ff00'; // Available - Green
+      case 2: return '#ffff00'; // On patrol - Yellow  
+      case 3: return '#ff6600'; // Responding - Orange
+      case 4: return '#ff0000'; // At scene - Red
+      case 6: return '#9900ff'; // En route back - Purple
+      case 7: return '#00ffff'; // Available at station - Cyan
+      case 8: return '#ff00ff'; // Out of service - Magenta
+      case 9: return '#888888'; // Off duty - Gray
+      default: return '#000000'; // Unknown - Black
+    }
+  };
+
+  // Animation for moving units
+  const animation = unit.isMoving ? 'animation: pulse 1.5s infinite;' : '';
+  
+  const color = getColorForStatus(unit.status);
+  const roepnummer = unit.roepnummer.replace('RT ', '');
+  
+  return L.divIcon({
+    className: 'unit-marker',
+    html: `
+      <div style="
+        background-color: ${color}; 
+        width: 30px; 
+        height: 30px; 
+        border-radius: 4px; 
+        border: 2px solid #000; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 10px; 
+        color: black; 
+        font-weight: bold;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        ${animation}
+      ">${roepnummer}</div>
+      <style>
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+      </style>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
+};
+
 interface GmsIncident {
   id: number;
   melderNaam: string;
@@ -111,10 +165,37 @@ interface ProcessedIncident {
   isNew?: boolean;
 }
 
+interface PoliceUnit {
+  id: number;
+  roepnummer: string;
+  aantal_mensen: number;
+  rollen: string[];
+  soort_auto: string;
+  team: string;
+  basisteam_id: string;
+  status: string;
+  locatie: string | null;
+  incident: string | null;
+  currentPosition: [number, number];
+  targetPosition?: [number, number];
+  movementSpeed: number; // km/h
+  lastUpdateTime: number;
+  isMoving: boolean;
+}
+
+interface MovementPattern {
+  type: 'idle' | 'responding' | 'patrol';
+  target?: [number, number];
+  waypoints?: [number, number][];
+  speed: number;
+}
+
 const KaartPage: React.FC = () => {
   const [incidents, setIncidents] = useState<ProcessedIncident[]>([]);
   const [basisteams, setBasisteams] = useState<Basisteam[]>([]);
+  const [policeUnits, setPoliceUnits] = useState<PoliceUnit[]>([]);
   const [showBasisteams, setShowBasisteams] = useState(true);
+  const [showUnits, setShowUnits] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState('alle');
   const [priorityFilter, setPriorityFilter] = useState('alle');
   const [isLoading, setIsLoading] = useState(true);
@@ -123,6 +204,7 @@ const KaartPage: React.FC = () => {
   const [newIncidentIds, setNewIncidentIds] = useState<Set<number>>(new Set());
   const mapRef = useRef<L.Map | null>(null);
   const lastFetchTime = useRef<Date>(new Date());
+  const movementIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load React Leaflet components dynamically
   useEffect(() => {
@@ -179,6 +261,65 @@ const KaartPage: React.FC = () => {
     ];
   };
 
+  // Calculate distance between two coordinates in kilometers
+  const calculateDistance = (pos1: [number, number], pos2: [number, number]): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (pos2[0] - pos1[0]) * Math.PI / 180;
+    const dLon = (pos2[1] - pos1[1]) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(pos1[0] * Math.PI / 180) * Math.cos(pos2[0] * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Generate random position within a municipality boundary
+  const generateRandomPositionInMunicipality = (basisteam: Basisteam): [number, number] => {
+    const polygon = basisteam.polygon as [number, number][];
+    if (!polygon || polygon.length === 0) {
+      return [51.9225, 4.4792]; // Default Rotterdam center
+    }
+
+    // Find bounding box
+    const lats = polygon.map(p => p[0]);
+    const lngs = polygon.map(p => p[1]);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+
+    // Generate random point within bounding box
+    const randomLat = minLat + Math.random() * (maxLat - minLat);
+    const randomLng = minLng + Math.random() * (maxLng - minLng);
+
+    return [randomLat, randomLng];
+  };
+
+  // Get movement speed based on unit status and type
+  const getMovementSpeed = (unit: PoliceUnit, isEmergency: boolean = false): number => {
+    const statusNum = parseInt(unit.status.split(' ')[0]);
+    
+    // Base speeds (km/h)
+    const baseSpeed = unit.soort_auto.includes('Motor') ? 60 : 50;
+    
+    if (isEmergency || statusNum === 3 || statusNum === 4) {
+      return baseSpeed * 1.5; // Emergency response speed
+    } else if (statusNum === 2) {
+      return baseSpeed * 1.2; // Patrol speed
+    } else {
+      return baseSpeed * 0.8; // Normal movement
+    }
+  };
+
+  // Generate initial position for a unit based on its basisteam
+  const generateInitialUnitPosition = (unit: PoliceUnit): [number, number] => {
+    const basisteam = basisteams.find(bt => bt.id === unit.basisteam_id);
+    if (basisteam) {
+      return generateRandomPositionInMunicipality(basisteam);
+    }
+    return [51.9225, 4.4792]; // Default Rotterdam center
+  };
+
   // Process raw GMS incidents into map-ready format
   const processIncidents = (rawIncidents: GmsIncident[]): ProcessedIncident[] => {
     return rawIncidents.map((incident) => {
@@ -205,6 +346,126 @@ const KaartPage: React.FC = () => {
       };
     });
   };
+
+  // Load police units from database
+  const loadPoliceUnits = useCallback(async () => {
+    try {
+      console.log('🚔 Loading police units for map...');
+      
+      const response = await fetch('/api/police-units');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const rawUnits = await response.json();
+      console.log('✅ Fetched police units for map:', rawUnits.length);
+      
+      // Convert raw units to map-ready format with movement tracking
+      const processedUnits: PoliceUnit[] = rawUnits.map((unit: any) => {
+        const currentPosition = unit.locatie 
+          ? JSON.parse(unit.locatie) 
+          : generateInitialUnitPosition(unit);
+        
+        return {
+          ...unit,
+          currentPosition,
+          movementSpeed: getMovementSpeed(unit),
+          lastUpdateTime: Date.now(),
+          isMoving: false
+        };
+      });
+      
+      setPoliceUnits(processedUnits);
+      
+    } catch (error) {
+      console.error('❌ Error loading police units:', error);
+    }
+  }, [basisteams]);
+
+  // Update unit positions based on movement simulation
+  const updateUnitPositions = useCallback(() => {
+    setPoliceUnits(prevUnits => {
+      return prevUnits.map(unit => {
+        const now = Date.now();
+        const deltaTime = (now - unit.lastUpdateTime) / 1000; // seconds
+        
+        // Only move units with active statuses
+        const statusNum = parseInt(unit.status.split(' ')[0]);
+        const shouldMove = [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum) || unit.status.includes('N');
+        
+        if (!shouldMove) {
+          return { ...unit, lastUpdateTime: now };
+        }
+
+        let newPosition = [...unit.currentPosition] as [number, number];
+        let isMoving = false;
+
+        // Determine movement target based on incident assignment
+        const assignedIncident = incidents.find(inc => 
+          inc.units.includes(unit.roepnummer)
+        );
+
+        if (assignedIncident && statusNum === 3) {
+          // Unit is responding to incident - move toward incident location
+          const target = assignedIncident.coordinates;
+          const distance = calculateDistance(unit.currentPosition, target);
+          
+          if (distance > 0.1) { // Still more than 100m away
+            const speed = getMovementSpeed(unit, true); // Emergency response
+            const distancePerSecond = (speed * 1000) / 3600; // m/s
+            const moveDistance = distancePerSecond * deltaTime / 1000; // km
+            
+            // Calculate direction
+            const bearing = Math.atan2(
+              target[1] - unit.currentPosition[1],
+              target[0] - unit.currentPosition[0]
+            );
+            
+            // Move toward target
+            const latMove = Math.cos(bearing) * moveDistance / 111; // Rough km to degrees
+            const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(unit.currentPosition[0] * Math.PI / 180));
+            
+            newPosition = [
+              unit.currentPosition[0] + latMove,
+              unit.currentPosition[1] + lonMove
+            ];
+            isMoving = true;
+          }
+        } else if (statusNum === 1 || statusNum === 2) {
+          // Unit is available or on patrol - random movement within municipality
+          const basisteam = basisteams.find(bt => bt.id === unit.basisteam_id);
+          if (basisteam && Math.random() < 0.3) { // 30% chance to move each update
+            const speed = getMovementSpeed(unit);
+            const distancePerSecond = (speed * 1000) / 3600;
+            const moveDistance = distancePerSecond * deltaTime / 1000;
+            
+            // Random direction
+            const bearing = Math.random() * 2 * Math.PI;
+            const latMove = Math.cos(bearing) * moveDistance / 111;
+            const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(unit.currentPosition[0] * Math.PI / 180));
+            
+            newPosition = [
+              unit.currentPosition[0] + latMove,
+              unit.currentPosition[1] + lonMove
+            ];
+            
+            // Keep within reasonable bounds
+            newPosition[0] = Math.max(51.8, Math.min(52.1, newPosition[0]));
+            newPosition[1] = Math.max(4.2, Math.min(4.7, newPosition[1]));
+            
+            isMoving = true;
+          }
+        }
+
+        return {
+          ...unit,
+          currentPosition: newPosition,
+          lastUpdateTime: now,
+          isMoving
+        };
+      });
+    });
+  }, [incidents, basisteams]);
 
   // Load incidents with real-time polling
   const loadIncidents = useCallback(async () => {
@@ -264,6 +525,27 @@ const KaartPage: React.FC = () => {
     
     return () => clearInterval(interval);
   }, [loadIncidents]);
+
+  // Load police units when basisteams are loaded
+  useEffect(() => {
+    if (basisteams.length > 0) {
+      loadPoliceUnits();
+    }
+  }, [basisteams, loadPoliceUnits]);
+
+  // Start movement simulation
+  useEffect(() => {
+    if (policeUnits.length > 0) {
+      // Update unit positions every 2 seconds
+      movementIntervalRef.current = setInterval(updateUnitPositions, 2000);
+      
+      return () => {
+        if (movementIntervalRef.current) {
+          clearInterval(movementIntervalRef.current);
+        }
+      };
+    }
+  }, [policeUnits.length, updateUnitPositions]);
 
   // Load basisteams data
   useEffect(() => {
@@ -373,6 +655,45 @@ const KaartPage: React.FC = () => {
                       {incident.notes && (
                         <div className="mt-2 p-2 bg-gray-100 rounded">
                           <strong>Details:</strong> {incident.notes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+
+          {/* Police Unit Markers */}
+          {showUnits && policeUnits.map((unit) => {
+            const statusNum = parseInt(unit.status.split(' ')[0]);
+            const shouldShow = [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum) || unit.status.includes('N');
+            
+            if (!shouldShow) return null;
+            
+            return (
+              <Marker
+                key={`unit-${unit.id}`}
+                position={unit.currentPosition}
+                icon={createUnitIcon(unit)}
+              >
+                <Popup>
+                  <div className="p-3 min-w-[200px]">
+                    <h3 className="font-bold text-base mb-2 text-gray-800">
+                      {unit.roepnummer}
+                    </h3>
+                    <div className="space-y-1 text-sm">
+                      <p><strong>Status:</strong> {unit.status}</p>
+                      <p><strong>Team:</strong> {unit.team}</p>
+                      <p><strong>Voertuig:</strong> {unit.soort_auto}</p>
+                      <p><strong>Bezetting:</strong> {unit.aantal_mensen} personen</p>
+                      <p><strong>Snelheid:</strong> {unit.movementSpeed} km/h</p>
+                      {unit.incident && (
+                        <p><strong>Incident:</strong> {unit.incident}</p>
+                      )}
+                      {unit.isMoving && (
+                        <div className="mt-2 p-1 bg-orange-100 rounded text-xs">
+                          🚗 In beweging
                         </div>
                       )}
                     </div>
