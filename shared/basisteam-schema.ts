@@ -1,9 +1,9 @@
-
 export interface Basisteam {
   id: string;
   naam: string;
   adres: string;
-  polygon: [number, number][]; // Array van coördinaten voor polygoon
+  polygon: [number, number][]; // Legacy single polygon for backward compatibility
+  polygons?: { [gemeente: string]: [number, number][] }; // Multiple polygons per gemeente
   gemeentes: string[];
   actief: boolean;
   instellingen: {

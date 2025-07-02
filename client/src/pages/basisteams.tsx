@@ -980,6 +980,7 @@ function EditBasisteamForm({
     adres: basisteam.adres,
     gemeentes: basisteam.gemeentes.join(', '),
     polygon: basisteam.polygon || [],
+    polygons: basisteam.polygons || {},
     actief: basisteam.actief,
     instellingen: {
       kan_inzetten_buiten_gebied: basisteam.instellingen.kan_inzetten_buiten_gebied,
@@ -988,19 +989,25 @@ function EditBasisteamForm({
     }
   });
 
-  // Functie om automatisch polygon te genereren op basis van wijknamen
+  // Functie om automatisch polygons te genereren op basis van wijknamen (één per gemeente)
   const generatePolygonFromWijken = () => {
     const wijken = formData.gemeentes.split(',').map(w => w.trim());
-    const matchedAreas: number[][] = [];
+    const newPolygons: { [gemeente: string]: [number, number][] } = {};
     
     wijken.forEach(wijk => {
       if (ROTTERDAM_AREAS[wijk]) {
-        matchedAreas.push(...ROTTERDAM_AREAS[wijk]);
+        newPolygons[wijk] = ROTTERDAM_AREAS[wijk] as [number, number][];
       }
     });
 
-    if (matchedAreas.length > 0) {
-      setFormData(prev => ({ ...prev, polygon: matchedAreas as any }));
+    if (Object.keys(newPolygons).length > 0) {
+      // Use the first polygon as main polygon for backward compatibility
+      const firstPolygon = Object.values(newPolygons)[0] || [];
+      setFormData(prev => ({ 
+        ...prev, 
+        polygon: firstPolygon,
+        polygons: newPolygons
+      }));
     }
   };
 
@@ -1011,6 +1018,7 @@ function EditBasisteamForm({
       adres: formData.adres,
       gemeentes: formData.gemeentes.split(',').map(g => g.trim()).filter(g => g),
       polygon: formData.polygon,
+      polygons: formData.polygons,
       actief: formData.actief,
       instellingen: formData.instellingen,
     });
@@ -1097,7 +1105,23 @@ function EditBasisteamForm({
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
-              {formData.polygon && formData.polygon.length > 0 && (
+              {/* Show multiple polygons per gemeente */}
+              {formData.polygons && Object.entries(formData.polygons).map(([gemeente, polygonCoords]) => (
+                polygonCoords && polygonCoords.length > 0 && (
+                  <Polygon
+                    key={gemeente}
+                    positions={polygonCoords}
+                    color="blue"
+                    weight={2}
+                    fillColor="blue"
+                    fillOpacity={0.2}
+                  />
+                )
+              ))}
+              
+              {/* Fallback to single polygon for backward compatibility */}
+              {(!formData.polygons || Object.keys(formData.polygons).length === 0) && 
+               formData.polygon && formData.polygon.length > 0 && (
                 <Polygon
                   positions={formData.polygon}
                   color="blue"
@@ -1113,7 +1137,11 @@ function EditBasisteamForm({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-500 rounded border border-blue-600"></div>
                 <span>Huidige gebied grenzen</span>
-                {formData.polygon && formData.polygon.length > 0 && (
+                {formData.polygons && Object.keys(formData.polygons).length > 0 ? (
+                  <Badge variant="secondary" className="text-xs">
+                    {Object.keys(formData.polygons).length} gemeentes
+                  </Badge>
+                ) : formData.polygon && formData.polygon.length > 0 && (
                   <Badge variant="secondary" className="text-xs">
                     {formData.polygon.length} punten
                   </Badge>
@@ -1133,7 +1161,7 @@ function EditBasisteamForm({
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setFormData(prev => ({ ...prev, polygon: [] }));
+                    setFormData(prev => ({ ...prev, polygon: [], polygons: {} }));
                   }}
                 >
                   Wis gebied

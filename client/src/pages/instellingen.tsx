@@ -301,25 +301,53 @@ const InstellingenPage: React.FC = () => {
                   {/* Toon alle basisteam polygonen */}
                   {basisteams
                     .filter(team => team.instellingen.zichtbaar_op_kaart)
-                    .map((team) => (
-                    <Polygon
-                      key={team.id}
-                      positions={team.polygon}
-                      color={team.id === selectedTeam.id ? '#3b82f6' : '#6b7280'}
-                      fillColor={team.id === selectedTeam.id ? '#dbeafe' : '#f3f4f6'}
-                      fillOpacity={0.3}
-                      weight={team.id === selectedTeam.id ? 3 : 2}
-                    >
-                      <Popup>
-                        <div className="p-2">
-                          <h3 className="font-bold text-sm">{team.naam}</h3>
-                          <p className="text-xs text-gray-600">{team.adres}</p>
-                          <p className="text-xs">Gemeentes: {team.gemeentes.join(', ')}</p>
-                          <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
-                        </div>
-                      </Popup>
-                    </Polygon>
-                  ))}
+                    .map((team) => {
+                      // If team has multiple polygons per gemeente, show them separately
+                      if (team.polygons && Object.keys(team.polygons).length > 0) {
+                        return Object.entries(team.polygons).map(([gemeente, polygonCoords]) => (
+                          polygonCoords && polygonCoords.length > 0 && (
+                            <Polygon
+                              key={`${team.id}-${gemeente}`}
+                              positions={polygonCoords}
+                              color={team.id === selectedTeam.id ? '#3b82f6' : '#6b7280'}
+                              fillColor={team.id === selectedTeam.id ? '#dbeafe' : '#f3f4f6'}
+                              fillOpacity={0.3}
+                              weight={team.id === selectedTeam.id ? 3 : 2}
+                            >
+                              <Popup>
+                                <div className="p-2">
+                                  <h3 className="font-bold text-sm">{team.naam}</h3>
+                                  <p className="text-xs text-gray-600">{gemeente}</p>
+                                  <p className="text-xs">{team.adres}</p>
+                                  <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
+                                </div>
+                              </Popup>
+                            </Polygon>
+                          )
+                        ));
+                      } else {
+                        // Fallback to single polygon
+                        return (
+                          <Polygon
+                            key={team.id}
+                            positions={team.polygon}
+                            color={team.id === selectedTeam.id ? '#3b82f6' : '#6b7280'}
+                            fillColor={team.id === selectedTeam.id ? '#dbeafe' : '#f3f4f6'}
+                            fillOpacity={0.3}
+                            weight={team.id === selectedTeam.id ? 3 : 2}
+                          >
+                            <Popup>
+                              <div className="p-2">
+                                <h3 className="font-bold text-sm">{team.naam}</h3>
+                                <p className="text-xs text-gray-600">{team.adres}</p>
+                                <p className="text-xs">Gemeentes: {team.gemeentes.join(', ')}</p>
+                                <p className="text-xs">Max eenheden: {team.instellingen.max_aantal_eenheden}</p>
+                              </div>
+                            </Popup>
+                          </Polygon>
+                        );
+                      }
+                    }).flat()}
 
                   {/* Toon adres marker voor geselecteerd team */}
                   {selectedTeam && (

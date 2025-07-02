@@ -383,32 +383,61 @@ const KaartPage: React.FC = () => {
           })}
 
           {/* Basisteam Polygons */}
-          {showBasisteams && basisteams.map((basisteam) => (
-            basisteam.polygon && basisteam.polygon.length > 0 && (
-              <Polygon
-                key={`basisteam-${basisteam.id}`}
-                positions={basisteam.polygon}
-                pathOptions={{
-                  fillColor: basisteam.actief ? '#3388ff' : '#888888',
-                  fillOpacity: 0.1,
-                  color: basisteam.actief ? '#3388ff' : '#888888',
-                  weight: 2,
-                  opacity: 0.6,
-                }}
-              >
-                <Popup>
-                  <div className="p-2">
-                    <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
-                    <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
-                    <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
-                    {basisteam.gemeentes && basisteam.gemeentes.length > 0 && (
-                      <p className="text-xs"><strong>Gemeentes:</strong> {basisteam.gemeentes.join(', ')}</p>
-                    )}
-                  </div>
-                </Popup>
-              </Polygon>
-            )
-          ))}
+          {showBasisteams && basisteams.map((basisteam) => {
+            // If team has multiple polygons per gemeente, show them separately
+            if (basisteam.polygons && Object.keys(basisteam.polygons).length > 0) {
+              return Object.entries(basisteam.polygons).map(([gemeente, polygonCoords]) => (
+                polygonCoords && polygonCoords.length > 0 && (
+                  <Polygon
+                    key={`basisteam-${basisteam.id}-${gemeente}`}
+                    positions={polygonCoords}
+                    pathOptions={{
+                      fillColor: basisteam.actief ? '#3388ff' : '#888888',
+                      fillOpacity: 0.1,
+                      color: basisteam.actief ? '#3388ff' : '#888888',
+                      weight: 2,
+                      opacity: 0.6,
+                    }}
+                  >
+                    <Popup>
+                      <div className="p-2">
+                        <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
+                        <p className="text-xs mb-1"><strong>Gemeente:</strong> {gemeente}</p>
+                        <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
+                        <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
+                      </div>
+                    </Popup>
+                  </Polygon>
+                )
+              ));
+            } else {
+              // Fallback to single polygon
+              return basisteam.polygon && basisteam.polygon.length > 0 && (
+                <Polygon
+                  key={`basisteam-${basisteam.id}`}
+                  positions={basisteam.polygon}
+                  pathOptions={{
+                    fillColor: basisteam.actief ? '#3388ff' : '#888888',
+                    fillOpacity: 0.1,
+                    color: basisteam.actief ? '#3388ff' : '#888888',
+                    weight: 2,
+                    opacity: 0.6,
+                  }}
+                >
+                  <Popup>
+                    <div className="p-2">
+                      <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
+                      <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
+                      <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
+                      {basisteam.gemeentes && basisteam.gemeentes.length > 0 && (
+                        <p className="text-xs"><strong>Gemeentes:</strong> {basisteam.gemeentes.join(', ')}</p>
+                      )}
+                    </div>
+                  </Popup>
+                </Polygon>
+              );
+            }
+          }).flat()}
         </MapContainer>
       </div>
 
