@@ -798,23 +798,37 @@ const KaartPage: React.FC = () => {
             </select>
           </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="showBasisteams"
-              checked={showBasisteams}
-              onChange={(e) => setShowBasisteams(e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor="showBasisteams" className="text-xs">Toon Basisteam Gebieden</label>
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showBasisteams"
+                checked={showBasisteams}
+                onChange={(e) => setShowBasisteams(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="showBasisteams" className="text-xs">Toon Basisteam Gebieden</label>
+            </div>
+            
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showUnits"
+                checked={showUnits}
+                onChange={(e) => setShowUnits(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.length})</label>
+            </div>
           </div>
         </div>
 
         <div className="mt-4 pt-3 border-t">
           <div className="text-xs text-gray-600 space-y-1">
             <p><strong>Live Statistieken:</strong></p>
-            <p>Actieve Incidents: {filteredIncidents.length}</p>
-            <p>Totaal: {incidents.length}</p>
+            <p>Incidents: {incidents.length} ({filteredIncidents.length} zichtbaar)</p>
+            <p>Eenheden: {policeUnits.length}</p>
+            <p>In beweging: {policeUnits.filter(u => u.isMoving).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
             {newIncidentIds.size > 0 && (
               <p className="text-red-600 font-bold">🚨 {newIncidentIds.size} nieuwe melding(en)</p>
@@ -823,31 +837,77 @@ const KaartPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000]">
-        <h4 className="font-bold text-xs mb-2">Legenda</h4>
-        <div className="space-y-1 text-xs">
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold mr-2">1</div>
-            <span>Brand (Rood)</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold mr-2">2</div>
-            <span>Politie (Blauw)</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold mr-2">3</div>
-            <span>Medisch (Groen)</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold mr-2">4</div>
-            <span>Verkeer (Oranje)</span>
+      {/* Unit Status Legend - Only show when units are visible */}
+      {showUnits && (
+        <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000] max-w-xs">
+          <h4 className="font-bold text-xs mb-2">Eenheid Status Legenda</h4>
+          <div className="grid grid-cols-2 gap-1 text-xs">
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-green-500 rounded-sm border border-black"></div>
+              <span>1-Beschikbaar</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-yellow-500 rounded-sm border border-black"></div>
+              <span>2-Surveilleren</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-orange-600 rounded-sm border border-black"></div>
+              <span>3-Onderweg</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-red-500 rounded-sm border border-black"></div>
+              <span>4-Ter plaatse</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-purple-600 rounded-sm border border-black"></div>
+              <span>6-Terug</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-cyan-500 rounded-sm border border-black"></div>
+              <span>7-Post</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-pink-500 rounded-sm border border-black"></div>
+              <span>8-Uitruk</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-gray-500 rounded-sm border border-black"></div>
+              <span>9-Dienst uit</span>
+            </div>
           </div>
           <div className="text-xs text-gray-600 mt-2">
-            Randkleur: Rood=P1, Oranje=P2, Grijs=P3+
+            Bewegende eenheden: pulserende animatie
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Incident Legend - Only show when units are hidden */}
+      {!showUnits && (
+        <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000]">
+          <h4 className="font-bold text-xs mb-2">Incident Legenda</h4>
+          <div className="space-y-1 text-xs">
+            <div className="flex items-center">
+              <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold mr-2">1</div>
+              <span>Brand (Rood)</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold mr-2">2</div>
+              <span>Politie (Blauw)</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold mr-2">3</div>
+              <span>Medisch (Groen)</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold mr-2">4</div>
+              <span>Verkeer (Oranje)</span>
+            </div>
+            <div className="text-xs text-gray-600 mt-2">
+              Randkleur: Rood=P1, Oranje=P2, Grijs=P3+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auto-refresh indicator */}
       <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-[1000]">
