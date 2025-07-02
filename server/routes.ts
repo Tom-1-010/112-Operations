@@ -578,7 +578,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Process each team and convert to police units
         for (const [teamName, units] of Object.entries(teamsData)) {
           for (const unit of units) {
-            const status = unit.primair ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
+            let status = unit.primair ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
+            
+            // Special handling for RT 11 team - only specific units are primair
+            if (unit.roepnummer && unit.roepnummer.startsWith('RT 11.')) {
+              const primairUnits = ['RT 11.01', 'RT 11.02', 'RT 11.03', 'RT 11.09'];
+              status = primairUnits.includes(unit.roepnummer) ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
+            }
             
             unitsToImport.push({
               roepnummer: unit.roepnummer,
