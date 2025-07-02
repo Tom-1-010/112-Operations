@@ -4416,6 +4416,12 @@ export default function Dashboard() {
                     "wegongeval": "ogwels",
                     "auto ongeval": "ogwels",
                     "aanrijding": "ogwels",
+                    "wegongeval letsel": "ogwels",
+                    "auto ongeval letsel": "ogwels",
+                    
+                    // Railway accidents
+                    "ongeval spoorvervoer letsel": "ogspls",
+                    "spoorwegongeval letsel": "ogspls",
                     
                     // Traffic violations
                     "wegverkeer onder invloed": "vkweoi",
@@ -4441,14 +4447,6 @@ export default function Dashboard() {
                     // Service requests - Ambulance
                     "ambulance afstemverzoek": "dvabav",
                     "afstemverzoek ambulance": "dvabav",
-                    
-                    // Accidents with disambiguation
-                    "ongeval wegvervoer letsel": "ogwels",
-                    "ongeval spoorvervoer letsel": "ogspls",
-                    "wegongeval letsel": "ogwels",
-                    "spoorwegongeval letsel": "ogspls",
-                    "auto ongeval letsel": "ogwels",
-                    "verkeersongeval letsel": "ogwels",
                     
                     // Property crimes
                     "bz": "bzdsbr",
