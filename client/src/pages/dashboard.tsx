@@ -404,7 +404,7 @@ export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [notification, setNotification] = useState("");
   const [showNotification, setShowNotification] = useState(false);
-  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  
 
   const [incidents, setIncidents] = useLocalStorage<Incident[]>(
     "policeIncidents",
@@ -2857,36 +2857,7 @@ export default function Dashboard() {
     showNotificationMessage("Nieuwe eenheid toegevoegd");
   };
 
-  const handleDeleteAllIncidents = () => {
-    // Clear incidents from localStorage
-    localStorage.removeItem("incidenten");
-
-    // Clear all incident logs
-    const keys = Object.keys(localStorage);
-    keys.forEach((key) => {
-      if (key.startsWith("incident_logs_")) {
-        localStorage.removeItem(key);
-      }
-    });
-
-    // Close the modal
-    setShowDeleteConfirmModal(false);
-
-    // Show success message
-    showNotificationMessage("Alle incidenten zijn verwijderd.");
-
-    // Refresh the incidents list if on the incidents page
-    if (activeSection === "incidents") {
-      const incidentsList = document.getElementById("allIncidentsLegacyList");
-      if (incidentsList) {
-        incidentsList.innerHTML = `
-          <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
-            Geen incidenten gevonden
-          </div>
-        `;
-      }
-    }
-  };
+  
 
   const toggleRole = (role: string) => {
     setNewUnit((prev) => ({
@@ -6087,155 +6058,7 @@ export default function Dashboard() {
     }
   }, [activeSection]);
 
-  // Incidents page functionality
-  useEffect(() => {
-    const loadIncidentsFromStorage = async () => {
-      const incidentsList = document.getElementById("allIncidentsLegacyList");
-      if (!incidentsList) return;
-
-      try {
-        // Try to load from database first
-        let storedIncidenten = [];
-        try {
-          const response = await fetch('/api/gms-incidents');
-          if (response.ok) {
-            storedIncidenten = await response.json();
-            console.log('Loaded incidents from database:', storedIncidenten.length);
-          }
-        } catch (error) {
-          console.error('Failed to load from database, falling back to localStorage');
-        }
-
-        // Fallback to localStorage if database is empty
-        if (storedIncidenten.length === 0) {
-          storedIncidenten = JSON.parse(
-            localStorage.getItem("incidenten") || "[]",
-          );
-        }
-
-        if (storedIncidenten.length === 0) {
-          incidentsList.innerHTML = `
-            <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
-              Geen incidenten gevonden
-            </div>
-          `;
-          return;
-        }
-
-        // Sort by timestamp (newest first) - handle both database and localStorage formats
-        const sortedIncidenten = storedIncidenten.sort(
-          (a: any, b: any) => {
-            const dateA = new Date(a.aangemaaktOp || a.timestamp);
-            const dateB = new Date(b.aangemaaktOp || b.timestamp);
-            return dateB.getTime() - dateA.getTime();
-          }
-        );
-
-        incidentsList.innerHTML = sortedIncidenten
-          .map((incident: any, index: number) => {
-            const incidentNumber = `I${String(incident.id || index + 1).padStart(6, "0")}`;
-            const formattedTime = new Date(
-              incident.aangemaaktOp || incident.timestamp,
-            ).toLocaleTimeString("nl-NL", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-
-            const mc = incident.mc1 || incident.classificatie1
-              ? (incident.mc1 || incident.classificatie1).substring(0, 12)
-              : "-";
-
-            // Parse location - street name and house number only
-            const locatie =
-              incident.straatnaam && incident.huisnummer
-                ? `${incident.straatnaam} ${incident.huisnummer}`
-                : incident.meldingsadres || "-";
-
-            // Place/city in separate column
-            const plaats = incident.plaatsnaam || incident.gemeente || "-";
-
-            const prioriteitNummer = incident.prioriteit || 3;
-
-            // Map status to legacy format
-            let status = "Nieuw";
-            if (incident.status === "Uitgegeven") status = "Openstaand";
-            if (incident.status === "Openstaand") status = "Openstaand";
-            if (incident.status === "In wacht") status = "Nieuw";
-            if (incident.status === "Afgesloten") status = "Afgesloten";
-
-            const statusClass = `legacy-status-${status.toLowerCase()}`;
-
-            // Combine MC1, MC2, MC3 classifications - support both database and localStorage formats
-            const mc1 = incident.mc1 || incident.classificatie1 || "";
-            const mc2 = incident.mc2 || incident.classificatie2 || "";
-            const mc3 = incident.mc3 || incident.classificatie3 || "";
-            const combinedMC =
-              [mc1, mc2, mc3].filter(Boolean).join(" / ") || "-";
-
-            // Get assigned units (placeholder for now)
-            const assignedUnits = incident.toegewezenEenheden || "Geen";
-
-            return `
-            <div class="legacy-incident-row" data-incident-id="${incident.id || index}" onclick="redirectToGMS(${incident.id || index})">
-              <div class="legacy-col-prio">
-                <div class="priority-circle priority-${prioriteitNummer}">${prioriteitNummer}</div>
-              </div>
-              <div class="legacy-col-mc" title="${combinedMC}">${combinedMC}</div>
-              <div class="legacy-col-locatie" title="${locatie}">${locatie}</div>
-              <div class="legacy-col-plaats" title="${plaats}">${plaats}</div>
-              <div class="legacy-col-id">${incidentNumber}</div>
-              <div class="legacy-col-units">${assignedUnits}</div>
-              <div class="legacy-col-status ${statusClass}">${status}</div>
-            </div>
-          `;
-          })
-          .join("");
-
-        // Make redirectToGMS globally accessible
-        (window as any).redirectToGMS = (incidentId: number) => {
-          console.log("Redirecting incident to GMS:", incidentId);
-
-          // Get fresh incident data from localStorage
-          const storedIncidenten = JSON.parse(
-            localStorage.getItem("incidenten") || "[]",
-          );
-          const incident = storedIncidenten.find(
-            (inc: any) => (inc.id || inc.incidentId) === incidentId,
-          );
-
-          if (!incident) {
-            console.error("Incident not found in storage:", incidentId);
-            return;
-          }
-
-          console.log("Found incident data:", incident);
-
-          // Switch to GMS tab first
-          setActiveSection("gms");
-
-          // Load the complete incident data into GMS form
-          setTimeout(() => {
-            loadIncidentIntoGMS(incident);
-          }, 100);
-        };
-      } catch (error) {
-        console.error("Error loading incidents:", error);
-        const incidentsList = document.getElementById("allIncidentsLegacyList");
-        if (incidentsList) {
-          incidentsList.innerHTML = `
-            <div style="padding: 40px; text-align: center; color: #666; grid-column: 1 / -1;">
-              Fout bij laden van incidenten
-            </div>
-          `;
-        }
-      }
-    };
-
-    // Only initialize if incidents section is active
-    if (activeSection === "incidents") {
-      loadIncidentsFromStorage();
-    }
-  }, [activeSection]);
+  
 
   // GMS Kladblok functionality
   useEffect(() => {
@@ -7899,73 +7722,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {activeSection === "incidents" && (
-          <div className="content-section active">
-            <div className="section">
-              <div className="section-header">
-                <h3 className="section-title">Alle Incidenten</h3>
-                <button
-                  className="delete-all-incidents-btn"
-                  onClick={() => setShowDeleteConfirmModal(true)}
-                >
-                  🗑️ Delete All Incidents
-                </button>
-              </div>
-              <div className="incidents-legacy-content">
-                <div className="incidents-legacy-table">
-                  <div className="legacy-table-header">
-                    <div className="legacy-col-prio">Prio</div>
-                    <div className="legacy-col-mc">MC1 / MC2 / MC3</div>
-                    <div className="legacy-col-locatie">
-                      Straatnaam + Huisnummer
-                    </div>
-                    <div className="legacy-col-plaats">Plaatsnaam</div>
-                    <div className="legacy-col-id">Incident Nummer</div>
-                    <div className="legacy-col-units">Toegewezen Eenheden</div>
-                    <div className="legacy-col-status">Status</div>
-                  </div>
-                  <div
-                    className="legacy-table-body"
-                    id="allIncidentsLegacyList"
-                  >
-                    {/* Incidents will be loaded here */}
-                  </div>
-                </div>
-              </div>
-
-              {/* Delete Confirmation Modal */}
-              {showDeleteConfirmModal && (
-                <div className="delete-confirm-modal-overlay">
-                  <div className="delete-confirm-modal-content">
-                    <div className="delete-confirm-modal-header">
-                      <h3>Bevestiging vereist</h3>
-                    </div>
-                    <div className="delete-confirm-modal-body">
-                      <p>
-                        Weet je zeker dat je alle incidenten wilt verwijderen?
-                        Deze actie kan niet ongedaan worden gemaakt.
-                      </p>
-                    </div>
-                    <div className="delete-confirm-modal-footer">
-                      <button
-                        className="delete-confirm-cancel-btn"
-                        onClick={() => setShowDeleteConfirmModal(false)}
-                      >
-                        Annuleren
-                      </button>
-                      <button
-                        className="delete-confirm-delete-btn"
-                        onClick={handleDeleteAllIncidents}
-                      >
-                        Verwijder alles
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        
         {activeSection === "intake" && (
           <div className="content-section active">
             <div className="telefoon-dashboard">

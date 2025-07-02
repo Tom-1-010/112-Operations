@@ -564,70 +564,9 @@ body {
   font-size: 14px;
 }
 
-/* Incidents page specific styling */
-.incidents-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
 
-.incidents-content .incident-row {
-  grid-template-columns: 1fr 1fr 1fr 80px 100px 140px;
-}
 
-/* Legacy Incidents Table */
-.incidents-legacy-content {
-  padding: 0;
-}
 
-.incidents-legacy-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.legacy-table-header {
-  display: grid;
-  grid-template-columns: 60px 150px 180px 120px 120px 150px 90px;
-  background: #e9ecef;
-  border: 1px solid #808080;
-  border-bottom: 2px solid #808080;
-  font-weight: bold;
-  font-size: 11px;
-}
-
-.legacy-table-header > div {
-  padding: 8px 12px;
-  border-right: 1px solid #808080;
-  text-align: left;
-}
-
-.legacy-table-header > div:last-child {
-  border-right: none;
-  text-align: right;
-}
-
-.legacy-table-body {
-  max-height: 600px;
-  overflow-y: auto;
-  border: 1px solid #808080;
-  border-top: none;
-}
-
-.legacy-incident-row {
-  display: grid;
-  grid-template-columns: 60px 150px 180px 120px 120px 150px 90px;
-  border-bottom: 1px solid #d0d0d0;
-  cursor: pointer;
-  transition: background-color 0.1s ease;
-  min-height: 32px;
-  align-items: center;
-}
-
-.legacy-incident-row:nth-child(even) {
-  background: #f8f9fa;
-}
 
 .legacy-incident-row:nth-child(odd) {
   background: white;
@@ -1035,23 +974,7 @@ body {
   background: #6f42c1;
 }
 
-/* Delete All Incidents Button */
-.delete-all-incidents-btn {
-  background: transparent;
-  border: 2px solid #dc3545;
-  color: #dc3545;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
 
-.delete-all-incidents-btn:hover {
-  background: #dc3545;
-  color: white;
-}
 
 /* Delete Confirmation Modal */
 .delete-confirm-modal-overlay {
