@@ -5,12 +5,8 @@ import { Basisteam } from '../../../shared/basisteam-schema';
 // Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
 
-// Dynamic import for React Leaflet components to ensure client-side rendering
-let MapContainer: any;
-let TileLayer: any;
-let Marker: any;
-let Popup: any;
-let Polygon: any;
+// Import React Leaflet components directly
+import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 
 // Fix for default markers in React Leaflet
 try {
@@ -235,31 +231,10 @@ const KaartPage: React.FC = () => {
     }
   }, []);
 
-  // Load React Leaflet components dynamically
+  // Load PDOK capabilities on mount
   useEffect(() => {
-    const loadMapComponents = async () => {
-      try {
-        console.log('🗺️ Loading React Leaflet components...');
-        const reactLeaflet = await import('react-leaflet');
-        MapContainer = reactLeaflet.MapContainer;
-        TileLayer = reactLeaflet.TileLayer;
-        Marker = reactLeaflet.Marker;
-        Popup = reactLeaflet.Popup;
-        Polygon = reactLeaflet.Polygon;
-        setMapLoaded(true);
-        console.log('✅ React Leaflet components loaded');
-        
-        // Load PDOK capabilities after map components are loaded
-        loadPdokCapabilities();
-      } catch (error) {
-        console.error('❌ Error loading React Leaflet components:', error);
-        setError('Fout bij laden kaartcomponenten');
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      loadMapComponents();
-    }
+    setMapLoaded(true);
+    loadPdokCapabilities();
   }, [loadPdokCapabilities]);
 
   // Generate coordinates for Rotterdam area based on incident data
