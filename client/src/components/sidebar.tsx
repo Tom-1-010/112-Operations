@@ -10,7 +10,6 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
   const menuItems = [
     { id: 'dashboard', icon: 'speedometer2', label: 'Dashboard' },
-    { id: 'units', icon: 'truck', label: 'Eenheden' },
     { id: 'gms-eenheden', icon: 'people', label: 'GMS-eenheden' },
     { id: 'gms2', icon: 'window', label: 'GMS2' },
     { id: 'intake', icon: 'telephone', label: 'Intake' },
