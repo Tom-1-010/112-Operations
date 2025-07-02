@@ -355,6 +355,26 @@ const KaartPage: React.FC = () => {
     });
   };
 
+  // Simulate realistic status distribution for active units
+  const assignRealisticStatus = (unit: any, index: number): string => {
+    // If unit has status 5 (afmelden), keep it as is
+    if (unit.status.includes('5 - Afmelden')) {
+      return unit.status;
+    }
+    
+    // For active units (status 1), distribute realistic statuses
+    const random = (index * 7 + unit.id * 13) % 100; // Deterministic but varied
+    
+    if (random < 60) return '1 - Beschikbaar/vrij';        // 60% available
+    if (random < 75) return '2 - Surveilleren';            // 15% patrolling  
+    if (random < 85) return '3 - Onderweg naar incident';  // 10% responding
+    if (random < 90) return '4 - Ter plaatse';             // 5% at scene
+    if (random < 94) return '6 - Terug naar post';         // 4% returning
+    if (random < 97) return '7 - Beschikbaar op post';     // 3% at station
+    if (random < 99) return '8 - Uitruk';                  // 2% emergency response
+    return '9 - Dienst uit';                               // 1% off duty
+  };
+
   // Load police units from database
   const loadPoliceUnits = useCallback(async () => {
     try {
@@ -369,13 +389,17 @@ const KaartPage: React.FC = () => {
       console.log('✅ Fetched police units for map:', rawUnits.length);
 
       // Convert raw units to map-ready format with movement tracking
-      const processedUnits: PoliceUnit[] = rawUnits.map((unit: any) => {
+      const processedUnits: PoliceUnit[] = rawUnits.map((unit: any, index: number) => {
         const currentPosition = unit.locatie 
           ? JSON.parse(unit.locatie) 
           : generateInitialUnitPosition(unit);
+        
+        // Assign realistic status for simulation
+        const realisticStatus = assignRealisticStatus(unit, index);
 
         return {
           ...unit,
+          status: realisticStatus, // Override with realistic status
           currentPosition,
           movementSpeed: getMovementSpeed(unit),
           lastUpdateTime: Date.now(),
@@ -681,8 +705,10 @@ const KaartPage: React.FC = () => {
             // Check for noodoproep (N)
             const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
             
-            // Debug all units to see what's happening
-            console.log(`🔍 Unit ${unit.roepnummer}: Status="${unit.status}", StatusNum=${statusNum}, IsNoodoproep=${isNoodoproep}`);
+            // Debug only first few units to avoid log spam
+            if (unit.id <= 5) {
+              console.log(`🔍 Unit ${unit.roepnummer}: Status="${unit.status}", StatusNum=${statusNum}, IsNoodoproep=${isNoodoproep}`);
+            }
             
             // Only show units with allowed statuses: 1,2,3,4,6,7,8,9 or N (noodoproep)
             // Explicitly exclude status 5 (afmelden)
@@ -690,18 +716,14 @@ const KaartPage: React.FC = () => {
             
             // Hide status 5 (afmelden) units completely
             if (statusNum === 5) {
-              console.log(`❌ Unit ${unit.roepnummer} HIDDEN - Status 5 (afmelden) not allowed`);
               return null;
             }
             
             const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
 
             if (!shouldShow) {
-              console.log(`❌ Unit ${unit.roepnummer} HIDDEN - Status ${statusNum} not in allowed list [${allowedStatuses.join(', ')}] and not noodoproep`);
               return null;
             }
-            
-            console.log(`✅ Unit ${unit.roepnummer} VISIBLE - Status ${statusNum} is allowed`);
 
             return (
               <Marker
@@ -888,7 +910,7 @@ const KaartPage: React.FC = () => {
             }).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
             {newIncidentIds.size > 0 && (
-              <p className="text-red-600 font-bold">🚨 {newIncidentIds.size} nieuwe melding(en)</p>
+              <p className="text-red-600 font-bold">🚨 {Array.from(newIncidentIds).length} nieuwe melding(en)</p>
             )}
           </div>
         </div>
