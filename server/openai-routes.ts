@@ -6,13 +6,27 @@ const router = express.Router();
 
 // Initialize OpenAI client only if API key is available
 let openai: OpenAI | null = null;
+let openrouter: OpenAI | null = null;
 
+// OpenAI setup
 if (process.env.OPENAI_API_KEY) {
   openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
   });
+  console.log('✅ OpenAI API configured');
 } else {
-  console.log('⚠️ OpenAI API key not found. OpenAI routes will return errors.');
+  console.log('⚠️ OpenAI API key not found (OPENAI_API_KEY)');
+}
+
+// OpenRouter setup
+if (process.env.OPENROUTER_API_KEY) {
+  openrouter = new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1',
+  });
+  console.log('✅ OpenRouter API configured');
+} else {
+  console.log('⚠️ OpenRouter API key not found (OPENROUTER_API_KEY)');
 }
 
 // Enhanced Dutch emergency caller prompt
@@ -40,11 +54,17 @@ router.post('/chat', async (req, res) => {
   try {
     const { message, conversationHistory = [], scenarioType = 'algemeen' } = req.body;
 
-    if (!openai) {
+    // Determine which AI service to use (prioritize OpenRouter if available)
+    const aiClient = openrouter || openai;
+    const aiService = openrouter ? 'OpenRouter' : 'OpenAI';
+
+    if (!aiClient) {
       return res.status(500).json({ 
-        error: 'OpenAI API key not configured. Set OPENAI_API_KEY environment variable.' 
+        error: 'Geen AI API key geconfigureerd. Stel OPENROUTER_API_KEY of OPENAI_API_KEY in als environment variable.' 
       });
     }
+
+    console.log(`🤖 Using ${aiService} for 112 conversation - Scenario: ${scenarioType}`);
 
     // Build conversation context
     const messages = [
@@ -65,8 +85,11 @@ Reageer als een Nederlandse burger die 112 belt voor deze specifieke situatie.`
       }
     ];
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+    // Select appropriate model based on service
+    const model = openrouter ? 'anthropic/claude-3.5-sonnet' : 'gpt-4';
+    
+    const completion = await aiClient.chat.completions.create({
+      model: model,
       messages: messages,
       max_tokens: 150, // Verkort voor snellere response
       temperature: 0.8,
@@ -77,9 +100,10 @@ Reageer als een Nederlandse burger die 112 belt voor deze specifieke situatie.`
 
     res.json({ response: aiResponse });
   } catch (error) {
-    console.error('OpenAI API error:', error);
+    const service = openrouter ? 'OpenRouter' : 'OpenAI';
+    console.error(`${service} API error:`, error);
     res.status(500).json({ 
-      error: 'Er ging iets mis met de AI response. Probeer opnieuw.' 
+      error: `Er ging iets mis met de ${service} AI response. Probeer opnieuw.` 
     });
   }
 });
