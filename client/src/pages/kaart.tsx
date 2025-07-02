@@ -14,8 +14,9 @@ let Polygon: any;
 
 // Fix for default markers in React Leaflet
 try {
-  if (L.Icon.Default.prototype._getIconUrl) {
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
+  const DefaultIcon = L.Icon.Default as any;
+  if (DefaultIcon.prototype._getIconUrl) {
+    delete DefaultIcon.prototype._getIconUrl;
   }
 
   L.Icon.Default.mergeOptions({
@@ -573,7 +574,7 @@ const KaartPage: React.FC = () => {
 
         if (newIds.length > 0) {
           console.log('🚨 New incidents detected:', newIds);
-          setNewIncidentIds(prev => new Set([...prev, ...newIds]));
+          setNewIncidentIds(prev => new Set([...Array.from(prev), ...newIds]));
 
           // Clear new incident highlighting after 10 seconds
           setTimeout(() => {
@@ -683,7 +684,7 @@ const KaartPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center text-red-600">
-          <p className="text-lg mb-4">Er is een fout opgetreden:</</p>
+          <p className="text-lg mb-4">Er is een fout opgetreden:</p>
           <p>{error}</p>
         </div>
       </div>
@@ -798,11 +799,40 @@ const KaartPage: React.FC = () => {
           {showBasisteams && basisteams.map((basisteam) => {
             // If team has multiple polygons per gemeente, show them separately
             if (basisteam.polygons && Object.keys(basisteam.polygons).length > 0) {
-              return Object.entries(basisteam.polygons).map(([gemeente, polygonCoords]) => (
-                polygonCoords && polygonCoords.length > 0 && (
+              return Object.entries(basisteam.polygons).map(([gemeente, polygonCoords]) => {
+                if (polygonCoords && polygonCoords.length > 0) {
+                  return (
+                    <Polygon
+                      key={`basisteam-${basisteam.id}-${gemeente}`}
+                      positions={polygonCoords}
+                      pathOptions={{
+                        fillColor: basisteam.actief ? '#3388ff' : '#888888',
+                        fillOpacity: 0.1,
+                        color: basisteam.actief ? '#3388ff' : '#888888',
+                        weight: 2,
+                        opacity: 0.6,
+                      }}
+                    >
+                      <Popup>
+                        <div className="p-2">
+                          <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
+                          <p className="text-xs mb-1"><strong>Gemeente:</strong> {gemeente}</p>
+                          <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
+                          <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
+                        </div>
+                      </Popup>
+                    </Polygon>
+                  );
+                }
+                return null;
+              });
+            } else {
+              // Fallback to single polygon
+              if (basisteam.polygon && basisteam.polygon.length > 0) {
+                return (
                   <Polygon
-                    key={`basisteam-${basisteam.id}-${gemeente}`}
-                    positions={polygonCoords}
+                    key={`basisteam-${basisteam.id}`}
+                    positions={basisteam.polygon}
                     pathOptions={{
                       fillColor: basisteam.actief ? '#3388ff' : '#888888',
                       fillOpacity: 0.1,
@@ -814,40 +844,17 @@ const KaartPage: React.FC = () => {
                     <Popup>
                       <div className="p-2">
                         <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
-                        <p className="text-xs mb-1"><strong>Gemeente:</strong> {gemeente}</p>
                         <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
                         <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
+                        {basisteam.gemeentes && basisteam.gemeentes.length > 0 && (
+                          <p className="text-xs"><strong>Gemeentes:</strong> {basisteam.gemeentes.join(', ')}</p>
+                        )}
                       </div>
                     </Popup>
                   </Polygon>
-                )
-              ));
-            } else {
-              // Fallback to single polygon
-              return basisteam.polygon && basisteam.polygon.length > 0 && (
-                <Polygon
-                  key={`basisteam-${basisteam.id}`}
-                  positions={basisteam.polygon}
-                  pathOptions={{
-                    fillColor: basisteam.actief ? '#3388ff' : '#888888',
-                    fillOpacity: 0.1,
-                    color: basisteam.actief ? '#3388ff' : '#888888',
-                    weight: 2,
-                    opacity: 0.6,
-                  }}
-                >
-                  <Popup>
-                    <div className="p-2">
-                      <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
-                      <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
-                      <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
-                      {basisteam.gemeentes && basisteam.gemeentes.length > 0 && (
-                        <p className="text-xs"><strong>Gemeentes:</strong> {basisteam.gemeentes.join(', ')}</p>
-                      )}
-                    </div>
-                  </Popup>
-                </Polygon>
-              );
+                );
+              }
+              return null;
             }
           }).flat()}
         </MapContainer>
