@@ -920,6 +920,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PDOK WFS gemeente boundaries endpoint
+  app.get('/api/pdok/gemeente-boundaries/:gemeente', async (req, res) => {
+    try {
+      const { gemeente } = req.params;
+      console.log(`[PDOK WFS] Fetching boundaries for gemeente: ${gemeente}`);
+
+      const baseUrl = 'https://service.pdok.nl/kadaster/bestuurlijkegebieden/wfs/v1_0';
+      const params = new URLSearchParams({
+        service: 'WFS',
+        version: '2.0.0',
+        request: 'GetFeature',
+        typeName: 'bestuurlijkegebieden:gemeenten',
+        outputFormat: 'application/json',
+        cql_filter: `gemeentenaam ILIKE '%${gemeente}%'`
+      });
+
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[PDOK WFS] URL: ${url}`);
+
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'GMS2-Application/1.0',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`[PDOK WFS] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `PDOK WFS API returned status ${response.status}` });
+      }
+
+      const data = await response.json();
+      
+      if (!data.features || data.features.length === 0) {
+        return res.status(404).json({ error: `Gemeente '${gemeente}' niet gevonden` });
+      }
+
+      // Transform geometry to simple polygon coordinates
+      const feature = data.features[0];
+      const geometry = feature.geometry;
+      
+      let polygon: [number, number][] = [];
+      
+      if (geometry.type === 'Polygon') {
+        // Simple polygon
+        polygon = geometry.coordinates[0].map((coord: number[]) => [coord[1], coord[0]] as [number, number]);
+      } else if (geometry.type === 'MultiPolygon') {
+        // Take the largest polygon from multipolygon
+        let largestPolygon = geometry.coordinates[0][0];
+        let maxArea = 0;
+        
+        for (const poly of geometry.coordinates) {
+          const coords = poly[0];
+          if (coords.length > largestPolygon.length) {
+            largestPolygon = coords;
+          }
+        }
+        
+        polygon = largestPolygon.map((coord: number[]) => [coord[1], coord[0]] as [number, number]);
+      }
+
+      console.log(`[PDOK WFS] Found boundary for ${gemeente} with ${polygon.length} points`);
+
+      res.json({
+        gemeente: feature.properties.gemeentenaam,
+        polygon: polygon,
+        properties: feature.properties
+      });
+
+    } catch (error) {
+      console.error('[PDOK WFS] Error fetching gemeente boundaries:', error);
+      res.status(500).json({ error: 'Failed to fetch gemeente boundaries from PDOK WFS API' });
+    }
+  });
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

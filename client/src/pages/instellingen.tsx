@@ -81,6 +81,8 @@ const InstellingenPage: React.FC = () => {
 
   const [pdokTestResult, setPdokTestResult] = useState<string>('');
   const [isTestingPdok, setIsTestingPdok] = useState(false);
+  const [isLoadingPolygons, setIsLoadingPolygons] = useState(false);
+  const [polygonLoadResult, setPolygonLoadResult] = useState<string>('');
 
   const testPdokConnection = async () => {
     setIsTestingPdok(true);
@@ -109,6 +111,96 @@ const InstellingenPage: React.FC = () => {
       setPdokTestResult(`❌ PDOK WMS API test gefaald: ${error}`);
     } finally {
       setIsTestingPdok(false);
+    }
+  };
+
+  // Function to fetch gemeente boundaries from PDOK WFS
+  const fetchGemeentePolygons = async (gemeenteNamen: string[]) => {
+    if (!gemeenteNamen || gemeenteNamen.length === 0) {
+      setPolygonLoadResult('❌ Geen gemeenten opgegeven');
+      return {};
+    }
+
+    setIsLoadingPolygons(true);
+    setPolygonLoadResult('🔄 Laden van gemeentegrenzen via PDOK WFS...');
+
+    try {
+      const polygons: { [gemeente: string]: [number, number][] } = {};
+      let loadedCount = 0;
+      let failedCount = 0;
+      
+      for (const gemeente of gemeenteNamen) {
+        if (!gemeente.trim()) continue;
+        
+        console.log(`📍 Fetching WFS boundary for gemeente: ${gemeente}`);
+        
+        try {
+          // Use PDOK WFS to get actual gemeente boundaries
+          const boundaryResponse = await fetch(`/api/pdok/gemeente-boundaries/${encodeURIComponent(gemeente.trim())}`);
+          
+          if (!boundaryResponse.ok) {
+            console.warn(`⚠️ Could not find boundary for ${gemeente}: ${boundaryResponse.status}`);
+            failedCount++;
+            continue;
+          }
+          
+          const boundaryData = await boundaryResponse.json();
+          
+          if (boundaryData.polygon && boundaryData.polygon.length > 0) {
+            polygons[boundaryData.gemeente] = boundaryData.polygon;
+            loadedCount++;
+            console.log(`✅ Loaded ${boundaryData.polygon.length} points for ${boundaryData.gemeente}`);
+          } else {
+            console.warn(`⚠️ No polygon data for ${gemeente}`);
+            failedCount++;
+          }
+          
+        } catch (error) {
+          console.error(`❌ Error fetching boundary for ${gemeente}:`, error);
+          failedCount++;
+        }
+      }
+      
+      if (loadedCount > 0) {
+        setPolygonLoadResult(`✅ ${loadedCount} gemeentegrenzen geladen via PDOK WFS${failedCount > 0 ? `, ${failedCount} mislukt` : ''}`);
+      } else {
+        setPolygonLoadResult(`❌ Geen gemeentegrenzen kunnen laden. Controleer gemeentenamen.`);
+      }
+      
+      return polygons;
+      
+    } catch (error) {
+      console.error('❌ Error fetching gemeente polygons:', error);
+      setPolygonLoadResult(`❌ Fout bij laden gemeentegrenzen: ${error}`);
+      return {};
+    } finally {
+      setIsLoadingPolygons(false);
+    }
+  };
+
+  // Function to load polygons for current team
+  const loadPolygonsForCurrentTeam = async () => {
+    if (!selectedTeam || !editForm.gemeentes) {
+      setPolygonLoadResult('❌ Geen team geselecteerd of gemeenten opgegeven');
+      return;
+    }
+
+    const polygons = await fetchGemeentePolygons(editForm.gemeentes);
+    
+    if (Object.keys(polygons).length > 0) {
+      setEditForm({
+        ...editForm,
+        polygons: polygons
+      });
+      
+      // Also update the main polygon with the first gemeente's polygon
+      const firstPolygon = Object.values(polygons)[0];
+      if (firstPolygon) {
+        setEditForm(prev => ({
+          ...prev,
+          polygon: firstPolygon
+        }));
+      }
     }
   };
 
@@ -244,6 +336,20 @@ const InstellingenPage: React.FC = () => {
                       placeholder="Rotterdam, Barendrecht"
                       className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                     />
+                    {isEditing && (
+                      <div className="mt-2">
+                        <button
+                          onClick={loadPolygonsForCurrentTeam}
+                          disabled={isLoadingPolygons || !editForm.gemeentes?.length}
+                          className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isLoadingPolygons ? 'Laden...' : '🗺️ Laad Gemeentegrenzen'}
+                        </button>
+                        {polygonLoadResult && (
+                          <p className="text-xs mt-1 text-gray-600">{polygonLoadResult}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -312,6 +418,20 @@ const InstellingenPage: React.FC = () => {
                           disabled={!isEditing}
                           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                         />
+                      </div>
+                    </div>
+                  </div>
+
+                  {(editForm.polygons && Object.keys(editForm.polygons).length > 0) && (
+                    <div className="border-t pt-4">
+                      <h3 className="text-lg font-medium text-gray-900 mb-3">Geladen Gemeentegrenzen</h3>
+                      <div className="space-y-2">
+                        {Object.entries(editForm.polygons).map(([gemeente, polygon]) => (
+                          <div key={gemeente} className="flex justify-between items-center text-sm">
+                            <span className="text-gray-700">{gemeente}</span>
+                            <span className="text-gray-500">{polygon.length} punten</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
