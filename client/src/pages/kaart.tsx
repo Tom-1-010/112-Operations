@@ -686,13 +686,14 @@ const KaartPage: React.FC = () => {
               console.log(`🔍 RT 12.08 Debug - Status: "${unit.status}", StatusNum: ${statusNum}, IsNoodoproep: ${isNoodoproep}`);
             }
             
-            // Only show units with status 1,2,3,4,6,7,8,9 or N (noodoproep)
-            // Explicitly exclude status 5
-            const shouldShow = statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
+            // Only show units with allowed statuses: 1,2,3,4,6,7,8,9 or N (noodoproep)
+            // Explicitly exclude status 5 (afmelden)
+            const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+            const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
 
             if (!shouldShow) {
               if (unit.roepnummer === 'RT 12.08') {
-                console.log(`❌ RT 12.08 Hidden - Status ${statusNum} not allowed`);
+                console.log(`❌ RT 12.08 Hidden - Status ${statusNum} not in allowed list [${allowedStatuses.join(', ')}] or noodoproep`);
               }
               return null;
             }
@@ -848,7 +849,8 @@ const KaartPage: React.FC = () => {
                 const statusMatch = unit.status.match(/^(\d+)/);
                 const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
                 const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-                return statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
+                const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+                return isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
               }).length})</label>
             </div>
           </div>
@@ -862,13 +864,15 @@ const KaartPage: React.FC = () => {
               const statusMatch = unit.status.match(/^(\d+)/);
               const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
               const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-              return statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
+              const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+              return isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
             }).length}</p>
             <p>In beweging: {policeUnits.filter(u => {
               const statusMatch = u.status.match(/^(\d+)/);
               const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
               const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
-              const shouldShow = statusNum !== 5 && ((statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep);
+              const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+              const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
               return shouldShow && u.isMoving;
             }).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
