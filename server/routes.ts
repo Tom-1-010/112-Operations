@@ -777,7 +777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[PDOK WMS] Requesting ${layers} with bbox: ${bbox}`);
 
-      const baseUrl = 'https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0';
+      const baseUrl = 'https://service.pdok.nl/kadaster/bestaster/bestuurlijkegebieden/wms/v1_0';
       const params = new URLSearchParams({
         service: service as string,
         version: version as string,
@@ -952,7 +952,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const data = await response.json();
-      
+
       if (!data.features || data.features.length === 0) {
         return res.status(404).json({ error: `Gemeente '${gemeente}' niet gevonden` });
       }
@@ -960,9 +960,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Transform geometry to simple polygon coordinates
       const feature = data.features[0];
       const geometry = feature.geometry;
-      
+
       let polygon: [number, number][] = [];
-      
+
       if (geometry.type === 'Polygon') {
         // Simple polygon
         polygon = geometry.coordinates[0].map((coord: number[]) => [coord[1], coord[0]] as [number, number]);
@@ -970,14 +970,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Take the largest polygon from multipolygon
         let largestPolygon = geometry.coordinates[0][0];
         let maxArea = 0;
-        
+
         for (const poly of geometry.coordinates) {
           const coords = poly[0];
           if (coords.length > largestPolygon.length) {
             largestPolygon = coords;
           }
         }
-        
+
         polygon = largestPolygon.map((coord: number[]) => [coord[1], coord[0]] as [number, number]);
       }
 
@@ -1003,4 +1003,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   return httpServer;
+}
+import { registerRoutes as registerApiRoutes } from "./routes";
+import openaiRoutes from "./openai-routes";
+
+export function registerRoutes(app: Express) {
+  app.use('/api/openai', openaiRoutes);
+  registerApiRoutes(app);
 }

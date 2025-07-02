@@ -1842,8 +1842,38 @@ export default function Dashboard() {
     console.log("🎭 simulateCallerMessage called but scenario already generated");
   };
 
-  // Enhanced 112 emergency caller AI - realistic Dutch civilian responses
-  const generate112Response = (operatorMessage: string, conversationHistory: any[] = []) => {
+  // ChatGPT-powered 112 emergency caller responses
+  const generate112Response = async (operatorMessage: string, conversationHistory: any[] = []) => {
+    try {
+      const scenarioType = currentConversation?.scenarioType || 'algemeen';
+      
+      const response = await fetch('/api/openai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: operatorMessage,
+          conversationHistory: conversationHistory,
+          scenarioType: scenarioType
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('ChatGPT API request failed');
+      }
+
+      const data = await response.json();
+      return data.response;
+    } catch (error) {
+      console.error('ChatGPT integration error:', error);
+      // Fallback to built-in responses
+      return generateFallback112Response(operatorMessage, conversationHistory);
+    }
+  };
+
+  // Fallback function for when ChatGPT is unavailable
+  const generateFallback112Response = (operatorMessage: string, conversationHistory: any[] = []) => {
     const message = operatorMessage.toLowerCase();
     
     // Get current scenario context
@@ -2228,20 +2258,36 @@ export default function Dashboard() {
     // Handle responses based on conversation type and current tab
     if (currentConversation?.type === "112-gesprek" || 
         (currentConversation?.isEmergencyCall && activeChatTab === "burgers")) {
-      // This is a 112 emergency call - generate realistic caller response
-      setTimeout(() => {
-        const callerResponse = generate112Response(message, chatMessages);
-        const responseMessage = {
-          id: Date.now() + 1,
-          sender: `Melder - ${currentConversation.callerInfo}`,
-          content: callerResponse,
-          timestamp: new Date().toLocaleTimeString("nl-NL", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          type: "incoming",
-        };
-        setChatMessages((prev) => [...prev, responseMessage]);
+      // This is a 112 emergency call - generate ChatGPT-powered response
+      setTimeout(async () => {
+        try {
+          const callerResponse = await generate112Response(message, chatMessages);
+          const responseMessage = {
+            id: Date.now() + 1,
+            sender: `Melder - ${currentConversation.callerInfo}`,
+            content: callerResponse,
+            timestamp: new Date().toLocaleTimeString("nl-NL", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            type: "incoming",
+          };
+          setChatMessages((prev) => [...prev, responseMessage]);
+        } catch (error) {
+          console.error('Error generating ChatGPT response:', error);
+          // Show fallback message
+          const fallbackMessage = {
+            id: Date.now() + 1,
+            sender: `Melder - ${currentConversation.callerInfo}`,
+            content: "Sorry, ik kan u niet goed verstaan... kunt u dat herhalen?",
+            timestamp: new Date().toLocaleTimeString("nl-NL", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            type: "incoming",
+          };
+          setChatMessages((prev) => [...prev, fallbackMessage]);
+        }
       }, 800 + Math.random() * 1500); // Quick response for 112 calls
     } else if (currentConversation?.type === "collega-gesprek" && 
                currentConversation?.functie && 
