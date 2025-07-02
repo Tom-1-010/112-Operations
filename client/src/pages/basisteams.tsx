@@ -91,7 +91,7 @@ const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
     [51.8930, 4.3900],
     [51.8950, 4.3800]
   ],
-  
+
   // Maassluis: Correcte gemeentegrens, compacte vorm rond centrum
   'Maassluis': [
     [51.9350, 4.2400],
@@ -285,7 +285,7 @@ const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
     [51.8350, 4.1200],
     [51.8350, 3.9200]
   ],
-  
+
   // Plaatsnamen binnen gemeentes
   'Poortugaal': [
     [51.8550, 4.4650],
@@ -431,7 +431,7 @@ const ROTTERDAM_AREAS: Record<string, [number, number][]> = {
     [51.8350, 3.9200],
     [51.8650, 3.9200],
     [51.8650, 4.1200],
-    [51.8350, 4.1200],
+    [51.8350, 4.12 ট্রংe00],
     [51.8350, 3.9200]
   ]
 };
@@ -477,7 +477,7 @@ export default function BasisteamsPage() {
   const [isPolygonEditorOpen, setIsPolygonEditorOpen] = useState(false);
   const [editingPolygon, setEditingPolygon] = useState<[number, number][]>([]);
   const [polygonEditMode, setPolygonEditMode] = useState<'draw' | 'edit'>('draw');
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -571,7 +571,7 @@ export default function BasisteamsPage() {
       });
     } catch (error) {
       toast({
-        title: "Fout",
+title: "Fout",
         description: "Kon polygoon niet opslaan.",
         variant: "destructive",
       });
@@ -673,7 +673,7 @@ export default function BasisteamsPage() {
                     <MapPin className="w-4 h-4 mr-2" />
                     {basisteam.adres}
                   </div>
-                  
+
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Users className="w-4 h-4 mr-2" />
                     {unitCount} eenheden ({activeUnits} actief)
@@ -737,7 +737,7 @@ export default function BasisteamsPage() {
               {selectedBasisteam ? 'Basisteam details en instellingen' : 'Maak een nieuw basisteam aan'}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedBasisteam && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -843,7 +843,7 @@ export default function BasisteamsPage() {
               Wijzig de gegevens van {editingBasisteam?.naam}
             </DialogDescription>
           </DialogHeader>
-          
+
           {editingBasisteam && (
             <EditBasisteamForm 
               basisteam={editingBasisteam}
@@ -903,7 +903,7 @@ function EditBasisteamForm({
   const generatePolygonFromWijken = () => {
     const wijken = formData.gemeentes.split(',').map(w => w.trim());
     const newPolygons: { [gemeente: string]: [number, number][] } = {};
-    
+
     wijken.forEach(wijk => {
       if (ROTTERDAM_AREAS[wijk]) {
         newPolygons[wijk] = ROTTERDAM_AREAS[wijk] as [number, number][];
@@ -969,30 +969,6 @@ function EditBasisteamForm({
           placeholder="Hoek van Holland, Alexandrium, Centrum, Delfshaven, Charlois, Feijenoord"
           className="min-h-[100px]"
         />
-        <div className="text-xs text-gray-500">
-          💡 Snelkeuze gemeentes: 
-          <div className="flex flex-wrap gap-1 mt-1">
-            {['Rotterdam', 'Schiedam', 'Vlaardingen', 'Maassluis', 'Barendrecht', 'Ridderkerk', 'Capelle aan den IJssel', 'Albrandswaard', 'Spijkenisse', 'Krimpen aan den IJssel', 'Lansingerland', 'Nissewaard', 'Goeree-Overflakkee', 'Voorne aan Zee'].map(gemeente => (
-              <button
-                key={gemeente}
-                type="button"
-                onClick={() => {
-                  const current = formData.gemeentes;
-                  const toAdd = current ? `, ${gemeente}` : gemeente;
-                  if (!current.includes(gemeente)) {
-                    setFormData(prev => ({ 
-                      ...prev, 
-                      gemeentes: current + toAdd
-                    }));
-                  }
-                }}
-                className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded border"
-              >
-                {gemeente}
-              </button>
-            ))}
-          </div>
-        </div>
         <p className="text-sm text-muted-foreground">
           Voer de wijken en stadsdelen in die onder dit basisteam vallen. Klik op de knopjes hierboven om snel gemeentes toe te voegen.
         </p>
@@ -1028,7 +1004,7 @@ function EditBasisteamForm({
                   />
                 )
               ))}
-              
+
               {/* Fallback to single polygon for backward compatibility */}
               {(!formData.polygons || Object.keys(formData.polygons).length === 0) && 
                formData.polygon && formData.polygon.length > 0 && (
@@ -1087,40 +1063,40 @@ function EditBasisteamForm({
                     Centrum, Delfshaven, Charlois, Feijenoord, Noord, Alexandrium, 
                     Kralingen-Crooswijk, Overschie, Pernis, Hoek van Holland
                   </div>
-                  
+
                   <div className="text-gray-700 font-medium">Albrandswaard:</div>
                   <div className="text-gray-500 text-xs pl-2">Poortugaal, Rhoon</div>
-                  
+
                   <div className="text-gray-700 font-medium">Barendrecht:</div>
                   <div className="text-gray-500 text-xs pl-2">Barendrecht, Smitshoek</div>
-                  
+
                   <div className="text-gray-700 font-medium">Capelle aan den IJssel:</div>
                   <div className="text-gray-500 text-xs pl-2">Capelle aan den IJssel, Capelle-West</div>
-                  
+
                   <div className="text-gray-700 font-medium">Goeree-Overflakkee:</div>
                   <div className="text-gray-500 text-xs pl-2">Middelharnis, Sommelsdijk, Dirksland, Stellendam, Goedereede</div>
-                  
+
                   <div className="text-gray-700 font-medium">Krimpen aan den IJssel:</div>
                   <div className="text-gray-500 text-xs pl-2">Krimpen aan den IJssel, Stormpolder</div>
-                  
+
                   <div className="text-gray-700 font-medium">Lansingerland:</div>
                   <div className="text-gray-500 text-xs pl-2">Zoetermeer, Bleiswijk, Bergschenhoek</div>
-                  
+
                   <div className="text-gray-700 font-medium">Maassluis:</div>
                   <div className="text-gray-500 text-xs pl-2">Maassluis</div>
-                  
+
                   <div className="text-gray-700 font-medium">Nissewaard:</div>
                   <div className="text-gray-500 text-xs pl-2">Spijkenisse, Bernisse, Geervliet</div>
-                  
+
                   <div className="text-gray-700 font-medium">Ridderkerk:</div>
                   <div className="text-gray-500 text-xs pl-2">Ridderkerk, Bolnes, Slikkerveer</div>
-                  
+
                   <div className="text-gray-700 font-medium">Schiedam:</div>
                   <div className="text-gray-500 text-xs pl-2">Schiedam, Kethel</div>
-                  
+
                   <div className="text-gray-700 font-medium">Vlaardingen:</div>
                   <div className="text-gray-500 text-xs pl-2">Vlaardingen, Vlaardingen Noord, Vlaardingen Centrum</div>
-                  
+
                   <div className="text-gray-700 font-medium">Voorne aan Zee:</div>
                   <div className="text-gray-500 text-xs pl-2">Rockanje, Oostvoorne, Tinte</div>
                 </div>
@@ -1135,7 +1111,7 @@ function EditBasisteamForm({
 
       <div className="space-y-4">
         <Label className="text-base font-semibold">Instellingen</Label>
-        
+
         <div className="flex items-center space-x-2">
           <Switch
             id="actief"
@@ -1224,7 +1200,7 @@ function PolygonEditor({
   const addPoint = () => {
     const lat = parseFloat(currentPoint.lat);
     const lng = parseFloat(currentPoint.lng);
-    
+
     if (isNaN(lat) || isNaN(lng)) {
       return;
     }
@@ -1338,7 +1314,7 @@ function PolygonEditor({
                 {polygon.length >= 3 ? "Geldig" : "Ongeldig"}
               </Badge>
             </div>
-            
+
             <div className="max-h-60 overflow-y-auto space-y-2">
               {polygon.map((point, index) => (
                 <div key={index} className="flex items-center justify-between p-2 border rounded">
@@ -1356,7 +1332,7 @@ function PolygonEditor({
                   </Button>
                 </div>
               ))}
-              
+
               {polygon.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   Nog geen punten toegevoegd
