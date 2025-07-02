@@ -185,9 +185,12 @@ const InstellingenPage: React.FC = () => {
       return;
     }
 
+    console.log(`🗺️ Loading official boundaries for gemeentes: ${editForm.gemeentes.join(', ')}`);
     const polygons = await fetchGemeentePolygons(editForm.gemeentes);
     
     if (Object.keys(polygons).length > 0) {
+      console.log(`✅ Successfully loaded ${Object.keys(polygons).length} gemeente boundaries from PDOK`);
+      
       setEditForm({
         ...editForm,
         polygons: polygons
@@ -200,7 +203,12 @@ const InstellingenPage: React.FC = () => {
           ...prev,
           polygon: firstPolygon
         }));
+        console.log(`🎯 Set main polygon to ${Object.keys(polygons)[0]} with ${firstPolygon.length} coordinate points`);
       }
+      
+      setPolygonLoadResult(`✅ Officiële gemeentegrenzen geladen voor: ${Object.keys(polygons).join(', ')}`);
+    } else {
+      setPolygonLoadResult('❌ Geen gemeentegrenzen kunnen laden via PDOK WFS API');
     }
   };
 
@@ -337,13 +345,28 @@ const InstellingenPage: React.FC = () => {
                       className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                     />
                     {isEditing && (
-                      <div className="mt-2">
+                      <div className="mt-2 space-y-2">
                         <button
                           onClick={loadPolygonsForCurrentTeam}
                           disabled={isLoadingPolygons || !editForm.gemeentes?.length}
                           className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isLoadingPolygons ? 'Laden...' : '🗺️ Laad Gemeentegrenzen'}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setEditForm({
+                              ...editForm,
+                              gemeentes: ['Maassluis']
+                            });
+                            setTimeout(() => {
+                              loadPolygonsForCurrentTeam();
+                            }, 100);
+                          }}
+                          disabled={isLoadingPolygons}
+                          className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed ml-2"
+                        >
+                          🧪 Test Maassluis
                         </button>
                         {polygonLoadResult && (
                           <p className="text-xs mt-1 text-gray-600">{polygonLoadResult}</p>
