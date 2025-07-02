@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Polygon, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -77,6 +76,39 @@ const InstellingenPage: React.FC = () => {
         setSelectedTeam(null);
         setEditForm({});
       }
+    }
+  };
+
+  const [pdokTestResult, setPdokTestResult] = useState<string>('');
+  const [isTestingPdok, setIsTestingPdok] = useState(false);
+
+  const testPdokConnection = async () => {
+    setIsTestingPdok(true);
+    try {
+      console.log('🧪 Testing PDOK WMS API connection...');
+
+      // Test capabilities
+      const capabilitiesResponse = await fetch('/api/pdok/capabilities');
+      if (!capabilitiesResponse.ok) {
+        throw new Error(`Capabilities failed: ${capabilitiesResponse.status}`);
+      }
+
+      const capabilitiesData = await capabilitiesResponse.text();
+
+      // Test GetMap request
+      const mapResponse = await fetch('/api/pdok/bestuurlijke-gebieden?layers=bestuurlijkegebieden:gemeenten&bbox=50000,400000,150000,500000&width=256&height=256&crs=EPSG:28992');
+      if (!mapResponse.ok) {
+        throw new Error(`GetMap failed: ${mapResponse.status}`);
+      }
+
+      setPdokTestResult('✅ PDOK WMS API connectie succesvol! Capabilities geladen en kaartdata beschikbaar.');
+      console.log('✅ PDOK WMS test successful');
+
+    } catch (error) {
+      console.error('❌ PDOK WMS test failed:', error);
+      setPdokTestResult(`❌ PDOK WMS API test gefaald: ${error}`);
+    } finally {
+      setIsTestingPdok(false);
     }
   };
 
@@ -229,7 +261,7 @@ const InstellingenPage: React.FC = () => {
 
                   <div className="border-t pt-4">
                     <h3 className="text-lg font-medium text-gray-900 mb-3">Instellingen</h3>
-                    
+
                     <div className="space-y-3">
                       <label className="flex items-center">
                         <input
@@ -297,7 +329,7 @@ const InstellingenPage: React.FC = () => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  
+
                   {/* Toon alle basisteam polygonen */}
                   {basisteams
                     .filter(team => team.instellingen.zichtbaar_op_kaart)
@@ -372,6 +404,45 @@ const InstellingenPage: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
+      <div className="w-96 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+        <div className="space-y-6">
+          <div className="bg-white p-4 rounded-lg shadow border">
+            <h2 className="text-lg font-semibold mb-4">PDOK WMS API Test</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Test de connectie met de PDOK Bestuurlijke Gebieden WMS API voor Nederlandse gemeente- en provinciegrenzen.
+            </p>
+
+            <button
+              onClick={testPdokConnection}
+              disabled={isTestingPdok}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isTestingPdok ? 'Bezig met testen...' : 'Test PDOK Connectie'}
+            </button>
+
+            {pdokTestResult && (
+              <div className="mt-4 p-3 bg-gray-100 rounded text-sm">
+                {pdokTestResult}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow border">
+            <h2 className="text-lg font-semibold mb-4">API Informatie</h2>
+            <div className="space-y-2 text-sm">
+              <p><strong>PDOK WMS Endpoint:</strong> https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0</p>
+              <p><strong>Beschikbare Layers:</strong></p>
+              <ul className="list-disc list-inside ml-4 text-xs">
+                <li>bestuurlijkegebieden:gemeenten - Nederlandse gemeentegrenzen</li>
+                <li>bestuurlijkegebieden:provincies - Nederlandse provinciegrenzen</li>
+                <li>bestuurlijkegebieden:land - Nederlandse landsgrenzen</li>
+              </ul>
+              <p><strong>Ondersteunde Formats:</strong> PNG, JPEG, GeoJSON, XML</p>
+              <p><strong>Coördinatensystemen:</strong> EPSG:4326 (WGS84), EPSG:28992 (RD New), EPSG:3857 (Web Mercator)</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

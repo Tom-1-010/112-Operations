@@ -211,9 +211,29 @@ const KaartPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [newIncidentIds, setNewIncidentIds] = useState<Set<number>>(new Set());
+  const [showAdministrativeBoundaries, setShowAdministrativeBoundaries] = useState(false);
+  const [pdokCapabilities, setPdokCapabilities] = useState<any>(null);
   const mapRef = useRef<L.Map | null>(null);
   const lastFetchTime = useRef<Date>(new Date());
   const movementIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load PDOK WMS capabilities
+  const loadPdokCapabilities = useCallback(async () => {
+    try {
+      console.log('🌍 Loading PDOK WMS capabilities...');
+      const response = await fetch('/api/pdok/capabilities');
+      
+      if (response.ok) {
+        const xmlText = await response.text();
+        console.log('✅ PDOK WMS capabilities loaded');
+        setPdokCapabilities(xmlText);
+      } else {
+        console.warn('⚠️ Could not load PDOK capabilities');
+      }
+    } catch (error) {
+      console.error('❌ Error loading PDOK capabilities:', error);
+    }
+  }, []);
 
   // Load React Leaflet components dynamically
   useEffect(() => {
@@ -228,6 +248,9 @@ const KaartPage: React.FC = () => {
         Polygon = reactLeaflet.Polygon;
         setMapLoaded(true);
         console.log('✅ React Leaflet components loaded');
+        
+        // Load PDOK capabilities after map components are loaded
+        loadPdokCapabilities();
       } catch (error) {
         console.error('❌ Error loading React Leaflet components:', error);
         setError('Fout bij laden kaartcomponenten');
@@ -237,7 +260,7 @@ const KaartPage: React.FC = () => {
     if (typeof window !== 'undefined') {
       loadMapComponents();
     }
-  }, []);
+  }, [loadPdokCapabilities]);
 
   // Generate coordinates for Rotterdam area based on incident data
   const generateCoordinatesForIncident = (incident: GmsIncident): [number, number] => {
@@ -707,6 +730,15 @@ const KaartPage: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          
+          {/* PDOK Administrative Boundaries WMS Layer */}
+          {showAdministrativeBoundaries && (
+            <TileLayer
+              attribution='&copy; <a href="https://www.pdok.nl/">PDOK</a> - Kadaster'
+              url="/api/pdok/bestuurlijke-gebieden?service=WMS&version=1.3.0&request=GetMap&layers=bestuurlijkegebieden:gemeenten&styles=&crs=EPSG:3857&bbox={bbox-epsg-3857}&width=256&height=256&format=image/png&transparent=true"
+              opacity={0.6}
+            />
+          )}
 
           {/* Incident Markers */}
           {filteredIncidents.map((incident) => {
@@ -917,6 +949,17 @@ const KaartPage: React.FC = () => {
                 className="mr-2"
               />
               <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => isUnitVisible(unit)).length})</label>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showAdministrativeBoundaries"
+                checked={showAdministrativeBoundaries}
+                onChange={(e) => setShowAdministrativeBoundaries(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="showAdministrativeBoundaries" className="text-xs">Toon Bestuurlijke Grenzen (PDOK)</label>
             </div>
           </div>
         </div>

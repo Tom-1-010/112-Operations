@@ -150,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/gms-incidents/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      
+
       // Handle the data more flexibly to support assigned units
       const incidentData = {
         melderNaam: req.body.melderNaam || "",
@@ -178,11 +178,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set(incidentData)
         .where(eq(gmsIncidents.id, id))
         .returning();
-        
+
       if (!updatedGmsIncident) {
         return res.status(404).json({ error: "GMS incident not found" });
       }
-      
+
       console.log(`Updated incident ${id} with ${incidentData.assignedUnits.length} assigned units`);
       res.json(updatedGmsIncident);
     } catch (error) {
@@ -532,10 +532,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const body = req.body;
-      
+
       // Remove timestamp fields and let the database handle them
       const { createdAt, updatedAt, ...updateData } = body;
-      
+
       const [updatedUnit] = await db
         .update(policeUnits)
         .set(updateData)
@@ -564,28 +564,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const fs = await import('fs');
       const path = await import('path');
-      
+
       console.log('🚀 Starting import of police units...');
 
       // Load the team data from JSON file
       const filePath = path.join(process.cwd(), 'attached_assets', 'rooster_eenheden_per_team_detailed_1751227112307.json');
-      
+
       let unitsToImport = [];
-      
+
       if (fs.existsSync(filePath)) {
         const teamsData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        
+
         // Process each team and convert to police units
         for (const [teamName, units] of Object.entries(teamsData)) {
           for (const unit of units) {
             let status = unit.primair ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
-            
+
             // Special handling for RT 11 team - only specific units are primair
             if (unit.roepnummer && unit.roepnummer.startsWith('RT 11.')) {
               const primairUnits = ['RT 11.01', 'RT 11.02', 'RT 11.03', 'RT 11.09'];
               status = primairUnits.includes(unit.roepnummer) ? "1 - Beschikbaar/vrij" : "5 - Afmelden";
             }
-            
+
             unitsToImport.push({
               roepnummer: unit.roepnummer,
               aantal_mensen: unit.aantal_mensen,
@@ -620,7 +620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Clear existing data
       await pool.query('DELETE FROM police_units');
-      
+
       // Insert new data
       let imported = 0;
       for (const unit of unitsToImport) {
@@ -653,7 +653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verify import
       const result = await pool.query('SELECT COUNT(*) FROM police_units');
       console.log(`✅ Successfully imported ${imported} police units`);
-      
+
       res.json({ 
         success: true, 
         imported: imported,
@@ -712,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set(basisteamData)
         .where(eq(basisteams.id, id))
         .returning();
-      
+
       if (!updatedBasisteam) {
         return res.status(404).json({ error: "Basisteam not found" });
       }
@@ -730,7 +730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .delete(basisteams)
         .where(eq(basisteams.id, id))
         .returning();
-      
+
       if (!deletedBasisteam) {
         return res.status(404).json({ error: "Basisteam not found" });
       }
@@ -751,12 +751,178 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .from(policeUnits)
         .leftJoin(basisteams, eq(policeUnits.basisteam_id, basisteams.id));
-      
+
       res.json(unitsWithBasisteam);
     } catch (error) {
       console.error('Error fetching units with basisteam:', error);
       res.status(500).json({ error: "Failed to fetch units with basisteam" });
     }
+  });
+
+  // PDOK Bestuurlijke Gebieden WMS API
+  app.get('/api/pdok/bestuurlijke-gebieden', async (req, res) => {
+    try {
+      const { 
+        service = 'WMS',
+        version = '1.3.0',
+        request = 'GetMap',
+        layers = 'bestuurlijkegebieden:gemeenten',
+        styles = '',
+        crs = 'EPSG:4326',
+        bbox,
+        width = '800',
+        height = '600',
+        format = 'image/png'
+      } = req.query;
+
+      console.log(`[PDOK WMS] Requesting ${layers} with bbox: ${bbox}`);
+
+      const baseUrl = 'https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0';
+      const params = new URLSearchParams({
+        service: service as string,
+        version: version as string,
+        request: request as string,
+        layers: layers as string,
+        styles: styles as string,
+        crs: crs as string,
+        bbox: bbox as string || '-180,-90,180,90',
+        width: width as string,
+        height: height as string,
+        format: format as string
+      });
+
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[PDOK WMS] Full URL: ${url}`);
+
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`[PDOK WMS] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `PDOK WMS API returned status ${response.status}` });
+      }
+
+      const contentType = response.headers.get('content-type');
+
+      if (contentType?.includes('image/')) {
+        // Return image data
+        const imageBuffer = await response.arrayBuffer();
+        res.set('Content-Type', contentType);
+        res.send(Buffer.from(imageBuffer));
+      } else {
+        // Return text/XML data
+        const data = await response.text();
+        res.set('Content-Type', contentType || 'text/xml');
+        res.send(data);
+      }
+
+    } catch (error) {
+      console.error('[PDOK WMS] Error:', error);
+      res.status(500).json({ error: 'Failed to fetch from PDOK WMS API' });
+    }
+  });
+
+  // PDOK WMS GetCapabilities endpoint
+  app.get('/api/pdok/capabilities', async (req, res) => {
+    try {
+      console.log('[PDOK WMS] Fetching capabilities...');
+
+      const url = 'https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0?request=GetCapabilities&service=WMS';
+
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`[PDOK WMS] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `PDOK WMS API returned status ${response.status}` });
+      }
+
+      const data = await response.text();
+      console.log(`[PDOK WMS] Capabilities fetched successfully`);
+
+      res.set('Content-Type', 'application/xml');
+      res.send(data);
+
+    } catch (error) {
+      console.error('[PDOK WMS] Error fetching capabilities:', error);
+      res.status(500).json({ error: 'Failed to fetch PDOK WMS capabilities' });
+    }
+  });
+
+  // PDOK WMS GetFeatureInfo endpoint
+  app.get('/api/pdok/feature-info', async (req, res) => {
+    try {
+      const { 
+        layers = 'bestuurlijkegebieden:gemeenten',
+        query_layers = 'bestuurlijkegebieden:gemeenten',
+        bbox,
+        width = '800',
+        height = '600',
+        x,
+        y,
+        info_format = 'application/json'
+      } = req.query;
+
+      console.log(`[PDOK WMS] GetFeatureInfo at ${x},${y} for ${layers}`);
+
+      const baseUrl = 'https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0';
+      const params = new URLSearchParams({
+        service: 'WMS',
+        version: '1.3.0',
+        request: 'GetFeatureInfo',
+        layers: layers as string,
+        query_layers: query_layers as string,
+        styles: '',
+        crs: 'EPSG:4326',
+        bbox: bbox as string || '-180,-90,180,90',
+        width: width as string,
+        height: height as string,
+        format: 'image/png',
+        info_format: info_format as string,
+        i: x as string,
+        j: y as string
+      });
+
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[PDOK WMS] GetFeatureInfo URL: ${url}`);
+
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`[PDOK WMS] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `PDOK WMS API returned status ${response.status}` });
+      }
+
+      const contentType = response.headers.get('content-type');
+
+      if (contentType?.includes('application/json')) {
+        const data = await response.json();
+        res.json(data);
+      } else {
+        const data = await response.text();
+        res.set('Content-Type', contentType || 'text/xml');
+        res.send(data);
+      }
+
+    } catch (error) {
+      console.error('[PDOK WMS] Error getting feature info:', error);
+      res.status(500).json({ error: 'Failed to get feature info from PDOK WMS API' });
+    }
+  });
+
+  // Health check endpoint
+  app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
   const httpServer = createServer(app);
