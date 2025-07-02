@@ -1186,9 +1186,180 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, [callTimers]);
 
-  // Note: Real addresses are now generated dynamically via BAG API
+  // Realistic addresses database for Rotterdam-Rijnmond region
+  const realisticAddresses = {
+    // Albrandswaard
+    "Poortugaal": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolstraat 10", "Molendijk 15"
+    ],
+    "Rhoon": [
+      "Dorpsstraat 2", "Kerkpad 8", "Schoolweg 12", "Molenkade 20"
+    ],
+    "Rotterdam Albrandswaard": [
+      "Industrieweg 1", "Havenstraat 5", "Fabrieksweg 10"
+    ],
+    
+    // Barendrecht
+    "Barendrecht": [
+      "Middenbaan Noord 1", "Carnisselaan 1", "Boezemkade 1", "Raadhuislaan 1",
+      "Wijngaardlaan 1", "Dorpsstraat 1", "Industrieweg 1", "Promenade 1"
+    ],
+    
+    // Capelle aan den IJssel
+    "Capelle aan den IJssel": [
+      "Hoofdweg 1", "Fascinatio Boulevard 1", "Rivium Boulevard 1", 
+      "Capelseweg 1", "Passage 1", "Hitland 1"
+    ],
+    
+    // Goeree-Overflakkee
+    "Dirksland": [
+      "Voorstraat 1", "Kerkstraat 5", "Schoolstraat 10"
+    ],
+    "Herkingen": [
+      "Dorpsstraat 1", "Kerkweg 5", "Hoofdstraat 10"
+    ],
+    "Melissant": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolweg 10"
+    ],
+    "Goedereede": [
+      "Markt 1", "Kerkstraat 5", "Voorstraat 10"
+    ],
+    "Ouddorp": [
+      "Weststraat 1", "Kerkstraat 5", "Schoolstraat 10"
+    ],
+    "Stellendam": [
+      "Voorstraat 1", "Havenstraat 5", "Kerkweg 10"
+    ],
+    "Middelharnis": [
+      "Voorstraat 1", "Kerkstraat 5", "Markt 10"
+    ],
+    "Nieuwe-Tonge": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolweg 10"
+    ],
+    "Sommelsdijk": [
+      "Voorstraat 1", "Kerkstraat 5", "Markt 10"
+    ],
+    "Stad aan 't Haringvliet": [
+      "Voorstraat 1", "Kerkstraat 5", "Havenweg 10"
+    ],
+    "Achthuizen": [
+      "Dorpsstraat 1", "Kerkweg 5", "Schoolstraat 10"
+    ],
+    "Den Bommel": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Hoofdweg 10"
+    ],
+    
+    // Krimpen aan den IJssel
+    "Krimpen aan den IJssel": [
+      "Hoofdstraat 1", "Kerkstraat 5", "Schoolweg 10", "IJsseldijk 15"
+    ],
+    
+    // Lansingerland
+    "Bergschenhoek": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolweg 10"
+    ],
+    "Berkel en Rodenrijs": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Rodenrijseweg 10"
+    ],
+    "Bleiswijk": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolweg 10"
+    ],
+    
+    // Maassluis
+    "Maassluis": [
+      "Hoogstraat 1", "Markt 1", "Koningin Julianaweg 1", "Noordhof 1",
+      "Havenstraat 1", "Stationsplein 1", "Maasboulevard 1"
+    ],
+    
+    // Nissewaard
+    "Spijkenisse": [
+      "Lange Nieuwstraat 1", "Markt 1", "Heemraadlaan 1", "Canadastraat 1",
+      "Havenstraat 1", "Stationsplein 1", "Bernisse Oostdijk 1"
+    ],
+    "Hekelingen": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolweg 10"
+    ],
+    "Abbenbroek": [
+      "Dorpsstraat 1", "Kerkweg 5", "Hoofdstraat 10"
+    ],
+    "Zuidland": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolstraat 10"
+    ],
+    "Geervliet": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Hoofdweg 10"
+    ],
+    "Heenvliet": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolweg 10"
+    ],
+    "Simonshaven": [
+      "Havenweg 1", "Dorpsstraat 5", "Kerkstraat 10"
+    ],
+    
+    // Ridderkerk
+    "Ridderkerk": [
+      "Ridderhaven 1", "Kerkplein 1", "Slinge 1", "Zwijndrechtseweg 1"
+    ],
+    
+    // Rotterdam
+    "Rotterdam": [
+      "Coolsingel 1", "Lijnbaan 1", "Witte de Withstraat 1", "Nieuwe Binnenweg 1",
+      "Westzeedijk 1", "Maashaven 1", "Kralingse Zoom 1", "Bergweg 1"
+    ],
+    "Hoek van Holland": [
+      "Strandweg 1", "Hoekse Brink 1", "Prins Hendrikstraat 1"
+    ],
+    "Hoogvliet Rotterdam": [
+      "Galerij 1", "Groene Kruisweg 1", "Zalmstraat 1"
+    ],
+    "Pernis Rotterdam": [
+      "Industrieweg 1", "Bernisse 1", "Oud Pernisse 1"
+    ],
+    "Rozenburg": [
+      "Molenstraat 1", "Kerkstraat 5", "Schoolstraat 10"
+    ],
+    "Botlek Rotterdam": [
+      "Botlekweg 1", "Industrieweg 5", "Havenstraat 10"
+    ],
+    "Europoort Rotterdam": [
+      "Europaweg 1", "Maasvlakte 5", "Havenweg 10"
+    ],
+    "Maasvlakte Rotterdam": [
+      "Maasvlakteboulevard 1", "Havenweg 5", "Industrieweg 10"
+    ],
+    
+    // Schiedam
+    "Schiedam": [
+      "Lange Haven 1", "Hoogstraat 1", "Nieuwe Haven 1", "Broersvest 1"
+    ],
+    
+    // Vlaardingen
+    "Vlaardingen": [
+      "Hoogstraat 1", "Markt 1", "Westhavenplaats 1", 
+      "Westzijde 1", "Station Vlaardingen Oost", "Broekpolder 1"
+    ],
+    
+    // Voorne aan Zee
+    "Oostvoorne": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Duinweg 10"
+    ],
+    "Rockanje": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Strandweg 10"
+    ],
+    "Tinte": [
+      "Dorpsstraat 1", "Kerkweg 5", "Schoolstraat 10"
+    ],
+    "Brielle": [
+      "Voorstraat 1", "Markt 1", "Kerkstraat 5"
+    ],
+    "Vierpolders": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Hoofdweg 10"
+    ],
+    "Zwartewaal": [
+      "Dorpsstraat 1", "Kerkstraat 5", "Schoolstraat 10"
+    ]
+  };
 
-  // Function to generate realistic 112 scenarios with BAG API address integration
+  // Function to generate realistic 112 scenarios with specific address selection
   const generateRealistic112Scenario = async () => {
     // Create weighted scenario pool based on frequency
     const weightedScenarios: any[] = [];
@@ -1202,20 +1373,18 @@ export default function Dashboard() {
     // Select from weighted pool
     const selectedScenario = weightedScenarios[Math.floor(Math.random() * weightedScenarios.length)];
     
-    // Get random real address from BAG API
-    const rotterdamGemeenten = [
-      "Rotterdam", "Barendrecht", "Capelle aan den IJssel", "Maassluis", 
-      "Spijkenisse", "Vlaardingen", "Schiedam", "Ridderkerk", "Delft",
-      "Westland", "Lansingerland", "Krimpen aan den IJssel"
-    ];
+    // Get random real address from specified places only
+    const allPlaces = Object.keys(realisticAddresses);
+    const randomPlace = allPlaces[Math.floor(Math.random() * allPlaces.length)];
+    const placeAddresses = realisticAddresses[randomPlace as keyof typeof realisticAddresses];
+    const randomAddress = placeAddresses[Math.floor(Math.random() * placeAddresses.length)];
     
-    const randomGemeente = rotterdamGemeenten[Math.floor(Math.random() * rotterdamGemeenten.length)];
-    let realAddress = "Hoofdstraat 1"; // Fallback
-    let gemeente = randomGemeente;
+    let realAddress = randomAddress;
+    let gemeente = randomPlace;
     
     try {
-      // Search for real addresses in the gemeente
-      const searchQuery = `${randomGemeente} hoofdstraat`;
+      // Try to get more specific address via BAG API for the selected place
+      const searchQuery = `${gemeente} hoofdstraat`;
       const response = await fetch(`/api/bag/search?q=${encodeURIComponent(searchQuery)}&limit=10`);
       
       if (response.ok) {
@@ -1227,12 +1396,13 @@ export default function Dashboard() {
           if (props.straatnaam && props.huisnummer) {
             const fullHuisnummer = `${props.huisnummer}${props.huisletter || ''}${props.huisnummertoevoeging ? '-' + props.huisnummertoevoeging : ''}`;
             realAddress = `${props.straatnaam} ${fullHuisnummer}`;
-            gemeente = props.gemeentenaam || props.plaatsnaam || gemeente;
+            // Keep the gemeente as selected from our list
           }
         }
       }
     } catch (error) {
-      console.warn('BAG API fallback to default address:', error);
+      console.warn('BAG API fallback to predefined address:', error);
+      // Fallback is already set above from our predefined list
     }
     
     return {
