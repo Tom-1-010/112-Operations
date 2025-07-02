@@ -443,23 +443,23 @@ const KaartPage: React.FC = () => {
         const statusMatch = u.status.match(/^(\d+)/);
         const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
         const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
-        const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
 
-        // Display rules: show only status 1,2,3,4,6,7,8,9 or N
+        // Show noodoproep units regardless of status number
         if (isNoodoproep) {
           return true;
         }
 
-        // Explicitly exclude status 0, 5 and null/unknown statuses
-        if (statusNum === null || statusNum === 0 || statusNum === 5) {
+        // Hide only status 5 (afmelden) - show all others
+        if (statusNum === 5) {
           return false;
         }
 
-        return allowedStatuses.includes(statusNum);
+        // Show all other statuses
+        return true;
       });
 
-      console.log('📊 Units visible on map (status 1,2,3,4,6,7,8,9,N):', visibleUnits.length);
-      console.log('📊 Hidden units (status 0,5,unknown):', processedUnits.length - visibleUnits.length);
+      console.log('📊 Units visible on map (alle behalve status 5):', visibleUnits.length);
+      console.log('📊 Hidden units (alleen status 5 - afmelden):', processedUnits.length - visibleUnits.length);
 
       setPoliceUnits(processedUnits); // Store all units for status tracking
 
@@ -473,19 +473,19 @@ const KaartPage: React.FC = () => {
     const statusMatch = unit.status.match(/^(\d+)/);
     const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
     const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-    const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
 
-    // Display rules: show only status 1,2,3,4,6,7,8,9 or N
+    // Show noodoproep units regardless of status number
     if (isNoodoproep) {
       return true;
     }
 
-    // Explicitly exclude status 0, 5 and null/unknown statuses
-    if (statusNum === null || statusNum === 0 || statusNum === 5) {
+    // Hide only status 5 (afmelden) - show all others
+    if (statusNum === 5) {
       return false;
     }
 
-    return allowedStatuses.includes(statusNum);
+    // Show all other statuses (1,2,3,4,6,7,8,9, etc.)
+    return true;
   };
 
   // Update unit positions based on movement simulation
@@ -495,9 +495,9 @@ const KaartPage: React.FC = () => {
         const now = Date.now();
         const deltaTime = (now - unit.lastUpdateTime) / 1000; // seconds
 
-        // Only move units with active statuses
+        // Only move units that are visible (not status 5)
         const statusNum = parseInt(unit.status.split(' ')[0]);
-        const shouldMove = [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum) || unit.status.includes('N');
+        const shouldMove = statusNum !== 5 || unit.status.includes('N');
 
         if (!shouldMove) {
           return { ...unit, lastUpdateTime: now };
