@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { Basisteam } from '../../../shared/basisteam-schema';
 
 // Import Leaflet CSS
-import 'leaflet.dist/leaflet.css';
+import 'leaflet/dist/leaflet.css';
 
 // Import React Leaflet components directly
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
