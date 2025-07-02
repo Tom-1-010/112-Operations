@@ -17,13 +17,13 @@ try {
   if (L.Icon.Default.prototype._getIconUrl) {
     delete (L.Icon.Default.prototype as any)._getIconUrl;
   }
-  
+
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   });
-  
+
   console.log('✅ Leaflet icons configured successfully');
 } catch (error) {
   console.error('❌ Error configuring Leaflet icons:', error);
@@ -45,9 +45,9 @@ const createIncidentIcon = (incidentNumber: number, incidentType: string, priori
   // Priority affects the border
   const borderColor = priority === 1 ? '#ff0000' : priority === 2 ? '#ffaa00' : '#888888';
   const borderWidth = priority === 1 ? 4 : priority === 2 ? 3 : 2;
-  
+
   const color = getColorForIncident(incidentType);
-  
+
   return L.divIcon({
     className: 'incident-marker',
     html: `
@@ -75,7 +75,15 @@ const createIncidentIcon = (incidentNumber: number, incidentType: string, priori
 // Create police unit markers with different colors based on status
 const createUnitIcon = (unit: PoliceUnit) => {
   const getColorForStatus = (status: string) => {
-    const statusNum = parseInt(status.split(' ')[0]);
+    // Extract status number from status string
+    const statusMatch = status.match(/^(\d+)/);
+    const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+
+    // Check for noodoproep
+    if (status.toLowerCase().includes('n') || status.toLowerCase().includes('nood')) {
+      return '#dc143c'; // Crimson red for emergency
+    }
+
     switch (statusNum) {
       case 1: return '#00ff00'; // Available - Green
       case 2: return '#ffff00'; // On patrol - Yellow  
@@ -91,10 +99,10 @@ const createUnitIcon = (unit: PoliceUnit) => {
 
   // Animation for moving units
   const animation = unit.isMoving ? 'animation: pulse 1.5s infinite;' : '';
-  
+
   const color = getColorForStatus(unit.status);
   const roepnummer = unit.roepnummer.replace('RT ', '');
-  
+
   return L.divIcon({
     className: 'unit-marker',
     html: `
@@ -234,27 +242,27 @@ const KaartPage: React.FC = () => {
   const generateCoordinatesForIncident = (incident: GmsIncident): [number, number] => {
     // Base coordinates for Rotterdam center
     const baseCoords: [number, number] = [51.9225, 4.4792];
-    
+
     // If we have address data, create variation based on it
     if (incident.straatnaam || incident.huisnummer) {
       const streetHash = (incident.straatnaam || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
       const houseNumber = parseInt(incident.huisnummer) || incident.id;
-      
+
       // Create reasonable spread across Rotterdam metropolitan area
       const latOffset = ((streetHash % 200) - 100) * 0.002; // ±0.2 degrees
       const lonOffset = ((houseNumber % 200) - 100) * 0.002;
-      
+
       return [
         Math.max(51.85, Math.min(52.0, baseCoords[0] + latOffset)),
         Math.max(4.3, Math.min(4.6, baseCoords[1] + lonOffset))
       ];
     }
-    
+
     // Fallback: spread incidents around Rotterdam area based on ID
     const idOffset = incident.id * 137; // Prime number for better distribution
     const latOffset = ((idOffset % 100) - 50) * 0.003;
     const lonOffset = (((idOffset * 7) % 100) - 50) * 0.003;
-    
+
     return [
       baseCoords[0] + latOffset,
       baseCoords[1] + lonOffset
@@ -298,10 +306,10 @@ const KaartPage: React.FC = () => {
   // Get movement speed based on unit status and type
   const getMovementSpeed = (unit: PoliceUnit, isEmergency: boolean = false): number => {
     const statusNum = parseInt(unit.status.split(' ')[0]);
-    
+
     // Base speeds (km/h)
     const baseSpeed = unit.soort_auto.includes('Motor') ? 60 : 50;
-    
+
     if (isEmergency || statusNum === 3 || statusNum === 4) {
       return baseSpeed * 1.5; // Emergency response speed
     } else if (statusNum === 2) {
@@ -351,21 +359,21 @@ const KaartPage: React.FC = () => {
   const loadPoliceUnits = useCallback(async () => {
     try {
       console.log('🚔 Loading police units for map...');
-      
+
       const response = await fetch('/api/police-units');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const rawUnits = await response.json();
       console.log('✅ Fetched police units for map:', rawUnits.length);
-      
+
       // Convert raw units to map-ready format with movement tracking
       const processedUnits: PoliceUnit[] = rawUnits.map((unit: any) => {
         const currentPosition = unit.locatie 
           ? JSON.parse(unit.locatie) 
           : generateInitialUnitPosition(unit);
-        
+
         return {
           ...unit,
           currentPosition,
@@ -374,9 +382,9 @@ const KaartPage: React.FC = () => {
           isMoving: false
         };
       });
-      
+
       setPoliceUnits(processedUnits);
-      
+
     } catch (error) {
       console.error('❌ Error loading police units:', error);
     }
@@ -388,11 +396,11 @@ const KaartPage: React.FC = () => {
       return prevUnits.map(unit => {
         const now = Date.now();
         const deltaTime = (now - unit.lastUpdateTime) / 1000; // seconds
-        
+
         // Only move units with active statuses
         const statusNum = parseInt(unit.status.split(' ')[0]);
         const shouldMove = [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum) || unit.status.includes('N');
-        
+
         if (!shouldMove) {
           return { ...unit, lastUpdateTime: now };
         }
@@ -409,22 +417,22 @@ const KaartPage: React.FC = () => {
           // Unit is responding to incident - move toward incident location
           const target = assignedIncident.coordinates;
           const distance = calculateDistance(unit.currentPosition, target);
-          
+
           if (distance > 0.1) { // Still more than 100m away
             const speed = getMovementSpeed(unit, true); // Emergency response
             const distancePerSecond = (speed * 1000) / 3600; // m/s
             const moveDistance = distancePerSecond * deltaTime / 1000; // km
-            
+
             // Calculate direction
             const bearing = Math.atan2(
               target[1] - unit.currentPosition[1],
               target[0] - unit.currentPosition[0]
             );
-            
+
             // Move toward target
             const latMove = Math.cos(bearing) * moveDistance / 111; // Rough km to degrees
             const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(unit.currentPosition[0] * Math.PI / 180));
-            
+
             newPosition = [
               unit.currentPosition[0] + latMove,
               unit.currentPosition[1] + lonMove
@@ -438,21 +446,21 @@ const KaartPage: React.FC = () => {
             const speed = getMovementSpeed(unit);
             const distancePerSecond = (speed * 1000) / 3600;
             const moveDistance = distancePerSecond * deltaTime / 1000;
-            
+
             // Random direction
             const bearing = Math.random() * 2 * Math.PI;
             const latMove = Math.cos(bearing) * moveDistance / 111;
             const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(unit.currentPosition[0] * Math.PI / 180));
-            
+
             newPosition = [
               unit.currentPosition[0] + latMove,
               unit.currentPosition[1] + lonMove
             ];
-            
+
             // Keep within reasonable bounds
             newPosition[0] = Math.max(51.8, Math.min(52.1, newPosition[0]));
             newPosition[1] = Math.max(4.2, Math.min(4.7, newPosition[1]));
-            
+
             isMoving = true;
           }
         }
@@ -471,28 +479,28 @@ const KaartPage: React.FC = () => {
   const loadIncidents = useCallback(async () => {
     try {
       console.log('🗺️ Loading GMS incidents for map...');
-      
+
       const response = await fetch('/api/gms-incidents');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const rawIncidents: GmsIncident[] = await response.json();
       console.log('✅ Fetched GMS incidents for map:', rawIncidents.length);
-      
+
       const processedIncidents = processIncidents(rawIncidents);
-      
+
       // Detect new incidents
       setIncidents(prevIncidents => {
         const prevIds = new Set(prevIncidents.map(i => i.id));
         const newIds = processedIncidents
           .filter(incident => !prevIds.has(incident.id))
           .map(incident => incident.id);
-        
+
         if (newIds.length > 0) {
           console.log('🚨 New incidents detected:', newIds);
           setNewIncidentIds(prev => new Set([...prev, ...newIds]));
-          
+
           // Clear new incident highlighting after 10 seconds
           setTimeout(() => {
             setNewIncidentIds(prev => {
@@ -502,13 +510,13 @@ const KaartPage: React.FC = () => {
             });
           }, 10000);
         }
-        
+
         return processedIncidents;
       });
-      
+
       lastFetchTime.current = new Date();
       setIsLoading(false);
-      
+
     } catch (error) {
       console.error('❌ Error loading GMS incidents:', error);
       setError('Fout bij laden van GMS meldingen');
@@ -519,10 +527,10 @@ const KaartPage: React.FC = () => {
   // Initial load and setup polling
   useEffect(() => {
     loadIncidents();
-    
+
     // Poll for updates every 5 seconds
     const interval = setInterval(loadIncidents, 5000);
-    
+
     return () => clearInterval(interval);
   }, [loadIncidents]);
 
@@ -538,7 +546,7 @@ const KaartPage: React.FC = () => {
     if (policeUnits.length > 0) {
       // Update unit positions every 2 seconds
       movementIntervalRef.current = setInterval(updateUnitPositions, 2000);
-      
+
       return () => {
         if (movementIntervalRef.current) {
           clearInterval(movementIntervalRef.current);
@@ -617,7 +625,7 @@ const KaartPage: React.FC = () => {
           {/* Incident Markers */}
           {filteredIncidents.map((incident) => {
             const isNew = newIncidentIds.has(incident.id);
-            
+
             return (
               <Marker
                 key={`incident-${incident.id}`}
@@ -668,9 +676,9 @@ const KaartPage: React.FC = () => {
           {showUnits && policeUnits.map((unit) => {
             const statusNum = parseInt(unit.status.split(' ')[0]);
             const shouldShow = [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum) || unit.status.includes('N');
-            
+
             if (!shouldShow) return null;
-            
+
             return (
               <Marker
                 key={`unit-${unit.id}`}
@@ -765,7 +773,7 @@ const KaartPage: React.FC = () => {
       {/* Control Panel */}
       <div className="absolute top-4 left-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-xs">
         <h3 className="font-bold text-sm mb-3">GMS Incidents Kaart</h3>
-        
+
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-medium mb-1">Filter Type:</label>
@@ -809,7 +817,7 @@ const KaartPage: React.FC = () => {
               />
               <label htmlFor="showBasisteams" className="text-xs">Toon Basisteam Gebieden</label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
