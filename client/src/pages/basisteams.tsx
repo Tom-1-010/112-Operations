@@ -1271,38 +1271,243 @@ function PolygonEditor({
             </div>
 
             {/* Quick Location Buttons */}
-            <div className="space-y-2 p-4 border rounded-lg">
-              <h3 className="font-semibold">Snelle Locaties</h3>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPoint({ lat: '51.9266', lng: '4.2527' })}
-                >
-                  Maassluis Centrum
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPoint({ lat: '51.9194', lng: '4.4061' })}
-                >
-                  Schiedam Centrum
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPoint({ lat: '51.9122', lng: '4.3897' })}
-                >
-                  Vlaardingen Centrum
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPoint({ lat: '51.9244', lng: '4.5833' })}
-                >
-                  Rotterdam Centrum
-                </Button>
+            <div className="space-y-3 p-4 border rounded-lg max-h-80 overflow-y-auto">
+              <h3 className="font-semibold">Snelle Locaties - Rotterdam-Rijnmond</h3>
+              
+              {/* Rotterdam wijken */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-blue-600">Rotterdam (wijken)</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9244', lng: '4.5833' })}>
+                    Centrum
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9177', lng: '4.4550' })}>
+                    Delfshaven
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8950', lng: '4.4850' })}>
+                    Charlois
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9080', lng: '4.4920' })}>
+                    Feijenoord
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9450', lng: '4.4800' })}>
+                    Noord
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9550', lng: '4.5200' })}>
+                    Alexandrium
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9340', lng: '4.5350' })}>
+                    Kralingen-Crooswijk
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9490', lng: '4.4350' })}>
+                    Overschie
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8990', lng: '4.3950' })}>
+                    Pernis
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9770', lng: '4.1350' })}>
+                    Hoek van Holland
+                  </Button>
+                </div>
               </div>
+
+              {/* Maassluis */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Maassluis</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9266', lng: '4.2527' })}>
+                    Maassluis Centrum
+                  </Button>
+                </div>
+              </div>
+
+              {/* Schiedam */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Schiedam</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9194', lng: '4.4061' })}>
+                    Schiedam Centrum
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9120', lng: '4.4000' })}>
+                    Kethel
+                  </Button>
+                </div>
+              </div>
+
+              {/* Vlaardingen */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Vlaardingen</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9122', lng: '4.3897' })}>
+                    Vlaardingen Centrum
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9150', lng: '4.3500' })}>
+                    Vlaardingen Noord
+                  </Button>
+                </div>
+              </div>
+
+              {/* Albrandswaard */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Albrandswaard</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8650', lng: '4.4850' })}>
+                    Poortugaal
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8650', lng: '4.4850' })}>
+                    Rhoon
+                  </Button>
+                </div>
+              </div>
+
+              {/* Barendrecht */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Barendrecht</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8550', lng: '4.5400' })}>
+                    Barendrecht
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8550', lng: '4.5400' })}>
+                    Smitshoek
+                  </Button>
+                </div>
+              </div>
+
+              {/* Capelle aan den IJssel */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Capelle aan den IJssel</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9293', lng: '4.5773' })}>
+                    Capelle a/d IJssel
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9325', lng: '4.5850' })}>
+                    Capelle-West
+                  </Button>
+                </div>
+              </div>
+
+              {/* Goeree-Overflakkee */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Goeree-Overflakkee</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.7650', lng: '3.9900' })}>
+                    Middelharnis
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.7550', lng: '4.0100' })}>
+                    Sommelsdijk
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.7450', lng: '4.1100' })}>
+                    Dirksland
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8150', lng: '3.9300' })}>
+                    Stellendam
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.7800', lng: '3.8800' })}>
+                    Goedereede
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8100', lng: '3.9900' })}>
+                    Ouddorp
+                  </Button>
+                </div>
+              </div>
+
+              {/* Krimpen aan den IJssel */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Krimpen aan den IJssel</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9250', lng: '4.6150' })}>
+                    Krimpen a/d IJssel
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9250', lng: '4.6250' })}>
+                    Stormpolder
+                  </Button>
+                </div>
+              </div>
+
+              {/* Lansingerland */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Lansingerland</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '52.0950', lng: '4.4950' })}>
+                    Zoetermeer
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9950', lng: '4.4650' })}>
+                    Bleiswijk
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9950', lng: '4.4750' })}>
+                    Bergschenhoek
+                  </Button>
+                </div>
+              </div>
+
+              {/* Nissewaard */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Nissewaard</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8440', lng: '4.3500' })}>
+                    Spijkenisse
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8350', lng: '4.2500' })}>
+                    Bernisse
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8350', lng: '4.2500' })}>
+                    Geervliet
+                  </Button>
+                </div>
+              </div>
+
+              {/* Ridderkerk */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Ridderkerk</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8721', lng: '4.6042' })}>
+                    Ridderkerk
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8750', lng: '4.6150' })}>
+                    Bolnes
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8750', lng: '4.6150' })}>
+                    Slikkerveer
+                  </Button>
+                </div>
+              </div>
+
+              {/* Voorne aan Zee */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Voorne aan Zee</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8500', lng: '4.0000' })}>
+                    Rockanje
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8500', lng: '4.1000' })}>
+                    Oostvoorne
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8500', lng: '4.0500' })}>
+                    Tinte
+                  </Button>
+                </div>
+              </div>
+
+              {/* Hellevoetsluis */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Hellevoetsluis</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.8350', lng: '4.1400' })}>
+                    Hellevoetsluis
+                  </Button>
+                </div>
+              </div>
+
+              {/* Rozenburg */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-green-600">Rozenburg</h4>
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPoint({ lat: '51.9100', lng: '4.2650' })}>
+                    Rozenburg
+                  </Button>
+                </div>
+              </div>
+
             </div>
           </div>
 
