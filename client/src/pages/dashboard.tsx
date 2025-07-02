@@ -1193,9 +1193,9 @@ export default function Dashboard() {
       "Westzijde 10", "Station Vlaardingen Oost", "Broekpolder 1"
     ],
     "Barendrecht": [
-      "Middenbaan Noord 50", "Carnisselaan 100", "Smitshoek 25", "Raadhuislaan 1",
-      "Wijngaardlaan 75", "Dorpsstraat 100", "Industrieweg 200",
-      "Promenade 1", "Station Barendrecht", "Binnenlandse Baan 1"
+      "Middenbaan Noord 1", "Carnisselaan 1", "Boezemkade 1", "Raadhuislaan 1",
+      "Wijngaardlaan 1", "Dorpsstraat 1", "Industrieweg 1",
+      "Promenade 1", "Stationsplein 1", "Binnenlandse Baan 1"
     ],
     "Ridderkerk": [
       "Ridderhaven 50", "Kerkplein 1", "Slinge 200", "Zwijndrechtseweg 300",
@@ -1208,12 +1208,12 @@ export default function Dashboard() {
       "Passage 1", "Station Capelle Schollevaar", "Hitland 1"
     ],
     "Spijkenisse": [
-      "Lange Nieuwstraat 100", "Markt 1", "Heemraadlaan 200", "Zuidbuurt 50",
-      "Havenstraat 75", "Stationsplein 1", "Bernisse 1"
+      "Lange Nieuwstraat 1", "Markt 1", "Heemraadlaan 1", "Canadastraat 1",
+      "Havenstraat 1", "Stationsplein 1", "Bernisse Oostdijk 1"
     ],
     "Maassluis": [
-      "Hoogstraat 50", "Markt 1", "Koningin Julianaweg 100", "Zuidbuurt 25",
-      "Havenstraat 40", "Stationsplein 1", "Maasboulevard 50"
+      "Hoogstraat 1", "Markt 1", "Koningin Julianaweg 1", "Noordhof 1",
+      "Havenstraat 1", "Stationsplein 1", "Maasboulevard 1"
     ],
     "Delft": [
       "Markt 1", "Oude Delft 100", "Nieuwe Langendijk 50", "Phoenixstraat 100",
