@@ -280,11 +280,20 @@ const KaartPage: React.FC = () => {
     return R * c;
   };
 
-  // Generate random position within a municipality boundary
-  const generateRandomPositionInMunicipality = (basisteam: Basisteam): [number, number] => {
+  // Generate random position within a municipality boundary with better distribution
+  const generateRandomPositionInMunicipality = (basisteam: Basisteam, unitId: number): [number, number] => {
     const polygon = basisteam.polygon as [number, number][];
     if (!polygon || polygon.length === 0) {
-      return [51.9225, 4.4792]; // Default Rotterdam center
+      // Spread units across larger Rotterdam metropolitan area
+      const baseCoords: [number, number] = [51.9225, 4.4792];
+      const idOffset = unitId * 137; // Prime number for better distribution
+      const latOffset = ((idOffset % 300) - 150) * 0.001; // Larger spread
+      const lonOffset = (((idOffset * 7) % 300) - 150) * 0.001;
+      
+      return [
+        Math.max(51.85, Math.min(52.05, baseCoords[0] + latOffset)),
+        Math.max(4.25, Math.min(4.65, baseCoords[1] + lonOffset))
+      ];
     }
 
     // Find bounding box
@@ -295,9 +304,17 @@ const KaartPage: React.FC = () => {
     const minLng = Math.min(...lngs);
     const maxLng = Math.max(...lngs);
 
-    // Generate random point within bounding box
-    const randomLat = minLat + Math.random() * (maxLat - minLat);
-    const randomLng = minLng + Math.random() * (maxLng - minLng);
+    // Use unit ID for deterministic but well-distributed positioning
+    const seedX = (unitId * 17) % 1000 / 1000; // 0-1
+    const seedY = (unitId * 31) % 1000 / 1000; // 0-1
+
+    // Apply seeds to bounding box with some padding to avoid clustering at edges
+    const padding = 0.1; // 10% padding
+    const latRange = (maxLat - minLat) * (1 - 2 * padding);
+    const lngRange = (maxLng - minLng) * (1 - 2 * padding);
+
+    const randomLat = minLat + padding * (maxLat - minLat) + seedY * latRange;
+    const randomLng = minLng + padding * (maxLng - minLng) + seedX * lngRange;
 
     return [randomLat, randomLng];
   };
@@ -322,9 +339,18 @@ const KaartPage: React.FC = () => {
   const generateInitialUnitPosition = (unit: PoliceUnit): [number, number] => {
     const basisteam = basisteams.find(bt => bt.id === unit.basisteam_id);
     if (basisteam) {
-      return generateRandomPositionInMunicipality(basisteam);
+      return generateRandomPositionInMunicipality(basisteam, unit.id);
     }
-    return [51.9225, 4.4792]; // Default Rotterdam center
+    // Fallback with unit-specific distribution across Rotterdam area
+    const baseCoords: [number, number] = [51.9225, 4.4792];
+    const idOffset = unit.id * 137;
+    const latOffset = ((idOffset % 400) - 200) * 0.001;
+    const lonOffset = (((idOffset * 7) % 400) - 200) * 0.001;
+    
+    return [
+      Math.max(51.85, Math.min(52.05, baseCoords[0] + latOffset)),
+      Math.max(4.25, Math.min(4.65, baseCoords[1] + lonOffset))
+    ];
   };
 
   // Process raw GMS incidents into map-ready format
@@ -768,6 +794,10 @@ const KaartPage: React.FC = () => {
           {/* Police Unit Markers - Synchronized with GMS-units sheet */}
           {showUnits && policeUnits
             .filter(isUnitVisible) // Use centralized visibility logic
+            .filter((unit, index) => {
+              // Show only every 3rd unit to reduce density (can be made configurable)
+              return index % 3 === 0;
+            })
             .map((unit) => {
 
             return (
@@ -923,7 +953,7 @@ const KaartPage: React.FC = () => {
                 onChange={(e) => setShowUnits(e.target.checked)}
                 className="mr-2"
               />
-              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => isUnitVisible(unit)).length})</label>
+              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => isUnitVisible(unit)).filter((unit, index) => index % 3 === 0).length})</label>
             </div>
 
             <div className="flex items-center">
@@ -943,8 +973,8 @@ const KaartPage: React.FC = () => {
           <div className="text-xs text-gray-600 space-y-1">
             <p><strong>Live Statistieken:</strong></p>
             <p>Incidents: {incidents.length} ({filteredIncidents.length} zichtbaar)</p>
-            <p>Eenheden: {policeUnits.filter(unit => isUnitVisible(unit)).length}</p>
-            <p>In beweging: {policeUnits.filter(u => isUnitVisible(u) && u.isMoving).length}</p>
+            <p>Eenheden: {policeUnits.filter(unit => isUnitVisible(unit)).filter((unit, index) => index % 3 === 0).length}</p>
+            <p>In beweging: {policeUnits.filter(u => isUnitVisible(u) && u.isMoving).filter((unit, index) => policeUnits.findIndex(pu => pu.id === unit.id) % 3 === 0).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
             {newIncidentIds.size > 0 && (
               <p className="text-red-600 font-bold">🚨 {Array.from(newIncidentIds).length} nieuwe melding(en)</p>
