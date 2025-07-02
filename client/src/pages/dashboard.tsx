@@ -1037,32 +1037,61 @@ export default function Dashboard() {
   };
 
   const simulateIncomingCall = () => {
+    // More realistic Dutch phone numbers with proper regional distribution
     const phoneNumbers = [
-      '06-12345678',
-      '06-87654321', 
-      '06-11223344',
-      '010-1234567',
-      '06-55667788',
-      '070-9876543',
-      '06-99887766',
-      '06-44556677'
+      '06-12345678', '06-87654321', '06-23456789', '06-34567890', '06-45678901',
+      '010-1234567', '010-2345678', '010-3456789', // Rotterdam area
+      '070-9876543', '070-8765432', '070-7654321', // Den Haag area  
+      '06-55667788', '06-66778899', '06-77889900', '06-88990011',
+      '0181-123456', '0181-234567', // Spijkenisse/Nissewaard
+      '0174-987654', '0174-876543'  // Naaldwijk/Westland
     ];
 
-    const priorities = ['zeer-hoog', 'hoog', 'middel', 'laag'];
+    // Priority distribution based on realistic emergency call patterns
+    // Most calls are prio 2, fewer prio 1, very few prio 3+
+    const priorityDistribution = [
+      'hoog', 'hoog', 'hoog', 'hoog', 'hoog', // 50% prio 1 (high urgency)
+      'middel', 'middel', 'middel', 'middel', // 40% prio 2 (medium urgency) 
+      'laag', 'zeer-laag' // 10% lower priority
+    ];
+
+    // Simulate more realistic call timing patterns
+    const currentHour = new Date().getHours();
+    let callIntensity = 1.0;
+    
+    // Evening/night hours have different call patterns
+    if (currentHour >= 18 && currentHour <= 23) {
+      callIntensity = 1.3; // More calls in evening
+    } else if (currentHour >= 0 && currentHour <= 6) {
+      callIntensity = 0.7; // Fewer calls at night
+    }
+
+    // Only simulate if random factor allows (for more realistic timing)
+    if (Math.random() > (0.1 * callIntensity)) {
+      return; // Skip this simulation round
+    }
 
     const newCall = {
       id: Date.now(),
-      line: Math.floor(Math.random() * 8) + 1,
+      line: Math.floor(Math.random() * 8) + 1, // 8 emergency lines
       phoneNumber: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)],
-      priority: priorities[Math.floor(Math.random() * priorities.length)],
+      priority: priorityDistribution[Math.floor(Math.random() * priorityDistribution.length)],
       duration: '00:00',
-      startTime: Date.now()
+      startTime: Date.now(),
+      region: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('010') ? 'Rotterdam' :
+              phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('070') ? 'Den Haag' :
+              phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('0181') ? 'Spijkenisse' :
+              phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('0174') ? 'Westland' : 'Mobiel'
     };
 
     setIncomingCalls(prev => [...prev, newCall]);
     setCallTimers(prev => ({ ...prev, [newCall.id]: 0 }));
     
-    showNotificationMessage(`Nieuwe 112-oproep op lijn ${newCall.line}`);
+    // More detailed notification based on priority
+    const priorityText = newCall.priority === 'hoog' ? 'SPOED' : 
+                        newCall.priority === 'middel' ? 'Urgent' : 'Regulier';
+    
+    showNotificationMessage(`${priorityText} 112-oproep op lijn ${newCall.line} (${newCall.region})`);
   };
 
   const acceptCall = (callId: number) => {
@@ -1363,13 +1392,45 @@ export default function Dashboard() {
     ]
   };
 
-  // Function to generate realistic 112 scenarios with specific address selection
+  // Function to generate realistic 112 scenarios with specific address selection and LMC integration
   const generateRealistic112Scenario = async () => {
-    // Create weighted scenario pool based on frequency
+    // Create weighted scenario pool based on frequency and time-of-day factors
+    const currentHour = new Date().getHours();
     const weightedScenarios: any[] = [];
+    
     realistic112Scenarios.forEach(scenario => {
-      const frequency = scenario.frequency || 1;
-      for (let i = 0; i < frequency; i++) {
+      let frequency = scenario.frequency || 1;
+      
+      // Adjust frequency based on time of day for more realism
+      if (currentHour >= 22 || currentHour <= 6) {
+        // Night hours - more domestic violence, burglary, less traffic accidents
+        if (scenario.type.includes('inbraak') || scenario.type.includes('geweld')) {
+          frequency *= 1.5;
+        }
+        if (scenario.type.includes('verkeer')) {
+          frequency *= 0.6;
+        }
+      } else if (currentHour >= 7 && currentHour <= 9) {
+        // Rush hour - more traffic accidents
+        if (scenario.type.includes('verkeer')) {
+          frequency *= 2.0;
+        }
+      } else if (currentHour >= 16 && currentHour <= 18) {
+        // Evening rush - more traffic, some violence
+        if (scenario.type.includes('verkeer') || scenario.type.includes('geweld')) {
+          frequency *= 1.3;
+        }
+      }
+      
+      // Weekend factors (if needed later)
+      const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+      if (isWeekend) {
+        if (scenario.type.includes('geweld') || scenario.type.includes('overlast')) {
+          frequency *= 1.2; // More incidents on weekends
+        }
+      }
+      
+      for (let i = 0; i < Math.ceil(frequency); i++) {
         weightedScenarios.push(scenario);
       }
     });
@@ -1494,195 +1555,284 @@ export default function Dashboard() {
     loadPoliceClassifications();
   }, []);
 
-  // Enhanced realistic 112 scenarios with official LMC classification support
+  // Enhanced realistic 112 scenarios based on official LMC classifications with detailed definitions
   const realistic112Scenarios = [
-    // High-priority police incidents (weighted higher)
+    // Prioriteit 1 - Zeer spoedeisend (direct levensgevaar)
     {
       type: "beroving",
       classification: "bzdsbr",
       priority: 1,
-      frequency: 3, // Higher frequency
+      frequency: 4,
+      definition: "Met geweld of dreiging daartoe een persoon of goederen beroven in de openbare ruimte, niet zijnde een waardetransport.",
       initialMessage: (address: string, gemeente: string) => {
         const messages = [
-          `Help! Ik word beroofd op ${address} in ${gemeente}! Hij heeft een mes!`,
-          `112? Iemand probeert mijn tas af te pakken op ${address} in ${gemeente}! Kom snel!`,
-          `Er wordt iemand beroofd vlakbij ${address} in ${gemeente}! Ze bedreigen hem!`
+          `Help! Ik word beroofd op ${address} in ${gemeente}! Hij heeft een mes en dreigt me!`,
+          `112? Er is een beroving gaande op ${address} in ${gemeente}! Ze pakken zijn tas af met geweld!`,
+          `Kom snel! Iemand wordt beroofd vlakbij ${address} in ${gemeente}! Ze bedreigen hem met een wapen!`,
+          `Er vindt een overval plaats op ${address} in ${gemeente}! De daders gebruiken geweld!`
         ];
         return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`Op straat voor het station`, `Bij de bushalt`, `Op het plein, veel mensen aanwezig`],
-        "gewonden": [`Het slachtoffer ligt op de grond!`, `Hij bloeit uit zijn hoofd`, `Ze hebben hem geslagen!`],
-        "dader": [`Een man in donkere kleding`, `Twee mannen op een scooter`, `Jongeman met bivakmuts`],
-        "wapen": [`Hij heeft een mes!`, `Ik zie iets glimmends`, `Hij bedreigt met een voorwerp`],
-        "situatie": [`Ze zijn nog hier!`, `Ze zijn net weggerend`, `Ze staan nog bij het slachtoffer`]
+        "locatie": [`Op straat voor het station`, `Bij de geldautomaat`, `Op het plein, veel getuigen`, `In de winkelstraat`],
+        "gewonden": [`Het slachtoffer ligt op de grond!`, `Hij bloeit uit zijn hoofd`, `Ze hebben hem tegen de grond gewerkt!`],
+        "dader": [`Twee mannen, een met donkere jas`, `Jongeman op een scooter`, `Man met bivakmuts, ongeveer 1.80m`],
+        "wapen": [`Hij heeft een mes!`, `Ik zag iets glimmends`, `Hij bedreigt met een voorwerp, kan niet goed zien wat`],
+        "situatie": [`Ze zijn nog hier!`, `Ze zijn net weggerend richting station`, `Een is weggerend, de ander staat nog bij het slachtoffer`]
       }
     },
     {
-      type: "inbraak",
-      classification: "bzibwn",
-      priority: 2,
-      frequency: 2,
-      initialMessage: (address: string, gemeente: string) => {
-        const messages = [
-          `Er wordt ingebroken in ${address} in ${gemeente}! Ik zie iemand rondlopen in het huis!`,
-          `112? Ik zie inbrekers in het huis op ${address} in ${gemeente}! Kom snel!`,
-          `Help! Er zijn mensen in mijn huis die er niet horen! ${address} in ${gemeente}!`
-        ];
-        return messages[Math.floor(Math.random() * messages.length)];
-      },
-      responses: {
-        "locatie": [`In het huis van de buren`, `Op de eerste verdieping`, `Via de achterdeur naar binnen`],
-        "dader": [`Twee personen in donkere kleding`, `Een man met een bivakmuts`, `Ik kan ze niet goed zien, maar ze hebben zaklampen`],
-        "situatie": [`Ze zijn nog binnen`, `Ik hoorde glas breken`, `Ze doorzoeken de kamers`],
-        "voertuig": [`Er staat een donkere auto voor de deur`, `Ik heb geen auto gezien`, `Er staat een busje om de hoek`]
-      }
-    },
-    {
-      type: "geweldsincident", 
-      classification: "vogwve",
+      type: "schietpartij",
+      classification: "vogwsi", 
       priority: 1,
       frequency: 3,
+      definition: "Een vuurgevecht door middel van vuurwapens tussen of gericht tegen personen.",
       initialMessage: (address: string, gemeente: string) => {
-        const panicMessages = [
-          `Help! Er wordt iemand mishandeld op ${address} in ${gemeente}! Kom snel!`,
-          `112? Er is een vechtpartij gaande op ${address} in ${gemeente}! Het is heel gewelddadig!`,
-          `Hallo... er is ruzie en nu slaan ze elkaar! ${address} in ${gemeente}. Ik ben bang!`
+        const messages = [
+          `Er worden schoten gelost op ${address} in ${gemeente}! Ik hoor knallen!`,
+          `112! Schietpartij op ${address} in ${gemeente}! Mensen rennen weg!`,
+          `Help! Er wordt geschoten op ${address} in ${gemeente}! Iemand ligt op de grond!`,
+          `Vuurwapen incident op ${address} in ${gemeente}! Meerdere schoten gehoord!`
         ];
-        return panicMessages[Math.floor(Math.random() * panicMessages.length)];
+        return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`Op straat voor het huis`, `Bij de hoofdingang van het gebouw`, `Op het plein, iedereen kan het zien`],
-        "gewonden": [`Ja! Er ligt iemand op de grond met bloed aan zijn hoofd!`, `Iemand schreeuwt van de pijn... er is veel bloed`, `Er zijn gewonden! Een man beweegt niet meer!`],
-        "dader": [`Een man in donkere kleding, ik durfde niet goed te kijken`, `Twee mannen, een met een rode jas`, `Lange blonde man, ongeveer 25-30 jaar`],
-        "wapen": [`Ik heb iets glimmends gezien... misschien een mes?`, `Nee, alleen met vuisten en geschreeuw`, `Hij had iets in zijn hand maar ik weet niet wat`],
-        "situatie": [`Ze zijn nog steeds aan het vechten!`, `Een van hen is weggerend`, `Er staan veel mensen omheen die kijken`]
+        "locatie": [`Voor het café`, `Bij de parkeerplaats`, `In de woonwijk`, `Nabij het winkelcentrum`],
+        "schoten": [`Ik hoorde 3 of 4 knallen`, `Meerdere schoten kort na elkaar`, `Een harde knal, daarna nog een`],
+        "gewonden": [`Er ligt iemand op straat!`, `Iemand wordt geholpen door omstanders`, `Ik zie veel bloed`],
+        "daders": [`Auto weggereden met gierende banden`, `Twee mannen weggerend`, `Iemand in donkere kleding`],
+        "situatie": [`Iedereen rent weg`, `Veel paniek op straat`, `Mensen verschuilen zich`]
+      }
+    },
+    {
+      type: "steekpartij",
+      classification: "vogwst",
+      priority: 1, 
+      frequency: 3,
+      definition: "Het gebruiken van steekwapens gericht tegen personen.",
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Er is iemand neergestoken op ${address} in ${gemeente}! Er is veel bloed!`,
+          `112? Steekpartij op ${address} in ${gemeente}! Het slachtoffer ligt op de grond!`,
+          `Help! Iemand is aangevallen met een mes op ${address} in ${gemeente}!`,
+          `Steekincident op ${address} in ${gemeente}! De dader heeft een mes gebruikt!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`Bij de ingang van het gebouw`, `Op de stoep`, `In de steeg`, `Voor de woning`],
+        "gewonde": [`Hij beweegt niet meer`, `Ze probeert te spreken maar kan niet`, `Veel bloedverlies`, `Bewusteloos`],
+        "wapen": [`Ik zag een mes`, `Lang keukenmes`, `Klein steekwapen`, `Mes ligt nog op straat`],
+        "dader": [`Weggerend richting park`, `Man in grijze hoodie`, `Vrouw, ongeveer 40 jaar`, `Nog steeds aanwezig`],
+        "hulp": [`Iemand drukt op de wond`, `Omstanders helpen`, `Niemand durft dichtbij te komen`]
+      }
+    },
+    {
+      type: "gijzeling",
+      classification: "vogwgz",
+      priority: 1,
+      frequency: 2,
+      definition: "Personen met geweld of bedreiging met geweld tegen hun wil vasthouden.",
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Er zijn mensen gegijzeld in ${address} in ${gemeente}! De dader heeft een wapen!`,
+          `112! Gijzeling gaande in ${address} in ${gemeente}! Hij houdt mensen vast!`,
+          `Help! Iemand houdt mensen gevangen op ${address} in ${gemeente}!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`In de winkel`, `Woning eerste verdieping`, `Kantoorgebouw`, `Restaurant`],
+        "gijzelaars": [`Ik zie 3 mensen binnen`, `Ongeveer 5 personen`, `Personeel en klanten`],
+        "dader": [`Man met vuurwapen`, `Persoon in zwarte kleding`, `Schreeuwt en dreigt`],
+        "eisen": [`Hij wil geld`, `Roept dat hij auto wil`, `Onduidelijke eisen`],
+        "situatie": [`Alle ingangen geblokkeerd`, `Gordijnen dichtgetrokken`, `Deur op slot`]
+      }
+    },
+    {
+      type: "verkeersongeval_letsel",
+      classification: "ogwels", 
+      priority: 1,
+      frequency: 4,
+      definition: "Een ongeval waarbij een voertuig (wegvervoer) is betrokken waarbij enig lichamelijk letsel is ontstaan.",
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Zwaar verkeersongeval met gewonden op ${address} in ${gemeente}! Auto's zijn zwaar beschadigd!`,
+          `112! Aanrijding met letsel op ${address} in ${gemeente}! Er liggen mensen op de weg!`,
+          `Ernstig ongeval op ${address} in ${gemeente}! Ambulance nodig, er zijn gewonden!`,
+          `Verkeersongeval met beknelling op ${address} in ${gemeente}! Persoon zit vast in auto!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`Kruispunt hoofdweg`, `Rotonde ingang`, `Voor verkeerslichten`, `Ter hoogte van bushalte`],
+        "gewonden": [`Twee mensen bewusteloos`, `Iemand schreeuwt van de pijn`, `Persoon bekneld in voertuig`, `Veel bloed zichtbaar`],
+        "voertuigen": [`Personenauto en vrachtwagen`, `Twee auto's frontaal`, `Auto tegen boom`, `Motorrijder en auto`],
+        "verkeer": [`Weg volledig afgesloten`, `Grote file ontstaat`, `Gevaarlijke situatie door glas`, `Brandstof op wegdek`],
+        "hulp": [`Omstanders helpen`, `Iemand doet reanimatie`, `Mensen staan om auto heen`]
+      }
+    },
+    {
+      type: "woningbrand",
+      classification: "brgb01",
+      priority: 1,
+      frequency: 3,
+      definition: "Gebruiksfunctie voor het wonen. Woongebouw met brand waarbij direct gevaar voor bewoners.",
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Woningbrand op ${address} in ${gemeente}! Vlammen slaan uit ramen, mensen kunnen niet weg!`,
+          `112! Huis staat in brand op ${address} in ${gemeente}! Bewoners zitten vast op verdieping!`,
+          `Brand in woning ${address} in ${gemeente}! Rook komt overal uit, mensen in gevaar!`,
+          `Woningbrand met personen binnen op ${address} in ${gemeente}! Vlammen groeien snel!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`Rijtjeshuis`, `Appartement tweede verdieping`, `Hoekwoning`, `Benedenwoning`],
+        "brand": [`Vlammen uit alle ramen`, `Dikke zwarte rook`, `Vuur verspreidt zich snel`, `Hele verdieping in brand`],
+        "bewoners": [`Mensen zwaaien uit raam`, `Iemand op balkon`, `Kinderen binnen gehoord`, `Familie van 4 personen`],
+        "verspreiding": [`Naastgelegen woning in gevaar`, `Rook trekt naar buren`, `Wind wakkert vuur aan`],
+        "toegang": [`Voordeur niet bereikbaar`, `Achterkant wel toegankelijk`, `Brandweer kan ladders zetten`]
+      }
+    },
+
+    // Prioriteit 2 - Spoedeisend maar minder acuut
+    {
+      type: "inbraak_woning",
+      classification: "bzibwn",
+      priority: 2,
+      frequency: 3,
+      definition: "Door middel van braak zich wederrechtelijk toegang verschaffen tot een woning, met het oogmerk om diefstal te plegen.",
+      initialMessage: (address: string, gemeente: string) => {
+        const messages = [
+          `Er wordt ingebroken in woning op ${address} in ${gemeente}! Ik zie licht bewegen binnen!`,
+          `Inbraak gaande op ${address} in ${gemeente}! Inbrekers zijn nog binnen het huis!`,
+          `112? Verdachte personen in huis ${address} in ${gemeente}! Ze horen er niet!`,
+          `Woninginbraak op ${address} in ${gemeente}! Raam is geforceerd, mensen binnen!`
+        ];
+        return messages[Math.floor(Math.random() * messages.length)];
+      },
+      responses: {
+        "locatie": [`Vrijstaand huis`, `Rijtjeshuis achterkant`, `Benedenwoning`, `Hoekhuis zijkant`],
+        "inbraak": [`Achterdeur geforceerd`, `Raam ingeslagen`, `Schuifpui opengebroken`, `Slot kapot gemaakt`],
+        "daders": [`Twee personen met tassen`, `Man en vrouw`, `Personen met zaklampen`, `Drie jongeren`],
+        "activiteit": [`Doorzoeken kamers`, `Spullen aan het inpakken`, `Laden busje in`, `Verplaatsen meubels`],
+        "voertuig": [`Donkere bestelwagen`, `Twee scooters`, `Auto zonder verlichting`, `Busje om de hoek`]
       }
     },
     {
       type: "verdachte_situatie",
       classification: "vovs",
       priority: 2,
-      frequency: 2,
+      frequency: 3,
+      definition: "Een ongewone situatie die om nader onderzoek vraagt",
       initialMessage: (address: string, gemeente: string) => {
         const messages = [
-          `Er gebeurt iets vreemds op ${address} in ${gemeente}. Ik zie verdachte personen`,
-          `112? Er zijn mensen aan het inbreken denk ik, op ${address} in ${gemeente}`,
-          `Verdachte situatie op ${address} in ${gemeente}. Mensen lopen rond een gebouw`
+          `Verdachte situatie op ${address} in ${gemeente}. Mensen gedragen zich vreemd!`,
+          `Er gebeurt iets vreemds rond ${address} in ${gemeente}. Kan politie komen kijken?`,
+          `Ongewone activiteit bij ${address} in ${gemeente}. Lijkt op voorbereiding van iets!`,
+          `Verdachte personen rond ${address} in ${gemeente}. Ze kijken steeds om zich heen!`
         ];
         return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`Rond het gebouw`, `In de steeg`, `Bij de parkeerplaats`],
-        "personen": [`Drie mannen in donkere kleding`, `Twee vrouwen die rondkijken`, `Een groep jongeren`],
-        "gedrag": [`Ze kijken steeds om zich heen`, `Ze proberen ergens in te komen`, `Ze hebben tassen bij zich`],
-        "voertuigen": [`Er staat een busje`, `Twee auto's met draaiende motor`, `Een scooter`]
+        "locatie": [`Industrieterrein`, `Achter winkelcentrum`, `Leegstaand gebouw`, `Parkeerplaats`],
+        "personen": [`Drie mannen in donkere kleding`, `Groep jongeren met tassen`, `Personen bij auto's`],
+        "gedrag": [`Kijken constant om zich heen`, `Fluisteren veel`, `Laden spullen over`, `Heen en weer lopen`],
+        "verdacht": [`Veel contant geld gezien`, `Pakketten uitwisselen`, `Gereedschap bij zich`, `Camera's afgeplakt`],
+        "voertuigen": [`Twee busjes zonder kenteken`, `Auto's met draaiende motor`, `Scooters klaar om weg te rijden`]
       }
     },
-    // Standard emergency scenarios (lower frequency)
     {
-      type: "verkeersongeval", 
-      classification: "ogwels",
+      type: "mishandeling",
+      classification: "vogwmh",
       priority: 2,
-      frequency: 1,
+      frequency: 3,
+      definition: "Het opzettelijk toebrengen van pijn of letsel aan een ander.",
       initialMessage: (address: string, gemeente: string) => {
-        const urgentMessages = [
-          `112! Er is een zwaar ongeval op ${address} in ${gemeente}! Auto's zijn op elkaar gebotst!`,
-          `Help! Verkeersongeval op ${address} in ${gemeente}! Er liggen mensen op de weg!`,
-          `Er zijn auto's gecrasht op ${address} in ${gemeente}! Kom snel, er zijn gewonden!`
+        const messages = [
+          `Er wordt iemand mishandeld op ${address} in ${gemeente}! Ze slaan hem tegen de grond!`,
+          `Geweldsincident op ${address} in ${gemeente}! Persoon wordt in elkaar geslagen!`,
+          `112? Iemand wordt aangevallen op ${address} in ${gemeente}! Veel geschreeuw!`,
+          `Mishandeling gaande op ${address} in ${gemeente}! Het slachtoffer kan niet weg!`
         ];
-        return urgentMessages[Math.floor(Math.random() * urgentMessages.length)];
+        return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`Ter hoogte van het kruispunt`, `Vlak bij de verkeerslichten`, `Op de hoofdweg, de hele rijbaan is geblokkeerd`],
-        "gewonden": [`Ja! Er liggen twee mensen naast de auto's en ze bewegen niet`, `Iemand zit nog vast in de auto, hij reageert niet`, `Ik zie mensen die gewond zijn... er is bloed`],
-        "voertuigen": [`Een rode personenauto en een witte bestelwagen`, `Twee auto's, een ligt op zijn kant`, `Drie voertuigen betrokken, veel schade`],
-        "verkeer": [`De hele weg is afgesloten`, `Er ontstaat een lange file`, `Niemand kan er nog doorheen`]
+        "locatie": [`Voor café`, `In park`, `Bij bushalte`, `Op pleintje`],
+        "geweld": [`Schoppen en stompen`, `Slaan met voorwerp`, `Tegen grond werken`, `Wurgen`],
+        "slachtoffer": [`Ligt op grond`, `Probeert weg te kruipen`, `Roept om hulp`, `Kan niet opstaan`],
+        "daders": [`Twee mannen`, `Groep jongeren`, `Een persoon`, `Man en vrouw`],
+        "getuigen": [`Mensen kijken toe`, `Niemand durft in te grijpen`, `Iemand filmt`, `Omstanders geschokt`]
       }
     },
     {
-      type: "brand",
+      type: "bedreiging",
+      classification: "vogwbd",
+      priority: 2,
+      frequency: 2,
+      definition: "Het verbaal bedreigen van personen met het toebrengen van schade, pijn of letsel zonder dit daadwerkelijk al te hebben uitgevoerd.",
       initialMessage: (address: string, gemeente: string) => {
-        const fireMessages = [
-          `Brand! Brand! ${address} in ${gemeente} staat in lichterlaaie!`,
-          `112? Er is brand uitgebroken in ${address} in ${gemeente}! De vlammen slaan uit de ramen!`,
-          `Help! Het huis op ${address} in ${gemeente} staat in brand! Er zijn mensen binnen!`
+        const messages = [
+          `Iemand wordt bedreigd op ${address} in ${gemeente}! De dader schreeuwt en dreigt!`,
+          `Bedreiging gaande op ${address} in ${gemeente}! Persoon wordt geïntimideerd!`,
+          `112? Iemand dreigt met geweld op ${address} in ${gemeente}! Slachtoffer is bang!`,
+          `Dreigende situatie op ${address} in ${gemeente}! Dader is agressief en intimiderend!`
         ];
-        return fireMessages[Math.floor(Math.random() * fireMessages.length)];
+        return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`Het is een rijtjeshuis in een woonwijk`, `Een appartementengebouw, derde verdieping`, `Een winkelpand met woningen erboven`],
-        "gewonden": [`Ik weet niet of er mensen binnen zijn!`, `Er zijn mensen die uit de ramen springen!`, `Mensen hoesten van de rook, ze kunnen niet ademen!`],
-        "brand": [`De vlammen zijn meters hoog!`, `Het hele huis staat nu in brand`, `Zwarte rook komt uit alle ramen`],
-        "verspreiding": [`Het vuur springt over naar de buurhuizen!`, `De buren evacueren hun huizen`, `De hele straat staat vol rook`]
+        "dreigingen": [`Dreigt te slaan`, `Zegt dat hij terugkomt`, `Dreigt familie aan te pakken`, `Intimideert verbaal`],
+        "dader": [`Zeer agressief`, `Onder invloed`, `Bekend van slachtoffer`, `Vreemde persoon`],
+        "slachtoffer": [`Heel bang`, `Durft niet weg`, `Vraagt om hulp`, `Trilt van angst`],
+        "situatie": [`Escalatie dreigt`, `Wordt steeds erger`, `Dader kalmeert niet`, `Veel spanning`],
+        "omgeving": [`Mensen kijken toe`, `Kinderen aanwezig`, `Drukke locatie`, `Rustige buurt`]
       }
     },
     {
-      type: "medische_noodsituatie",
+      type: "drugsdeal",
+      classification: "vodzdl",
+      priority: 2,
+      frequency: 2,
+      definition: "Het (illegaal) handelen in drugs.",
       initialMessage: (address: string, gemeente: string) => {
-        const medicalMessages = [
-          `Help! Er ligt iemand bewusteloos op ${address} in ${gemeente}!`,
-          `112? Iemand is zomaar in elkaar gezakt op ${address} in ${gemeente}! Hij reageert niet!`,
-          `Er is iemand flauwgevallen op ${address} in ${gemeente}! Stuur een ambulance!`
+        const messages = [
+          `Er wordt gedeald met drugs op ${address} in ${gemeente}! Veel verdachte uitwisselingen!`,
+          `Drugshandel gaande op ${address} in ${gemeente}! Constant mensen die komen en gaan!`,
+          `112? Drugsdealers actief op ${address} in ${gemeente}! Open en bloot!`,
+          `Verdachte drugsactiviteit op ${address} in ${gemeente}! Dealer staat op straat!`
         ];
-        return medicalMessages[Math.floor(Math.random() * medicalMessages.length)];
+        return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`Op de stoep voor het huis`, `In de winkel, bij de kassa`, `Op straat, mensen lopen eromheen`],
-        "gewonden": [`Hij beweegt helemaal niet en reageert op niets`, `Ze ademt nog maar heel zwak`, `Er is bloed... ik denk dat hij gevallen is`],
-        "bewustzijn": [`Helemaal bewusteloos`, `Reageert niet als ik zijn naam roep`, `Ogen zijn dicht, geen reactie op wat dan ook`],
-        "ademhaling": [`Ik zie zijn borst nog wel bewegen`, `Heel zwakke ademhaling`, `Ik weet niet zeker of hij nog ademt... stuur snel hulp!`]
+        "activiteit": [`Korte contacten`, `Geld en pakjes uitwisselen`, `Veel verschillende klanten`, `Auto's stoppen kort`],
+        "dealers": [`Jongeman op fiets`, `Persoon bij auto`, `Loopt heen en weer`, `Heeft zakjes bij zich`],
+        "klanten": [`Komen per auto`, `Lopen snel weg`, `Verschillende leeftijden`, `Zenuwachtig gedrag`],
+        "locatie": [`Hoek van straat`, `Bij speelplaats`, `Parkeerplaats`, `Steegje`],
+        "hoeveelheid": [`Kleine pakjes`, `Veel contacten per uur`, `Zakjes en pillen`, `Contant geld`]
       }
     },
     {
-      type: "inbraak",
+      type: "verkeersongeval_materieel",
+      classification: "ogwemt",
+      priority: 2,
+      frequency: 2,
+      definition: "Een ongeval waarbij een voertuig (wegvervoer) is betrokken en waarbij slechts sprake is van materiele schade.",
       initialMessage: (address: string, gemeente: string) => {
-        const burglaryMessages = [
-          `Er wordt ingebroken in ${address} in ${gemeente}! Ik zie iemand rondlopen in het huis!`,
-          `112? Ik zie inbrekers in het huis op ${address} in ${gemeente}! Kom snel!`,
-          `Help! Er zijn mensen in mijn huis die er niet horen! ${address} in ${gemeente}!`
+        const messages = [
+          `Verkeersongeval op ${address} in ${gemeente}! Auto's beschadigd maar geen gewonden!`,
+          `Aanrijding op ${address} in ${gemeente}! Alleen blikschade, verkeer staat stil!`,
+          `Fender bender op ${address} in ${gemeente}! Twee auto's geraakt, bestuurders ongedeerd!`,
+          `Verkeersongeval met materiele schade op ${address} in ${gemeente}! Weg gedeeltelijk geblokkeerd!`
         ];
-        return burglaryMessages[Math.floor(Math.random() * burglaryMessages.length)];
+        return messages[Math.floor(Math.random() * messages.length)];
       },
       responses: {
-        "locatie": [`In het huis van de buren`, `Op de eerste verdieping`, `Via de achterdeur naar binnen`],
-        "dader": [`Twee personen in donkere kleding`, `Een man met een bivakmuts`, `Ik kan ze niet goed zien, maar ze hebben zaklampen`],
-        "situatie": [`Ze zijn nog binnen`, `Ik hoorde glas breken`, `Ze doorzoeken de kamers`],
-        "voertuig": [`Er staat een donkere auto voor de deur`, `Ik heb geen auto gezien`, `Er staat een busje om de hoek`]
-      }
-    },
-    {
-      type: "verdrinking",
-      initialMessage: (address: string, gemeente: string) => {
-        const drowningMessages = [
-          `Help! Iemand verdrinkt in het water bij ${address} in ${gemeente}!`,
-          `112! Er ligt iemand in het water bij ${address} in ${gemeente} en hij beweegt niet!`,
-          `Snel! Er is iemand in het water gevallen bij ${address} in ${gemeente}!`
-        ];
-        return drowningMessages[Math.floor(Math.random() * drowningMessages.length)];
-      },
-      responses: {
-        "locatie": [`In de rivier bij de brug`, `In de haven`, `Bij de waterkant, vlak bij het pad`],
-        "persoon": [`Een man, hij spartelt in het water`, `Iemand drijft roerloos`, `Een vrouw, ze roept om hulp maar gaat kopje onder`],
-        "situatie": [`Het water is hier diep`, `Er is sterke stroming`, `Ik durf niet het water in`],
-        "hulp": [`Andere mensen proberen te helpen`, `Niemand durft erin`, `Iemand gooit een reddingsboei`]
-      }
-    },
-    {
-      type: "overdosis",
-      initialMessage: (address: string, gemeente: string) => {
-        const overdoseMessages = [
-          `Er ligt iemand bewusteloos op ${address} in ${gemeente}! Ik denk drugs!`,
-          `112? Iemand heeft te veel gebruikt bij ${address} in ${gemeente}! Hij reageert nergens op!`,
-          `Help! Er ligt een persoon met schuim op de mond op ${address} in ${gemeente}!`
-        ];
-        return overdoseMessages[Math.floor(Math.random() * overdoseMessages.length)];
-      },
-      responses: {
-        "locatie": [`In het park op een bankje`, `In de steeg achter de winkels`, `Bij de bushalte`],
-        "persoon": [`Een jongeman, hij beweegt niet`, `Vrouw van middelbare leeftijd`, `Tiener, lijkt heel jong`],
-        "symptomen": [`Schuim uit de mond`, `Heel bleek en koud`, `Hijgt heel zwaar`],
-        "spullen": [`Er liggen spullen naast hem`, `Ik zie naalden en zakjes`, `Er ligt een lepel en andere dingen`]
+        "schade": [`Flink ingedeukt`, `Bumpers beschadigd`, `Glas op wegdek`, `Auto's nog rijdbaar`],
+        "bestuurders": [`Ruzie over schuld`, `Maken foto's`, `Beide ongedeerd`, `Wisselen gegevens uit`],
+        "verkeer": [`File ontstaat`, `Eén rijstrook dicht`, `Mensen toeterend`, `Omleidingen nodig`],
+        "voertuigen": [`Twee personenauto's`, `Auto en bestelwagen`, `Drie voertuigen`, `Motor en auto`],
+        "politie": [`Voor afhandeling`, `Verkeersregeling`, `Rapport opmaken`, `Weg vrijmaken`]
       }
     }
   ];
