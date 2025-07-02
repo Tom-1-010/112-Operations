@@ -361,10 +361,10 @@ const KaartPage: React.FC = () => {
     if (unit.status.includes('5 - Afmelden')) {
       return unit.status;
     }
-    
+
     // For active units (status 1), distribute realistic statuses
     const random = (index * 7 + unit.id * 13) % 100; // Deterministic but varied
-    
+
     if (random < 60) return '1 - Beschikbaar/vrij';        // 60% available
     if (random < 75) return '2 - Surveilleren';            // 15% patrolling  
     if (random < 85) return '3 - Onderweg naar incident';  // 10% responding
@@ -375,10 +375,10 @@ const KaartPage: React.FC = () => {
     return '9 - Dienst uit';                               // 1% off duty
   };
 
-  // Load police units from database
+  // Load police units from database with real status synchronization
   const loadPoliceUnits = useCallback(async () => {
     try {
-      console.log('🚔 Loading police units for map...');
+      console.log('🚔 Loading police units for map synchronization...');
 
       const response = await fetch('/api/police-units');
       if (!response.ok) {
@@ -386,20 +386,17 @@ const KaartPage: React.FC = () => {
       }
 
       const rawUnits = await response.json();
-      console.log('✅ Fetched police units for map:', rawUnits.length);
+      console.log('✅ Fetched police units from GMS-units sheet:', rawUnits.length);
 
-      // Convert raw units to map-ready format with movement tracking
-      const processedUnits: PoliceUnit[] = rawUnits.map((unit: any, index: number) => {
+      // Convert raw units to map-ready format using EXACT status from database
+      const processedUnits: PoliceUnit[] = rawUnits.map((unit: any) => {
         const currentPosition = unit.locatie 
           ? JSON.parse(unit.locatie) 
           : generateInitialUnitPosition(unit);
-        
-        // Assign realistic status for simulation
-        const realisticStatus = assignRealisticStatus(unit, index);
 
         return {
           ...unit,
-          status: realisticStatus, // Override with realistic status
+          status: unit.status, // Use EXACT status from GMS-units sheet
           currentPosition,
           movementSpeed: getMovementSpeed(unit),
           lastUpdateTime: Date.now(),
@@ -407,29 +404,65 @@ const KaartPage: React.FC = () => {
         };
       });
 
-      // Log status distribution for debugging
+      // Log status distribution from real data
       const statusCounts = processedUnits.reduce((acc: any, unit) => {
         const statusMatch = unit.status.match(/^(\d+)/);
         const statusNum = statusMatch ? statusMatch[1] : 'unknown';
         acc[statusNum] = (acc[statusNum] || 0) + 1;
         return acc;
       }, {});
-      
-      console.log('📊 Unit status distribution:', statusCounts);
-      console.log('📊 Units that should be visible (1,2,3,4,6,7,8,9):', 
-        processedUnits.filter(u => {
-          const statusMatch = u.status.match(/^(\d+)/);
-          const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-          return statusNum && [1,2,3,4,6,7,8,9].includes(statusNum);
-        }).length
-      );
 
-      setPoliceUnits(processedUnits);
+      console.log('📊 Real unit status distribution from GMS-units sheet:', statusCounts);
+
+      // Filter for visible units based on display rules
+      const visibleUnits = processedUnits.filter(u => {
+        const statusMatch = u.status.match(/^(\d+)/);
+        const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+        const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
+        const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+
+        // Display rules: show only status 1,2,3,4,6,7,8,9 or N
+        if (isNoodoproep) {
+          return true;
+        }
+
+        // Explicitly exclude status 0, 5 and null/unknown statuses
+        if (statusNum === null || statusNum === 0 || statusNum === 5) {
+          return false;
+        }
+
+        return allowedStatuses.includes(statusNum);
+      });
+
+      console.log('📊 Units visible on map (status 1,2,3,4,6,7,8,9,N):', visibleUnits.length);
+      console.log('📊 Hidden units (status 0,5,unknown):', processedUnits.length - visibleUnits.length);
+
+      setPoliceUnits(processedUnits); // Store all units for status tracking
 
     } catch (error) {
       console.error('❌ Error loading police units:', error);
     }
   }, [basisteams]);
+
+  // Centralized unit visibility logic
+  const isUnitVisible = (unit: PoliceUnit): boolean => {
+    const statusMatch = unit.status.match(/^(\d+)/);
+    const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+    const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
+    const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+
+    // Display rules: show only status 1,2,3,4,6,7,8,9 or N
+    if (isNoodoproep) {
+      return true;
+    }
+
+    // Explicitly exclude status 0, 5 and null/unknown statuses
+    if (statusNum === null || statusNum === 0 || statusNum === 5) {
+      return false;
+    }
+
+    return allowedStatuses.includes(statusNum);
+  };
 
   // Update unit positions based on movement simulation
   const updateUnitPositions = useCallback(() => {
@@ -650,7 +683,7 @@ const KaartPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center text-red-600">
-          <p className="text-lg mb-4">Er is een fout opgetreden:</p>
+          <p className="text-lg mb-4">Er is een fout opgetreden:</</p>
           <p>{error}</p>
         </div>
       </div>
@@ -724,21 +757,9 @@ const KaartPage: React.FC = () => {
             );
           })}
 
-          {/* Police Unit Markers - Only show active units */}
+          {/* Police Unit Markers - Synchronized with GMS-units sheet */}
           {showUnits && policeUnits
-            .filter((unit) => {
-              const statusMatch = unit.status.match(/^(\d+)/);
-              const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-              const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-              const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
-              
-              // Explicitly exclude status 5 and any unknown statuses
-              if (statusNum === 5 || statusNum === null) {
-                return false;
-              }
-              
-              return isNoodoproep || allowedStatuses.includes(statusNum);
-            })
+            .filter(isUnitVisible) // Use centralized visibility logic
             .map((unit) => {
 
             return (
@@ -888,15 +909,7 @@ const KaartPage: React.FC = () => {
                 onChange={(e) => setShowUnits(e.target.checked)}
                 className="mr-2"
               />
-              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => {
-                const statusMatch = unit.status.match(/^(\d+)/);
-                const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-                const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-                const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
-                // Exclude status 5 explicitly
-                if (statusNum === 5) return false;
-                return isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
-              }).length})</label>
+              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => isUnitVisible(unit)).length})</label>
             </div>
           </div>
         </div>
@@ -905,25 +918,8 @@ const KaartPage: React.FC = () => {
           <div className="text-xs text-gray-600 space-y-1">
             <p><strong>Live Statistieken:</strong></p>
             <p>Incidents: {incidents.length} ({filteredIncidents.length} zichtbaar)</p>
-            <p>Eenheden: {policeUnits.filter(unit => {
-              const statusMatch = unit.status.match(/^(\d+)/);
-              const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-              const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-              const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
-              // Exclude status 5 explicitly
-              if (statusNum === 5) return false;
-              return isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
-            }).length}</p>
-            <p>In beweging: {policeUnits.filter(u => {
-              const statusMatch = u.status.match(/^(\d+)/);
-              const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-              const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
-              const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
-              // Exclude status 5 explicitly
-              if (statusNum === 5) return false;
-              const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
-              return shouldShow && u.isMoving;
-            }).length}</p>
+            <p>Eenheden: {policeUnits.filter(unit => isUnitVisible(unit)).length}</p>
+            <p>In beweging: {policeUnits.filter(u => isUnitVisible(u) && u.isMoving).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
             {newIncidentIds.size > 0 && (
               <p className="text-red-600 font-bold">🚨 {Array.from(newIncidentIds).length} nieuwe melding(en)</p>
