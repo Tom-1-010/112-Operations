@@ -1191,25 +1191,25 @@ export default function Dashboard() {
   const realisticAddresses = {
     // Albrandswaard
     "Poortugaal": [
-      "Dorpsstraat 1", "Kerkstraat 5", "Schoolstraat 10", "Molendijk 15"
+      "Dorpsstraat 12", "Kerkstraat 45", "Schoolstraat 78", "Molendijk 156"
     ],
     "Rhoon": [
-      "Dorpsstraat 2", "Kerkpad 8", "Schoolweg 12", "Molenkade 20"
+      "Dorpsstraat 23", "Kerkpad 67", "Schoolweg 89", "Molenkade 134"
     ],
     "Rotterdam Albrandswaard": [
-      "Industrieweg 1", "Havenstraat 5", "Fabrieksweg 10"
+      "Industrieweg 12", "Havenstraat 34", "Fabrieksweg 56"
     ],
     
     // Barendrecht
     "Barendrecht": [
-      "Middenbaan Noord 1", "Carnisselaan 1", "Boezemkade 1", "Raadhuislaan 1",
-      "Wijngaardlaan 1", "Dorpsstraat 1", "Industrieweg 1", "Promenade 1"
+      "Middenbaan Noord 45", "Carnisselaan 123", "Boezemkade 67", "Raadhuislaan 89",
+      "Wijngaardlaan 34", "Dorpsstraat 156", "Industrieweg 78", "Promenade 23"
     ],
     
     // Capelle aan den IJssel
     "Capelle aan den IJssel": [
-      "Hoofdweg 1", "Fascinatio Boulevard 1", "Rivium Boulevard 1", 
-      "Capelseweg 1", "Passage 1", "Hitland 1"
+      "Hoofdweg 234", "Fascinatio Boulevard 12", "Rivium Boulevard 67", 
+      "Capelseweg 89", "Passage 45", "Hitland 123"
     ],
     
     // Goeree-Overflakkee
@@ -1378,7 +1378,19 @@ export default function Dashboard() {
     const allPlaces = Object.keys(realisticAddresses);
     const randomPlace = allPlaces[Math.floor(Math.random() * allPlaces.length)];
     const placeAddresses = realisticAddresses[randomPlace as keyof typeof realisticAddresses];
-    const randomAddress = placeAddresses[Math.floor(Math.random() * placeAddresses.length)];
+    let randomAddress = placeAddresses[Math.floor(Math.random() * placeAddresses.length)];
+    
+    // Ensure we have a proper street name format
+    if (!randomAddress.match(/^[A-Za-z\s]+ \d+/)) {
+      // If the address doesn't have a proper street name + number format, create one
+      const commonStreetNames = [
+        "Hoofdstraat", "Dorpsstraat", "Kerkstraat", "Schoolstraat", 
+        "Nieuwstraat", "Oude Straat", "Molenweg", "Stationsweg"
+      ];
+      const streetName = commonStreetNames[Math.floor(Math.random() * commonStreetNames.length)];
+      const houseNumber = Math.floor(Math.random() * 200) + 1;
+      randomAddress = `${streetName} ${houseNumber}`;
+    }
     
     let realAddress = randomAddress;
     let gemeente = randomPlace;
@@ -1397,7 +1409,8 @@ export default function Dashboard() {
           if (props.straatnaam && props.huisnummer) {
             const fullHuisnummer = `${props.huisnummer}${props.huisletter || ''}${props.huisnummertoevoeging ? '-' + props.huisnummertoevoeging : ''}`;
             realAddress = `${props.straatnaam} ${fullHuisnummer}`;
-            // Keep the gemeente as selected from our list
+            // Use the woonplaatsnaam from BAG API as gemeente if available
+            gemeente = props.woonplaatsnaam || gemeente;
           }
         }
       }
@@ -1406,6 +1419,18 @@ export default function Dashboard() {
       // Fallback is already set above from our predefined list
     }
     
+    // Final validation: ensure address has proper format (street name + number)
+    const addressPattern = /^[A-Za-z\s]+ \d+/;
+    if (!addressPattern.test(realAddress)) {
+      console.warn('Generated address does not match expected format:', realAddress);
+      // Force proper format
+      const fallbackStreets = ["Hoofdstraat", "Kerkstraat", "Schoolstraat", "Dorpsstraat"];
+      const randomStreet = fallbackStreets[Math.floor(Math.random() * fallbackStreets.length)];
+      const randomNumber = Math.floor(Math.random() * 200) + 1;
+      realAddress = `${randomStreet} ${randomNumber}`;
+      console.log('Corrected to:', realAddress);
+    }
+
     return {
       type: selectedScenario.type,
       classification: selectedScenario.classification,
