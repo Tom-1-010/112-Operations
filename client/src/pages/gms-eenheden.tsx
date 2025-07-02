@@ -118,27 +118,16 @@ export default function GMSEenheden() {
               teamUnits.forEach((unit: any) => {
                 console.log(`🔍 Unit ${unit.roepnummer}: primair=${unit.primair}, type=${typeof unit.primair}, kans_in_dienst=${unit.kans_in_dienst}`);
                 
-                // Determine status based on primair value AND kans_in_dienst
+                // Determine status based on primair value only
                 let status = '5 - Afmelden'; // Default to afgemeld
                 
-                // Check primair first (boolean true means definitely active)
+                // Check primair value: true = status 1, false = status 5
                 if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
                   status = '1 - Beschikbaar/vrij';
-                  console.log(`📍 Unit ${unit.roepnummer} is PRIMAIR - status: ${status}`);
-                } 
-                // Check kans_in_dienst for additional active units
-                else if (unit.kans_in_dienst && unit.kans_in_dienst >= 50) {
-                  status = '1 - Beschikbaar/vrij';
-                  console.log(`📊 Unit ${unit.roepnummer} has high kans_in_dienst (${unit.kans_in_dienst}%) - status: ${status}`);
-                } 
-                // Medium chance units
-                else if (unit.kans_in_dienst && unit.kans_in_dienst >= 20) {
-                  status = '4 - Niet inzetbaar';
-                  console.log(`⚠️ Unit ${unit.roepnummer} has medium kans_in_dienst (${unit.kans_in_dienst}%) - status: ${status}`);
-                }
-                // Low chance or no chance units remain off-duty
-                else {
-                  console.log(`❌ Unit ${unit.roepnummer} low/no chance (${unit.kans_in_dienst}%) - status: ${status}`);
+                  console.log(`📍 Unit ${unit.roepnummer} is PRIMAIR (true) - status: ${status}`);
+                } else {
+                  status = '5 - Afmelden';
+                  console.log(`❌ Unit ${unit.roepnummer} is NOT PRIMAIR (false) - status: ${status}`);
                 }
                 
                 units.push({
