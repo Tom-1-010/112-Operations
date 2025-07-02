@@ -130,17 +130,8 @@ export default function GMSEenheden() {
                   console.log(`❌ Unit ${unit.roepnummer} is NOT PRIMAIR (false) - status: ${status}`);
                 }
                 
-                // Double check for RT 11 team units specifically
-                if (unit.roepnummer && unit.roepnummer.startsWith('RT 11.')) {
-                  const primairUnits = ['RT 11.01', 'RT 11.02', 'RT 11.03', 'RT 11.09'];
-                  if (primairUnits.includes(unit.roepnummer)) {
-                    status = '1 - Beschikbaar/vrij';
-                    console.log(`🔧 Forced ${unit.roepnummer} to available (primair unit)`);
-                  } else {
-                    status = '5 - Afmelden';
-                    console.log(`🔧 Forced ${unit.roepnummer} to afgemeld (not primair)`);
-                  }
-                }
+                // Status is already correctly determined by primair value above
+                // No need for additional RT 11 specific logic
                 
                 units.push({
                   id: `bt-${unit.roepnummer}` as any,
@@ -190,8 +181,8 @@ export default function GMSEenheden() {
     loadBasisteamsUnits();
   }, []);
 
-  // Combine database units with basisteams units, removing duplicates by roepnummer
-  const allUnits = [...dbPoliceUnits, ...basisteamsUnits];
+  // Combine units, prioritizing basisteams data over database data
+  const allUnits = [...basisteamsUnits, ...dbPoliceUnits];
   const policeUnits = allUnits.filter((unit, index, self) => 
     index === self.findIndex(u => u.roepnummer === unit.roepnummer)
   );
