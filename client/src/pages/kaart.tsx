@@ -407,6 +407,23 @@ const KaartPage: React.FC = () => {
         };
       });
 
+      // Log status distribution for debugging
+      const statusCounts = processedUnits.reduce((acc: any, unit) => {
+        const statusMatch = unit.status.match(/^(\d+)/);
+        const statusNum = statusMatch ? statusMatch[1] : 'unknown';
+        acc[statusNum] = (acc[statusNum] || 0) + 1;
+        return acc;
+      }, {});
+      
+      console.log('📊 Unit status distribution:', statusCounts);
+      console.log('📊 Units that should be visible (1,2,3,4,6,7,8,9):', 
+        processedUnits.filter(u => {
+          const statusMatch = u.status.match(/^(\d+)/);
+          const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+          return statusNum && [1,2,3,4,6,7,8,9].includes(statusNum);
+        }).length
+      );
+
       setPoliceUnits(processedUnits);
 
     } catch (error) {
@@ -565,6 +582,17 @@ const KaartPage: React.FC = () => {
     }
   }, [basisteams, loadPoliceUnits]);
 
+  // Force reload police units on component mount to ensure status assignment
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (basisteams.length > 0) {
+        console.log('🔄 Force reloading police units with new status assignment...');
+        loadPoliceUnits();
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Start movement simulation
   useEffect(() => {
     if (policeUnits.length > 0) {
@@ -696,34 +724,22 @@ const KaartPage: React.FC = () => {
             );
           })}
 
-          {/* Police Unit Markers */}
-          {showUnits && policeUnits.map((unit) => {
-            // Extract status number from status string (e.g., "1 - Beschikbaar" -> 1, "5 - Afmelden" -> 5)
-            const statusMatch = unit.status.match(/^(\d+)/);
-            const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-            
-            // Check for noodoproep (N)
-            const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-            
-            // Debug only first few units to avoid log spam
-            if (unit.id <= 5) {
-              console.log(`🔍 Unit ${unit.roepnummer}: Status="${unit.status}", StatusNum=${statusNum}, IsNoodoproep=${isNoodoproep}`);
-            }
-            
-            // Only show units with allowed statuses: 1,2,3,4,6,7,8,9 or N (noodoproep)
-            // Explicitly exclude status 5 (afmelden)
-            const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
-            
-            // Hide status 5 (afmelden) units completely
-            if (statusNum === 5) {
-              return null;
-            }
-            
-            const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
-
-            if (!shouldShow) {
-              return null;
-            }
+          {/* Police Unit Markers - Only show active units */}
+          {showUnits && policeUnits
+            .filter((unit) => {
+              const statusMatch = unit.status.match(/^(\d+)/);
+              const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+              const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
+              const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+              
+              // Explicitly exclude status 5 and any unknown statuses
+              if (statusNum === 5 || statusNum === null) {
+                return false;
+              }
+              
+              return isNoodoproep || allowedStatuses.includes(statusNum);
+            })
+            .map((unit) => {
 
             return (
               <Marker
