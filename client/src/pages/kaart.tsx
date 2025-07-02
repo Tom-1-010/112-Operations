@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { Basisteam } from '../../../shared/basisteam-schema';
 
 // Import Leaflet CSS
-import 'leaflet/dist/leaflet.css';
+import 'leaflet.dist/leaflet.css';
 
 // Import React Leaflet components directly
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
@@ -218,7 +218,7 @@ const KaartPage: React.FC = () => {
     try {
       console.log('🌍 Loading PDOK WMS capabilities...');
       const response = await fetch('/api/pdok/capabilities');
-      
+
       if (response.ok) {
         const xmlText = await response.text();
         console.log('✅ PDOK WMS capabilities loaded');
@@ -289,7 +289,7 @@ const KaartPage: React.FC = () => {
       const idOffset = unitId * 137; // Prime number for better distribution
       const latOffset = ((idOffset % 300) - 150) * 0.001; // Larger spread
       const lonOffset = (((idOffset * 7) % 300) - 150) * 0.001;
-      
+
       return [
         Math.max(51.85, Math.min(52.05, baseCoords[0] + latOffset)),
         Math.max(4.25, Math.min(4.65, baseCoords[1] + lonOffset))
@@ -346,7 +346,7 @@ const KaartPage: React.FC = () => {
     const idOffset = unit.id * 137;
     const latOffset = ((idOffset % 400) - 200) * 0.001;
     const lonOffset = (((idOffset * 7) % 400) - 200) * 0.001;
-    
+
     return [
       Math.max(51.85, Math.min(52.05, baseCoords[0] + latOffset)),
       Math.max(4.25, Math.min(4.65, baseCoords[1] + lonOffset))
@@ -731,7 +731,7 @@ const KaartPage: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          
+
           {/* PDOK Administrative Boundaries WMS Layer */}
           {showAdministrativeBoundaries && (
             <TileLayer
