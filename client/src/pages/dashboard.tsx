@@ -1191,10 +1191,10 @@ export default function Dashboard() {
   const realisticAddresses = {
     // Albrandswaard
     "Poortugaal": [
-      "Dorpsstraat 12", "Kerkstraat 45", "Schoolstraat 78", "Molendijk 156"
+      "Dorpsstraat 12", "Kerkstraat 45", "Schoolstraat", "Molendijk 156", "Centrum"
     ],
     "Rhoon": [
-      "Dorpsstraat 23", "Kerkpad 67", "Schoolweg 89", "Molenkade 134"
+      "Dorpsstraat 23", "Kerkpad 67", "Schoolweg", "Molenkade 134", "Stationsplein"
     ],
     "Rotterdam Albrandswaard": [
       "Industrieweg 12", "Havenstraat 34", "Fabrieksweg 56"
@@ -1203,7 +1203,8 @@ export default function Dashboard() {
     // Barendrecht
     "Barendrecht": [
       "Middenbaan Noord 45", "Carnisselaan 123", "Boezemkade 67", "Raadhuislaan 89",
-      "Wijngaardlaan 34", "Dorpsstraat 156", "Industrieweg 78", "Promenade 23"
+      "Wijngaardlaan 34", "Dorpsstraat 156", "Industrieweg", "Promenade 23",
+      "Winkelcentrum Barendrecht", "Station Barendrecht"
     ],
     
     // Capelle aan den IJssel
@@ -1304,7 +1305,9 @@ export default function Dashboard() {
     // Rotterdam
     "Rotterdam": [
       "Coolsingel 1", "Lijnbaan 1", "Witte de Withstraat 1", "Nieuwe Binnenweg 1",
-      "Westzeedijk 1", "Maashaven 1", "Kralingse Zoom 1", "Bergweg 1"
+      "Westzeedijk 1", "Maashaven 1", "Kralingse Zoom 1", "Bergweg 1",
+      "A20 ter hoogte van Kleinpolderplein", "Erasmusbrug", "Centraal Station",
+      "Alexandrium", "Zuidplein", "Markthal"
     ],
     "Hoek van Holland": [
       "Strandweg 1", "Hoekse Brink 1", "Prins Hendrikstraat 1"
@@ -1419,11 +1422,40 @@ export default function Dashboard() {
       // Fallback is already set above from our predefined list
     }
     
-    // Final validation: ensure address has proper format (street name + number)
-    const addressPattern = /^[A-Za-z\s]+ \d+/;
-    if (!addressPattern.test(realAddress)) {
-      console.warn('Generated address does not match expected format:', realAddress);
-      // Force proper format
+    // Add address variation: sometimes no house number or "ter hoogte van"
+    const addressVariationRoll = Math.random();
+    
+    if (addressVariationRoll < 0.15) {
+      // 15% chance: "ter hoogte van" for highways/main roads
+      const highways = ["A20", "A16", "A4", "A13", "N210", "N57", "N218"];
+      const locations = ["afslag Vlaardingen", "afslag Rotterdam-Centrum", "afslag Spijkenisse", 
+                        "knooppunt Kleinpolderplein", "tankstation Shell", "viaduct Zuidplein",
+                        "afslag Barendrecht", "Botlektunnel", "Maastunnel"];
+      
+      if (Math.random() < 0.7) { // 70% highways, 30% regular roads
+        const highway = highways[Math.floor(Math.random() * highways.length)];
+        const location = locations[Math.floor(Math.random() * locations.length)];
+        realAddress = `${highway} ter hoogte van ${location}`;
+        gemeente = "Rotterdam"; // Most highways go through Rotterdam area
+      } else {
+        // Regular road with "ter hoogte van"
+        const streets = ["Rotterdamseweg", "Vlaardingseweg", "Hoekse Lijn", "Rijnweg"];
+        const street = streets[Math.floor(Math.random() * streets.length)];
+        const location = locations[Math.floor(Math.random() * locations.length)];
+        realAddress = `${street} ter hoogte van ${location}`;
+      }
+    } else if (addressVariationRoll < 0.25) {
+      // 10% chance: street name without house number
+      const streetParts = realAddress.split(' ');
+      if (streetParts.length > 1 && /\d+/.test(streetParts[streetParts.length - 1])) {
+        // Remove the house number part
+        realAddress = streetParts.slice(0, -1).join(' ');
+      }
+    }
+    
+    // Final validation: ensure we have some kind of address
+    if (!realAddress || realAddress.trim().length < 3) {
+      console.warn('Generated address too short, using fallback');
       const fallbackStreets = ["Hoofdstraat", "Kerkstraat", "Schoolstraat", "Dorpsstraat"];
       const randomStreet = fallbackStreets[Math.floor(Math.random() * fallbackStreets.length)];
       const randomNumber = Math.floor(Math.random() * 200) + 1;
