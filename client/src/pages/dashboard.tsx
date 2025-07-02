@@ -6,6 +6,7 @@ import UnitsPanel from "../components/units-panel";
 import GMS2 from "./gms2";
 import GMSEenheden from "./gms-eenheden";
 import BasisteamsPage from "./basisteams";
+import KaartPage from "./kaart";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { Incident, Unit, Stats } from "../types";
 import L from 'leaflet';
@@ -9061,7 +9062,7 @@ export default function Dashboard() {
         )}
         {activeSection === "kaart" && (
           <div className="content-section active">
-            <KaartSection />
+            <KaartPage />
           </div>
         )}
         {activeSection === "archive" &&
