@@ -68,8 +68,9 @@ Reageer als een Nederlandse burger die 112 belt voor deze specifieke situatie.`
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: messages,
-      max_tokens: 200,
+      max_tokens: 150, // Verkort voor snellere response
       temperature: 0.8,
+      timeout: 2500, // 2.5 seconde timeout
     });
 
     const aiResponse = completion.choices[0]?.message?.content || 'Ik kan u niet goed verstaan...';
