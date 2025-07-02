@@ -674,8 +674,15 @@ const KaartPage: React.FC = () => {
 
           {/* Police Unit Markers */}
           {showUnits && policeUnits.map((unit) => {
-            const statusNum = parseInt(unit.status.split(' ')[0]);
-            const shouldShow = [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum) || unit.status.includes('N');
+            // Extract status number from status string (e.g., "1 - Beschikbaar" -> 1)
+            const statusMatch = unit.status.match(/^(\d+)/);
+            const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+            
+            // Check for noodoproep (N)
+            const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
+            
+            // Only show units with status 1,2,3,4,6,7,8,9 or N (noodoproep)
+            const shouldShow = (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
 
             if (!shouldShow) return null;
 
@@ -826,7 +833,12 @@ const KaartPage: React.FC = () => {
                 onChange={(e) => setShowUnits(e.target.checked)}
                 className="mr-2"
               />
-              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.length})</label>
+              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => {
+                const statusMatch = unit.status.match(/^(\d+)/);
+                const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+                const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
+                return (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+              }).length})</label>
             </div>
           </div>
         </div>
@@ -835,8 +847,19 @@ const KaartPage: React.FC = () => {
           <div className="text-xs text-gray-600 space-y-1">
             <p><strong>Live Statistieken:</strong></p>
             <p>Incidents: {incidents.length} ({filteredIncidents.length} zichtbaar)</p>
-            <p>Eenheden: {policeUnits.length}</p>
-            <p>In beweging: {policeUnits.filter(u => u.isMoving).length}</p>
+            <p>Eenheden: {policeUnits.filter(unit => {
+              const statusMatch = unit.status.match(/^(\d+)/);
+              const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+              const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
+              return (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+            }).length}</p>
+            <p>In beweging: {policeUnits.filter(u => {
+              const statusMatch = u.status.match(/^(\d+)/);
+              const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
+              const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
+              const shouldShow = (statusNum && [1, 2, 3, 4, 6, 7, 8, 9].includes(statusNum)) || isNoodoproep;
+              return shouldShow && u.isMoving;
+            }).length}</p>
             <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
             {newIncidentIds.size > 0 && (
               <p className="text-red-600 font-bold">🚨 {newIncidentIds.size} nieuwe melding(en)</p>
