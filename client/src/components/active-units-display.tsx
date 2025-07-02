@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 interface PoliceUnit {
-  id: string;
+  id?: number | string;
   roepnummer: string;
   aantal_mensen: number;
   rollen: string[];
@@ -10,6 +10,8 @@ interface PoliceUnit {
   status: string;
   locatie?: string;
   incident?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface ContextMenu {
@@ -136,27 +138,50 @@ export default function ActiveUnitsDisplay() {
         incident: selectedIncident.nr?.toString() || ""
       };
 
-      const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedUnit),
-      });
+      // Use same update logic as status change handler
+      if (typeof contextMenu.unit.id === 'number') {
+        // Database unit
+        const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedUnit),
+        });
 
-      if (response.ok) {
-        console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} status automatisch gewijzigd naar "2 - Aanrijdend"`);
-
-        // Update local units state if available
-        setUnits(prev => prev.map(unit => 
-          unit.id === contextMenu.unit?.id ? updatedUnit : unit
-        ));
-
-        // Update status time in GMS2 incident if function is available
-        const gms2Window = window.parent || window;
-        if ((gms2Window as any).updateUnitStatusTime) {
-          (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, "2 - Aanrijdend");
+        if (response.ok) {
+          console.log(`✅ Database eenheid ${contextMenu.unit.roepnummer} status automatisch gewijzigd naar "2 - Aanrijdend"`);
+          setDbPoliceUnits(prev => 
+            prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
+          );
         }
       } else {
-        console.error('Failed to update unit status');
+        // Basisteams unit
+        setBasisteamsUnits(prev => 
+          prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
+        );
+        
+        // Sync to database
+        const dbUnit = {
+          roepnummer: contextMenu.unit.roepnummer,
+          aantal_mensen: contextMenu.unit.aantal_mensen,
+          rollen: contextMenu.unit.rollen,
+          soort_auto: contextMenu.unit.soort_auto,
+          team: contextMenu.unit.team,
+          status: "2 - Aanrijdend",
+          locatie: contextMenu.unit.locatie || '',
+          incident: selectedIncident.nr?.toString() || ""
+        };
+        
+        await fetch('/api/police-units', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dbUnit),
+        });
+      }
+
+      // Update status time in GMS2 incident if function is available
+      const gms2Window = window.parent || window;
+      if ((gms2Window as any).updateUnitStatusTime) {
+        (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, "2 - Aanrijdend");
       }
     } catch (error) {
       console.error('Error updating unit status:', error);
@@ -200,23 +225,51 @@ export default function ActiveUnitsDisplay() {
         incident: ""
       };
 
-      const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUnit),
-      });
+      // Use same update logic as status change handler
+      if (typeof contextMenu.unit.id === 'number') {
+        // Database unit
+        const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedUnit),
+        });
 
-      if (response.ok) {
-        console.log(`✅ Eenheid ${contextMenu.unit.roepnummer} ontkoppeld en status gewijzigd naar "1 - Beschikbaar/vrij"`);
-
-        // Update unit status time if function is available
-        if ((gms2Window as any).updateUnitStatusTime) {
-          (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, "1 - Beschikbaar/vrij");
+        if (response.ok) {
+          console.log(`✅ Database eenheid ${contextMenu.unit.roepnummer} ontkoppeld en status gewijzigd naar "1 - Beschikbaar/vrij"`);
+          setDbPoliceUnits(prev => 
+            prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
+          );
         }
       } else {
-        console.error('Failed to update unit status');
+        // Basisteams unit
+        setBasisteamsUnits(prev => 
+          prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
+        );
+        
+        // Sync to database
+        const dbUnit = {
+          roepnummer: contextMenu.unit.roepnummer,
+          aantal_mensen: contextMenu.unit.aantal_mensen,
+          rollen: contextMenu.unit.rollen,
+          soort_auto: contextMenu.unit.soort_auto,
+          team: contextMenu.unit.team,
+          status: "1 - Beschikbaar/vrij",
+          locatie: contextMenu.unit.locatie || '',
+          incident: ""
+        };
+        
+        await fetch('/api/police-units', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dbUnit),
+        });
+      }
+
+      // Update unit status time if function is available
+      if ((gms2Window as any).updateUnitStatusTime) {
+        (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, "1 - Beschikbaar/vrij");
       }
     } catch (error) {
       console.error('Error updating unit status:', error);
@@ -229,29 +282,68 @@ export default function ActiveUnitsDisplay() {
     console.log(`Status wijzigen voor eenheid ${contextMenu.unit.roepnummer} naar: ${newStatus}`);
 
     try {
-      const updatedUnit = {
-        ...contextMenu.unit,
-        status: newStatus
-      };
+      // Update both database units and basisteams units (same logic as GMS-eenheden)
+      if (typeof contextMenu.unit.id === 'number') {
+        // Database unit - update directly
+        const updatedUnit = {
+          ...contextMenu.unit,
+          status: newStatus
+        };
 
-      const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUnit),
-      });
+        const response = await fetch(`/api/police-units/${contextMenu.unit.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedUnit),
+        });
 
-      if (response.ok) {
-        console.log(`✅ Status van eenheid ${contextMenu.unit.roepnummer} gewijzigd naar: ${newStatus}`);
-
-        // Update unit status time if function is available
-        const gms2Window = window.parent || window;
-        if ((gms2Window as any).updateUnitStatusTime) {
-          (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, newStatus);
+        if (response.ok) {
+          console.log(`✅ Status van database eenheid ${contextMenu.unit.roepnummer} gewijzigd naar: ${newStatus}`);
+          // Update local database units state
+          setDbPoliceUnits(prev => 
+            prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
+          );
+        } else {
+          console.error('Failed to update database unit status');
         }
       } else {
-        console.error('Failed to update unit status');
+        // Basisteams unit - update local state and sync to database
+        const updatedUnit = { ...contextMenu.unit, status: newStatus };
+        setBasisteamsUnits(prev => 
+          prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
+        );
+        
+        // Also try to sync to database by creating/updating a database entry
+        const dbUnit = {
+          roepnummer: contextMenu.unit.roepnummer,
+          aantal_mensen: contextMenu.unit.aantal_mensen,
+          rollen: contextMenu.unit.rollen,
+          soort_auto: contextMenu.unit.soort_auto,
+          team: contextMenu.unit.team,
+          status: newStatus,
+          locatie: contextMenu.unit.locatie || '',
+          incident: contextMenu.unit.incident || ''
+        };
+        
+        // Try to create/update in database
+        const response = await fetch('/api/police-units', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dbUnit),
+        });
+
+        if (response.ok) {
+          console.log(`✅ Status van basisteams eenheid ${contextMenu.unit.roepnummer} gewijzigd naar: ${newStatus} en gesynchroniseerd naar database`);
+        } else {
+          console.log(`⚠️ Status van basisteams eenheid ${contextMenu.unit.roepnummer} gewijzigd naar: ${newStatus} maar sync naar database gefaald`);
+        }
+      }
+
+      // Update unit status time if function is available
+      const gms2Window = window.parent || window;
+      if ((gms2Window as any).updateUnitStatusTime) {
+        (gms2Window as any).updateUnitStatusTime(contextMenu.unit.roepnummer, newStatus);
       }
     } catch (error) {
       console.error('Error updating unit status:', error);
@@ -261,34 +353,123 @@ export default function ActiveUnitsDisplay() {
     setShowStatusSubmenu(false);
   };
 
-  // Load units data
+  // Load basisteams units from attached assets (same as GMS-eenheden)
+  const [basisteamsUnits, setBasisteamsUnits] = useState<PoliceUnit[]>([]);
+  const [dbPoliceUnits, setDbPoliceUnits] = useState<PoliceUnit[]>([]);
+
   useEffect(() => {
-    const loadUnits = async () => {
+    const loadBasisteamsUnits = async () => {
+      try {
+        console.log('🔄 [ActiveUnits] Loading rooster data directly...');
+        const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
+        
+        if (response.ok) {
+          const roosterData = await response.json();
+          console.log('📊 [ActiveUnits] Loaded rooster data with teams:', Object.keys(roosterData));
+          
+          const units: PoliceUnit[] = [];
+          const teamOrder = [
+            'Basisteam Waterweg (A1)', 
+            'Basisteam Schiedam (A2)', 
+            'Basisteam Midden-Schieland (A3)', 
+            'Basisteam Delfshaven (B1)', 
+            'Basisteam Centrum (B2)'
+          ];
+
+          Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
+            if (Array.isArray(teamUnits)) {
+              teamUnits.forEach((unit: any) => {
+                // Determine status based on primair value only (same logic as GMS-eenheden)
+                let status = '5 - Afmelden'; // Default to afgemeld
+                
+                // Check primair value: true = status 1, false = status 5
+                if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
+                  status = '1 - Beschikbaar/vrij';
+                } else {
+                  status = '5 - Afmelden';
+                }
+                
+                units.push({
+                  id: `bt-${unit.roepnummer}`,
+                  roepnummer: unit.roepnummer,
+                  aantal_mensen: unit.aantal_mensen,
+                  rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
+                  soort_auto: unit.soort_auto,
+                  team: teamName,
+                  status: status,
+                  locatie: '',
+                  incident: ''
+                });
+              });
+            }
+          });
+
+          // Sort units by team order, then by roepnummer (same as GMS-eenheden)
+          units.sort((a, b) => {
+            const aTeamIndex = teamOrder.indexOf(a.team);
+            const bTeamIndex = teamOrder.indexOf(b.team);
+
+            if (aTeamIndex !== bTeamIndex) {
+              if (aTeamIndex === -1) return 1;
+              if (bTeamIndex === -1) return -1;
+              return aTeamIndex - bTeamIndex;
+            }
+
+            return a.roepnummer.localeCompare(b.roepnummer);
+          });
+
+          setBasisteamsUnits(units);
+          console.log('✅ [ActiveUnits] Successfully loaded', units.length, 'units from rooster file');
+        } else {
+          console.error('❌ [ActiveUnits] Failed to fetch rooster file:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('❌ [ActiveUnits] Failed to load rooster units:', error);
+      }
+    };
+
+    loadBasisteamsUnits();
+  }, []);
+
+  // Load database units (same as GMS-eenheden)
+  useEffect(() => {
+    const loadDbUnits = async () => {
       try {
         setIsLoading(true);
         const response = await fetch('/api/police-units');
         if (response.ok) {
           const data = await response.json();
-          setUnits(data || []);
+          setDbPoliceUnits(data || []);
         } else {
-          console.warn('Failed to load units, using empty array');
-          setUnits([]);
+          console.warn('[ActiveUnits] Failed to load database units, using empty array');
+          setDbPoliceUnits([]);
         }
       } catch (error) {
-        console.error('Failed to load units:', error);
-        setUnits([]);
+        console.error('[ActiveUnits] Failed to load database units:', error);
+        setDbPoliceUnits([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadUnits();
+    loadDbUnits();
 
     // Refresh every 10 seconds (reduced frequency)
-    const refreshTimer = setInterval(loadUnits, 10000);
+    const refreshTimer = setInterval(loadDbUnits, 10000);
 
     return () => clearInterval(refreshTimer);
   }, []);
+
+  // Combine units, prioritizing basisteams data over database data (same logic as GMS-eenheden)
+  const allUnits = [...basisteamsUnits, ...dbPoliceUnits];
+  const combinedUnits = allUnits.filter((unit, index, self) => 
+    index === self.findIndex(u => u.roepnummer === unit.roepnummer)
+  );
+
+  // Set the combined units
+  useEffect(() => {
+    setUnits(combinedUnits);
+  }, [basisteamsUnits, dbPoliceUnits]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("nl-NL", {
