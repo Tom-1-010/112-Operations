@@ -674,29 +674,34 @@ const KaartPage: React.FC = () => {
 
           {/* Police Unit Markers */}
           {showUnits && policeUnits.map((unit) => {
-            // Extract status number from status string (e.g., "1 - Beschikbaar" -> 1)
+            // Extract status number from status string (e.g., "1 - Beschikbaar" -> 1, "5 - Afmelden" -> 5)
             const statusMatch = unit.status.match(/^(\d+)/);
             const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
             
             // Check for noodoproep (N)
             const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
             
-            // Debug logging for problematic units
-            if (unit.roepnummer === 'RT 12.08') {
-              console.log(`🔍 RT 12.08 Debug - Status: "${unit.status}", StatusNum: ${statusNum}, IsNoodoproep: ${isNoodoproep}`);
-            }
+            // Debug all units to see what's happening
+            console.log(`🔍 Unit ${unit.roepnummer}: Status="${unit.status}", StatusNum=${statusNum}, IsNoodoproep=${isNoodoproep}`);
             
             // Only show units with allowed statuses: 1,2,3,4,6,7,8,9 or N (noodoproep)
             // Explicitly exclude status 5 (afmelden)
             const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+            
+            // Hide status 5 (afmelden) units completely
+            if (statusNum === 5) {
+              console.log(`❌ Unit ${unit.roepnummer} HIDDEN - Status 5 (afmelden) not allowed`);
+              return null;
+            }
+            
             const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
 
             if (!shouldShow) {
-              if (unit.roepnummer === 'RT 12.08') {
-                console.log(`❌ RT 12.08 Hidden - Status ${statusNum} not in allowed list [${allowedStatuses.join(', ')}] or noodoproep`);
-              }
+              console.log(`❌ Unit ${unit.roepnummer} HIDDEN - Status ${statusNum} not in allowed list [${allowedStatuses.join(', ')}] and not noodoproep`);
               return null;
             }
+            
+            console.log(`✅ Unit ${unit.roepnummer} VISIBLE - Status ${statusNum} is allowed`);
 
             return (
               <Marker
@@ -850,6 +855,8 @@ const KaartPage: React.FC = () => {
                 const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
                 const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
                 const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+                // Exclude status 5 explicitly
+                if (statusNum === 5) return false;
                 return isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
               }).length})</label>
             </div>
@@ -865,6 +872,8 @@ const KaartPage: React.FC = () => {
               const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
               const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
               const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+              // Exclude status 5 explicitly
+              if (statusNum === 5) return false;
               return isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
             }).length}</p>
             <p>In beweging: {policeUnits.filter(u => {
@@ -872,6 +881,8 @@ const KaartPage: React.FC = () => {
               const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
               const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
               const allowedStatuses = [1, 2, 3, 4, 6, 7, 8, 9];
+              // Exclude status 5 explicitly
+              if (statusNum === 5) return false;
               const shouldShow = isNoodoproep || (statusNum !== null && allowedStatuses.includes(statusNum));
               return shouldShow && u.isMoving;
             }).length}</p>
