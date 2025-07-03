@@ -1066,10 +1066,8 @@ export default function Dashboard() {
       callIntensity = 0.7; // Fewer calls at night
     }
 
-    // Only simulate if random factor allows (for more realistic timing)
-    if (Math.random() > (0.1 * callIntensity)) {
-      return; // Skip this simulation round
-    }
+    // When manually triggered, always create a call
+    // (This random check was preventing manual simulation from working)
 
     const newCall = {
       id: Date.now(),
