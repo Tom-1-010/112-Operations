@@ -999,6 +999,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route to load 112 script data
+  app.get("/api/112-scripts", (req, res) => {
+    try {
+      // In een echte implementatie zou je hier je JSON-bestand laden
+      // Voor nu returneren we een voorbeeldstructuur
+      const scriptData = {
+        scenarios: {
+          afpersing: {
+            category: "Bezitsaantasting",
+            subcategory: "Diefstal",
+            priority: 1,
+            questions: [
+              "Wat is er gebeurd?",
+              "Waar bevindt u zich?", 
+              "Bent u gewond geraakt?",
+              "Zijn de daders nog in de buurt?"
+            ]
+          },
+          beroving: {
+            category: "Bezitsaantasting", 
+            subcategory: "Diefstal",
+            priority: 1,
+            questions: [
+              "Wat is er gestolen?",
+              "Waar bent u nu?",
+              "Welke kant zijn ze op gevlucht?",
+              "Waren ze gewapend?"
+            ]
+          }
+        }
+      };
+      
+      res.json(scriptData);
+    } catch (error) {
+      console.error('Error loading 112 scripts:', error);
+      res.status(500).json({ error: 'Failed to load 112 scripts' });
+    }
+  });
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -1008,41 +1047,3 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   return httpServer;
 }
-// Route to load 112 script data
-app.get("/api/112-scripts", (req, res) => {
-  try {
-    // In een echte implementatie zou je hier je JSON-bestand laden
-    // Voor nu returneren we een voorbeeldstructuur
-    const scriptData = {
-      scenarios: {
-        afpersing: {
-          category: "Bezitsaantasting",
-          subcategory: "Diefstal",
-          priority: 1,
-          questions: [
-            "Wat is er gebeurd?",
-            "Waar bevindt u zich?", 
-            "Bent u gewond geraakt?",
-            "Zijn de daders nog in de buurt?"
-          ]
-        },
-        beroving: {
-          category: "Bezitsaantasting", 
-          subcategory: "Diefstal",
-          priority: 1,
-          questions: [
-            "Wat is er gestolen?",
-            "Waar bent u nu?",
-            "Welke kant zijn ze op gevlucht?",
-            "Waren ze gewapend?"
-          ]
-        }
-      }
-    };
-    
-    res.json(scriptData);
-  } catch (error) {
-    console.error('Error loading 112 scripts:', error);
-    res.status(500).json({ error: 'Failed to load 112 scripts' });
-  }
-});
