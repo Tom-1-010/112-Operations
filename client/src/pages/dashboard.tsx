@@ -4443,12 +4443,10 @@ export default function Dashboard() {
                     "afstemverzoek ambulance": "dvabav",
                     
                     // Accidents with disambiguation
-                    "ongeval wegvervoer letsel": "ogwels",
                     "ongeval spoorvervoer letsel": "ogspls",
                     "wegongeval letsel": "ogwels",
                     "spoorwegongeval letsel": "ogspls",
                     "auto ongeval letsel": "ogwels",
-                    "verkeersongeval letsel": "ogwels",
                     
                     // Property crimes
                     "bz": "bzdsbr",
