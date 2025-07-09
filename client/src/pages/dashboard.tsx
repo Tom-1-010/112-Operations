@@ -1055,33 +1055,20 @@ export default function Dashboard() {
       'laag', 'zeer-laag' // 10% lower priority
     ];
 
-    // Simulate more realistic call timing patterns
-    const currentHour = new Date().getHours();
-    let callIntensity = 1.0;
+    // Always generate a call when button is clicked (removed random skip condition)
+    const selectedPhoneNumber = phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)];
     
-    // Evening/night hours have different call patterns
-    if (currentHour >= 18 && currentHour <= 23) {
-      callIntensity = 1.3; // More calls in evening
-    } else if (currentHour >= 0 && currentHour <= 6) {
-      callIntensity = 0.7; // Fewer calls at night
-    }
-
-    // Only simulate if random factor allows (for more realistic timing)
-    if (Math.random() > (0.1 * callIntensity)) {
-      return; // Skip this simulation round
-    }
-
     const newCall = {
       id: Date.now(),
       line: Math.floor(Math.random() * 8) + 1, // 8 emergency lines
-      phoneNumber: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)],
+      phoneNumber: selectedPhoneNumber,
       priority: priorityDistribution[Math.floor(Math.random() * priorityDistribution.length)],
       duration: '00:00',
       startTime: Date.now(),
-      region: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('010') ? 'Rotterdam' :
-              phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('070') ? 'Den Haag' :
-              phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('0181') ? 'Spijkenisse' :
-              phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)].startsWith('0174') ? 'Westland' : 'Mobiel'
+      region: selectedPhoneNumber.startsWith('010') ? 'Rotterdam' :
+              selectedPhoneNumber.startsWith('070') ? 'Den Haag' :
+              selectedPhoneNumber.startsWith('0181') ? 'Spijkenisse' :
+              selectedPhoneNumber.startsWith('0174') ? 'Westland' : 'Mobiel'
     };
 
     setIncomingCalls(prev => [...prev, newCall]);
@@ -1092,6 +1079,8 @@ export default function Dashboard() {
                         newCall.priority === 'middel' ? 'Urgent' : 'Regulier';
     
     showNotificationMessage(`${priorityText} 112-oproep op lijn ${newCall.line} (${newCall.region})`);
+    
+    console.log('🚨 New 112 call generated:', newCall);
   };
 
   const acceptCall = (callId: number) => {
