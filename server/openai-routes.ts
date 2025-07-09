@@ -109,6 +109,145 @@ Reageer als een Nederlandse burger die 112 belt voor deze specifieke situatie.`
 });
 
 export default router;
+// Standard rules for all emergency call scenarios
+const STANDARD_RULES = {
+  "veiligheidsregio": "Rotterdam-Rijnmond",
+  "gemeenten": {
+    "Albrandswaard": {
+      "plaatsen": [
+        "Poortugaal",
+        "Rhoon"
+      ]
+    },
+    "Barendrecht": {
+      "plaatsen": [
+        "Barendrecht"
+      ]
+    },
+    "Capelle aan den IJssel": {
+      "plaatsen": [
+        "Capelle aan den IJssel"
+      ]
+    },
+    "Goeree-Overflakkee": {
+      "plaatsen": [
+        "Ouddorp",
+        "Goedereede",
+        "Middelharnis",
+        "Sommelsdijk",
+        "Oude-Tonge",
+        "Dirksland",
+        "Stellendam",
+        "Melissant",
+        "Achthuizen",
+        "Nieuwe-Tonge"
+      ]
+    },
+    "Krimpen aan den IJssel": {
+      "plaatsen": [
+        "Krimpen aan den IJssel"
+      ]
+    },
+    "Lansingerland": {
+      "plaatsen": [
+        "Bergschenhoek",
+        "Berkel en Rodenrijs",
+        "Bleiswijk"
+      ]
+    },
+    "Maassluis": {
+      "plaatsen": [
+        "Maassluis"
+      ]
+    },
+    "Nissewaard": {
+      "plaatsen": [
+        "Spijkenisse",
+        "Heenvliet",
+        "Geervliet",
+        "Abbenbroek",
+        "Hekelingen",
+        "Oudenhoorn",
+        "Zuidland"
+      ]
+    },
+    "Ridderkerk": {
+      "plaatsen": [
+        "Ridderkerk"
+      ]
+    },
+    "Rotterdam": {
+      "plaatsen": [
+        "Rotterdam",
+        "Hoek van Holland",
+        "Hoogvliet",
+        "IJsselmonde",
+        "Charlois",
+        "Overschie",
+        "Hillegersberg",
+        "Kralingen",
+        "Ommoord",
+        "Schiebroek",
+        "Feijenoord"
+      ]
+    },
+    "Schiedam": {
+      "plaatsen": [
+        "Schiedam"
+      ]
+    },
+    "Vlaardingen": {
+      "plaatsen": [
+        "Vlaardingen"
+      ]
+    },
+    "Voorne aan Zee": {
+      "plaatsen": [
+        "Hellevoetsluis",
+        "Oostvoorne",
+        "Rockanje",
+        "Tinte",
+        "Zwartewaal"
+      ]
+    }
+  },
+  "locatiebeschrijving_regels": [
+    "Laat AI een logische beschrijving maken die bij het adres past",
+    "Gebruik bijvoorbeeld: 'bij de bushalte', 'voor de flat', 'op de parkeerplaats van de supermarkt'",
+    "De omschrijving mag niet in strijd zijn met de opgehaalde straatnaam of omgeving"
+  ],
+  "adresregels": {
+    "huisnummer_verplicht": false,
+    "variatie_mogelijk": true,
+    "maximale_afwijking_in_meters": 50
+  },
+  "melderregels": {
+    "toegestane_types": [
+      "slachtoffer",
+      "omstander",
+      "betrokkene"
+    ],
+    "standaard_naam": "Anoniem",
+    "telefoon_verplicht": true
+  },
+  "intake_vragen": {
+    "min_aantal": 15,
+    "max_aantal": 25,
+    "structuur": [
+      "Omschrijving incident",
+      "Locatie en context",
+      "Verwondingen",
+      "Verdachten",
+      "Vluchtroute / voertuig / kenteken",
+      "Getuigen en camerabeelden",
+      "Identiteit melder",
+      "Aangifte en vervolg"
+    ]
+  },
+  "configuratie_type": "standaardregels_meldkamersimulator",
+  "beschrijving": "Dit bestand bevat de standaardregels voor meldingsscripts binnen de meldkamersimulator. Het definieert gemeenten en plaatsen binnen veiligheidsregio Rotterdam-Rijnmond, en beschrijft vaste afspraken over locatieomschrijvingen, melderinformatie, adreslogica en intakevragen."
+};
+
 // Enhanced 112 script system with structured scenarios
 const STRUCTURED_112_SCENARIOS = {
   'afpersing': {
@@ -157,19 +296,23 @@ const STRUCTURED_112_SCENARIOS = {
 // Load structured scenario data from JSON file
 router.post('/generate-structured-scenario', async (req, res) => {
   try {
-    // In a real implementation, you would load your JSON file here
-    // For now, we'll use the predefined scenarios above
-    
+    // Use the standard rules for generating realistic scenarios
     const scenarioTypes = Object.keys(STRUCTURED_112_SCENARIOS);
     const randomScenario = scenarioTypes[Math.floor(Math.random() * scenarioTypes.length)];
     const scenario = STRUCTURED_112_SCENARIOS[randomScenario];
     
-    // Generate random caller details
-    const callerTypes = ['slachtoffer', 'omstander'];
+    // Generate random caller details using standard rules
+    const callerTypes = STANDARD_RULES.melderregels.toegestane_types;
     const randomCallerType = callerTypes[Math.floor(Math.random() * callerTypes.length)];
     
     // Generate phone number
     const phoneNumber = `06-${Math.floor(Math.random() * 90000000 + 10000000)}`;
+    
+    // Select random gemeente and plaats from standard rules
+    const gemeenteNames = Object.keys(STANDARD_RULES.gemeenten);
+    const randomGemeente = gemeenteNames[Math.floor(Math.random() * gemeenteNames.length)];
+    const gemeente = STANDARD_RULES.gemeenten[randomGemeente];
+    const randomPlaats = gemeente.plaatsen[Math.floor(Math.random() * gemeente.plaatsen.length)];
     
     const structuredScenario = {
       type: randomScenario,
@@ -179,8 +322,11 @@ router.post('/generate-structured-scenario', async (req, res) => {
       isUrgent: scenario.isUrgent,
       callerType: randomCallerType,
       phoneNumber: phoneNumber,
+      gemeente: randomGemeente,
+      plaats: randomPlaats,
       initialResponse: scenario.initialResponse,
       questions: scenario.followUpQuestions,
+      standardRules: STANDARD_RULES,
       scriptData: {
         categorie: scenario.category,
         subcategorie: scenario.subcategory,
@@ -188,13 +334,19 @@ router.post('/generate-structured-scenario', async (req, res) => {
         spoed: scenario.isUrgent,
         melder: {
           type: randomCallerType,
-          naam: "Anoniem",
+          naam: STANDARD_RULES.melderregels.standaard_naam,
           telefoon: phoneNumber
+        },
+        locatie: {
+          gemeente: randomGemeente,
+          plaats: randomPlaats,
+          adres: "VIA_BAG_SCRIPT",
+          context_prompt: STANDARD_RULES.locatiebeschrijving_regels.join('. ')
         }
       }
     };
     
-    console.log(`🎯 Generated structured scenario: ${randomScenario} (${randomCallerType})`);
+    console.log(`🎯 Generated structured scenario: ${randomScenario} (${randomCallerType}) in ${randomPlaats}, ${randomGemeente}`);
     
     res.json(structuredScenario);
     
@@ -228,6 +380,8 @@ router.post('/chat-with-script', async (req, res) => {
     // If we have structured scenario data, enhance the prompt
     if (scenarioData && scenarioData.scriptData) {
       const script = scenarioData.scriptData;
+      const standardRules = scenarioData.standardRules || STANDARD_RULES;
+      
       systemPrompt += `
 
 SCENARIO DETAILS:
@@ -235,14 +389,22 @@ SCENARIO DETAILS:
 - Categorie: ${script.categorie} > ${script.subcategorie}
 - Melder type: ${script.melder.type}
 - Urgentie: ${script.spoed ? 'Spoed' : 'Niet spoed'}
+- Locatie: ${script.locatie?.plaats || 'Onbekend'}, ${script.locatie?.gemeente || 'Rotterdam-Rijnmond'}
 
 Je speelt de rol van een ${script.melder.type} die belt over een ${script.classificatie.toLowerCase()}.
+
+STANDAARD REGELS (Rotterdam-Rijnmond):
+- Veiligheidsregio: ${standardRules.veiligheidsregio}
+- Toegestane melder types: ${standardRules.melderregels.toegestane_types.join(', ')}
+- Locatie beschrijving: ${standardRules.locatiebeschrijving_regels.join('. ')}
+- Intake structuur: ${standardRules.intake_vragen.structuur.join(' → ')}
 
 GEDRAGSINSTRUCTIES:
 - Wees realistisch emotioneel (paniek bij spoed, bezorgdheid bij niet-spoed)
 - Geef informatie geleidelijk prijs zoals een echte burger
 - Gebruik Nederlandse uitdrukkingen en taalgebruik
-- Reageer natuurlijk op vragen van de meldkamer`;
+- Reageer natuurlijk op vragen van de meldkamer
+- Houd rekening met de locatie context (${script.locatie?.plaats || 'Rotterdam'})`;
     }
 
     console.log(`🤖 Using ${aiService} for structured 112 conversation`);
