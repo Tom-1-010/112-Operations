@@ -81,6 +81,9 @@ export default function GMS2() {
   const [selectedKarakteristieken, setSelectedKarakteristieken] = useState<any[]>([]);
   const [showP2000Screen, setShowP2000Screen] = useState(false);
   const [pagerText, setPagerText] = useState("");
+  const [showKarakteristiekenDialog, setShowKarakteristiekenDialog] = useState(false);
+  const [karakteristiekenSearchQuery, setKarakteristiekenSearchQuery] = useState("");
+  const [filteredKarakteristieken, setFilteredKarakteristieken] = useState<any[]>([]);
 
   // Form state for new incidents
   const [formData, setFormData] = useState({
@@ -2242,6 +2245,70 @@ export default function GMS2() {
     return matches;
   };
 
+  // Function to search karakteristieken for dialog
+  const searchKarakteristiekenForDialog = (query: string) => {
+    if (!query.trim()) {
+      setFilteredKarakteristieken([]);
+      return;
+    }
+
+    const searchLower = query.toLowerCase().trim();
+    const results = karakteristiekenDatabase.filter(k => {
+      const nameMatch = k.ktNaam?.toLowerCase().includes(searchLower);
+      const codeMatch = k.ktCode?.toLowerCase().includes(searchLower);
+      const parserMatch = k.ktParser?.toLowerCase().includes(searchLower);
+      const typeMatch = k.ktType?.toLowerCase().includes(searchLower);
+      
+      return nameMatch || codeMatch || parserMatch || typeMatch;
+    });
+
+    // Sort by relevance: exact name matches first, then code matches, then partial matches
+    results.sort((a, b) => {
+      const aNameExact = a.ktNaam?.toLowerCase() === searchLower ? 1 : 0;
+      const bNameExact = b.ktNaam?.toLowerCase() === searchLower ? 1 : 0;
+      
+      if (aNameExact !== bNameExact) return bNameExact - aNameExact;
+      
+      const aCodeExact = a.ktCode?.toLowerCase() === searchLower ? 1 : 0;
+      const bCodeExact = b.ktCode?.toLowerCase() === searchLower ? 1 : 0;
+      
+      if (aCodeExact !== bCodeExact) return bCodeExact - aCodeExact;
+      
+      return (a.ktNaam || '').localeCompare(b.ktNaam || '');
+    });
+
+    setFilteredKarakteristieken(results.slice(0, 50)); // Limit to 50 results
+  };
+
+  // Function to add karakteristiek from dialog
+  const addKarakteristiekFromDialog = (karakteristiek: any) => {
+    // Check if this karakteristiek already exists
+    const existingIndex = selectedKarakteristieken.findIndex(k => 
+      k.ktCode === karakteristiek.ktCode && k.ktNaam === karakteristiek.ktNaam
+    );
+
+    if (existingIndex === -1) {
+      // Add new karakteristiek
+      const newKarakteristiek = {
+        id: Date.now() + Math.random(),
+        ktNaam: karakteristiek.ktNaam,
+        ktType: karakteristiek.ktType,
+        waarde: karakteristiek.ktWaarde || '',
+        ktCode: karakteristiek.ktCode
+      };
+
+      setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
+      addLoggingEntry(`📋 Karakteristiek toegevoegd: ${karakteristiek.ktNaam}`);
+    } else {
+      addLoggingEntry(`⚠️ Karakteristiek "${karakteristiek.ktNaam}" is al toegevoegd`);
+    }
+
+    // Close dialog
+    setShowKarakteristiekenDialog(false);
+    setKarakteristiekenSearchQuery("");
+    setFilteredKarakteristieken([]);
+  };
+
   return (
     <div className="gms2-container">
       {/* P2000 Alarm Screen Popup */}
@@ -3157,14 +3224,29 @@ export default function GMS2() {
                       <option value="">Selecteer MC2...</option>
                     </select>
                   </div>
-                  <div className="gms2-tab-group">
+                  <div className="gms2-tab-group" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <select 
                       id="gms2-mc3-select" 
                       className="gms2-dropdown" 
-                      style={{ backgroundColor: '#f5f5f5' }}
+                      style={{ backgroundColor: '#f5f5f5', flex: 1 }}
                     >
                       <option value="">Selecteer MC3...</option>
                     </select>
+                    <button 
+                      className="gms2-btn small"
+                      onClick={() => setShowKarakteristiekenDialog(true)}
+                      style={{ 
+                        minWidth: '24px', 
+                        height: '22px', 
+                        padding: '2px 4px',
+                        fontSize: '10px',
+                        backgroundColor: '#e0e0e0',
+                        border: '1px solid #999'
+                      }}
+                      title="Zoek karakteristieken"
+                    >
+                      📋
+                    </button>
                   </div>
                 </div>
 
@@ -3274,6 +3356,90 @@ export default function GMS2() {
               </div>
         </div>
       </div>
+
+      {/* Karakteristieken Search Dialog */}
+      {showKarakteristiekenDialog && (
+        <div className="gms2-karakteristieken-overlay">
+          <div className="gms2-karakteristieken-dialog">
+            <div className="gms2-dialog-header">
+              <span>Zoek Karakteristieken</span>
+              <button 
+                className="gms2-dialog-close"
+                onClick={() => {
+                  setShowKarakteristiekenDialog(false);
+                  setKarakteristiekenSearchQuery("");
+                  setFilteredKarakteristieken([]);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="gms2-dialog-content">
+              <div className="gms2-search-section">
+                <input
+                  type="text"
+                  className="gms2-karakteristieken-search"
+                  placeholder="Zoek op naam, code, type of parser..."
+                  value={karakteristiekenSearchQuery}
+                  onChange={(e) => {
+                    const query = e.target.value;
+                    setKarakteristiekenSearchQuery(query);
+                    searchKarakteristiekenForDialog(query);
+                  }}
+                  autoFocus
+                />
+                <div className="gms2-search-info">
+                  {filteredKarakteristieken.length > 0 && (
+                    <span>{filteredKarakteristieken.length} resultaten gevonden</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="gms2-karakteristieken-results">
+                {karakteristiekenSearchQuery.length === 0 && (
+                  <div className="gms2-search-hint">
+                    <p><strong>Zoektips:</strong></p>
+                    <ul>
+                      <li>• Typ "aanh" voor aanhoudingen</li>
+                      <li>• Typ "pol" voor politie-gerelateerd</li>
+                      <li>• Typ "gewond" voor gewonden</li>
+                      <li>• Typ "dader" voor daders</li>
+                      <li>• Zoek op type zoals "Getal" of "Ja/Nee"</li>
+                    </ul>
+                  </div>
+                )}
+
+                {filteredKarakteristieken.map((kar, index) => (
+                  <div
+                    key={`search-kar-${kar.ktCode}-${index}`}
+                    className="gms2-karakteristiek-result"
+                    onClick={() => addKarakteristiekFromDialog(kar)}
+                  >
+                    <div className="gms2-kar-result-main">
+                      <span className="gms2-kar-name">{kar.ktNaam}</span>
+                      <span className="gms2-kar-type">({kar.ktType})</span>
+                    </div>
+                    <div className="gms2-kar-result-details">
+                      {kar.ktCode && <span className="gms2-kar-code">Code: {kar.ktCode}</span>}
+                      {kar.ktWaarde && <span className="gms2-kar-value">Waarde: {kar.ktWaarde}</span>}
+                    </div>
+                    {kar.ktParser && (
+                      <div className="gms2-kar-parser">Parser: {kar.ktParser}</div>
+                    )}
+                  </div>
+                ))}
+
+                {karakteristiekenSearchQuery.length >= 2 && filteredKarakteristieken.length === 0 && (
+                  <div className="gms2-no-results">
+                    Geen karakteristieken gevonden voor "{karakteristiekenSearchQuery}"
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Status Bar */}
       <div className="gms2-status-bar">
