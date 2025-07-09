@@ -3357,12 +3357,18 @@ export default function GMS2() {
         </div>
       </div>
 
-      {/* Karakteristieken Search Dialog */}
+      {/* Karakteristieken Search Dialog - Verbeterde Popup */}
       {showKarakteristiekenDialog && (
-        <div className="gms2-karakteristieken-overlay">
+        <div className="gms2-karakteristieken-overlay" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowKarakteristiekenDialog(false);
+            setKarakteristiekenSearchQuery("");
+            setFilteredKarakteristieken([]);
+          }
+        }}>
           <div className="gms2-karakteristieken-dialog">
             <div className="gms2-dialog-header">
-              <span>Zoek Karakteristieken</span>
+              <span className="gms2-dialog-title">🔍 Zoek Karakteristieken Database</span>
               <button 
                 className="gms2-dialog-close"
                 onClick={() => {
@@ -3370,6 +3376,7 @@ export default function GMS2() {
                   setKarakteristiekenSearchQuery("");
                   setFilteredKarakteristieken([]);
                 }}
+                title="Sluiten"
               >
                 ✕
               </button>
@@ -3380,7 +3387,7 @@ export default function GMS2() {
                 <input
                   type="text"
                   className="gms2-karakteristieken-search"
-                  placeholder="Zoek op naam, code, type of parser..."
+                  placeholder="🔍 Zoek karakteristieken (bijv: aanh, gewond, pol, dader)..."
                   value={karakteristiekenSearchQuery}
                   onChange={(e) => {
                     const query = e.target.value;
@@ -3391,7 +3398,10 @@ export default function GMS2() {
                 />
                 <div className="gms2-search-info">
                   {filteredKarakteristieken.length > 0 && (
-                    <span>{filteredKarakteristieken.length} resultaten gevonden</span>
+                    <span>📋 {filteredKarakteristieken.length} resultaten gevonden</span>
+                  )}
+                  {karakteristiekenSearchQuery.length > 0 && filteredKarakteristieken.length === 0 && (
+                    <span style={{ color: '#ff6b6b' }}>❌ Geen resultaten</span>
                   )}
                 </div>
               </div>
@@ -3399,14 +3409,27 @@ export default function GMS2() {
               <div className="gms2-karakteristieken-results">
                 {karakteristiekenSearchQuery.length === 0 && (
                   <div className="gms2-search-hint">
-                    <p><strong>Zoektips:</strong></p>
-                    <ul>
-                      <li>• Typ "aanh" voor aanhoudingen</li>
-                      <li>• Typ "pol" voor politie-gerelateerd</li>
-                      <li>• Typ "gewond" voor gewonden</li>
-                      <li>• Typ "dader" voor daders</li>
-                      <li>• Zoek op type zoals "Getal" of "Ja/Nee"</li>
-                    </ul>
+                    <div className="gms2-hint-header">💡 <strong>Snelle zoektips:</strong></div>
+                    <div className="gms2-hint-grid">
+                      <div className="gms2-hint-item">
+                        <strong>"aanh"</strong> → Aanhoudingen
+                      </div>
+                      <div className="gms2-hint-item">
+                        <strong>"pol"</strong> → Politie inzet
+                      </div>
+                      <div className="gms2-hint-item">
+                        <strong>"gewond"</strong> → Gewonden
+                      </div>
+                      <div className="gms2-hint-item">
+                        <strong>"dader"</strong> → Daders
+                      </div>
+                      <div className="gms2-hint-item">
+                        <strong>"ovdp"</strong> → Overval/Diefstal
+                      </div>
+                      <div className="gms2-hint-item">
+                        <strong>"inzet"</strong> → Inzet types
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -3415,26 +3438,43 @@ export default function GMS2() {
                     key={`search-kar-${kar.ktCode}-${index}`}
                     className="gms2-karakteristiek-result"
                     onClick={() => addKarakteristiekFromDialog(kar)}
+                    title="Klik om toe te voegen"
                   >
                     <div className="gms2-kar-result-main">
-                      <span className="gms2-kar-name">{kar.ktNaam}</span>
+                      <span className="gms2-kar-name">📋 {kar.ktNaam}</span>
                       <span className="gms2-kar-type">({kar.ktType})</span>
                     </div>
                     <div className="gms2-kar-result-details">
-                      {kar.ktCode && <span className="gms2-kar-code">Code: {kar.ktCode}</span>}
-                      {kar.ktWaarde && <span className="gms2-kar-value">Waarde: {kar.ktWaarde}</span>}
+                      {kar.ktCode && <span className="gms2-kar-code">🏷️ {kar.ktCode}</span>}
+                      {kar.ktWaarde && <span className="gms2-kar-value">💾 {kar.ktWaarde}</span>}
                     </div>
                     {kar.ktParser && (
-                      <div className="gms2-kar-parser">Parser: {kar.ktParser}</div>
+                      <div className="gms2-kar-parser">⚡ {kar.ktParser}</div>
                     )}
                   </div>
                 ))}
 
                 {karakteristiekenSearchQuery.length >= 2 && filteredKarakteristieken.length === 0 && (
                   <div className="gms2-no-results">
-                    Geen karakteristieken gevonden voor "{karakteristiekenSearchQuery}"
+                    <div>❌ Geen karakteristieken gevonden voor "{karakteristiekenSearchQuery}"</div>
+                    <div style={{ fontSize: '11px', marginTop: '8px', color: '#666' }}>
+                      💡 Probeer kortere zoektermen zoals "aanh", "pol" of "gewond"
+                    </div>
                   </div>
                 )}
+              </div>
+
+              <div className="gms2-dialog-footer">
+                <button 
+                  className="gms2-btn" 
+                  onClick={() => {
+                    setShowKarakteristiekenDialog(false);
+                    setKarakteristiekenSearchQuery("");
+                    setFilteredKarakteristieken([]);
+                  }}
+                >
+                  Sluiten
+                </button>
               </div>
             </div>
           </div>
