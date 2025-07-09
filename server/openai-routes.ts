@@ -248,7 +248,7 @@ const STANDARD_RULES = {
   "beschrijving": "Dit bestand bevat de standaardregels voor meldingsscripts binnen de meldkamersimulator. Het definieert gemeenten en plaatsen binnen veiligheidsregio Rotterdam-Rijnmond, en beschrijft vaste afspraken over locatieomschrijvingen, melderinformatie, adreslogica en intakevragen."
 };
 
-// Enhanced 112 script system with structured scenarios
+// Nieuwe gestructureerde 112-script systeemtured scenarios
 const STRUCTURED_112_SCENARIOS = {
   'afpersing': {
     category: 'Bezitsaantasting',
