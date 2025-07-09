@@ -1066,8 +1066,10 @@ export default function Dashboard() {
       callIntensity = 0.7; // Fewer calls at night
     }
 
-    // When manually triggered, always create a call
-    // (This random check was preventing manual simulation from working)
+    // Only simulate if random factor allows (for more realistic timing)
+    if (Math.random() > (0.1 * callIntensity)) {
+      return; // Skip this simulation round
+    }
 
     const newCall = {
       id: Date.now(),
@@ -4414,12 +4416,6 @@ export default function Dashboard() {
                     "wegongeval": "ogwels",
                     "auto ongeval": "ogwels",
                     "aanrijding": "ogwels",
-                    "wegongeval letsel": "ogwels",
-                    "auto ongeval letsel": "ogwels",
-                    
-                    // Railway accidents
-                    "ongeval spoorvervoer letsel": "ogspls",
-                    "spoorwegongeval letsel": "ogspls",
                     
                     // Traffic violations
                     "wegverkeer onder invloed": "vkweoi",
@@ -4445,6 +4441,14 @@ export default function Dashboard() {
                     // Service requests - Ambulance
                     "ambulance afstemverzoek": "dvabav",
                     "afstemverzoek ambulance": "dvabav",
+                    
+                    // Accidents with disambiguation
+                    "ongeval wegvervoer letsel": "ogwels",
+                    "ongeval spoorvervoer letsel": "ogspls",
+                    "wegongeval letsel": "ogwels",
+                    "spoorwegongeval letsel": "ogspls",
+                    "auto ongeval letsel": "ogwels",
+                    "verkeersongeval letsel": "ogwels",
                     
                     // Property crimes
                     "bz": "bzdsbr",
