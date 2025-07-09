@@ -248,7 +248,123 @@ const STANDARD_RULES = {
   "beschrijving": "Dit bestand bevat de standaardregels voor meldingsscripts binnen de meldkamersimulator. Het definieert gemeenten en plaatsen binnen veiligheidsregio Rotterdam-Rijnmond, en beschrijft vaste afspraken over locatieomschrijvingen, melderinformatie, adreslogica en intakevragen."
 };
 
-// Nieuwe gestructureerde 112-script systeemtured scenarios
+// Uitgebreide diefstal scenario's database - geïntegreerd met bestaande standaardregels
+const DIEFSTAL_SCENARIOS_DATABASE = [
+  {
+    "categorie": "Bezitsaantasting",
+    "subcategorie": "Diefstal",
+    "classificatie": "Afpersing",
+    "spoed": true,
+    "intake": [
+      {"vraag": "Wat is er gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is het exacte adres?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u de locatie verder omschrijven?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u gewond geraakt?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is er gestolen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wanneer is het gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoeveel daders waren er?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoe zagen de daders eruit?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Waren ze gewapend?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Welke kant zijn ze op gevlucht?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Was er een voertuig of kenteken betrokken?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Zijn er getuigen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hangen er camera's in de omgeving?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is uw naam en telefoonnummer?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u zich legitimeren?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u aangifte doen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Is er verder gevaar?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u alleen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u op dit moment veilig?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u dat we direct politie sturen?", "antwoord": "Wordt aangevuld door AI"}
+    ]
+  },
+  {
+    "categorie": "Bezitsaantasting",
+    "subcategorie": "Diefstal",
+    "classificatie": "Beroving",
+    "spoed": true,
+    "intake": [
+      {"vraag": "Wat is er gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is het exacte adres?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u de locatie verder omschrijven?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u gewond geraakt?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is er gestolen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wanneer is het gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoeveel daders waren er?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoe zagen de daders eruit?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Waren ze gewapend?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Welke kant zijn ze op gevlucht?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Was er een voertuig of kenteken betrokken?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Zijn er getuigen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hangen er camera's in de omgeving?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is uw naam en telefoonnummer?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u zich legitimeren?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u aangifte doen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Is er verder gevaar?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u alleen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u op dit moment veilig?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u dat we direct politie sturen?", "antwoord": "Wordt aangevuld door AI"}
+    ]
+  },
+  {
+    "categorie": "Bezitsaantasting",
+    "subcategorie": "Diefstal",
+    "classificatie": "Dier",
+    "spoed": false,
+    "intake": [
+      {"vraag": "Wat is er gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is het exacte adres?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u de locatie verder omschrijven?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u gewond geraakt?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is er gestolen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wanneer is het gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoeveel daders waren er?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoe zagen de daders eruit?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Waren ze gewapend?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Welke kant zijn ze op gevlucht?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Was er een voertuig of kenteken betrokken?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Zijn er getuigen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hangen er camera's in de omgeving?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is uw naam en telefoonnummer?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u zich legitimeren?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u aangifte doen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Is er verder gevaar?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u alleen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u op dit moment veilig?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u dat we direct politie sturen?", "antwoord": "Wordt aangevuld door AI"}
+    ]
+  },
+  {
+    "categorie": "Bezitsaantasting",
+    "subcategorie": "Diefstal",
+    "classificatie": "Fraude",
+    "spoed": false,
+    "intake": [
+      {"vraag": "Wat is er gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is het exacte adres?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u de locatie verder omschrijven?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u gewond geraakt?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is er gestolen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wanneer is het gebeurd?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoeveel daders waren er?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hoe zagen de daders eruit?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Waren ze gewapend?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Welke kant zijn ze op gevlucht?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Was er een voertuig of kenteken betrokken?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Zijn er getuigen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Hangen er camera's in de omgeving?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wat is uw naam en telefoonnummer?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Kunt u zich legitimeren?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u aangifte doen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Is er verder gevaar?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u alleen?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Bent u op dit moment veilig?", "antwoord": "Wordt aangevuld door AI"},
+      {"vraag": "Wilt u dat we direct politie sturen?", "antwoord": "Wordt aangevuld door AI"}
+    ]
+  }
+];
+
+// Gestructureerde 112-script scenarios - nu geïntegreerd met uitgebreide database
 const STRUCTURED_112_SCENARIOS = {
   'afpersing': {
     category: 'Bezitsaantasting',
@@ -256,7 +372,7 @@ const STRUCTURED_112_SCENARIOS = {
     priority: 1,
     isUrgent: true,
     initialResponse: "112, wat is uw noodsituatie?",
-    followUpQuestions: [
+    followUpQuestions: DIEFSTAL_SCENARIOS_DATABASE.find(s => s.classificatie === 'Afpersing')?.intake?.map(q => q.vraag) || [
       "Wat is er precies gebeurd?",
       "Waar bevindt u zich nu?",
       "Bent u gewond geraakt?",
@@ -270,7 +386,7 @@ const STRUCTURED_112_SCENARIOS = {
     priority: 1,
     isUrgent: true,
     initialResponse: "112, wat is uw noodsituatie?",
-    followUpQuestions: [
+    followUpQuestions: DIEFSTAL_SCENARIOS_DATABASE.find(s => s.classificatie === 'Beroving')?.intake?.map(q => q.vraag) || [
       "Wat is er gestolen?",
       "Waar bent u nu?",
       "Bent u gewond?",
@@ -284,10 +400,23 @@ const STRUCTURED_112_SCENARIOS = {
     priority: 3,
     isUrgent: false,
     initialResponse: "112, wat is uw noodsituatie?",
-    followUpQuestions: [
+    followUpQuestions: DIEFSTAL_SCENARIOS_DATABASE.find(s => s.classificatie === 'Dier')?.intake?.map(q => q.vraag) || [
       "Welk dier is er gestolen?",
       "Wanneer heeft u dit ontdekt?",
       "Heeft u vermoedens wie dit gedaan heeft?",
+      "Wilt u aangifte doen?"
+    ]
+  },
+  'fraude': {
+    category: 'Bezitsaantasting',
+    subcategory: 'Diefstal', 
+    priority: 3,
+    isUrgent: false,
+    initialResponse: "112, wat is uw noodsituatie?",
+    followUpQuestions: DIEFSTAL_SCENARIOS_DATABASE.find(s => s.classificatie === 'Fraude')?.intake?.map(q => q.vraag) || [
+      "Wat voor soort fraude is het?",
+      "Wanneer heeft u dit ontdekt?",
+      "Hoeveel schade is er ontstaan?",
       "Wilt u aangifte doen?"
     ]
   }
@@ -300,6 +429,11 @@ router.post('/generate-structured-scenario', async (req, res) => {
     const scenarioTypes = Object.keys(STRUCTURED_112_SCENARIOS);
     const randomScenario = scenarioTypes[Math.floor(Math.random() * scenarioTypes.length)];
     const scenario = STRUCTURED_112_SCENARIOS[randomScenario];
+    
+    // Find detailed scenario data from database
+    const detailedScenario = DIEFSTAL_SCENARIOS_DATABASE.find(s => 
+      s.classificatie.toLowerCase() === randomScenario.toLowerCase()
+    );
     
     // Generate random caller details using standard rules
     const callerTypes = STANDARD_RULES.melderregels.toegestane_types;
@@ -327,6 +461,7 @@ router.post('/generate-structured-scenario', async (req, res) => {
       initialResponse: scenario.initialResponse,
       questions: scenario.followUpQuestions,
       standardRules: STANDARD_RULES,
+      detailedIntake: detailedScenario?.intake || [],
       scriptData: {
         categorie: scenario.category,
         subcategorie: scenario.subcategory,
@@ -342,11 +477,13 @@ router.post('/generate-structured-scenario', async (req, res) => {
           plaats: randomPlaats,
           adres: "VIA_BAG_SCRIPT",
           context_prompt: STANDARD_RULES.locatiebeschrijving_regels.join('. ')
-        }
+        },
+        intake_vragen: detailedScenario?.intake || []
       }
     };
     
     console.log(`🎯 Generated structured scenario: ${randomScenario} (${randomCallerType}) in ${randomPlaats}, ${randomGemeente}`);
+    console.log(`📋 Intake questions: ${detailedScenario?.intake?.length || 0} detailed questions available`);
     
     res.json(structuredScenario);
     
@@ -399,12 +536,17 @@ STANDAARD REGELS (Rotterdam-Rijnmond):
 - Locatie beschrijving: ${standardRules.locatiebeschrijving_regels.join('. ')}
 - Intake structuur: ${standardRules.intake_vragen.structuur.join(' → ')}
 
+INTAKE VRAGEN STRUCTUUR:
+${script.intake_vragen ? script.intake_vragen.map((q, i) => `${i + 1}. ${q.vraag}`).join('\n') : 'Standaard intake vragen'}
+
 GEDRAGSINSTRUCTIES:
 - Wees realistisch emotioneel (paniek bij spoed, bezorgdheid bij niet-spoed)
 - Geef informatie geleidelijk prijs zoals een echte burger
 - Gebruik Nederlandse uitdrukkingen en taalgebruik
 - Reageer natuurlijk op vragen van de meldkamer
-- Houd rekening met de locatie context (${script.locatie?.plaats || 'Rotterdam'})`;
+- Houd rekening met de locatie context (${script.locatie?.plaats || 'Rotterdam'})
+- Beantwoord vragen volgens de intake structuur hierboven
+- Gebruik realistische details passend bij het incident type`;
     }
 
     console.log(`🤖 Using ${aiService} for structured 112 conversation`);
