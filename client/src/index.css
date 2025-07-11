@@ -3259,16 +3259,32 @@ body {
   padding: 4px 6px;
   cursor: pointer;
   border-radius: 2px;
-  transition: background-color 0.1s ease;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .gms2-dub-incident-item:hover {
-  background: #e0e0ff;
-  border-color: #9999ff;
+  background: #e0ffe0;
+  border-color: #66cc66;
+  transform: translateX(2px);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
 .gms2-dub-incident-item:active {
-  background: #d0d0ff;
+  background: #d0ffd0;
+  transform: translateX(1px);
+}
+
+.gms2-dub-incident-item::before {
+  content: "🔗 ";
+  position: absolute;
+  left: -15px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.gms2-dub-incident-item:hover::before {
+  opacity: 1;
 }
 
 .gms2-dub-incident-header {
