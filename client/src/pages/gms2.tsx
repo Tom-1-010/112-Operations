@@ -84,8 +84,7 @@ export default function GMS2() {
   const [showKarakteristiekenDialog, setShowKarakteristiekenDialog] = useState(false);
   const [karakteristiekenSearchQuery, setKarakteristiekenSearchQuery] = useState("");
   const [filteredKarakteristieken, setFilteredKarakteristieken] = useState<any[]>([]);
-  const [showDubDialog, setShowDubDialog] = useState(false);
-  const [dubTargetIncident, setDubTargetIncident] = useState<GmsIncident | null>(null);
+  
 
   // Form state for new incidents
   const [formData, setFormData] = useState({
@@ -2366,9 +2365,8 @@ export default function GMS2() {
     addLoggingEntry(`📊 ${(targetIncident.assignedUnits?.length || 0)} eenheden overgenomen`);
     addLoggingEntry(`📋 ${(targetIncident.karakteristieken?.length || 0)} karakteristieken overgenomen`);
 
-    // Close dialog
-    setShowDubDialog(false);
-    setDubTargetIncident(null);
+    // Switch back to logging tab
+    setActiveLoggingTab('hist-meldblok');
 
     console.log(`🔗 DUB: Incident ${targetIncident.nr} merged into ${selectedIncident.nr}`);
   };
@@ -3008,7 +3006,7 @@ export default function GMS2() {
                   <button className="gms2-btn small">EDB</button>
                   <button 
                     className="gms2-btn small"
-                    onClick={() => setShowDubDialog(true)}
+                    onClick={() => setActiveLoggingTab('dub')}
                     title="Duplicaat - Voeg meldingen samen"
                   >
                     DUB
@@ -3055,6 +3053,12 @@ export default function GMS2() {
                     onClick={() => setActiveLoggingTab('overige-inzet')}
                   >
                     Overige inzet
+                  </button>
+                  <button 
+                    className={`gms2-btn tab-btn ${activeLoggingTab === 'dub' ? 'active' : ''}`}
+                    onClick={() => setActiveLoggingTab('dub')}
+                  >
+                    DUB
                   </button>
                 </div>
 
@@ -3272,6 +3276,72 @@ export default function GMS2() {
                       </div>
                     </div>
                   )}
+
+                  {/* DUB Tab Content - only shown when activeLoggingTab is 'dub' */}
+                  {activeLoggingTab === 'dub' && (
+                    <div className="gms2-dub-content">
+                      <div className="gms2-dub-header">
+                        <div className="gms2-dub-title">🔗 DUB - Incident Samenvoegen</div>
+                        <div className="gms2-dub-info">
+                          <div className="gms2-dub-selected">
+                            <strong>Hoofdincident:</strong> #{selectedIncident?.nr} - {selectedIncident?.mc3 || selectedIncident?.mc2 || selectedIncident?.mc1 || 'Onbekend'}
+                            <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                              📍 {selectedIncident?.locatie || 'Geen locatie'} | 📞 {selectedIncident?.melderNaam || 'Geen melder'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="gms2-dub-instructions">
+                        Selecteer het incident dat moet worden samengevoegd met het hoofdincident:
+                      </div>
+
+                      <div className="gms2-dub-incidents-list">
+                        {incidents.filter(inc => inc.id !== selectedIncident?.id).map((incident) => {
+                          const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || 'Onbekend';
+                          const timeAgo = incident.tijdstip ? 
+                            `${Math.floor((Date.now() - new Date(incident.tijdstip).getTime()) / 60000)} min geleden` : 
+                            'Onbekend';
+                          
+                          return (
+                            <div
+                              key={`dub-incident-${incident.id}`}
+                              className="gms2-dub-incident-item"
+                              onClick={() => handleDubMerge(incident)}
+                              title="Klik om samen te voegen"
+                            >
+                              <div className="gms2-dub-incident-header">
+                                <span className="gms2-dub-incident-number">🚨 Incident #{incident.nr}</span>
+                                <span className="gms2-dub-incident-priority">P{incident.prio} | {mcClassification}</span>
+                              </div>
+                              <div className="gms2-dub-incident-details">
+                                <div className="gms2-dub-incident-location">📍 {incident.locatie || 'Geen locatie'}</div>
+                                <div className="gms2-dub-incident-time">⏰ {timeAgo}</div>
+                              </div>
+                              <div className="gms2-dub-incident-meta">
+                                👤 {incident.melderNaam || 'Geen melder'} | 
+                                🚔 {incident.assignedUnits?.length || 0} eenheden | 
+                                📋 {incident.karakteristieken?.length || 0} karakteristieken
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {incidents.filter(inc => inc.id !== selectedIncident?.id).length === 0 && (
+                          <div className="gms2-dub-no-incidents">
+                            <div>ℹ️ Geen andere incidenten beschikbaar om samen te voegen</div>
+                            <div style={{ fontSize: '10px', marginTop: '6px', color: '#666' }}>
+                              Er zijn momenteel geen andere openstaande incidenten
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="gms2-dub-warning">
+                        ⚠️ Let op: Het geselecteerde incident wordt permanent samengevoegd en kan niet ongedaan worden gemaakt
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* LMC Classification dropdowns row */}
@@ -3427,104 +3497,7 @@ export default function GMS2() {
         </div>
       </div>
 
-      {/* DUB Dialog - Incident samenvoegen */}
-      {showDubDialog && (
-        <div className="gms2-karakteristieken-overlay" onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setShowDubDialog(false);
-            setDubTargetIncident(null);
-          }
-        }}>
-          <div className="gms2-karakteristieken-dialog">
-            <div className="gms2-dialog-header">
-              <span className="gms2-dialog-title">🔗 DUB - Incident Samenvoegen</span>
-              <button 
-                className="gms2-dialog-close"
-                onClick={() => {
-                  setShowDubDialog(false);
-                  setDubTargetIncident(null);
-                }}
-                title="Sluiten"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="gms2-dialog-content">
-              <div className="gms2-search-section">
-                <div className="gms2-dub-info">
-                  <div className="gms2-dub-selected">
-                    <strong>Hoofdincident:</strong> #{selectedIncident?.nr} - {selectedIncident?.mc3 || selectedIncident?.mc2 || selectedIncident?.mc1 || 'Onbekend'}
-                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-                      📍 {selectedIncident?.locatie || 'Geen locatie'} | 📞 {selectedIncident?.melderNaam || 'Geen melder'}
-                    </div>
-                  </div>
-                  <div style={{ margin: '10px 0', fontSize: '11px', color: '#333' }}>
-                    Selecteer het incident dat moet worden samengevoegd met het hoofdincident:
-                  </div>
-                </div>
-              </div>
-
-              <div className="gms2-karakteristieken-results" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                {incidents.filter(inc => inc.id !== selectedIncident?.id).map((incident) => {
-                  const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || 'Onbekend';
-                  const timeAgo = incident.tijdstip ? 
-                    `${Math.floor((Date.now() - new Date(incident.tijdstip).getTime()) / 60000)} min geleden` : 
-                    'Onbekend';
-                  
-                  return (
-                    <div
-                      key={`dub-incident-${incident.id}`}
-                      className="gms2-karakteristiek-result"
-                      onClick={() => handleDubMerge(incident)}
-                      title="Klik om samen te voegen"
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <div className="gms2-kar-result-main">
-                        <span className="gms2-kar-name">🚨 Incident #{incident.nr}</span>
-                        <span className="gms2-kar-type">P{incident.prio} | {mcClassification}</span>
-                      </div>
-                      <div className="gms2-kar-result-details">
-                        <span className="gms2-kar-code">📍 {incident.locatie || 'Geen locatie'}</span>
-                        <span className="gms2-kar-value">⏰ {timeAgo}</span>
-                      </div>
-                      <div className="gms2-kar-parser" style={{ fontSize: '9px' }}>
-                        👤 {incident.melderNaam || 'Geen melder'} | 
-                        🚔 {incident.assignedUnits?.length || 0} eenheden | 
-                        📋 {incident.karakteristieken?.length || 0} karakteristieken
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {incidents.filter(inc => inc.id !== selectedIncident?.id).length === 0 && (
-                  <div className="gms2-no-results">
-                    <div>ℹ️ Geen andere incidenten beschikbaar om samen te voegen</div>
-                    <div style={{ fontSize: '11px', marginTop: '8px', color: '#666' }}>
-                      Er zijn momenteel geen andere openstaande incidenten
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="gms2-dialog-footer">
-                <div style={{ fontSize: '10px', color: '#666', marginBottom: '10px' }}>
-                  ⚠️ Let op: Het geselecteerde incident wordt permanent samengevoegd en kan niet ongedaan worden gemaakt
-                </div>
-                <button 
-                  className="gms2-btn" 
-                  onClick={() => {
-                    setShowDubDialog(false);
-                    setDubTargetIncident(null);
-                  }}
-                >
-                  Annuleren
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Karakteristieken Search Dialog - Verbeterde Popup */}
       {showKarakteristiekenDialog && (

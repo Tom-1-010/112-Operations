@@ -3205,6 +3205,131 @@ body {
   padding: 20px;
 }
 
+/* GMS2 DUB Tab Content */
+.gms2-dub-content {
+  height: 100%;
+  padding: 4px;
+  font-size: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gms2-dub-header {
+  background: #e0e0ff;
+  border: 1px solid #9999ff;
+  padding: 4px 6px;
+  border-radius: 2px;
+}
+
+.gms2-dub-title {
+  font-weight: bold;
+  font-size: 11px;
+  color: #000080;
+  margin-bottom: 2px;
+}
+
+.gms2-dub-selected {
+  font-size: 10px;
+  color: #000;
+}
+
+.gms2-dub-instructions {
+  font-size: 10px;
+  color: #333;
+  padding: 2px 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  margin: 2px 0;
+}
+
+.gms2-dub-incidents-list {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px inset #c0c0c0;
+  background: white;
+  padding: 2px;
+}
+
+.gms2-dub-incident-item {
+  background: white;
+  border: 1px solid #d0d0d0;
+  margin: 2px 0;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.1s ease;
+}
+
+.gms2-dub-incident-item:hover {
+  background: #e0e0ff;
+  border-color: #9999ff;
+}
+
+.gms2-dub-incident-item:active {
+  background: #d0d0ff;
+}
+
+.gms2-dub-incident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.gms2-dub-incident-number {
+  font-weight: bold;
+  font-size: 10px;
+  color: #000080;
+}
+
+.gms2-dub-incident-priority {
+  font-size: 9px;
+  color: #666;
+  font-weight: bold;
+}
+
+.gms2-dub-incident-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.gms2-dub-incident-location,
+.gms2-dub-incident-time {
+  font-size: 9px;
+}
+
+.gms2-dub-incident-meta {
+  font-size: 8px;
+  color: #666;
+  font-style: italic;
+}
+
+.gms2-dub-no-incidents {
+  text-align: center;
+  padding: 15px;
+  color: #666;
+  font-style: italic;
+  background: #f8f8f8;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+.gms2-dub-warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 4px 6px;
+  font-size: 9px;
+  color: #856404;
+  border-radius: 2px;
+  text-align: center;
+  margin-top: auto;
+}
+
 .gms2-status-overview {
   height: 100%;
   background: #c0c0c0;
