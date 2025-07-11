@@ -2323,6 +2323,8 @@ export default function GMS2() {
       return;
     }
 
+    console.log(`🔗 DUB: Merging incident ${targetIncident.nr} into ${selectedIncident.nr}`);
+
     // Parse existing logging entries to add new ones properly
     const existingLoggingEntries = selectedIncident.meldingslogging ? 
       selectedIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
@@ -2330,7 +2332,7 @@ export default function GMS2() {
       targetIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
 
     // Create merged incident with combined data
-    const mergedIncident = {
+    const mergedIncident: GmsIncident = {
       ...selectedIncident,
       // Combine logging entries
       meldingslogging: [
@@ -2367,13 +2369,26 @@ export default function GMS2() {
       ].filter(note => note.trim()).join('\n\n')
     };
 
+    console.log(`🔗 Merged incident data:`, mergedIncident);
+
     // Update incidents list - remove target, update selected
-    setIncidents(prev => prev.filter(inc => inc.id !== targetIncident.id).map(inc => 
-      inc.id === selectedIncident.id ? mergedIncident : inc
-    ));
+    setIncidents(prev => {
+      const updatedIncidents = prev
+        .filter(inc => inc.id !== targetIncident.id) // Remove target incident
+        .map(inc => inc.id === selectedIncident.id ? mergedIncident : inc); // Update selected incident
+      
+      console.log(`🔗 Updated incidents list: ${updatedIncidents.length} incidents remaining`);
+      return updatedIncidents;
+    });
 
     // Update selected incident
     setSelectedIncident(mergedIncident);
+
+    // Update notes text area to reflect merged notes
+    setNotitiesText(mergedIncident.notities || '');
+
+    // Update karakteristieken state
+    setSelectedKarakteristieken(mergedIncident.karakteristieken || []);
 
     // Update current logging entries to reflect the merge
     const now = new Date();
@@ -2383,32 +2398,43 @@ export default function GMS2() {
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
 
-    // Add new logging entries
+    // Parse all logging entries from merged incident
+    const allLoggingLines = mergedIncident.meldingslogging ? 
+      mergedIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
+    
+    const parsedEntries = allLoggingLines.map((line, index) => ({
+      id: Date.now() + index + Math.random(),
+      timestamp: line.substring(0, 20) || timestamp,
+      message: line.substring(21) || line
+    }));
+
+    // Add new logging entries for the merge
     const newEntries = [
       {
-        id: Date.now() + 1,
+        id: Date.now() + 1000,
         timestamp,
         message: `🔗 Incident ${targetIncident.nr} samengevoegd met ${selectedIncident.nr}`
       },
       {
-        id: Date.now() + 2,
+        id: Date.now() + 1001,
         timestamp,
         message: `📊 ${(targetIncident.assignedUnits?.length || 0)} eenheden overgenomen`
       },
       {
-        id: Date.now() + 3,
+        id: Date.now() + 1002,
         timestamp,
         message: `📋 ${(targetIncident.karakteristieken?.length || 0)} karakteristieken overgenomen`
       }
     ];
 
-    setLoggingEntries(prev => [...newEntries, ...prev]);
+    // Set all logging entries (new merge entries + all existing entries)
+    setLoggingEntries([...newEntries, ...parsedEntries]);
 
     // Close DUB content and switch back to logging tab
     setShowDubContent(false);
     setActiveLoggingTab('hist-meldblok');
 
-    console.log(`🔗 DUB: Incident ${targetIncident.nr} merged into ${selectedIncident.nr}`);
+    console.log(`✅ DUB: Incident ${targetIncident.nr} successfully merged into ${selectedIncident.nr}`);
   };
 
   return (
@@ -3103,220 +3129,7 @@ export default function GMS2() {
 
                 {/* Dynamic Tabbed Content */}
                 <div className="gms2-history-section">
-                  {activeLoggingTab === 'hist-meldblok' && (
-                    <div className="gms2-history-scrollbox" id="gms2-logging-display">
-                      {loggingEntries.map((entry) => (
-                        <div key={entry.id} className="gms2-history-entry">
-                          {entry.timestamp} {entry.message}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {activeLoggingTab === 'locatietreffers' && (
-                    <div className="gms2-locatietreffers">
-                      <div className="gms2-search-container">
-                        <input
-                          type="text"
-                          className="gms2-search-input"
-                          placeholder="Zoek adres via BAG API... (bijv. Rotterdam Kleiweg 12)"
-                          value={bagSearchQuery}
-                          onChange={async (e) => {
-                            const query = e.target.value;
-                            setBagSearchQuery(query);
-
-                            if (query.length >= 2) {
-                              console.log(`Manual search for: "${query}"`);
-                              const results = await searchBAGAddress(query);
-                              setBagSearchResults(results);
-                            } else {
-                              setBagSearchResults([]);
-                            }
-                          }}
-                          onKeyPress={async (e) => {
-                            if (e.key === 'Enter' && bagSearchQuery.length > 0) {
-                              if (bagSearchResults.length === 1) {
-                                // Auto-select if only one result
-                                const result = bagSearchResults[0];
-                                const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
-
-                                const addressData = {
-                                  straatnaam: result.straatnaam,
-                                  huisnummer: fullHuisnummer,
-                                  postcode: result.postcode,
-                                  plaatsnaam: result.plaatsnaam,
-                                  gemeente: result.gemeente
-                                };
-
-                                setFormData(prev => ({ ...prev, ...addressData }));
-                                if (selectedIncident) {
-                                  setSelectedIncident({ ...selectedIncident, ...addressData });
-                                }
-
-                                addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
-                                setBagSearchQuery("");
-                                setBagSearchResults([]);
-                              } else if (bagSearchResults.length === 0) {
-                                // Try fallback search
-                                const fallbackResults = await searchBAGAddress(bagSearchQuery);
-                                if (fallbackResults.length > 0) {
-                                  const result = fallbackResults[0];
-                                  setFormData(prev => ({ ...prev, postcode: result.postcode }));
-                                  addLoggingEntry(`Postcode automatisch ingevuld: ${result.postcode}`);
-                                } else {
-                                  addLoggingEntry(`Geen adres gevonden voor: "${bagSearchQuery}"`);
-                                }
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-
-                      <div className="gms2-search-help">
-                        💡 Tip: Begin te typen met = in het kladblok voor automatisch zoeken
-                      </div>
-
-                      <div className="gms2-search-results">
-                        {bagSearchResults.map((result, index) => {
-                          const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
-                          return (
-                            <div
-                              key={index}
-                              className="gms2-address-result"
-                              onClick={() => {
-                                const addressData = {
-                                  straatnaam: result.straatnaam,
-                                  huisnummer: fullHuisnummer,
-                                  postcode: result.postcode,
-                                  plaatsnaam: result.plaatsnaam,
-                                  gemeente: result.gemeente
-                                };
-
-                                setFormData(prev => ({ ...prev, ...addressData }));
-                                if (selectedIncident) {
-                                  setSelectedIncident({ ...selectedIncident, ...addressData });
-                                }
-
-                                addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
-                                setBagSearchQuery("");
-                                setBagSearchResults([]);
-
-                                // Clear any =address query from kladblok
-                                if (kladblokText.startsWith('=')) {
-                                  setKladblokText('');
-                                }
-                              }}
-                            >
-                              <div className="gms2-address-main">{result.volledigAdres}</div>
-                              <div className="gms2-address-details">
-                                {result.gemeente} | {result.postcode}
-                              </div>                              </div>
-                            );
-                        })}
-
-                        {bagSearchQuery.length >= 2 && bagSearchResults.length === 0 && (
-                          <div className="gms2-no-results">
-                            <div>Geen adressen gevonden voor "{bagSearchQuery}"</div>
-                            <div style={{ fontSize: '10px', marginTop: '4px', color: '#999' }}>
-                              Probeer een andere zoekterm of gebruik de volledige syntax
-                            </div>
-                          </div>
-                        )}
-
-                        {bagSearchQuery.length < 2 && bagSearchResults.length === 0 && (
-                          <div className="gms2-search-instructions">
-                            <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Hoe te gebruiken:</div>
-                            <div style={{ fontSize: '10px', lineHeight: '1.4' }}>
-                              • Type in het kladblok: <strong>=Rotterdam/Kleiweg 12</strong><br/>
-                              • Of zoek direct hier: <strong>Rotterdam Kleiweg</strong><br/>
-                              • Klik op een resultaat om automatisch in te vullen
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeLoggingTab === 'statusoverzicht' && (
-                    <div className="gms2-status-overview">
-                      <div className="gms2-status-table-container" style={{ 
-                        overflowX: 'auto', 
-                        width: '100%',
-                        fontSize: '10px'
-                      }}>
-                        <table style={{ 
-                          width: '100%', 
-                          borderCollapse: 'collapse', 
-                          border: '1px solid #ccc',
-                          fontSize: '10px',
-                          tableLayout: 'auto'
-                        }}>
-                          {/* Header row */}
-                          <thead>
-                            <tr style={{ backgroundColor: '#f0f0f0' }}>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '25px' }}>D<br/>P</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: 'auto', minWidth: '100px' }}>Roepnaam</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '70px' }}>Soort voe</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ov</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ar</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>tp</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>nb</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>am</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>vr</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>fd</th>
-                              <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>GA</th>
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {/* Dynamic rows for assigned units from selected incident */}
-                            {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
-                              selectedIncident.assignedUnits.map((unit, index) => (
-                                <tr key={`${unit.roepnummer}-${index}`}>
-                                  <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', fontSize: '9px' }}>P</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'left', fontSize: '9px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.roepnummer}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px' }}>{unit.soort_voertuig || 'SurvBus'}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ov_tijd ? '#ffff99' : 'transparent' }}>{unit.ov_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ar_tijd ? '#ffff99' : 'transparent' }}>{unit.ar_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.tp_tijd ? '#ffff99' : 'transparent' }}>{unit.tp_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.nb_tijd ? '#ffff99' : 'transparent' }}>{unit.nb_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.am_tijd ? '#ffff99' : 'transparent' }}>{unit.am_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.vr_tijd ? '#ffff99' : 'transparent' }}>{unit.vr_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.fd_tijd ? '#ffff99' : 'transparent' }}>{unit.fd_tijd || ''}</td>
-                                  <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ga_tijd ? '#ffff99' : 'transparent' }}>{unit.ga_tijd || ''}</td>
-                                </tr>
-                              ))
-                            ) : (
-                              selectedIncident && (
-                                <tr>
-                                  <td colSpan={11} style={{ 
-                                    border: '1px solid #ccc', 
-                                    padding: '10px', 
-                                    textAlign: 'center', 
-                                    fontStyle: 'italic', 
-                                    color: '#666',
-                                    fontSize: '9px'
-                                  }}>
-                                    Geen eenheden toegewezen aan dit incident
-                                  </td>
-                                </tr>
-                              )
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeLoggingTab === 'overige-inzet' && (
-                    <div className="gms2-tab-content">
-                      <div className="gms2-content-placeholder">
-                        Overige inzet - Inhoud volgt later
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Show DUB content when DUB is active, otherwise show selected tab */}
+                  {/* Show DUB content when DUB button is active */}
                   {showDubContent ? (
                     <div className="gms2-dub-content">
                       <div className="gms2-dub-header">
@@ -3391,7 +3204,224 @@ export default function GMS2() {
                         </div>
                       )}
                     </div>
-                  ) : null}
+                  ) : (
+                    /* Show normal tab content when DUB is not active */
+                    <>
+                      {activeLoggingTab === 'hist-meldblok' && (
+                        <div className="gms2-history-scrollbox" id="gms2-logging-display">
+                          {loggingEntries.map((entry) => (
+                            <div key={entry.id} className="gms2-history-entry">
+                              {entry.timestamp} {entry.message}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {activeLoggingTab === 'locatietreffers' && (
+                        <div className="gms2-locatietreffers">
+                          <div className="gms2-search-container">
+                            <input
+                              type="text"
+                              className="gms2-search-input"
+                              placeholder="Zoek adres via BAG API... (bijv. Rotterdam Kleiweg 12)"
+                              value={bagSearchQuery}
+                              onChange={async (e) => {
+                                const query = e.target.value;
+                                setBagSearchQuery(query);
+
+                                if (query.length >= 2) {
+                                  console.log(`Manual search for: "${query}"`);
+                                  const results = await searchBAGAddress(query);
+                                  setBagSearchResults(results);
+                                } else {
+                                  setBagSearchResults([]);
+                                }
+                              }}
+                              onKeyPress={async (e) => {
+                                if (e.key === 'Enter' && bagSearchQuery.length > 0) {
+                                  if (bagSearchResults.length === 1) {
+                                    // Auto-select if only one result
+                                    const result = bagSearchResults[0];
+                                    const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
+
+                                    const addressData = {
+                                      straatnaam: result.straatnaam,
+                                      huisnummer: fullHuisnummer,
+                                      postcode: result.postcode,
+                                      plaatsnaam: result.plaatsnaam,
+                                      gemeente: result.gemeente
+                                    };
+
+                                    setFormData(prev => ({ ...prev, ...addressData }));
+                                    if (selectedIncident) {
+                                      setSelectedIncident({ ...selectedIncident, ...addressData });
+                                    }
+
+                                    addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
+                                    setBagSearchQuery("");
+                                    setBagSearchResults([]);
+                                  } else if (bagSearchResults.length === 0) {
+                                    // Try fallback search
+                                    const fallbackResults = await searchBAGAddress(bagSearchQuery);
+                                    if (fallbackResults.length > 0) {
+                                      const result = fallbackResults[0];
+                                      setFormData(prev => ({ ...prev, postcode: result.postcode }));
+                                      addLoggingEntry(`Postcode automatisch ingevuld: ${result.postcode}`);
+                                    } else {
+                                      addLoggingEntry(`Geen adres gevonden voor: "${bagSearchQuery}"`);
+                                    }
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+
+                          <div className="gms2-search-help">
+                            💡 Tip: Begin te typen met = in het kladblok voor automatisch zoeken
+                          </div>
+
+                          <div className="gms2-search-results">
+                            {bagSearchResults.map((result, index) => {
+                              const fullHuisnummer = `${result.huisnummer}${result.huisletter || ''}${result.huisnummertoevoeging ? '-' + result.huisnummertoevoeging : ''}`;
+                              return (
+                                <div
+                                  key={index}
+                                  className="gms2-address-result"
+                                  onClick={() => {
+                                    const addressData = {
+                                      straatnaam: result.straatnaam,
+                                      huisnummer: fullHuisnummer,
+                                      postcode: result.postcode,
+                                      plaatsnaam: result.plaatsnaam,
+                                      gemeente: result.gemeente
+                                    };
+
+                                    setFormData(prev => ({ ...prev, ...addressData }));
+                                    if (selectedIncident) {
+                                      setSelectedIncident({ ...selectedIncident, ...addressData });
+                                    }
+
+                                    addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
+                                    setBagSearchQuery("");
+                                    setBagSearchResults([]);
+
+                                    // Clear any =address query from kladblok
+                                    if (kladblokText.startsWith('=')) {
+                                      setKladblokText('');
+                                    }
+                                  }}
+                                >
+                                  <div className="gms2-address-main">{result.volledigAdres}</div>
+                                  <div className="gms2-address-details">
+                                    {result.gemeente} | {result.postcode}
+                                  </div>
+                                </div>
+                              );
+                            })}
+
+                            {bagSearchQuery.length >= 2 && bagSearchResults.length === 0 && (
+                              <div className="gms2-no-results">
+                                <div>Geen adressen gevonden voor "{bagSearchQuery}"</div>
+                                <div style={{ fontSize: '10px', marginTop: '4px', color: '#999' }}>
+                                  Probeer een andere zoekterm of gebruik de volledige syntax
+                                </div>
+                              </div>
+                            )}
+
+                            {bagSearchQuery.length < 2 && bagSearchResults.length === 0 && (
+                              <div className="gms2-search-instructions">
+                                <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Hoe te gebruiken:</div>
+                                <div style={{ fontSize: '10px', lineHeight: '1.4' }}>
+                                  • Type in het kladblok: <strong>=Rotterdam/Kleiweg 12</strong><br/>
+                                  • Of zoek direct hier: <strong>Rotterdam Kleiweg</strong><br/>
+                                  • Klik op een resultaat om automatisch in te vullen
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {activeLoggingTab === 'statusoverzicht' && (
+                        <div className="gms2-status-overview">
+                          <div className="gms2-status-table-container" style={{ 
+                            overflowX: 'auto', 
+                            width: '100%',
+                            fontSize: '10px'
+                          }}>
+                            <table style={{ 
+                              width: '100%', 
+                              borderCollapse: 'collapse', 
+                              border: '1px solid #ccc',
+                              fontSize: '10px',
+                              tableLayout: 'auto'
+                            }}>
+                              {/* Header row */}
+                              <thead>
+                                <tr style={{ backgroundColor: '#f0f0f0' }}>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '25px' }}>D<br/>P</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: 'auto', minWidth: '100px' }}>Roepnaam</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '70px' }}>Soort voe</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ov</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ar</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>tp</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>nb</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>am</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>vr</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>fd</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>GA</th>
+                                </tr>
+                              </thead>
+
+                              <tbody>
+                                {/* Dynamic rows for assigned units from selected incident */}
+                                {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
+                                  selectedIncident.assignedUnits.map((unit, index) => (
+                                    <tr key={`${unit.roepnummer}-${index}`}>
+                                      <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', fontSize: '9px' }}>P</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'left', fontSize: '9px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.roepnummer}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px' }}>{unit.soort_voertuig || 'SurvBus'}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ov_tijd ? '#ffff99' : 'transparent' }}>{unit.ov_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ar_tijd ? '#ffff99' : 'transparent' }}>{unit.ar_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.tp_tijd ? '#ffff99' : 'transparent' }}>{unit.tp_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.nb_tijd ? '#ffff99' : 'transparent' }}>{unit.nb_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.am_tijd ? '#ffff99' : 'transparent' }}>{unit.am_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.vr_tijd ? '#ffff99' : 'transparent' }}>{unit.vr_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.fd_tijd ? '#ffff99' : 'transparent' }}>{unit.fd_tijd || ''}</td>
+                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ga_tijd ? '#ffff99' : 'transparent' }}>{unit.ga_tijd || ''}</td>
+                                    </tr>
+                                  ))
+                                ) : (
+                                  selectedIncident && (
+                                    <tr>
+                                      <td colSpan={11} style={{ 
+                                        border: '1px solid #ccc', 
+                                        padding: '10px', 
+                                        textAlign: 'center', 
+                                        fontStyle: 'italic', 
+                                        color: '#666',
+                                        fontSize: '9px'
+                                      }}>
+                                        Geen eenheden toegewezen aan dit incident
+                                      </td>
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {activeLoggingTab === 'overige-inzet' && (
+                        <div className="gms2-tab-content">
+                          <div className="gms2-content-placeholder">
+                            Overige inzet - Inhoud volgt later
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* LMC Classification dropdowns row */}
