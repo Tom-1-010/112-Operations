@@ -3330,6 +3330,22 @@ body {
   margin-top: auto;
 }
 
+.gms2-dub-no-selection {
+  text-align: center;
+  padding: 20px;
+  color: #ff6b6b;
+  background: #fff5f5;
+  border: 1px solid #ff9999;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+.gms2-btn.active {
+  background: #ff99cc;
+  border: 1px inset #c0c0c0;
+  font-weight: bold;
+}
+
 .gms2-status-overview {
   height: 100%;
   background: #c0c0c0;
