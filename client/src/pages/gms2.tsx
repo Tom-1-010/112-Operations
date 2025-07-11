@@ -3161,7 +3161,11 @@ export default function GMS2() {
                                 <div
                                   key={`dub-incident-${incident.id}`}
                                   className="gms2-dub-incident-item"
-                                  onClick={() => handleDubMerge(incident)}
+                                  onClick={() => {
+                                    if (window.confirm(`Weet u zeker dat u incident #${incident.nr} wilt samenvoegen met #${selectedIncident.nr}?\n\nDit kan niet ongedaan worden gemaakt.`)) {
+                                      handleDubMerge(incident);
+                                    }
+                                  }}
                                   title="Klik om samen te voegen"
                                 >
                                   <div className="gms2-dub-incident-header">
@@ -3183,10 +3187,36 @@ export default function GMS2() {
 
                             {incidents.filter(inc => inc.id !== selectedIncident?.id).length === 0 && (
                               <div className="gms2-dub-no-incidents">
-                                <div>ℹ️ Geen andere incidenten beschikbaar om samen te voegen</div>
-                                <div style={{ fontSize: '10px', marginTop: '6px', color: '#666' }}>
-                                  Er zijn momenteel geen andere openstaande incidenten
+                                <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '8px' }}>
+                                  ℹ️ Geen andere incidenten beschikbaar om samen te voegen
                                 </div>
+                                <div style={{ fontSize: '10px', color: '#666', marginBottom: '12px' }}>
+                                  Er zijn momenteel {incidents.length === 1 ? 'alleen dit incident' : 'geen andere openstaande incidenten'}
+                                </div>
+                                <div style={{ fontSize: '10px', background: '#f0f8ff', padding: '8px', borderRadius: '4px', border: '1px solid #b3d9ff' }}>
+                                  <strong>💡 Tips voor DUB (samenvoegen):</strong><br/>
+                                  • Maak eerst een tweede incident aan met "Nieuw" + "Uitgifte"<br/>
+                                  • Of wacht tot er een nieuwe melding binnenkomt<br/>
+                                  • DUB wordt gebruikt om dubbele meldingen samen te voegen
+                                </div>
+                                <button 
+                                  className="gms2-btn" 
+                                  onClick={() => {
+                                    setShowDubContent(false);
+                                    handleNieuw();
+                                    addLoggingEntry("🆕 Nieuwe melding aangemaakt voor mogelijke DUB samenvoeg");
+                                  }}
+                                  style={{ 
+                                    marginTop: '10px', 
+                                    width: '100%', 
+                                    background: '#4CAF50', 
+                                    color: 'white',
+                                    fontSize: '10px',
+                                    padding: '6px'
+                                  }}
+                                >
+                                  🆕 Maak nieuwe melding aan
+                                </button>
                               </div>
                             )}
                           </div>
