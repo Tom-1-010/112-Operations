@@ -2325,72 +2325,7 @@ export default function GMS2() {
 
     console.log(`🔗 DUB: Merging incident ${targetIncident.nr} into ${selectedIncident.nr}`);
 
-    // Parse existing logging entries to add new ones properly
-    const existingLoggingEntries = selectedIncident.meldingslogging ? 
-      selectedIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
-    const targetLoggingEntries = targetIncident.meldingslogging ? 
-      targetIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
-
-    // Create merged incident with combined data
-    const mergedIncident: GmsIncident = {
-      ...selectedIncident,
-      // Combine logging entries
-      meldingslogging: [
-        ...existingLoggingEntries,
-        `[DUB] Incident ${targetIncident.nr} samengevoegd op ${new Date().toLocaleTimeString('nl-NL')}`,
-        ...targetLoggingEntries
-      ].join('\n'),
-      
-      // Combine karakteristieken (remove duplicates based on ktCode)
-      karakteristieken: [
-        ...(selectedIncident.karakteristieken || []),
-        ...(targetIncident.karakteristieken || []).filter(targetKar => 
-          !(selectedIncident.karakteristieken || []).some(existingKar => 
-            existingKar.ktCode === targetKar.ktCode
-          )
-        )
-      ],
-      
-      // Combine assigned units (remove duplicates based on roepnummer)
-      assignedUnits: [
-        ...(selectedIncident.assignedUnits || []),
-        ...(targetIncident.assignedUnits || []).filter(targetUnit => 
-          !(selectedIncident.assignedUnits || []).some(existingUnit => 
-            existingUnit.roepnummer === targetUnit.roepnummer
-          )
-        )
-      ],
-      
-      // Combine notes
-      notities: [
-        selectedIncident.notities || '',
-        `[DUB] Samengevoegd met incident ${targetIncident.nr} op ${new Date().toLocaleString('nl-NL')}`,
-        targetIncident.notities || ''
-      ].filter(note => note.trim()).join('\n\n')
-    };
-
-    console.log(`🔗 Merged incident data:`, mergedIncident);
-
-    // Update incidents list - remove target, update selected
-    setIncidents(prev => {
-      const updatedIncidents = prev
-        .filter(inc => inc.id !== targetIncident.id) // Remove target incident
-        .map(inc => inc.id === selectedIncident.id ? mergedIncident : inc); // Update selected incident
-      
-      console.log(`🔗 Updated incidents list: ${updatedIncidents.length} incidents remaining`);
-      return updatedIncidents;
-    });
-
-    // Update selected incident
-    setSelectedIncident(mergedIncident);
-
-    // Update notes text area to reflect merged notes
-    setNotitiesText(mergedIncident.notities || '');
-
-    // Update karakteristieken state
-    setSelectedKarakteristieken(mergedIncident.karakteristieken || []);
-
-    // Update current logging entries to reflect the merge
+    // Create timestamp for merge operation
     const now = new Date();
     const dateStr = String(now.getDate()).padStart(2, '0');
     const monthStr = String(now.getMonth() + 1).padStart(2, '0');
@@ -2398,41 +2333,116 @@ export default function GMS2() {
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
 
-    // Parse all logging entries from merged incident
-    const allLoggingLines = mergedIncident.meldingslogging ? 
-      mergedIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
+    // Combine karakteristieken (remove duplicates based on ktCode)
+    const combinedKarakteristieken = [
+      ...(selectedIncident.karakteristieken || []),
+      ...(targetIncident.karakteristieken || []).filter(targetKar => 
+        !(selectedIncident.karakteristieken || []).some(existingKar => 
+          existingKar.ktCode === targetKar.ktCode && existingKar.ktNaam === targetKar.ktNaam
+        )
+      )
+    ];
+
+    // Combine assigned units (remove duplicates based on roepnummer)
+    const combinedUnits = [
+      ...(selectedIncident.assignedUnits || []),
+      ...(targetIncident.assignedUnits || []).filter(targetUnit => 
+        !(selectedIncident.assignedUnits || []).some(existingUnit => 
+          existingUnit.roepnummer === targetUnit.roepnummer
+        )
+      )
+    ];
+
+    // Combine notes with proper formatting
+    const combinedNotes = [
+      selectedIncident.notities || '',
+      `\n[DUB ${new Date().toLocaleString('nl-NL')}] Incident ${targetIncident.nr} samengevoegd`,
+      targetIncident.notities || ''
+    ].filter(note => note.trim()).join('\n').trim();
+
+    // Parse and combine logging entries
+    const existingLoggingEntries = selectedIncident.meldingslogging ? 
+      selectedIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
+    const targetLoggingEntries = targetIncident.meldingslogging ? 
+      targetIncident.meldingslogging.split('\n').filter(line => line.trim()) : [];
+
+    // Create merge log entry
+    const mergeLogEntry = `${timestamp} [DUB] Incident ${targetIncident.nr} samengevoegd`;
     
+    // Combine all logging entries
+    const combinedLogging = [
+      ...existingLoggingEntries,
+      mergeLogEntry,
+      ...targetLoggingEntries
+    ].join('\n');
+
+    // Create merged incident with all combined data
+    const mergedIncident: GmsIncident = {
+      ...selectedIncident,
+      karakteristieken: combinedKarakteristieken,
+      assignedUnits: combinedUnits,
+      notities: combinedNotes,
+      meldingslogging: combinedLogging
+    };
+
+    console.log(`🔗 Creating merged incident:`, {
+      originalId: selectedIncident.id,
+      targetId: targetIncident.id,
+      combinedKarakteristieken: combinedKarakteristieken.length,
+      combinedUnits: combinedUnits.length,
+      combinedNotesLength: combinedNotes.length
+    });
+
+    // Update incidents list - remove target, update selected
+    setIncidents(prev => {
+      const updatedIncidents = prev
+        .filter(inc => inc.id !== targetIncident.id) // Remove target incident
+        .map(inc => inc.id === selectedIncident.id ? mergedIncident : inc); // Update selected incident
+      
+      console.log(`🔗 Updated incidents list: removed incident ${targetIncident.nr}, ${updatedIncidents.length} incidents remaining`);
+      return updatedIncidents;
+    });
+
+    // Update all related state
+    setSelectedIncident(mergedIncident);
+    setNotitiesText(combinedNotes);
+    setSelectedKarakteristieken(combinedKarakteristieken);
+
+    // Update logging entries display
+    const allLoggingLines = combinedLogging.split('\n').filter(line => line.trim());
     const parsedEntries = allLoggingLines.map((line, index) => ({
       id: Date.now() + index + Math.random(),
-      timestamp: line.substring(0, 20) || timestamp,
-      message: line.substring(21) || line
+      timestamp: line.length >= 20 ? line.substring(0, 20) : timestamp,
+      message: line.length >= 20 ? line.substring(21) : line
     }));
 
-    // Add new logging entries for the merge
-    const newEntries = [
+    // Add current merge status to logging entries
+    const mergeStatusEntries = [
       {
-        id: Date.now() + 1000,
+        id: Date.now() + 10000,
         timestamp,
-        message: `🔗 Incident ${targetIncident.nr} samengevoegd met ${selectedIncident.nr}`
+        message: `🔗 Incident ${targetIncident.nr} succesvol samengevoegd`
       },
       {
-        id: Date.now() + 1001,
+        id: Date.now() + 10001,
         timestamp,
         message: `📊 ${(targetIncident.assignedUnits?.length || 0)} eenheden overgenomen`
       },
       {
-        id: Date.now() + 1002,
+        id: Date.now() + 10002,
         timestamp,
         message: `📋 ${(targetIncident.karakteristieken?.length || 0)} karakteristieken overgenomen`
       }
     ];
 
-    // Set all logging entries (new merge entries + all existing entries)
-    setLoggingEntries([...newEntries, ...parsedEntries]);
+    setLoggingEntries([...mergeStatusEntries, ...parsedEntries]);
 
     // Close DUB content and switch back to logging tab
     setShowDubContent(false);
     setActiveLoggingTab('hist-meldblok');
+
+    // Show success message
+    addLoggingEntry(`✅ DUB voltooid: Incident ${targetIncident.nr} samengevoegd met ${selectedIncident.nr}`);
 
     console.log(`✅ DUB: Incident ${targetIncident.nr} successfully merged into ${selectedIncident.nr}`);
   };
