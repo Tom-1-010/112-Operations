@@ -3208,12 +3208,12 @@ body {
 /* GMS2 DUB Tab Content */
 .gms2-dub-content {
   height: 100%;
-  padding: 4px;
+  padding: 6px;
   font-size: 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .gms2-dub-header {
@@ -3246,21 +3246,24 @@ body {
 
 .gms2-dub-incidents-list {
   flex: 1;
+  min-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
   border: 1px inset #c0c0c0;
   background: white;
-  padding: 2px;
+  padding: 4px;
 }
 
 .gms2-dub-incident-item {
   background: white;
   border: 1px solid #d0d0d0;
-  margin: 2px 0;
-  padding: 4px 6px;
+  margin: 4px 0;
+  padding: 8px 10px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 4px;
   transition: all 0.2s ease;
   position: relative;
+  min-height: 60px;
 }
 
 .gms2-dub-incident-item:hover {
