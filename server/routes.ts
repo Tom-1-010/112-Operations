@@ -1178,73 +1178,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: 'Call not found' });
       }
 
-      // Get template for context
-      const template = await db.select().from(emergencyTemplates)
-        .where(eq(emergencyTemplates.meldingId, call.operatorNotes?.split(' - ')[0] || ''))
-        .limit(1);
+      // Context-aware responses based on call details
+      const situationResponses = {
+        initial: [
+          "Hallo, met wie spreek ik?",
+          "Ja, wat is er aan de hand?",
+          "Goedendag, wat kan ik voor u doen?"
+        ],
+        location: [
+          "Dat is in de buurt van de markt.",
+          "Ja, ik ken die straat wel.",
+          "Nee, ik weet niet precies welk nummer."
+        ],
+        details: [
+          "Ja, dat klopt ongeveer.",
+          "Nee, dat weet ik niet precies.",
+          "Ik kan het niet zo goed zien."
+        ],
+        urgent: [
+          "Ja, het is wel urgent!",
+          "Kunnen jullie snel komen?",
+          "Ik ben een beetje bang."
+        ]
+      };
 
-      const templateData = template[0];
-
-      // Generate AI response using OpenAI
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [
-            {
-              role: 'system',
-              content: `Je bent een Nederlandse 112-melder die ${call.emergencyType === 'police' ? 'de politie' : call.emergencyType === 'fire' ? 'de brandweer' : 'medische hulp'} belt. 
-              
-              Situatie: ${call.description}
-              Locatie: ${call.address}
-              Je bent: ${call.callerName || 'een burger'}
-              
-              ${templateData ? `
-              Specifieke context: ${templateData.situatie}
-              Classificatie: ${templateData.classificatie}
-              Je rol: ${templateData.melderType}
-              Spoed: ${templateData.spoed ? 'JA, dit is urgent!' : 'Nee, niet urgent'}
-              ` : ''}
-              
-              Gedragsregels:
-              - Reageer natuurlijk en realistisch als een echte Nederlandse burger
-              - Wees emotioneel betrokken bij de situatie
-              - Geef informatie geleidelijk prijs, niet alles tegelijk
-              - Stel soms wedervragen of vraag om verduidelijking
-              - Gebruik Nederlandse uitdrukkingen en spreektaal
-              - Blijf consistent met de situatie
-              - Als je emotioneel bent, laat dat merken in je taal
-              - Geef alleen informatie die de melder zou kunnen weten
-              `
-            },
-            ...conversationHistory.map((msg: any) => ({
-              role: msg.sender === 'caller' ? 'assistant' : 'user',
-              content: msg.message
-            })),
-            {
-              role: 'user',
-              content: message
-            }
-          ],
-          max_tokens: 200,
-          temperature: 0.8
-        })
-      });
-
-      const aiResponse = await response.json();
+      // Simple response logic based on message content
+      let responseCategory = 'details';
+      const lowerMessage = message.toLowerCase();
       
-      if (!response.ok) {
-        throw new Error('OpenAI API error');
+      if (lowerMessage.includes('naam') || lowerMessage.includes('wie')) {
+        responseCategory = 'initial';
+      } else if (lowerMessage.includes('adres') || lowerMessage.includes('waar')) {
+        responseCategory = 'location';
+      } else if (lowerMessage.includes('snel') || lowerMessage.includes('urgent')) {
+        responseCategory = 'urgent';
       }
-
-      const aiMessage = aiResponse.choices[0].message.content;
+      
+      const responses = situationResponses[responseCategory];
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
       
       res.json({ 
-        message: aiMessage,
+        message: randomResponse,
         timestamp: new Date().toISOString()
       });
       
