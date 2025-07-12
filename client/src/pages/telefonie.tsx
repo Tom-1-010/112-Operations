@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Phone, PhoneCall, PhoneOff, Clock, User, MapPin, Save, Share2, Plus, History } from 'lucide-react';
+import { Phone, PhoneCall, PhoneOff, Clock, User, MapPin, Save, Share2, Plus, History, AlertTriangle, MessageCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface ActiveCall {
@@ -36,6 +36,8 @@ export default function TelefoniePage() {
   const [callHistory, setCallHistory] = useState<CallHistory[]>([]);
   const [dialNumber, setDialNumber] = useState('');
   const [currentMessage, setCurrentMessage] = useState('');
+  const [currentTemplate, setCurrentTemplate] = useState<any>(null);
+  const [questionIndex, setQuestionIndex] = useState(0);
   const [frequentNumbers, setFrequentNumbers] = useState<string[]>([
     '0900-8844', // Politie niet-spoed
     '0900-1450', // Brandweer niet-spoed
@@ -68,36 +70,42 @@ export default function TelefoniePage() {
     onSuccess: (newCall) => {
       queryClient.invalidateQueries({ queryKey: ['/api/emergency-calls'] });
       
-      // Create realistic call scenario based on the generated emergency call
-      const callScenarios = {
-        police: [
-          'Hallo, ik wil graag aangifte doen van een diefstal.',
-          'Er is ingebroken in mijn huis, kunt u iemand sturen?',
-          'Ik zie verdachte activiteiten bij mijn buurman.',
-          'Er is een vechtpartij gaande op straat.'
-        ],
-        fire: [
-          'Er is brand bij mijn buurman! Ik zie rook uit het dak komen.',
-          'Ik ruik brandlucht, kunt u de brandweer sturen?',
-          'Er staat een auto in brand langs de weg.',
-          'Brand in de keuken! Help alstublieft!'
-        ],
-        medical: [
-          'Mijn vader is onwel geworden en reageert niet meer.',
-          'Er is een ongeval gebeurd, iemand is gewond.',
-          'Ik heb verschrikkelijke pijn op mijn borst.',
-          'Mijn buurvrouw is gevallen en kan niet meer opstaan.'
-        ],
-        other: [
-          'Er is een gaslek in mijn straat.',
-          'Er ligt een boom over de weg.',
-          'Ik zie een verdacht pakket bij het station.',
-          'Er is een grote waterleiding gesprongen.'
-        ]
-      };
-
-      const scenarios = callScenarios[newCall.emergencyType as keyof typeof callScenarios] || callScenarios.other;
-      const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+      // Create realistic call scenario based on the template data
+      const templateData = newCall.templateData;
+      let initialMessage = '';
+      
+      if (templateData) {
+        // Generate realistic opening based on template
+        const openingPhrases = {
+          'slachtoffer': [
+            'Hallo, ik moet de politie hebben. Er is net...',
+            'Hallo, ik wil aangifte doen van...',
+            'Hallo politie, ik ben net...',
+            'Hallo, ik heb hulp nodig. Er is...'
+          ],
+          'omstander': [
+            'Hallo, ik zie hier iets verdachts gebeuren...',
+            'Hallo politie, ik ben getuige van...',
+            'Hallo, ik zie hier een situatie die niet goed is...',
+            'Hallo, ik wil een melding doen van iets wat ik zie...'
+          ],
+          'betrokkene': [
+            'Hallo, ik moet melding doen van een incident...',
+            'Hallo politie, er is hier iets gebeurd...',
+            'Hallo, ik wil een situatie melden...',
+            'Hallo, ik ben betrokken bij een incident...'
+          ]
+        };
+        
+        const phrases = openingPhrases[templateData.melderType] || openingPhrases['slachtoffer'];
+        const randomOpening = phrases[Math.floor(Math.random() * phrases.length)];
+        
+        // Create initial message based on template
+        initialMessage = `${randomOpening} ${templateData.classificatie.toLowerCase()}. ${templateData.situatie}`;
+      } else {
+        // Fallback to simple scenario
+        initialMessage = newCall.description || 'Er is een incident gebeurd waar ik melding van wil doen.';
+      }
 
       // Start simulated call with realistic data
       const simulatedCall: ActiveCall = {
@@ -111,20 +119,22 @@ export default function TelefoniePage() {
           {
             id: '1',
             sender: 'system',
-            message: `Inkomende 112-melding ontvangen`,
+            message: `Inkomende 112-melding ontvangen - ${templateData?.categorie || 'Politie'} ${templateData?.spoed ? '(SPOED)' : ''}`,
             timestamp: new Date(),
             type: 'system'
           },
           {
             id: '2',
             sender: 'caller',
-            message: randomScenario,
+            message: initialMessage,
             timestamp: new Date(),
             type: 'text'
           }
         ]
       };
       setActiveCall(simulatedCall);
+      setCurrentTemplate(templateData);
+      setQuestionIndex(0);
     },
     onError: (error) => {
       console.error('Error generating emergency call:', error);
@@ -150,7 +160,39 @@ export default function TelefoniePage() {
       };
       setCallHistory(prev => [callRecord, ...prev]);
       setActiveCall(null);
+      setCurrentTemplate(null);
+      setQuestionIndex(0);
     }
+  };
+
+  // Intelligent question helper based on 112 templates
+  const getNextQuestion = () => {
+    if (!currentTemplate || !currentTemplate.intakeVragen) return null;
+    
+    const questions = currentTemplate.intakeVragen;
+    if (questionIndex >= questions.length) return null;
+    
+    return questions[questionIndex];
+  };
+
+  const askNextQuestion = () => {
+    const nextQuestion = getNextQuestion();
+    if (!nextQuestion || !activeCall) return;
+    
+    const questionMessage: ChatMessage = {
+      id: Date.now().toString(),
+      sender: 'operator',
+      message: nextQuestion.vraag,
+      timestamp: new Date(),
+      type: 'text'
+    };
+    
+    setActiveCall({
+      ...activeCall,
+      messages: [...activeCall.messages, questionMessage]
+    });
+    
+    setQuestionIndex(prev => prev + 1);
   };
 
   const transferToGMS = () => {
@@ -303,6 +345,41 @@ export default function TelefoniePage() {
                   <button onClick={sendMessage}>Verstuur</button>
                 </div>
               </div>
+
+              {/* Intelligent Question Helper */}
+              {currentTemplate && (
+                <div className="question-helper">
+                  <div className="helper-header">
+                    <h3>Gesprekshulp</h3>
+                    {currentTemplate.spoed && (
+                      <span className="spoed-indicator">
+                        <AlertTriangle size={16} />
+                        SPOED
+                      </span>
+                    )}
+                  </div>
+                  <div className="template-info">
+                    <span className="template-category">{currentTemplate.categorie}</span>
+                    <span className="template-subcategory">{currentTemplate.subcategorie}</span>
+                  </div>
+                  {getNextQuestion() && (
+                    <div className="next-question">
+                      <p><strong>Volgende vraag:</strong></p>
+                      <p>{getNextQuestion().vraag}</p>
+                      <button className="btn btn-info" onClick={askNextQuestion}>
+                        <MessageCircle size={16} />
+                        Stel Vraag
+                      </button>
+                    </div>
+                  )}
+                  {currentTemplate.locatieContextPrompt && (
+                    <div className="location-context">
+                      <p><strong>Locatie context:</strong></p>
+                      <p>{currentTemplate.locatieContextPrompt}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Call Actions */}
               <div className="call-actions">

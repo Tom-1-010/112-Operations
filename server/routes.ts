@@ -15,9 +15,10 @@ import {
   insertBasisteamSchema,
   updateBasisteamSchema,
   emergencyCalls,
-  insertEmergencyCallSchema
+  insertEmergencyCallSchema,
+  emergencyTemplates
 } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import openaiRoutes from "./openai-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1077,48 +1078,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate random emergency call data endpoint
+  // Generate realistic emergency call using templates
   app.post('/api/emergency-calls/generate', async (req, res) => {
     try {
-      const emergencyTypes = ['police', 'fire', 'medical', 'other'];
+      // Get a random emergency template from the database
+      const templates = await db.select().from(emergencyTemplates).orderBy(sql`RANDOM()`).limit(1);
+      
+      if (templates.length === 0) {
+        return res.status(404).json({ error: 'No emergency templates found' });
+      }
+      
+      const template = templates[0];
+      
+      // Generate realistic Rotterdam-area addresses
       const addresses = [
         'Lange Boonestraat 12, Maassluis',
         'Stationsplein 8, Rotterdam',
         'Marktplein 15, Schiedam',
         'Hoofdstraat 45, Vlaardingen',
         'Parkweg 22, Spijkenisse',
-        'Centrumstraat 33, Capelle aan den IJssel'
-      ];
-      const descriptions = [
-        'Verdachte situatie gemeld door voorbijganger',
-        'Medische noodsituatie - persoon bewusteloos',
-        'Brand in woning - rook waargenomen',
-        'Verkeersongeval met gewonden',
-        'Inbraak in woning - alarm afgegaan',
-        'Vechtpartij op straat'
+        'Centrumstraat 33, Capelle aan den IJssel',
+        'Weena 505, Rotterdam',
+        'Coolsingel 114, Rotterdam',
+        'Wilhelminaplein 1, Vlaardingen',
+        'Stadhuisplein 1, Ridderkerk'
       ];
       
+      // Map template categories to emergency types
+      const emergencyTypeMap = {
+        'Bezitsaantasting': 'police',
+        'Geweld': 'police',
+        'Verkeer': 'police',
+        'Brand': 'fire',
+        'Medisch': 'medical',
+        'Milieu': 'other'
+      };
+      
+      const emergencyType = emergencyTypeMap[template.categorie] || 'police';
+      const urgencyLevel = template.spoed ? 4 : 2;
+      
       const randomCall = {
-        phoneNumber: `06-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
-        callerName: Math.random() > 0.5 ? 'Anoniem' : 'Mevrouw van der Berg',
+        phoneNumber: template.melderTelefoon || `06-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
+        callerName: template.melderType === 'slachtoffer' ? 'Slachtoffer' : 
+                   template.melderType === 'omstander' ? 'Getuige' : 'Melder',
         callerLocation: addresses[Math.floor(Math.random() * addresses.length)],
-        emergencyType: emergencyTypes[Math.floor(Math.random() * emergencyTypes.length)],
-        urgencyLevel: Math.floor(Math.random() * 5) + 1,
-        description: descriptions[Math.floor(Math.random() * descriptions.length)],
+        emergencyType,
+        urgencyLevel,
+        description: `${template.classificatie} - ${template.situatie}`,
         address: addresses[Math.floor(Math.random() * addresses.length)],
         coordinates: JSON.stringify({
           lat: 51.9 + Math.random() * 0.2,
           lng: 4.3 + Math.random() * 0.4
         }),
         operatorId: 'OPERATOR_001',
-        operatorNotes: 'Automatisch gegenereerde melding ter simulatie'
+        operatorNotes: `Template: ${template.meldingId} - ${template.categorie}/${template.subcategorie}`
       };
       
       const [call] = await db.insert(emergencyCalls).values(randomCall).returning();
-      res.json(call);
+      
+      // Return call with template data for realistic conversation
+      res.json({
+        ...call,
+        templateData: {
+          categorie: template.categorie,
+          subcategorie: template.subcategorie,
+          classificatie: template.classificatie,
+          melderType: template.melderType,
+          intakeVragen: template.intakeVragen,
+          locatieContextPrompt: template.locatieContextPrompt
+        }
+      });
     } catch (error) {
       console.error('Error generating emergency call:', error);
       res.status(500).json({ error: 'Failed to generate emergency call' });
+    }
+  });
+
+  // Get emergency templates
+  app.get('/api/emergency-templates', async (req, res) => {
+    try {
+      const templates = await db.select().from(emergencyTemplates).limit(50);
+      res.json(templates);
+    } catch (error) {
+      console.error('Error fetching emergency templates:', error);
+      res.status(500).json({ error: 'Failed to fetch emergency templates' });
     }
   });
 

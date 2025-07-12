@@ -104,6 +104,40 @@ export const emergencyCalls = pgTable("emergency_calls", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// 112 Emergency Report Templates - for AI-generated realistic calls
+export const emergencyTemplates = pgTable("emergency_templates", {
+  id: serial("id").primaryKey(),
+  
+  // Template identification
+  meldingId: text("melding_id").notNull().unique(),
+  categorie: text("categorie").notNull(),
+  subcategorie: text("subcategorie").notNull(),
+  classificatie: text("classificatie").notNull(),
+  
+  // Call urgency and type
+  spoed: boolean("spoed").notNull().default(false),
+  
+  // Caller information template
+  melderType: text("melder_type").notNull(), // 'slachtoffer', 'omstander', 'betrokkene'
+  melderTelefoon: text("melder_telefoon"),
+  
+  // Location context
+  locatieContextPrompt: text("locatie_context_prompt"),
+  
+  // Situation description
+  situatie: text("situatie").notNull(),
+  
+  // Intake questions and structure
+  intakeVragen: jsonb("intake_vragen").notNull().$type<{
+    vraag: string;
+    antwoord: string;
+  }[]>(),
+  
+  // Metadata
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const phoneNumbers = pgTable("phone_numbers", {
   id: serial("id").primaryKey(),
   functie: text("functie").notNull(),
@@ -189,6 +223,13 @@ export const insertEmergencyCallSchema = createInsertSchema(emergencyCalls).omit
 });
 export const selectEmergencyCallSchema = createSelectSchema(emergencyCalls);
 
+export const insertEmergencyTemplateSchema = createInsertSchema(emergencyTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const selectEmergencyTemplateSchema = createSelectSchema(emergencyTemplates);
+
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
 export type InsertUnit = z.infer<typeof insertUnitSchema>;
@@ -247,3 +288,5 @@ export type InsertKarakteristiek = z.infer<typeof insertKarakteristiekSchema>;
 export type Karakteristiek = typeof karakteristieken.$inferSelect;
 export type InsertEmergencyCall = z.infer<typeof insertEmergencyCallSchema>;
 export type EmergencyCall = typeof emergencyCalls.$inferSelect;
+export type InsertEmergencyTemplate = z.infer<typeof insertEmergencyTemplateSchema>;
+export type EmergencyTemplate = typeof emergencyTemplates.$inferSelect;
