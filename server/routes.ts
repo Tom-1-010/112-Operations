@@ -1185,55 +1185,260 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const templateData = template[0];
 
-      // Smart response system based on question type and context
+      // Professional 112 response system with comprehensive question handling
       const lowerMessage = message.toLowerCase();
       let response = "";
 
-      // What happened / situation questions
-      if (lowerMessage.includes('wat is er gebeurd') || lowerMessage.includes('wat is er aan de hand')) {
-        if (templateData) {
-          response = templateData.situatie || "Er is iets gebeurd, maar ik kan het niet goed uitleggen.";
-        } else {
-          response = "Er is iets gebeurd hier, maar ik weet niet precies wat.";
-        }
+      // 🧍 ALGEMENE IDENTIFICATIE
+      if (lowerMessage.includes('wat is uw naam') || lowerMessage.includes('uw naam') || lowerMessage.includes('hoe heet u')) {
+        response = call.callerName || "Mijn naam is... eh... moet ik dat zeggen?";
       }
-      // Location questions
-      else if (lowerMessage.includes('waar') || lowerMessage.includes('adres') || lowerMessage.includes('locatie')) {
-        response = call.address || "Ik ben op een adres, maar ik weet niet precies welk nummer.";
+      else if (lowerMessage.includes('spellen') || lowerMessage.includes('kunt u dat spellen')) {
+        const name = call.callerName || "Jan Janssen";
+        response = `Ja, dat is ${name.split('').join(' - ')}.`;
       }
-      // Name/identity questions
-      else if (lowerMessage.includes('naam') || lowerMessage.includes('wie bent u') || lowerMessage.includes('met wie spreek ik')) {
-        response = call.callerName || "Ik ben... eh... ik weet niet of ik mijn naam moet zeggen.";
+      else if (lowerMessage.includes('telefoonnummer') || lowerMessage.includes('uw nummer')) {
+        response = call.phoneNumber || "Mijn nummer is... eh... dat weet ik niet uit mijn hoofd.";
       }
-      // Urgency questions
-      else if (lowerMessage.includes('urgent') || lowerMessage.includes('snel') || lowerMessage.includes('spoed')) {
-        if (templateData && templateData.spoed) {
-          response = "Ja, het is wel urgent! Kunnen jullie snel komen?";
-        } else {
-          response = "Ik denk dat het wel snel moet, maar ik weet niet zeker.";
-        }
+      else if (lowerMessage.includes('ter plaatse') || lowerMessage.includes('bent u daar')) {
+        response = "Ja, ik ben hier ter plaatse.";
       }
-      // Details and follow-up questions
-      else if (lowerMessage.includes('hoe') || lowerMessage.includes('wanneer') || lowerMessage.includes('waarom')) {
-        const detailResponses = [
+      else if (lowerMessage.includes('namens uzelf') || lowerMessage.includes('namens iemand anders')) {
+        response = "Ik bel voor mezelf.";
+      }
+      else if (lowerMessage.includes('eerder gemeld') || lowerMessage.includes('al gemeld')) {
+        response = "Nee, ik heb dit nog niet eerder gemeld.";
+      }
+      else if (lowerMessage.includes('iemand anders al gebeld') || lowerMessage.includes('al andere hulp')) {
+        response = "Nee, ik heb alleen jullie gebeld.";
+      }
+
+      // 📍 LOCATIE
+      else if (lowerMessage.includes('exacte adres') || lowerMessage.includes('wat is het adres')) {
+        response = call.address || "Ik weet het niet precies, maar ik ben op de hoofdstraat.";
+      }
+      else if (lowerMessage.includes('welke plaats') || lowerMessage.includes('in welke stad')) {
+        const address = call.address || "";
+        const city = address.split(',').pop()?.trim() || "Rotterdam";
+        response = `Het gebeurt in ${city}.`;
+      }
+      else if (lowerMessage.includes('binnen of buiten') || lowerMessage.includes('gebeurt het binnen')) {
+        response = templateData?.locatie?.includes('binnen') ? "Het gebeurt binnen." : "Het gebeurt buiten.";
+      }
+      else if (lowerMessage.includes('herkenningspunten') || lowerMessage.includes('punten noemen')) {
+        response = "Ik zie een bushalte en een supermarkt in de buurt.";
+      }
+      else if (lowerMessage.includes('verkeer') || lowerMessage.includes('publiek in de buurt')) {
+        response = "Ja, er zijn best veel mensen hier.";
+      }
+      else if (lowerMessage.includes('snelweg') || lowerMessage.includes('op de snelweg')) {
+        response = "Nee, dit is niet op de snelweg.";
+      }
+      else if (lowerMessage.includes('kruispunt') || lowerMessage.includes('op een kruispunt')) {
+        response = "Nee, het is niet op een kruispunt.";
+      }
+      else if (lowerMessage.includes('veilig voor hulpdiensten') || lowerMessage.includes('veilig om te stoppen')) {
+        response = "Ja, het is veilig om hier te stoppen.";
+      }
+
+      // 🚨 AARD VAN HET INCIDENT
+      else if (lowerMessage.includes('wat is er precies aan de hand') || lowerMessage.includes('wat gebeurt er')) {
+        response = templateData?.situatie || "Er is iets gebeurd, maar ik kan het niet goed uitleggen.";
+      }
+      else if (lowerMessage.includes('misdrijf') || lowerMessage.includes('ongeluk') || lowerMessage.includes('gaat het om')) {
+        response = templateData?.categorie || "Ik weet niet precies wat het is.";
+      }
+      else if (lowerMessage.includes('sprake van geweld') || lowerMessage.includes('geweld')) {
+        response = templateData?.classificatie?.includes('geweld') ? "Ja, er is geweld." : "Nee, geen geweld.";
+      }
+      else if (lowerMessage.includes('medische noodsituatie') || lowerMessage.includes('medisch')) {
+        response = call.emergencyType === 'medical' ? "Ja, het is medisch." : "Nee, niet medisch.";
+      }
+      else if (lowerMessage.includes('brand') || lowerMessage.includes('rook te zien')) {
+        response = call.emergencyType === 'fire' ? "Ja, ik zie rook!" : "Nee, geen brand.";
+      }
+      else if (lowerMessage.includes('iemand in gevaar') || lowerMessage.includes('in gevaar')) {
+        response = templateData?.spoed ? "Ja, er is gevaar!" : "Ik weet niet of er gevaar is.";
+      }
+      else if (lowerMessage.includes('bedreigd') || lowerMessage.includes('wordt bedreigd')) {
+        response = templateData?.classificatie?.includes('bedreiging') ? "Ja, er wordt bedreigd." : "Nee, niemand wordt bedreigd.";
+      }
+      else if (lowerMessage.includes('nog gaande') || lowerMessage.includes('nog bezig')) {
+        response = "Ja, het is nog gaande.";
+      }
+      else if (lowerMessage.includes('verdachte nog aanwezig') || lowerMessage.includes('verdachte er nog')) {
+        response = "Ik weet niet of de verdachte er nog is.";
+      }
+      else if (lowerMessage.includes('zelf gewond') || lowerMessage.includes('bent u gewond')) {
+        response = "Nee, ik ben niet gewond.";
+      }
+
+      // 👥 BETROKKENEN
+      else if (lowerMessage.includes('hoeveel personen') || lowerMessage.includes('hoeveel mensen')) {
+        response = "Ik zie ongeveer 2 of 3 personen.";
+      }
+      else if (lowerMessage.includes('volwassenen of kinderen') || lowerMessage.includes('kinderen')) {
+        response = "Het zijn volwassenen, geen kinderen.";
+      }
+      else if (lowerMessage.includes('iemand gewond') || lowerMessage.includes('gewonden')) {
+        response = templateData?.spoed ? "Ja, er is iemand gewond." : "Ik weet niet of er gewonden zijn.";
+      }
+      else if (lowerMessage.includes('bewusteloos') || lowerMessage.includes('bij bewustzijn')) {
+        response = "Ik kan niet goed zien of iemand bewusteloos is.";
+      }
+      else if (lowerMessage.includes('verdachte personen') || lowerMessage.includes('verdachten')) {
+        response = "Ik weet niet wie de verdachte is.";
+      }
+      else if (lowerMessage.includes('beschrijf de verdachte') || lowerMessage.includes('hoe ziet')) {
+        response = "Ik kan de persoon niet goed beschrijven, het gaat te snel.";
+      }
+      else if (lowerMessage.includes('wat dragen zij') || lowerMessage.includes('kleding')) {
+        response = "Ik kan niet goed zien wat ze aan hebben.";
+      }
+      else if (lowerMessage.includes('welke richting') || lowerMessage.includes('vertrokken')) {
+        response = "Ik weet niet in welke richting ze zijn gegaan.";
+      }
+      else if (lowerMessage.includes('bekende persoon') || lowerMessage.includes('kent u')) {
+        response = "Nee, ik ken deze personen niet.";
+      }
+
+      // 🩺 LETSEL
+      else if (lowerMessage.includes('bloed te zien') || lowerMessage.includes('bloed')) {
+        response = "Ik zie geen bloed.";
+      }
+      else if (lowerMessage.includes('kan de persoon nog praten') || lowerMessage.includes('praten')) {
+        response = "Ja, de persoon kan nog praten.";
+      }
+      else if (lowerMessage.includes('ademt normaal') || lowerMessage.includes('ademhaling')) {
+        response = "Ja, de persoon ademt normaal.";
+      }
+      else if (lowerMessage.includes('pijn op de borst') || lowerMessage.includes('borst')) {
+        response = "Ik weet niet of er pijn op de borst is.";
+      }
+      else if (lowerMessage.includes('aanspreekbaar') || lowerMessage.includes('reageert')) {
+        response = "Ja, de persoon is aanspreekbaar.";
+      }
+      else if (lowerMessage.includes('eerste hulp') || lowerMessage.includes('hulp verleend')) {
+        response = "Nee, er is nog geen eerste hulp verleend.";
+      }
+      else if (lowerMessage.includes('reanimeren') || lowerMessage.includes('reanimatie')) {
+        response = "Nee, niemand is aan het reanimeren.";
+      }
+      else if (lowerMessage.includes('aed') || lowerMessage.includes('defibrillator')) {
+        response = "Ik weet niet of er een AED in de buurt is.";
+      }
+      else if (lowerMessage.includes('hoe oud') || lowerMessage.includes('leeftijd')) {
+        response = "Ik schat ongeveer 30 tot 40 jaar.";
+      }
+
+      // 🚗 VERKEER / ONGEVAL
+      else if (lowerMessage.includes('hoeveel voertuigen') || lowerMessage.includes('auto\'s')) {
+        response = call.emergencyType === 'traffic' ? "Er zijn 2 auto's bij betrokken." : "Ik zie geen voertuigen.";
+      }
+      else if (lowerMessage.includes('verkeer geblokkeerd') || lowerMessage.includes('blokkade')) {
+        response = "Ja, het verkeer staat vast.";
+      }
+      else if (lowerMessage.includes('beknelling') || lowerMessage.includes('beklemd')) {
+        response = "Nee, niemand zit beklemd.";
+      }
+      else if (lowerMessage.includes('brandweer nodig') || lowerMessage.includes('brandweer')) {
+        response = call.emergencyType === 'fire' ? "Ja, brandweer is nodig!" : "Ik denk niet dat brandweer nodig is.";
+      }
+      else if (lowerMessage.includes('alcohol') || lowerMessage.includes('dronken')) {
+        response = "Ik ruik geen alcohol.";
+      }
+
+      // 🧠 GEDRAG & GEESTELIJKE TOESTAND
+      else if (lowerMessage.includes('in paniek') || lowerMessage.includes('paniek')) {
+        response = "Ja, de persoon is behoorlijk in paniek.";
+      }
+      else if (lowerMessage.includes('emotioneel stabiel') || lowerMessage.includes('kalm')) {
+        response = "Nee, de persoon is niet kalm.";
+      }
+      else if (lowerMessage.includes('verward') || lowerMessage.includes('in de war')) {
+        response = "Ja, de persoon lijkt verward.";
+      }
+      else if (lowerMessage.includes('suïcide') || lowerMessage.includes('zelfmoord')) {
+        response = "Daar weet ik niks van.";
+      }
+      else if (lowerMessage.includes('onder invloed') || lowerMessage.includes('drugs')) {
+        response = "Ik weet niet of de persoon onder invloed is.";
+      }
+      else if (lowerMessage.includes('agressie') || lowerMessage.includes('agressief')) {
+        response = templateData?.classificatie?.includes('agressie') ? "Ja, er is agressie." : "Nee, geen agressie.";
+      }
+
+      // 🧾 VERVOLGVRAGEN
+      else if (lowerMessage.includes('sinds wanneer') || lowerMessage.includes('hoe lang')) {
+        response = "Dit is net begonnen, een paar minuten geleden.";
+      }
+      else if (lowerMessage.includes('eerder gebeurd') || lowerMessage.includes('vaker gebeurd')) {
+        response = "Nee, dit is de eerste keer dat ik dit zie.";
+      }
+      else if (lowerMessage.includes('bewijs') || lowerMessage.includes('foto\'s')) {
+        response = "Nee, ik heb geen foto's gemaakt.";
+      }
+      else if (lowerMessage.includes('videobeeld') || lowerMessage.includes('camera')) {
+        response = "Ik weet niet of er camera's zijn.";
+      }
+      else if (lowerMessage.includes('zelf ingegrepen') || lowerMessage.includes('geholpen')) {
+        response = "Nee, ik heb niet ingegrepen.";
+      }
+      else if (lowerMessage.includes('hulp onderweg') || lowerMessage.includes('al hulp')) {
+        response = "Nee, ik zie nog geen hulp.";
+      }
+      else if (lowerMessage.includes('bekend op deze locatie') || lowerMessage.includes('kent u hier')) {
+        response = "Ja, ik kom hier wel vaker.";
+      }
+      else if (lowerMessage.includes('hulp van omstanders') || lowerMessage.includes('helpen mensen')) {
+        response = "Ja, er zijn mensen die proberen te helpen.";
+      }
+      else if (lowerMessage.includes('precies gezien') || lowerMessage.includes('wat zag u')) {
+        response = templateData?.situatie || "Ik heb het incident zien gebeuren.";
+      }
+      else if (lowerMessage.includes('blijven tot') || lowerMessage.includes('kunt u wachten')) {
+        response = "Ja, ik kan wachten tot jullie er zijn.";
+      }
+
+      // 🧭 AFHANDELING & AFRONDING
+      else if (lowerMessage.includes('teruggebeld') || lowerMessage.includes('terug bellen')) {
+        response = "Nee, dat hoeft niet.";
+      }
+      else if (lowerMessage.includes('aanvullende informatie') || lowerMessage.includes('nog iets')) {
+        response = "Nee, ik denk dat ik alles heb verteld.";
+      }
+      else if (lowerMessage.includes('eerder meegemaakt') || lowerMessage.includes('ervaring')) {
+        response = "Nee, dit heb ik nog nooit eerder meegemaakt.";
+      }
+      else if (lowerMessage.includes('veilig op dit moment') || lowerMessage.includes('bent u veilig')) {
+        response = "Ja, ik ben veilig.";
+      }
+      else if (lowerMessage.includes('op afstand blijven') || lowerMessage.includes('afstand houden')) {
+        response = "Ja, ik blijf op afstand.";
+      }
+      else if (lowerMessage.includes('anoniem') || lowerMessage.includes('naam niet noemen')) {
+        response = "Nee, dat is niet nodig.";
+      }
+      else if (lowerMessage.includes('escalatie') || lowerMessage.includes('erger worden')) {
+        response = "Ik weet niet of het erger wordt.";
+      }
+      else if (lowerMessage.includes('aan de lijn blijven') || lowerMessage.includes('blijven praten')) {
+        response = "Ja, ik kan aan de lijn blijven.";
+      }
+
+      // DEFAULT FALLBACKS
+      else if (lowerMessage.includes('hallo') || lowerMessage.includes('goedendag') || message.trim().length < 10) {
+        response = "Hallo, ja ik heb dringend hulp nodig!";
+      }
+      else if (lowerMessage.includes('dank') || lowerMessage.includes('bedankt')) {
+        response = "Graag gedaan, komen jullie snel?";
+      }
+      else {
+        const defaultResponses = [
           "Dat weet ik niet precies.",
           "Ik kan het niet zo goed zien.",
           "Dat is moeilijk te zeggen.",
-          "Ik weet niet zeker."
-        ];
-        response = detailResponses[Math.floor(Math.random() * detailResponses.length)];
-      }
-      // Greeting or initial contact
-      else if (lowerMessage.includes('hallo') || lowerMessage.includes('goedendag') || message.trim().length < 10) {
-        response = "Hallo, ja ik heb hulp nodig!";
-      }
-      // Default responses
-      else {
-        const defaultResponses = [
-          "Ja, dat klopt wel.",
-          "Nee, dat weet ik niet.",
-          "Ik denk het wel.",
-          "Dat kan ik niet zeggen."
+          "Daar ben ik niet zeker van."
         ];
         response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
       }

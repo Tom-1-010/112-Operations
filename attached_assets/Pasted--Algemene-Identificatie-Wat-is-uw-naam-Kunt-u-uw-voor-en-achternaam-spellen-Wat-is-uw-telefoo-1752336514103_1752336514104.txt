@@ -1,0 +1,210 @@
+🧍 Algemene Identificatie
+Wat is uw naam?
+
+Kunt u uw voor- en achternaam spellen?
+
+Wat is uw telefoonnummer?
+
+Wat is uw huidige locatie?
+
+Spreekt u namens uzelf of namens iemand anders?
+
+Bent u ter plaatse?
+
+Wat is uw relatie tot de betrokken persoon?
+
+Hoe laat heeft u dit gemeld?
+
+Is dit eerder gemeld?
+
+Heeft u iemand anders al gebeld?
+
+📍 Locatie
+Wat is het exacte adres van het incident?
+
+In welke plaats gebeurt dit?
+
+Gebeurt het binnen of buiten?
+
+Kunt u herkenningspunten noemen?
+
+Is er verkeer of publiek in de buurt?
+
+Bevindt u zich op de snelweg?
+
+Gebeurt het op een kruispunt?
+
+Is het veilig voor hulpdiensten om daar te stoppen?
+
+Zijn er obstakels voor de hulpverlening?
+
+Kunt u een coördinaat of hectometerpaal doorgeven?
+
+🚨 Aard van het incident
+Wat is er precies aan de hand?
+
+Gaat het om een misdrijf, ongeluk, of iets anders?
+
+Is er sprake van geweld?
+
+Gaat het om een medische noodsituatie?
+
+Is er brand of rook te zien?
+
+Is er iemand in gevaar?
+
+Wordt er iemand bedreigd?
+
+Is het incident nog gaande?
+
+Is de verdachte nog aanwezig?
+
+Bent u zelf gewond?
+
+👥 Betrokkenen
+Hoeveel personen zijn erbij betrokken?
+
+Gaat het om volwassenen of kinderen?
+
+Is er iemand gewond?
+
+Is er iemand bewusteloos?
+
+Zijn er verdachte personen?
+
+Beschrijf de verdachte(n).
+
+Wat dragen zij?
+
+In welke richting zijn zij vertrokken?
+
+Gaat het om een bekende persoon?
+
+Zijn er dieren bij betrokken?
+
+🩺 Letsel
+Is er bloed te zien?
+
+Kan de persoon nog praten?
+
+Ademt de persoon normaal?
+
+Is er sprake van pijn op de borst?
+
+Is het slachtoffer aanspreekbaar?
+
+Is er eerste hulp verleend?
+
+Zijn er mensen aan het reanimeren?
+
+Is er een AED in de buurt?
+
+Heeft het slachtoffer onderliggende gezondheidsproblemen?
+
+Hoe oud is het slachtoffer?
+
+🔥 Brand & Gevaar
+Is er rook zichtbaar?
+
+Hoe groot is de brand?
+
+Bevinden zich mensen of dieren in het pand?
+
+Kunt u de bron van de brand aanwijzen?
+
+Zijn er gasflessen of gevaarlijke stoffen aanwezig?
+
+Is het veilig om in de buurt te blijven?
+
+Heeft u zelf geprobeerd te blussen?
+
+Wordt de brand erger?
+
+Zijn er explosies gehoord?
+
+Is er gevaar voor omliggende panden?
+
+🚗 Verkeer / Ongeval
+Hoeveel voertuigen zijn betrokken?
+
+Is het verkeer geblokkeerd?
+
+Zijn er gewonden?
+
+Is er sprake van beknelling?
+
+Is de brandweer nodig?
+
+Zijn er gevaarlijke stoffen betrokken?
+
+Is er sprake van een spookrijder?
+
+Was er alcohol in het spel?
+
+Zijn er kinderen in de voertuigen?
+
+Is er een voertuig te water geraakt?
+
+🧠 Gedrag & Geestelijke Toestand
+Is de persoon in paniek?
+
+Is de melder emotioneel stabiel?
+
+Gedraagt de persoon zich verward?
+
+Is er sprake van suïcide(gedachten)?
+
+Wordt er gesproken over zelfbeschadiging?
+
+Is de persoon onder invloed?
+
+Is er sprake van psychose?
+
+Moet er een psycholance komen?
+
+Heeft u geprobeerd iemand te kalmeren?
+
+Is er sprake van agressie?
+
+🧾 Vervolgvragen / Verduidelijking
+Sinds wanneer is dit aan de gang?
+
+Is het eerder gebeurd?
+
+Heeft u bewijs of foto's?
+
+Is er videobeeld beschikbaar?
+
+Heeft u zelf ingegrepen?
+
+Weet u of er al hulp onderweg is?
+
+Bent u bekend op deze locatie?
+
+Is er hulp van omstanders?
+
+Wat heeft u precies gezien/gehoord?
+
+Kunt u blijven tot de hulpdiensten er zijn?
+
+🧭 Afhandeling & Afronding
+Wilt u teruggebeld worden?
+
+Heeft u nog aanvullende informatie?
+
+Heeft u dit eerder meegemaakt?
+
+Bent u veilig op dit moment?
+
+Kunt u op afstand blijven?
+
+Is er een reden waarom u anoniem wilt blijven?
+
+Heeft u contact gehad met de politie?
+
+Verwacht u escalatie?
+
+Is er een taalbarrière?
+
+Kunt u nog even aan de lijn blijven?
+
