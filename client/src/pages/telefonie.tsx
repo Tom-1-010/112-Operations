@@ -148,57 +148,67 @@ export default function Telefonie() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+    <div className="telefonie-container">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-blue-600 flex items-center gap-2">
-              <i className="bi bi-telephone-fill"></i>
-              Telefonie - Meldkamer
-            </h1>
-            <p className="text-sm text-gray-600">
-              {currentTime.toLocaleString('nl-NL', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-              })}
-            </p>
+      <div className="telefoon-header">
+        <div className="telefoon-header-left">
+          <h1 className="telefoon-title">
+            <i className="bi bi-telephone-fill"></i>
+            Telefonie - Meldkamer
+          </h1>
+          <div className="telefoon-datetime">
+            {currentTime.toLocaleString('nl-NL', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            })}
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm">
-              <span className="text-gray-600">Status:</span>
-              <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                🟢 Beschikbaar
-              </span>
-            </div>
-          </div>
+        </div>
+        <div className="telefoon-header-buttons">
+          <button className="telefoon-header-btn gms-btn">
+            <i className="bi bi-window"></i>
+            GMS
+          </button>
+          <button className="telefoon-header-btn new-tab-btn">
+            <i className="bi bi-plus-square"></i>
+            Nieuw Tabblad
+          </button>
+        </div>
+      </div>
+
+      {/* Status Bar */}
+      <div className="telefoon-status-bar">
+        <div className="status-left">
+          <span className="call-status">Status: Beschikbaar</span>
+          <span className="active-calls">Actieve gesprekken: {activeGesprek ? '1' : '0'}</span>
+        </div>
+        <div className="status-right">
+          <span className="queue-count">Wachtrij: 0</span>
+          <span>Lijn: 112</span>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 grid grid-cols-3 gap-4">
+      <div className="telefoon-main-grid">
         
         {/* Live Gesprekspaneel */}
-        <div className="col-span-2 bg-white rounded-lg shadow border">
-          <div className="border-b border-gray-200 p-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <div className="telefoon-chat-section">
+          <div className="telefoon-panel-header">
+            <h2 className="panel-title">
               <i className="bi bi-chat-dots"></i>
               Actief Gesprek
             </h2>
             {activeGesprek && (
-              <div className="mt-2 text-sm text-gray-600">
-                <div className="flex items-center gap-4">
-                  <span>📞 {activeGesprek.telefoonnummer}</span>
-                  <span>🕐 Gestart: {formatTijd(activeGesprek.startTijd)}</span>
-                  {activeGesprek.melderInfo?.locatie && (
-                    <span>📍 {activeGesprek.melderInfo.locatie}</span>
-                  )}
-                </div>
+              <div className="gesprek-info">
+                <span>📞 {activeGesprek.telefoonnummer}</span>
+                <span>🕐 Gestart: {formatTijd(activeGesprek.startTijd)}</span>
+                {activeGesprek.melderInfo?.locatie && (
+                  <span>📍 {activeGesprek.melderInfo.locatie}</span>
+                )}
               </div>
             )}
           </div>
@@ -206,31 +216,23 @@ export default function Telefonie() {
           {activeGesprek ? (
             <>
               {/* Chat Venster */}
-              <div className="h-96 overflow-y-auto p-4 space-y-3">
+              <div className="chat-messages">
                 {activeGesprek.berichten.length === 0 ? (
-                  <div className="text-center text-gray-500 py-8">
-                    <i className="bi bi-telephone text-3xl mb-2"></i>
+                  <div className="no-messages">
+                    <i className="bi bi-telephone"></i>
                     <p>Gesprek gestart. Wacht op eerste bericht...</p>
                   </div>
                 ) : (
                   activeGesprek.berichten.map((bericht) => (
                     <div
                       key={bericht.id}
-                      className={`flex ${bericht.afzender === 'centralist' ? 'justify-end' : 'justify-start'}`}
+                      className={`chat-message ${bericht.afzender === 'centralist' ? 'outgoing' : 'incoming'}`}
                     >
-                      <div
-                        className={`max-w-xs px-4 py-2 rounded-lg ${
-                          bericht.afzender === 'centralist'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-900'
-                        }`}
-                      >
-                        <p className="text-sm">{bericht.inhoud}</p>
-                        <p className={`text-xs mt-1 ${
-                          bericht.afzender === 'centralist' ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
+                      <div className="message-content">
+                        <p>{bericht.inhoud}</p>
+                        <span className="message-time">
                           {formatTijd(bericht.tijdstip)}
-                        </p>
+                        </span>
                       </div>
                     </div>
                   ))
@@ -238,87 +240,75 @@ export default function Telefonie() {
               </div>
 
               {/* Bericht Input */}
-              <div className="border-t border-gray-200 p-4">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={currentMessage}
-                    onChange={(e) => setCurrentMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && verstuurBericht()}
-                    placeholder="Typ uw bericht..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <button
-                    onClick={verstuurBericht}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    <i className="bi bi-send"></i>
-                  </button>
-                </div>
+              <div className="chat-input-container">
+                <input
+                  type="text"
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && verstuurBericht()}
+                  placeholder="Typ uw bericht..."
+                  className="chat-input"
+                />
+                <button
+                  onClick={verstuurBericht}
+                  className="chat-send-btn"
+                >
+                  <i className="bi bi-send"></i>
+                </button>
               </div>
 
               {/* Actie Knoppen */}
-              <div className="border-t border-gray-200 p-4 flex gap-2">
+              <div className="gesprek-acties">
                 <button
                   onClick={beeindigGesprek}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                  className="actie-btn beeindig-btn"
                 >
                   <i className="bi bi-telephone-x"></i>
                   Beëindig Gesprek
                 </button>
-                <button
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-                >
+                <button className="actie-btn doorverbind-btn">
                   <i className="bi bi-arrow-right-circle"></i>
                   Doorverbind naar GMS
                 </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
+                <button className="actie-btn opslaan-btn">
                   <i className="bi bi-save"></i>
                   Opslaan Melding
                 </button>
               </div>
             </>
           ) : (
-            <div className="h-96 flex items-center justify-center text-gray-500">
-              <div className="text-center">
-                <i className="bi bi-telephone text-5xl mb-4"></i>
-                <h3 className="text-lg font-medium mb-2">Geen actief gesprek</h3>
-                <p>Start een nieuw gesprek door een nummer te bellen</p>
-              </div>
+            <div className="no-active-gesprek">
+              <i className="bi bi-telephone"></i>
+              <h3>Geen actief gesprek</h3>
+              <p>Start een nieuw gesprek door een nummer te bellen</p>
             </div>
           )}
         </div>
 
         {/* Rechterpaneel */}
-        <div className="space-y-4">
+        <div className="telefoon-controls">
           
           {/* Bellen Paneel */}
-          <div className="bg-white rounded-lg shadow border">
-            <div className="border-b border-gray-200 p-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <i className="bi bi-telephone-outbound"></i>
-                Uitgaande Oproep
-              </h3>
+          <div className="telefoon-panel">
+            <div className="panel-title">
+              <i className="bi bi-telephone-outbound"></i>
+              Uitgaande Oproep
             </div>
-            <div className="p-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Telefoonnummer
-                </label>
+            <div className="bel-controls">
+              <div className="nummer-input-group">
+                <label>Telefoonnummer</label>
                 <input
                   type="tel"
                   value={belNummer}
                   onChange={(e) => setBelNummer(e.target.value)}
                   placeholder="06-12345678 of 112"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="nummer-input"
                 />
               </div>
               <button
                 onClick={() => startNieuwGesprek(belNummer)}
                 disabled={!belNummer.trim()}
-                className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="bel-btn"
               >
                 <i className="bi bi-telephone"></i>
                 Bel Nummer
@@ -327,62 +317,50 @@ export default function Telefonie() {
           </div>
 
           {/* Snelkeuze Contacten */}
-          <div className="bg-white rounded-lg shadow border">
-            <div className="border-b border-gray-200 p-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <i className="bi bi-person-lines-fill"></i>
-                Snelkeuze
-              </h3>
+          <div className="telefoon-panel">
+            <div className="panel-title">
+              <i className="bi bi-person-lines-fill"></i>
+              Snelkeuze
             </div>
-            <div className="p-4 space-y-2">
+            <div className="contact-list">
               {contacts.slice(0, 5).map((contact) => (
                 <button
                   key={contact.id}
                   onClick={() => startNieuwGesprek(contact.telefoonnummer)}
-                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="contact-btn telefoon-contact"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm">{contact.naam}</p>
-                      <p className="text-xs text-gray-600">{contact.telefoonnummer}</p>
-                    </div>
-                    <span className="text-lg">{getStatusIcon(contact.status)}</span>
+                  <div className="contact-info">
+                    <span className="contact-naam">{contact.naam}</span>
+                    <span className="contact-nummer">{contact.telefoonnummer}</span>
                   </div>
+                  <span className="contact-status-icon">{getStatusIcon(contact.status)}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Gespreksgeschiedenis */}
-          <div className="bg-white rounded-lg shadow border">
-            <div className="border-b border-gray-200 p-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <i className="bi bi-clock-history"></i>
-                Recente Gesprekken
-              </h3>
+          <div className="telefoon-panel">
+            <div className="panel-title">
+              <i className="bi bi-clock-history"></i>
+              Recente Gesprekken
             </div>
-            <div className="p-4 max-h-64 overflow-y-auto">
+            <div className="geschiedenis-container">
               {gesprekGeschiedenis.length === 0 ? (
-                <p className="text-gray-500 text-sm text-center py-4">
+                <p className="no-geschiedenis">
                   Geen recente gesprekken
                 </p>
               ) : (
-                <div className="space-y-2">
+                <div className="geschiedenis-list">
                   {gesprekGeschiedenis.slice(0, 10).map((gesprek) => (
-                    <div key={gesprek.id} className="p-3 rounded-lg border border-gray-200">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-sm">{gesprek.telefoonnummer}</span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          gesprek.status === 'afgerond' 
-                            ? 'bg-green-100 text-green-800'
-                            : gesprek.status === 'actief'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                    <div key={gesprek.id} className="geschiedenis-item">
+                      <div className="gesprek-header">
+                        <span className="gesprek-nummer">{gesprek.telefoonnummer}</span>
+                        <span className={`gesprek-status status-${gesprek.status}`}>
                           {gesprek.status}
                         </span>
                       </div>
-                      <div className="flex items-center text-xs text-gray-600 gap-2">
+                      <div className="gesprek-tijden">
                         <span>{formatDatum(gesprek.startTijd)}</span>
                         <span>{formatTijd(gesprek.startTijd)}</span>
                         {gesprek.eindTijd && (
@@ -390,7 +368,7 @@ export default function Telefonie() {
                         )}
                       </div>
                       {gesprek.berichten.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-1 truncate">
+                        <p className="laatste-bericht">
                           {gesprek.berichten[gesprek.berichten.length - 1].inhoud}
                         </p>
                       )}

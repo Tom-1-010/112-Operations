@@ -1415,6 +1415,465 @@ body {
   background: #545b62;
 }
 
+/* Telefonie Page Styling */
+.telefonie-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #c0c0c0;
+}
+
+.telefoon-header {
+  background: #c0c0c0;
+  border-bottom: 2px solid #808080;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.telefoon-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.telefoon-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.telefoon-datetime {
+  font-size: 11px;
+  color: #666;
+}
+
+.telefoon-header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.telefoon-header-btn {
+  background: #e0e0e0;
+  border: 1px outset #c0c0c0;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.telefoon-header-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.gms-btn {
+  background: #ff6b6b;
+  color: white;
+}
+
+.gms-btn:hover {
+  background: #ff5252;
+}
+
+.new-tab-btn {
+  background: #4dabf7;
+  color: white;
+}
+
+.new-tab-btn:hover {
+  background: #339af0;
+}
+
+.telefoon-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Chat Section */
+.telefoon-chat-section {
+  background: white;
+  border: 2px inset #c0c0c0;
+  display: flex;
+  flex-direction: column;
+}
+
+.telefoon-panel-header {
+  background: #e0e0e0;
+  border-bottom: 1px solid #c0c0c0;
+  padding: 8px 12px;
+}
+
+.telefoon-panel-header .panel-title {
+  margin: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gesprek-info {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #666;
+  display: flex;
+  gap: 12px;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  background: white;
+  max-height: 400px;
+}
+
+.no-messages {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-messages i {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.chat-message {
+  margin-bottom: 12px;
+  display: flex;
+}
+
+.chat-message.incoming {
+  justify-content: flex-start;
+}
+
+.chat-message.outgoing {
+  justify-content: flex-end;
+}
+
+.message-content {
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d0d0d0;
+}
+
+.chat-message.incoming .message-content {
+  background: #f0f0f0;
+  border-color: #d0d0d0;
+}
+
+.chat-message.outgoing .message-content {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.message-content p {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.message-time {
+  font-size: 10px;
+  color: #666;
+}
+
+.chat-input-container {
+  border-top: 1px solid #c0c0c0;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  background: #f8f8f8;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px inset #c0c0c0;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.chat-send-btn {
+  background: #4caf50;
+  color: white;
+  border: 1px outset #c0c0c0;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.chat-send-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.gesprek-acties {
+  border-top: 1px solid #c0c0c0;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  background: #f8f8f8;
+}
+
+.actie-btn {
+  padding: 6px 12px;
+  border: 1px outset #c0c0c0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actie-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.beeindig-btn {
+  background: #f44336;
+  color: white;
+}
+
+.doorverbind-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.opslaan-btn {
+  background: #2196f3;
+  color: white;
+}
+
+.no-active-gesprek {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #666;
+  padding: 40px;
+}
+
+.no-active-gesprek i {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.no-active-gesprek h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.no-active-gesprek p {
+  margin: 0;
+  font-size: 12px;
+}
+
+/* Right Panel Controls */
+.telefoon-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.telefoon-panel {
+  background: white;
+  border: 2px inset #c0c0c0;
+}
+
+.bel-controls {
+  padding: 12px;
+}
+
+.nummer-input-group {
+  margin-bottom: 12px;
+}
+
+.nummer-input-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+}
+
+.nummer-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px inset #c0c0c0;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.bel-btn {
+  width: 100%;
+  background: #4caf50;
+  color: white;
+  border: 1px outset #c0c0c0;
+  padding: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bel-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.bel-btn:not(:disabled):active {
+  border: 1px inset #c0c0c0;
+}
+
+.contact-list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-btn.telefoon-contact {
+  background: #f8f9fa;
+  border: 1px outset #c0c0c0;
+  padding: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contact-btn.telefoon-contact:active {
+  border: 1px inset #c0c0c0;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-naam {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+}
+
+.contact-nummer {
+  font-size: 10px;
+  color: #666;
+  font-family: monospace;
+}
+
+.contact-status-icon {
+  font-size: 16px;
+}
+
+.geschiedenis-container {
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.no-geschiedenis {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 16px;
+  margin: 0;
+  font-size: 11px;
+}
+
+.geschiedenis-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.geschiedenis-item {
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+
+.gesprek-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.gesprek-nummer {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+  font-family: monospace;
+}
+
+.gesprek-status {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.status-afgerond {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-actief {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-mislukt {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.gesprek-tijden {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 8px;
+}
+
+.laatste-bericht {
+  font-size: 10px;
+  color: #666;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .telefoon-main-grid {
