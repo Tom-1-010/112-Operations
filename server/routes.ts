@@ -1178,47 +1178,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: 'Call not found' });
       }
 
-      // Context-aware responses based on call details
-      const situationResponses = {
-        initial: [
-          "Hallo, met wie spreek ik?",
-          "Ja, wat is er aan de hand?",
-          "Goedendag, wat kan ik voor u doen?"
-        ],
-        location: [
-          "Dat is in de buurt van de markt.",
-          "Ja, ik ken die straat wel.",
-          "Nee, ik weet niet precies welk nummer."
-        ],
-        details: [
-          "Ja, dat klopt ongeveer.",
-          "Nee, dat weet ik niet precies.",
-          "Ik kan het niet zo goed zien."
-        ],
-        urgent: [
-          "Ja, het is wel urgent!",
-          "Kunnen jullie snel komen?",
-          "Ik ben een beetje bang."
-        ]
-      };
+      // Get template for better context
+      const template = await db.select().from(emergencyTemplates)
+        .where(eq(emergencyTemplates.meldingId, call.operatorNotes?.split(' - ')[0] || ''))
+        .limit(1);
 
-      // Simple response logic based on message content
-      let responseCategory = 'details';
+      const templateData = template[0];
+
+      // Smart response system based on question type and context
       const lowerMessage = message.toLowerCase();
-      
-      if (lowerMessage.includes('naam') || lowerMessage.includes('wie')) {
-        responseCategory = 'initial';
-      } else if (lowerMessage.includes('adres') || lowerMessage.includes('waar')) {
-        responseCategory = 'location';
-      } else if (lowerMessage.includes('snel') || lowerMessage.includes('urgent')) {
-        responseCategory = 'urgent';
+      let response = "";
+
+      // What happened / situation questions
+      if (lowerMessage.includes('wat is er gebeurd') || lowerMessage.includes('wat is er aan de hand')) {
+        if (templateData) {
+          response = templateData.situatie || "Er is iets gebeurd, maar ik kan het niet goed uitleggen.";
+        } else {
+          response = "Er is iets gebeurd hier, maar ik weet niet precies wat.";
+        }
+      }
+      // Location questions
+      else if (lowerMessage.includes('waar') || lowerMessage.includes('adres') || lowerMessage.includes('locatie')) {
+        response = call.address || "Ik ben op een adres, maar ik weet niet precies welk nummer.";
+      }
+      // Name/identity questions
+      else if (lowerMessage.includes('naam') || lowerMessage.includes('wie bent u') || lowerMessage.includes('met wie spreek ik')) {
+        response = call.callerName || "Ik ben... eh... ik weet niet of ik mijn naam moet zeggen.";
+      }
+      // Urgency questions
+      else if (lowerMessage.includes('urgent') || lowerMessage.includes('snel') || lowerMessage.includes('spoed')) {
+        if (templateData && templateData.spoed) {
+          response = "Ja, het is wel urgent! Kunnen jullie snel komen?";
+        } else {
+          response = "Ik denk dat het wel snel moet, maar ik weet niet zeker.";
+        }
+      }
+      // Details and follow-up questions
+      else if (lowerMessage.includes('hoe') || lowerMessage.includes('wanneer') || lowerMessage.includes('waarom')) {
+        const detailResponses = [
+          "Dat weet ik niet precies.",
+          "Ik kan het niet zo goed zien.",
+          "Dat is moeilijk te zeggen.",
+          "Ik weet niet zeker."
+        ];
+        response = detailResponses[Math.floor(Math.random() * detailResponses.length)];
+      }
+      // Greeting or initial contact
+      else if (lowerMessage.includes('hallo') || lowerMessage.includes('goedendag') || message.trim().length < 10) {
+        response = "Hallo, ja ik heb hulp nodig!";
+      }
+      // Default responses
+      else {
+        const defaultResponses = [
+          "Ja, dat klopt wel.",
+          "Nee, dat weet ik niet.",
+          "Ik denk het wel.",
+          "Dat kan ik niet zeggen."
+        ];
+        response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
       }
       
-      const responses = situationResponses[responseCategory];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
       res.json({ 
-        message: randomResponse,
+        message: response,
         timestamp: new Date().toISOString()
       });
       
