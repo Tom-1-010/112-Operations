@@ -7502,6 +7502,96 @@ body {
   background: #c82333;
 }
 
+/* Additional Emergency Call Display Styles */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+}
+
+.emergency-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  display: inline-block;
+  width: fit-content;
+  margin-right: 8px;
+}
+
+.emergency-type.police {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.emergency-type.fire {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.emergency-type.medical {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.emergency-type.other {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.urgency-level {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f5f5f5;
+  color: #666;
+  display: inline-block;
+  width: fit-content;
+}
+
+.history-caller {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.history-description {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.history-address {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.history-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-status.active {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.history-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .telefonie-content {

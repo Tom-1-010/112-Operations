@@ -72,6 +72,38 @@ export const gmsIncidents = pgTable("gms_incidents", {
   assignedUnits: jsonb("assigned_units").array().$type<AssignedUnit[]>(),
 });
 
+// 112 Emergency Calls table
+export const emergencyCalls = pgTable("emergency_calls", {
+  id: serial("id").primaryKey(),
+  
+  // Call information
+  phoneNumber: text("phone_number").notNull(),
+  callerName: text("caller_name"),
+  callerLocation: text("caller_location"),
+  callStartTime: timestamp("call_start_time").notNull().defaultNow(),
+  callEndTime: timestamp("call_end_time"),
+  callDuration: integer("call_duration"), // in seconds
+  callStatus: text("call_status").notNull().default("active"), // 'active', 'completed', 'transferred', 'failed'
+  
+  // Emergency details
+  emergencyType: text("emergency_type").notNull(), // 'police', 'fire', 'medical', 'other'
+  urgencyLevel: integer("urgency_level").notNull().default(3), // 1-5 scale
+  description: text("description"),
+  address: text("address"),
+  coordinates: text("coordinates"), // JSON string with lat/lng
+  
+  // Operator information
+  operatorId: text("operator_id"),
+  operatorNotes: text("operator_notes"),
+  
+  // Related incident
+  relatedIncidentId: integer("related_incident_id"),
+  
+  // Metadata
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const phoneNumbers = pgTable("phone_numbers", {
   id: serial("id").primaryKey(),
   functie: text("functie").notNull(),
@@ -150,6 +182,13 @@ export const selectUserSchema = createSelectSchema(users);
 export const insertPoliceUnitSchema = createInsertSchema(policeUnits);
 export const selectPoliceUnitSchema = createSelectSchema(policeUnits);
 
+export const insertEmergencyCallSchema = createInsertSchema(emergencyCalls).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const selectEmergencyCallSchema = createSelectSchema(emergencyCalls);
+
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
 export type InsertUnit = z.infer<typeof insertUnitSchema>;
@@ -206,3 +245,5 @@ export type InsertPoliceUnit = typeof policeUnits.$inferInsert;
 export type SelectPoliceUnit = typeof policeUnits.$inferSelect;
 export type InsertKarakteristiek = z.infer<typeof insertKarakteristiekSchema>;
 export type Karakteristiek = typeof karakteristieken.$inferSelect;
+export type InsertEmergencyCall = z.infer<typeof insertEmergencyCallSchema>;
+export type EmergencyCall = typeof emergencyCalls.$inferSelect;

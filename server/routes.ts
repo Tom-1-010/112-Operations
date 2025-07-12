@@ -13,7 +13,9 @@ import {
   policeUnits,
   basisteams,
   insertBasisteamSchema,
-  updateBasisteamSchema
+  updateBasisteamSchema,
+  emergencyCalls,
+  insertEmergencyCallSchema
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 import openaiRoutes from "./openai-routes";
@@ -1035,6 +1037,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error loading 112 scripts:', error);
       res.status(500).json({ error: 'Failed to load 112 scripts' });
+    }
+  });
+
+  // Emergency calls API routes
+  app.get('/api/emergency-calls', async (req, res) => {
+    try {
+      const calls = await db.select().from(emergencyCalls).orderBy(desc(emergencyCalls.callStartTime));
+      res.json(calls);
+    } catch (error) {
+      console.error('Error fetching emergency calls:', error);
+      res.status(500).json({ error: 'Failed to fetch emergency calls' });
+    }
+  });
+
+  app.post('/api/emergency-calls', async (req, res) => {
+    try {
+      const validatedData = insertEmergencyCallSchema.parse(req.body);
+      const [call] = await db.insert(emergencyCalls).values(validatedData).returning();
+      res.json(call);
+    } catch (error) {
+      console.error('Error creating emergency call:', error);
+      res.status(500).json({ error: 'Failed to create emergency call' });
+    }
+  });
+
+  app.put('/api/emergency-calls/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertEmergencyCallSchema.partial().parse(req.body);
+      const [call] = await db.update(emergencyCalls)
+        .set({ ...validatedData, updatedAt: new Date() })
+        .where(eq(emergencyCalls.id, id))
+        .returning();
+      res.json(call);
+    } catch (error) {
+      console.error('Error updating emergency call:', error);
+      res.status(500).json({ error: 'Failed to update emergency call' });
+    }
+  });
+
+  // Generate random emergency call data endpoint
+  app.post('/api/emergency-calls/generate', async (req, res) => {
+    try {
+      const emergencyTypes = ['police', 'fire', 'medical', 'other'];
+      const addresses = [
+        'Lange Boonestraat 12, Maassluis',
+        'Stationsplein 8, Rotterdam',
+        'Marktplein 15, Schiedam',
+        'Hoofdstraat 45, Vlaardingen',
+        'Parkweg 22, Spijkenisse',
+        'Centrumstraat 33, Capelle aan den IJssel'
+      ];
+      const descriptions = [
+        'Verdachte situatie gemeld door voorbijganger',
+        'Medische noodsituatie - persoon bewusteloos',
+        'Brand in woning - rook waargenomen',
+        'Verkeersongeval met gewonden',
+        'Inbraak in woning - alarm afgegaan',
+        'Vechtpartij op straat'
+      ];
+      
+      const randomCall = {
+        phoneNumber: `06-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
+        callerName: Math.random() > 0.5 ? 'Anoniem' : 'Mevrouw van der Berg',
+        callerLocation: addresses[Math.floor(Math.random() * addresses.length)],
+        emergencyType: emergencyTypes[Math.floor(Math.random() * emergencyTypes.length)],
+        urgencyLevel: Math.floor(Math.random() * 5) + 1,
+        description: descriptions[Math.floor(Math.random() * descriptions.length)],
+        address: addresses[Math.floor(Math.random() * addresses.length)],
+        coordinates: JSON.stringify({
+          lat: 51.9 + Math.random() * 0.2,
+          lng: 4.3 + Math.random() * 0.4
+        }),
+        operatorId: 'OPERATOR_001',
+        operatorNotes: 'Automatisch gegenereerde melding ter simulatie'
+      };
+      
+      const [call] = await db.insert(emergencyCalls).values(randomCall).returning();
+      res.json(call);
+    } catch (error) {
+      console.error('Error generating emergency call:', error);
+      res.status(500).json({ error: 'Failed to generate emergency call' });
     }
   });
 
