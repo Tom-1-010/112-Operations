@@ -13,6 +13,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     { id: 'gms-eenheden', icon: 'people', label: 'GMS-eenheden' },
     { id: 'gms2', icon: 'window', label: 'GMS2' },
     { id: 'intake', icon: 'telephone', label: 'Intake' },
+    { id: 'telefonie', icon: 'telephone-fill', label: 'Telefonie' },
     { id: 'kaart', icon: 'geo-alt', label: 'Kaart' },
     { id: 'archive', icon: 'archive', label: 'Archief' },
     { id: 'reports', icon: 'file-text', label: 'Rapporten' },
