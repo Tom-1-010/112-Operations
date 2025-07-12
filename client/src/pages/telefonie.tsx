@@ -1,382 +1,337 @@
+import { useState, useEffect } from 'react';
+import { Phone, PhoneCall, PhoneOff, Clock, User, MapPin, Save, Share2, Plus, History } from 'lucide-react';
 
-import { useState, useEffect } from "react";
-import { useLocalStorage } from "../hooks/use-local-storage";
-
-interface TelefoonContact {
-  id: number;
-  naam: string;
-  telefoonnummer: string;
-  laatstGebeld?: string;
-  status: 'beschikbaar' | 'bezet' | 'offline';
+interface ActiveCall {
+  id: string;
+  phoneNumber: string;
+  callerName?: string;
+  location?: string;
+  startTime: Date;
+  status: 'active' | 'on_hold' | 'transferring';
+  messages: ChatMessage[];
 }
 
-interface Gesprek {
-  id: number;
-  telefoonnummer: string;
-  startTijd: string;
-  eindTijd?: string;
-  status: 'actief' | 'afgerond' | 'mislukt';
-  berichten: ChatBericht[];
-  melderInfo?: {
-    naam?: string;
-    locatie?: string;
-  };
+interface ChatMessage {
+  id: string;
+  sender: 'caller' | 'operator';
+  message: string;
+  timestamp: Date;
+  type: 'text' | 'system';
 }
 
-interface ChatBericht {
-  id: number;
-  tijdstip: string;
-  afzender: 'melder' | 'centralist';
-  inhoud: string;
+interface CallHistory {
+  id: string;
+  phoneNumber: string;
+  callerName?: string;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number;
+  status: 'completed' | 'ongoing' | 'failed' | 'transferred';
+  summary?: string;
 }
 
-const defaultContacts: TelefoonContact[] = [
-  { id: 1, naam: "Spoednummer - Brandweer", telefoonnummer: "112", status: 'beschikbaar' },
-  { id: 2, naam: "Spoednummer - Ambulance", telefoonnummer: "112", status: 'beschikbaar' },
-  { id: 3, naam: "Dienstdoende OvD", telefoonnummer: "06-12345678", status: 'beschikbaar' },
-  { id: 4, naam: "Teamleider A-shift", telefoonnummer: "06-87654321", status: 'bezet' },
-  { id: 5, naam: "Coördinator", telefoonnummer: "06-11223344", status: 'beschikbaar' },
-];
+export default function TelefoniePage() {
+  const [activeCall, setActiveCall] = useState<ActiveCall | null>(null);
+  const [callHistory, setCallHistory] = useState<CallHistory[]>([]);
+  const [dialNumber, setDialNumber] = useState('');
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [frequentNumbers, setFrequentNumbers] = useState<string[]>([
+    '0900-8844', // Politie niet-spoed
+    '0900-1450', // Brandweer niet-spoed
+    '088-6661100', // GGD
+    '0800-1351', // Veilig thuis
+  ]);
 
-export default function Telefonie() {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeGesprek, setActiveGesprek] = useState<Gesprek | null>(null);
-  const [gesprekGeschiedenis, setGesprekGeschiedenis] = useLocalStorage<Gesprek[]>("gesprek-geschiedenis", []);
-  const [contacts] = useLocalStorage<TelefoonContact[]>("telefoon-contacten", defaultContacts);
-  const [belNummer, setBelNummer] = useState("");
-  const [currentMessage, setCurrentMessage] = useState("");
-
-  // Update tijd elke seconde
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const startNieuwGesprek = (telefoonnummer: string) => {
-    const nieuwGesprek: Gesprek = {
-      id: Date.now(),
-      telefoonnummer,
-      startTijd: new Date().toISOString(),
-      status: 'actief',
-      berichten: [],
-      melderInfo: {
-        locatie: 'Locatie wordt bepaald...'
-      }
+  // Simulate incoming call
+  const simulateIncomingCall = () => {
+    const newCall: ActiveCall = {
+      id: Date.now().toString(),
+      phoneNumber: '06-12345678',
+      callerName: 'Onbekend',
+      location: 'Rotterdam Centrum',
+      startTime: new Date(),
+      status: 'active',
+      messages: [
+        {
+          id: '1',
+          sender: 'system',
+          message: 'Gesprek gestart',
+          timestamp: new Date(),
+          type: 'system'
+        },
+        {
+          id: '2',
+          sender: 'caller',
+          message: 'Hallo, ik wil graag aangifte doen van een diefstal.',
+          timestamp: new Date(),
+          type: 'text'
+        }
+      ]
     };
-    setActiveGesprek(nieuwGesprek);
-    setBelNummer("");
+    setActiveCall(newCall);
   };
 
-  const beeindigGesprek = () => {
-    if (activeGesprek) {
-      const afgerondGesprek = {
-        ...activeGesprek,
-        eindTijd: new Date().toISOString(),
-        status: 'afgerond' as const
+  const endCall = () => {
+    if (activeCall) {
+      const callRecord: CallHistory = {
+        id: activeCall.id,
+        phoneNumber: activeCall.phoneNumber,
+        callerName: activeCall.callerName,
+        startTime: activeCall.startTime,
+        endTime: new Date(),
+        duration: Math.floor((new Date().getTime() - activeCall.startTime.getTime()) / 1000),
+        status: 'completed',
+        summary: 'Melding geregistreerd'
       };
-      setGesprekGeschiedenis(prev => [afgerondGesprek, ...prev]);
-      setActiveGesprek(null);
+      setCallHistory(prev => [callRecord, ...prev]);
+      setActiveCall(null);
     }
   };
 
-  const verstuurBericht = () => {
-    if (!currentMessage.trim() || !activeGesprek) return;
-
-    const nieuwBericht: ChatBericht = {
-      id: Date.now(),
-      tijdstip: new Date().toISOString(),
-      afzender: 'centralist',
-      inhoud: currentMessage
-    };
-
-    setActiveGesprek(prev => prev ? {
-      ...prev,
-      berichten: [...prev.berichten, nieuwBericht]
-    } : null);
-
-    setCurrentMessage("");
-
-    // Simuleer antwoord van melder na 2-3 seconden
-    setTimeout(() => {
-      const melderAntwoorden = [
-        "Ja, er is een inbraak gaande in mijn huis",
-        "Ik zie verdachte personen bij de buren",
-        "Er is een ongeval gebeurd op de kruising",
-        "Ik hoor geschreeuw uit het appartement hiernaast",
-        "Er staat een auto in brand",
-        "Ja, ik ben de persoon die gebeld heeft"
-      ];
-      
-      const antwoordBericht: ChatBericht = {
-        id: Date.now() + 1,
-        tijdstip: new Date().toISOString(),
-        afzender: 'melder',
-        inhoud: melderAntwoorden[Math.floor(Math.random() * melderAntwoorden.length)]
-      };
-
-      setActiveGesprek(prev => prev ? {
-        ...prev,
-        berichten: [...prev.berichten, antwoordBericht]
-      } : null);
-    }, 2000 + Math.random() * 1000);
-  };
-
-  const formatTijd = (tijdString: string) => {
-    return new Date(tijdString).toLocaleTimeString('nl-NL', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatDatum = (tijdString: string) => {
-    return new Date(tijdString).toLocaleDateString('nl-NL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'beschikbaar': return '🟢';
-      case 'bezet': return '🔴';
-      case 'offline': return '⚫';
-      default: return '⚪';
+  const transferToGMS = () => {
+    if (activeCall) {
+      const updatedCall = { ...activeCall, status: 'transferring' as const };
+      setActiveCall(updatedCall);
+      // Simulate transfer
+      setTimeout(() => {
+        endCall();
+      }, 2000);
     }
+  };
+
+  const sendMessage = () => {
+    if (currentMessage.trim() && activeCall) {
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        sender: 'operator',
+        message: currentMessage,
+        timestamp: new Date(),
+        type: 'text'
+      };
+      setActiveCall({
+        ...activeCall,
+        messages: [...activeCall.messages, newMessage]
+      });
+      setCurrentMessage('');
+    }
+  };
+
+  const dialCall = () => {
+    if (dialNumber.trim()) {
+      const newCall: ActiveCall = {
+        id: Date.now().toString(),
+        phoneNumber: dialNumber,
+        startTime: new Date(),
+        status: 'active',
+        messages: [
+          {
+            id: '1',
+            sender: 'system',
+            message: `Uitgaand gesprek naar ${dialNumber}`,
+            timestamp: new Date(),
+            type: 'system'
+          }
+        ]
+      };
+      setActiveCall(newCall);
+      setDialNumber('');
+    }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
     <div className="telefonie-container">
-      {/* Header */}
-      <div className="telefoon-header">
-        <div className="telefoon-header-left">
-          <h1 className="telefoon-title">
-            <i className="bi bi-telephone-fill"></i>
-            Telefonie - Meldkamer
-          </h1>
-          <div className="telefoon-datetime">
-            {currentTime.toLocaleString('nl-NL', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
-            })}
-          </div>
+      <div className="telefonie-header">
+        <div className="header-left">
+          <Phone className="header-icon" />
+          <h1>Telefonie</h1>
         </div>
-        <div className="telefoon-header-buttons">
-          <button className="telefoon-header-btn gms-btn">
-            <i className="bi bi-window"></i>
-            GMS
-          </button>
-          <button className="telefoon-header-btn new-tab-btn">
-            <i className="bi bi-plus-square"></i>
-            Nieuw Tabblad
+        <div className="header-right">
+          <button className="btn btn-primary" onClick={simulateIncomingCall}>
+            <Plus size={16} />
+            Simuleer Inkomende Oproep
           </button>
         </div>
       </div>
 
-      {/* Status Bar */}
-      <div className="telefoon-status-bar">
-        <div className="status-left">
-          <span className="call-status">Status: Beschikbaar</span>
-          <span className="active-calls">Actieve gesprekken: {activeGesprek ? '1' : '0'}</span>
-        </div>
-        <div className="status-right">
-          <span className="queue-count">Wachtrij: 0</span>
-          <span>Lijn: 112</span>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="telefoon-main-grid">
-        
-        {/* Live Gesprekspaneel */}
-        <div className="telefoon-chat-section">
-          <div className="telefoon-panel-header">
-            <h2 className="panel-title">
-              <i className="bi bi-chat-dots"></i>
-              Actief Gesprek
-            </h2>
-            {activeGesprek && (
-              <div className="gesprek-info">
-                <span>📞 {activeGesprek.telefoonnummer}</span>
-                <span>🕐 Gestart: {formatTijd(activeGesprek.startTijd)}</span>
-                {activeGesprek.melderInfo?.locatie && (
-                  <span>📍 {activeGesprek.melderInfo.locatie}</span>
-                )}
+      <div className="telefonie-content">
+        {/* Active Call Panel */}
+        <div className="active-call-panel">
+          <div className="panel-header">
+            <h2>Actief Gesprek</h2>
+            {activeCall && (
+              <div className="call-status">
+                <div className={`status-indicator ${activeCall.status}`}></div>
+                <span>
+                  {activeCall.status === 'active' && 'Actief'}
+                  {activeCall.status === 'on_hold' && 'In de wacht'}
+                  {activeCall.status === 'transferring' && 'Doorverbinden...'}
+                </span>
               </div>
             )}
           </div>
 
-          {activeGesprek ? (
-            <>
-              {/* Chat Venster */}
-              <div className="chat-messages">
-                {activeGesprek.berichten.length === 0 ? (
-                  <div className="no-messages">
-                    <i className="bi bi-telephone"></i>
-                    <p>Gesprek gestart. Wacht op eerste bericht...</p>
+          {activeCall ? (
+            <div className="active-call-content">
+              {/* Caller Information */}
+              <div className="caller-info">
+                <div className="caller-details">
+                  <div className="caller-item">
+                    <Phone size={16} />
+                    <span>{activeCall.phoneNumber}</span>
                   </div>
-                ) : (
-                  activeGesprek.berichten.map((bericht) => (
+                  <div className="caller-item">
+                    <User size={16} />
+                    <span>{activeCall.callerName || 'Onbekend'}</span>
+                  </div>
+                  {activeCall.location && (
+                    <div className="caller-item">
+                      <MapPin size={16} />
+                      <span>{activeCall.location}</span>
+                    </div>
+                  )}
+                  <div className="caller-item">
+                    <Clock size={16} />
+                    <span>Gestart: {formatTime(activeCall.startTime)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat Window */}
+              <div className="chat-window">
+                <div className="chat-messages">
+                  {activeCall.messages.map((message) => (
                     <div
-                      key={bericht.id}
-                      className={`chat-message ${bericht.afzender === 'centralist' ? 'outgoing' : 'incoming'}`}
+                      key={message.id}
+                      className={`message ${message.sender} ${message.type}`}
                     >
                       <div className="message-content">
-                        <p>{bericht.inhoud}</p>
-                        <span className="message-time">
-                          {formatTijd(bericht.tijdstip)}
-                        </span>
+                        {message.message}
+                      </div>
+                      <div className="message-time">
+                        {formatTime(message.timestamp)}
                       </div>
                     </div>
-                  ))
-                )}
+                  ))}
+                </div>
+                <div className="chat-input">
+                  <input
+                    type="text"
+                    value={currentMessage}
+                    onChange={(e) => setCurrentMessage(e.target.value)}
+                    placeholder="Type uw antwoord..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  />
+                  <button onClick={sendMessage}>Verstuur</button>
+                </div>
               </div>
 
-              {/* Bericht Input */}
-              <div className="chat-input-container">
-                <input
-                  type="text"
-                  value={currentMessage}
-                  onChange={(e) => setCurrentMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && verstuurBericht()}
-                  placeholder="Typ uw bericht..."
-                  className="chat-input"
-                />
-                <button
-                  onClick={verstuurBericht}
-                  className="chat-send-btn"
-                >
-                  <i className="bi bi-send"></i>
-                </button>
-              </div>
-
-              {/* Actie Knoppen */}
-              <div className="gesprek-acties">
-                <button
-                  onClick={beeindigGesprek}
-                  className="actie-btn beeindig-btn"
-                >
-                  <i className="bi bi-telephone-x"></i>
+              {/* Call Actions */}
+              <div className="call-actions">
+                <button className="btn btn-danger" onClick={endCall}>
+                  <PhoneOff size={16} />
                   Beëindig Gesprek
                 </button>
-                <button className="actie-btn doorverbind-btn">
-                  <i className="bi bi-arrow-right-circle"></i>
+                <button className="btn btn-warning" onClick={transferToGMS}>
+                  <Share2 size={16} />
                   Doorverbind naar GMS
                 </button>
-                <button className="actie-btn opslaan-btn">
-                  <i className="bi bi-save"></i>
+                <button className="btn btn-success">
+                  <Save size={16} />
                   Opslaan Melding
                 </button>
               </div>
-            </>
+            </div>
           ) : (
-            <div className="no-active-gesprek">
-              <i className="bi bi-telephone"></i>
+            <div className="no-active-call">
+              <Phone size={48} />
               <h3>Geen actief gesprek</h3>
-              <p>Start een nieuw gesprek door een nummer te bellen</p>
+              <p>Wacht op inkomende oproep of start een uitgaand gesprek</p>
             </div>
           )}
         </div>
 
-        {/* Rechterpaneel */}
-        <div className="telefoon-controls">
-          
-          {/* Bellen Paneel */}
-          <div className="telefoon-panel">
-            <div className="panel-title">
-              <i className="bi bi-telephone-outbound"></i>
-              Uitgaande Oproep
-            </div>
-            <div className="bel-controls">
-              <div className="nummer-input-group">
-                <label>Telefoonnummer</label>
-                <input
-                  type="tel"
-                  value={belNummer}
-                  onChange={(e) => setBelNummer(e.target.value)}
-                  placeholder="06-12345678 of 112"
-                  className="nummer-input"
-                />
-              </div>
-              <button
-                onClick={() => startNieuwGesprek(belNummer)}
-                disabled={!belNummer.trim()}
-                className="bel-btn"
-              >
-                <i className="bi bi-telephone"></i>
-                Bel Nummer
+        {/* Dialer Panel */}
+        <div className="dialer-panel">
+          <div className="panel-header">
+            <h2>Uitbellen</h2>
+          </div>
+          <div className="dialer-content">
+            <div className="dial-input">
+              <input
+                type="tel"
+                value={dialNumber}
+                onChange={(e) => setDialNumber(e.target.value)}
+                placeholder="Voer telefoonnummer in..."
+              />
+              <button className="btn btn-primary" onClick={dialCall}>
+                <PhoneCall size={16} />
+                Bel
               </button>
             </div>
-          </div>
-
-          {/* Snelkeuze Contacten */}
-          <div className="telefoon-panel">
-            <div className="panel-title">
-              <i className="bi bi-person-lines-fill"></i>
-              Snelkeuze
-            </div>
-            <div className="contact-list">
-              {contacts.slice(0, 5).map((contact) => (
-                <button
-                  key={contact.id}
-                  onClick={() => startNieuwGesprek(contact.telefoonnummer)}
-                  className="contact-btn telefoon-contact"
-                >
-                  <div className="contact-info">
-                    <span className="contact-naam">{contact.naam}</span>
-                    <span className="contact-nummer">{contact.telefoonnummer}</span>
+            
+            <div className="frequent-numbers">
+              <h3>Veelgebruikte Nummers</h3>
+              <div className="numbers-grid">
+                {frequentNumbers.map((number, index) => (
+                  <div key={index} className="number-item" onClick={() => setDialNumber(number)}>
+                    <Phone size={14} />
+                    <span>{number}</span>
                   </div>
-                  <span className="contact-status-icon">{getStatusIcon(contact.status)}</span>
-                </button>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Gespreksgeschiedenis */}
-          <div className="telefoon-panel">
-            <div className="panel-title">
-              <i className="bi bi-clock-history"></i>
-              Recente Gesprekken
-            </div>
-            <div className="geschiedenis-container">
-              {gesprekGeschiedenis.length === 0 ? (
-                <p className="no-geschiedenis">
-                  Geen recente gesprekken
-                </p>
-              ) : (
-                <div className="geschiedenis-list">
-                  {gesprekGeschiedenis.slice(0, 10).map((gesprek) => (
-                    <div key={gesprek.id} className="geschiedenis-item">
-                      <div className="gesprek-header">
-                        <span className="gesprek-nummer">{gesprek.telefoonnummer}</span>
-                        <span className={`gesprek-status status-${gesprek.status}`}>
-                          {gesprek.status}
-                        </span>
-                      </div>
-                      <div className="gesprek-tijden">
-                        <span>{formatDatum(gesprek.startTijd)}</span>
-                        <span>{formatTijd(gesprek.startTijd)}</span>
-                        {gesprek.eindTijd && (
-                          <span>- {formatTijd(gesprek.eindTijd)}</span>
+        {/* Call History */}
+        <div className="call-history-panel">
+          <div className="panel-header">
+            <h2>Gespreksgeschiedenis</h2>
+            <History size={20} />
+          </div>
+          <div className="history-content">
+            {callHistory.length === 0 ? (
+              <div className="no-history">
+                <p>Geen gespreksgeschiedenis beschikbaar</p>
+              </div>
+            ) : (
+              <div className="history-list">
+                {callHistory.slice(0, 10).map((call) => (
+                  <div key={call.id} className="history-item">
+                    <div className="history-main">
+                      <div className="history-number">{call.phoneNumber}</div>
+                      <div className="history-time">
+                        {formatTime(call.startTime)}
+                        {call.duration && (
+                          <span className="duration"> - {formatDuration(call.duration)}</span>
                         )}
                       </div>
-                      {gesprek.berichten.length > 0 && (
-                        <p className="laatste-bericht">
-                          {gesprek.berichten[gesprek.berichten.length - 1].inhoud}
-                        </p>
+                    </div>
+                    <div className="history-details">
+                      <div className={`history-status ${call.status}`}>
+                        {call.status === 'completed' && 'Voltooid'}
+                        {call.status === 'ongoing' && 'Lopend'}
+                        {call.status === 'failed' && 'Mislukt'}
+                        {call.status === 'transferred' && 'Doorverbonden'}
+                      </div>
+                      {call.summary && (
+                        <div className="history-summary">{call.summary}</div>
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

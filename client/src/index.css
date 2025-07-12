@@ -6974,3 +6974,550 @@ body {
   height: 16px;
   width: 80px;
 }
+
+/* Telefonie (Telephone) Interface Styling */
+.telefonie-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.telefonie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  color: #0066cc;
+  width: 28px;
+  height: 28px;
+}
+
+.telefonie-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.telefonie-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  max-height: calc(100vh - 80px);
+  overflow: hidden;
+}
+
+/* Active Call Panel */
+.active-call-panel {
+  grid-row: 1 / 3;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.call-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+.status-indicator.active {
+  background: #28a745;
+  animation: pulse 1.5s infinite;
+}
+
+.status-indicator.on_hold {
+  background: #ffc107;
+}
+
+.status-indicator.transferring {
+  background: #17a2b8;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.active-call-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.caller-info {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.caller-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.caller-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.caller-item svg {
+  color: #0066cc;
+}
+
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+}
+
+.message.caller {
+  align-self: flex-start;
+}
+
+.message.operator {
+  align-self: flex-end;
+}
+
+.message.system {
+  align-self: center;
+  max-width: 80%;
+}
+
+.message-content {
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.message.caller .message-content {
+  background: #e9ecef;
+  color: #333;
+}
+
+.message.operator .message-content {
+  background: #0066cc;
+  color: white;
+}
+
+.message.system .message-content {
+  background: #f8f9fa;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+.message.caller .message-time {
+  align-self: flex-start;
+}
+
+.message.operator .message-time {
+  align-self: flex-end;
+}
+
+.message.system .message-time {
+  align-self: center;
+}
+
+.chat-input {
+  display: flex;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  gap: 0.5rem;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.chat-input input:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0,102,204,0.1);
+}
+
+.chat-input button {
+  padding: 0.75rem 1rem;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-input button:hover {
+  background: #0052a3;
+}
+
+.call-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.no-active-call {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: #666;
+}
+
+.no-active-call svg {
+  color: #ccc;
+}
+
+.no-active-call h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.no-active-call p {
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Dialer Panel */
+.dialer-panel {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dialer-content {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dial-input {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dial-input input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.dial-input input:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0,102,204,0.1);
+}
+
+.frequent-numbers h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.numbers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.number-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.number-item:hover {
+  background: #e9ecef;
+  border-color: #0066cc;
+}
+
+.number-item svg {
+  color: #0066cc;
+}
+
+/* Call History Panel */
+.call-history-panel {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.history-content {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.no-history {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.history-item:hover {
+  background: #f8f9fa;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.history-number {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.history-time {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.duration {
+  color: #999;
+}
+
+.history-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-status {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.history-status.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.history-status.ongoing {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.history-status.failed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.history-status.transferred {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.history-summary {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+  background: #0066cc;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0052a3;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background: #e0a800;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .telefonie-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  
+  .active-call-panel {
+    grid-row: 1;
+  }
+  
+  .dialer-panel {
+    grid-row: 2;
+  }
+  
+  .call-history-panel {
+    grid-row: 3;
+  }
+}

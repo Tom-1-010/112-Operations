@@ -8,6 +8,7 @@ import Gms2Page from "./pages/gms2";
 import BasisteamsPage from "./pages/basisteams";
 import InstellingenPage from "./pages/instellingen";
 import KaartPage from "./pages/kaart";
+import TelefoniePage from "./pages/telefonie";
 import NotFoundPage from "./pages/not-found";
 import "./index.css";
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/gms2" component={Gms2Page} />
           <Route path="/basisteams" component={BasisteamsPage} />
           <Route path="/kaart" component={KaartPage} />
+          <Route path="/telefonie" component={TelefoniePage} />
           <Route path="/instellingen" component={InstellingenPage} />
           <Route component={NotFoundPage} />
         </Switch>
