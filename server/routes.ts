@@ -1078,18 +1078,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate realistic emergency call using templates
+  // Generate realistic emergency call using LMC classifications
   app.post('/api/emergency-calls/generate', async (req, res) => {
     try {
-      // Get a random emergency template from the database
-      const templates = await db.select().from(emergencyTemplates).orderBy(sql`RANDOM()`).limit(1);
+      // Official LMC incident types - weighted distribution
+      const lmcIncidents = [
+        // POLITIE MELDINGEN (70% - most common)
+        { code: 'bzdsbr', type: 'police', priority: 1, category: 'Beroving', situation: 'Er wordt iemand beroofd op straat met geweld of bedreiging', mc1: 'Bezitsaantasting', mc2: 'Diefstal', mc3: 'Beroving' },
+        { code: 'bzovbi', type: 'police', priority: 1, category: 'Overval bedrijf', situation: 'Er is een overval gaande in een winkel of bedrijf', mc1: 'Bezitsaantasting', mc2: 'Overval', mc3: 'Bedrijf/Instelling' },
+        { code: 'bzovwn', type: 'police', priority: 1, category: 'Woningoverval', situation: 'Er is een overval in een woning', mc1: 'Bezitsaantasting', mc2: 'Overval', mc3: 'Woning' },
+        { code: 'bzibwn', type: 'police', priority: 2, category: 'Woninginbraak', situation: 'Er is ingebroken in een woning', mc1: 'Bezitsaantasting', mc2: 'Inbraak', mc3: 'Woning' },
+        { code: 'bzibbi', type: 'police', priority: 2, category: 'Bedrijfsinbraak', situation: 'Er is ingebroken in een bedrijf', mc1: 'Bezitsaantasting', mc2: 'Inbraak', mc3: 'Bedrijf/Instelling' },
+        { code: 'bzdswk', type: 'police', priority: 2, category: 'Winkeldiefstal', situation: 'Er is een winkeldiefstal gepleegd', mc1: 'Bezitsaantasting', mc2: 'Diefstal', mc3: 'Winkeldiefstal' },
+        { code: 'bzdsvo', type: 'police', priority: 3, category: 'Voertuigdiefstal', situation: 'Er is een voertuig gestolen', mc1: 'Bezitsaantasting', mc2: 'Diefstal', mc3: 'Voertuig' },
+        { code: 'bzvnvo', type: 'police', priority: 3, category: 'Vernieling voertuig', situation: 'Er is een auto beschadigd of vernield', mc1: 'Bezitsaantasting', mc2: 'Vernieling', mc3: 'Voertuig' },
+        { code: 'bzvngf', type: 'police', priority: 3, category: 'Graffiti', situation: 'Er is graffiti aangebracht op een gebouw', mc1: 'Bezitsaantasting', mc2: 'Vernieling', mc3: 'Graffiti' },
+        { code: 'gwpe', type: 'police', priority: 1, category: 'Geweld persoon', situation: 'Er is geweld gebruikt tegen een persoon', mc1: 'Geweld', mc2: 'Persoon', mc3: '' },
+        { code: 'gwhu', type: 'police', priority: 2, category: 'Huiselijk geweld', situation: 'Er is huiselijk geweld aan de gang', mc1: 'Geweld', mc2: 'Huiselijk', mc3: '' },
+        { code: 'gwdr', type: 'police', priority: 2, category: 'Dreiging', situation: 'Iemand wordt bedreigd', mc1: 'Geweld', mc2: 'Dreiging', mc3: '' },
+        { code: 'vkaa', type: 'police', priority: 2, category: 'Verkeersongeval', situation: 'Er is een verkeersongeval gebeurd', mc1: 'Verkeer', mc2: 'Aanrijding', mc3: '' },
+        { code: 'vkre', type: 'police', priority: 3, category: 'Verkeersobstakels', situation: 'Er staan obstakels op de weg', mc1: 'Verkeer', mc2: 'Reconstructie', mc3: '' },
+        { code: 'oovi', type: 'police', priority: 3, category: 'Overlast', situation: 'Er is overlast van personen', mc1: 'Openbare orde', mc2: 'Overlast', mc3: 'Personen' },
+        { code: 'oogt', type: 'police', priority: 3, category: 'Geluidsoverlast', situation: 'Er is geluidsoverlast', mc1: 'Openbare orde', mc2: 'Geluid', mc3: 'Overlast' },
+        
+        // BRANDWEER MELDINGEN (20%)
+        { code: 'brgb', type: 'fire', priority: 1, category: 'Gebouwbrand', situation: 'Er is brand in een gebouw', mc1: 'Brand', mc2: 'Gebouw', mc3: '' },
+        { code: 'brvo', type: 'fire', priority: 1, category: 'Voertuigbrand', situation: 'Er staat een voertuig in brand', mc1: 'Brand', mc2: 'Voertuig', mc3: '' },
+        { code: 'brbu', type: 'fire', priority: 2, category: 'Buitenbrand', situation: 'Er is brand in de buitenlucht', mc1: 'Brand', mc2: 'Buiten', mc3: '' },
+        { code: 'brsc', type: 'fire', priority: 2, category: 'Schoorsteenbrand', situation: 'Er is brand in een schoorsteen', mc1: 'Brand', mc2: 'Schoorsteen', mc3: '' },
+        { code: 'alabab', type: 'fire', priority: 2, category: 'Automatisch brandalarm', situation: 'Er is een automatisch brandalarm afgegaan', mc1: 'Alarm', mc2: 'Automatisch brand', mc3: 'Automatisch brand OMS' },
+        { code: 'allorm', type: 'fire', priority: 3, category: 'Rookmelder', situation: 'Er gaat een rookmelder af', mc1: 'Alarm', mc2: 'Luid/optisch alarm', mc3: 'Rookmelder' },
+        
+        // AMBULANCE MELDINGEN (10%)
+        { code: 'amhu', type: 'medical', priority: 1, category: 'Medische hulp', situation: 'Er is medische hulp nodig', mc1: 'Ambulance', mc2: 'Hulp', mc3: '' },
+        { code: 'amre', type: 'medical', priority: 1, category: 'Reanimatie', situation: 'Er moet gereanimeerd worden', mc1: 'Ambulance', mc2: 'Reanimatie', mc3: '' },
+        { code: 'amov', type: 'medical', priority: 2, category: 'Medisch ongeval', situation: 'Er is een medisch ongeval gebeurd', mc1: 'Ambulance', mc2: 'Ongeval', mc3: '' },
+        { code: 'amoo', type: 'medical', priority: 2, category: 'Medische noodsituatie', situation: 'Er is een medische noodsituatie', mc1: 'Ambulance', mc2: 'Noodsituatie', mc3: '' }
+      ];
+
+      // Weighted random selection (70% police, 20% fire, 10% medical)
+      const weights = [
+        ...Array(16).fill('police'),  // 70% police (16 out of 26 total)
+        ...Array(6).fill('fire'),     // 20% fire (6 out of 26 total)
+        ...Array(4).fill('medical')   // 10% medical (4 out of 26 total)
+      ];
       
-      if (templates.length === 0) {
-        return res.status(404).json({ error: 'No emergency templates found' });
-      }
-      
-      const template = templates[0];
-      
+      const selectedType = weights[Math.floor(Math.random() * weights.length)];
+      const typeIncidents = lmcIncidents.filter(inc => inc.type === selectedType);
+      const selectedIncident = typeIncidents[Math.floor(Math.random() * typeIncidents.length)];
+
       // Generate realistic Rotterdam-area addresses
       const addresses = [
         'Lange Boonestraat 12, Maassluis',
@@ -1101,51 +1138,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Weena 505, Rotterdam',
         'Coolsingel 114, Rotterdam',
         'Wilhelminaplein 1, Vlaardingen',
-        'Stadhuisplein 1, Ridderkerk'
+        'Stadhuisplein 1, Ridderkerk',
+        'Blaak 555, Rotterdam',
+        'Lijnbaan 77, Rotterdam',
+        'Karel Doormanstraat 15, Maassluis',
+        'Nieuwe Binnenweg 300, Rotterdam',
+        'Kleiweg 500, Rotterdam'
+      ];
+
+      // Generate realistic caller data
+      const phoneNumbers = [
+        '06-12345678', '06-87654321', '06-55566677', '06-99887766',
+        '06-11223344', '06-44556677', '06-77889900', '06-33445566',
+        '06-18872879', '06-23666977', '06-66909061', '06-55601889'
       ];
       
-      // Map template categories to emergency types
-      const emergencyTypeMap = {
-        'Bezitsaantasting': 'police',
-        'Geweld': 'police',
-        'Verkeer': 'police',
-        'Brand': 'fire',
-        'Medisch': 'medical',
-        'Milieu': 'other'
-      };
-      
-      const emergencyType = emergencyTypeMap[template.categorie] || 'police';
-      const urgencyLevel = template.spoed ? 4 : 2;
-      
+      const callerNames = [
+        'Jan de Vries', 'Maria van der Berg', 'Peter Janssen', 'Karin Smit',
+        'Dirk van Dam', 'Lisa Bakker', 'Tom de Groot', 'Sandra Mulder',
+        'Ahmed Hassan', 'Fatima Al-Rashid', 'Chen Wei', 'Anna Kowalski',
+        'Roberto Silva', 'Amara Okafor', 'Yasmin Patel', 'Erik Andersson'
+      ];
+
       const randomCall = {
-        phoneNumber: template.melderTelefoon || `06-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
-        callerName: template.melderType === 'slachtoffer' ? 'Slachtoffer' : 
-                   template.melderType === 'omstander' ? 'Getuige' : 'Melder',
+        phoneNumber: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)],
+        callerName: callerNames[Math.floor(Math.random() * callerNames.length)],
         callerLocation: addresses[Math.floor(Math.random() * addresses.length)],
-        emergencyType,
-        urgencyLevel,
-        description: `${template.classificatie} - ${template.situatie}`,
+        emergencyType: selectedIncident.type,
+        urgencyLevel: selectedIncident.priority,
+        description: selectedIncident.situation,
         address: addresses[Math.floor(Math.random() * addresses.length)],
         coordinates: JSON.stringify({
           lat: 51.9 + Math.random() * 0.2,
           lng: 4.3 + Math.random() * 0.4
         }),
         operatorId: 'OPERATOR_001',
-        operatorNotes: `Template: ${template.meldingId} - ${template.categorie}/${template.subcategorie}`
+        operatorNotes: `${selectedIncident.code} - ${selectedIncident.mc1}/${selectedIncident.mc2}/${selectedIncident.mc3}`.replace(/\/$/, '')
       };
       
       const [call] = await db.insert(emergencyCalls).values(randomCall).returning();
       
-      // Return call with template data for realistic conversation
+      // Return call with LMC data for realistic conversation
       res.json({
         ...call,
         templateData: {
-          categorie: template.categorie,
-          subcategorie: template.subcategorie,
-          classificatie: template.classificatie,
-          melderType: template.melderType,
-          intakeVragen: template.intakeVragen,
-          locatieContextPrompt: template.locatieContextPrompt
+          categorie: selectedIncident.mc1,
+          subcategorie: selectedIncident.mc2,
+          classificatie: selectedIncident.category,
+          situatie: selectedIncident.situation,
+          spoed: selectedIncident.priority <= 2,
+          code: selectedIncident.code,
+          type: selectedIncident.type
         }
       });
     } catch (error) {
