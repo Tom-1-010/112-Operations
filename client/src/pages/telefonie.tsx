@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Phone, PhoneCall, PhoneOff, Clock, User, MapPin, Save, Share2, Plus, History, AlertTriangle, MessageCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -44,6 +44,15 @@ export default function TelefoniePage() {
     '088-6661100', // GGD
     '0800-1351', // Veilig thuis
   ]);
+  
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  }, [activeCall?.messages]);
 
   const queryClient = useQueryClient();
 
@@ -206,6 +215,39 @@ export default function TelefoniePage() {
     }
   };
 
+  // AI Chat mutation
+  const sendChatMessage = useMutation({
+    mutationFn: async ({ message, callId }: { message: string; callId: string }) => {
+      const response = await fetch(`/api/emergency-calls/${callId}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message, 
+          conversationHistory: activeCall?.messages || [] 
+        })
+      });
+      if (!response.ok) throw new Error('Failed to send message');
+      return response.json();
+    },
+    onSuccess: (aiResponse) => {
+      if (!activeCall) return;
+      
+      // Add AI response to conversation
+      const aiMessage: ChatMessage = {
+        id: Date.now().toString(),
+        sender: 'caller',
+        message: aiResponse.message,
+        timestamp: new Date(),
+        type: 'text'
+      };
+      
+      setActiveCall({
+        ...activeCall,
+        messages: [...activeCall.messages, aiMessage]
+      });
+    }
+  });
+
   const sendMessage = () => {
     if (currentMessage.trim() && activeCall) {
       const newMessage: ChatMessage = {
@@ -215,10 +257,19 @@ export default function TelefoniePage() {
         timestamp: new Date(),
         type: 'text'
       };
+      
+      // Add operator message immediately
       setActiveCall({
         ...activeCall,
         messages: [...activeCall.messages, newMessage]
       });
+      
+      // Send to AI for response
+      sendChatMessage.mutate({ 
+        message: currentMessage, 
+        callId: activeCall.id 
+      });
+      
       setCurrentMessage('');
     }
   };
@@ -319,65 +370,69 @@ export default function TelefoniePage() {
 
               {/* Chat Window */}
               <div className="chat-window">
-                <div className="chat-messages">
+                <div className="chat-messages" ref={chatMessagesRef}>
                   {activeCall.messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`message ${message.sender} ${message.type}`}
+                      className={`chat-message ${message.sender} ${message.type}`}
                     >
+                      <div className="message-header">
+                        <span className="message-sender">
+                          {message.sender === 'caller' ? 'Melder' : 'Meldkamer'}
+                        </span>
+                        <span className="message-time">
+                          {formatTime(message.timestamp)}
+                        </span>
+                      </div>
                       <div className="message-content">
                         {message.message}
                       </div>
-                      <div className="message-time">
-                        {formatTime(message.timestamp)}
-                      </div>
                     </div>
                   ))}
+                  {sendChatMessage.isPending && (
+                    <div className="chat-message typing">
+                      <div className="message-header">
+                        <span className="message-sender">Melder</span>
+                        <span className="message-time">Nu</span>
+                      </div>
+                      <div className="message-content">
+                        <div className="typing-indicator">
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                        </div>
+                        <span style={{ marginLeft: '8px', fontSize: '12px', color: '#6b7280' }}>
+                          Melder typt...
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="chat-input">
                   <input
                     type="text"
                     value={currentMessage}
                     onChange={(e) => setCurrentMessage(e.target.value)}
-                    placeholder="Type uw antwoord..."
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder="Type uw vraag of reactie..."
+                    onKeyPress={(e) => e.key === 'Enter' && !sendChatMessage.isPending && sendMessage()}
+                    disabled={sendChatMessage.isPending}
                   />
-                  <button onClick={sendMessage}>Verstuur</button>
+                  <button 
+                    onClick={sendMessage}
+                    disabled={sendChatMessage.isPending || !currentMessage.trim()}
+                    className="send-button"
+                  >
+                    <MessageCircle size={16} />
+                    Verstuur
+                  </button>
                 </div>
               </div>
 
-              {/* Intelligent Question Helper */}
-              {currentTemplate && (
-                <div className="question-helper">
-                  <div className="helper-header">
-                    <h3>Gesprekshulp</h3>
-                    {currentTemplate.spoed && (
-                      <span className="spoed-indicator">
-                        <AlertTriangle size={16} />
-                        SPOED
-                      </span>
-                    )}
-                  </div>
-                  <div className="template-info">
-                    <span className="template-category">{currentTemplate.categorie}</span>
-                    <span className="template-subcategory">{currentTemplate.subcategorie}</span>
-                  </div>
-                  {getNextQuestion() && (
-                    <div className="next-question">
-                      <p><strong>Volgende vraag:</strong></p>
-                      <p>{getNextQuestion().vraag}</p>
-                      <button className="btn btn-info" onClick={askNextQuestion}>
-                        <MessageCircle size={16} />
-                        Stel Vraag
-                      </button>
-                    </div>
-                  )}
-                  {currentTemplate.locatieContextPrompt && (
-                    <div className="location-context">
-                      <p><strong>Locatie context:</strong></p>
-                      <p>{currentTemplate.locatieContextPrompt}</p>
-                    </div>
-                  )}
+              {/* Spoedmelding indicator alleen */}
+              {currentTemplate && currentTemplate.spoed && (
+                <div className="spoed-alert">
+                  <AlertTriangle size={16} />
+                  <span>SPOEDMELDING</span>
                 </div>
               )}
 

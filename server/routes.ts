@@ -1165,6 +1165,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Chat endpoint for emergency calls
+  app.post('/api/emergency-calls/:callId/chat', async (req, res) => {
+    try {
+      const { callId } = req.params;
+      const { message, conversationHistory } = req.body;
+      
+      // Get the emergency call details
+      const [call] = await db.select().from(emergencyCalls).where(eq(emergencyCalls.id, parseInt(callId)));
+      
+      if (!call) {
+        return res.status(404).json({ error: 'Call not found' });
+      }
+
+      // Get template for context
+      const template = await db.select().from(emergencyTemplates)
+        .where(eq(emergencyTemplates.meldingId, call.operatorNotes?.split(' - ')[0] || ''))
+        .limit(1);
+
+      const templateData = template[0];
+
+      // Generate AI response using OpenAI
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'system',
+              content: `Je bent een Nederlandse 112-melder die ${call.emergencyType === 'police' ? 'de politie' : call.emergencyType === 'fire' ? 'de brandweer' : 'medische hulp'} belt. 
+              
+              Situatie: ${call.description}
+              Locatie: ${call.address}
+              Je bent: ${call.callerName || 'een burger'}
+              
+              ${templateData ? `
+              Specifieke context: ${templateData.situatie}
+              Classificatie: ${templateData.classificatie}
+              Je rol: ${templateData.melderType}
+              Spoed: ${templateData.spoed ? 'JA, dit is urgent!' : 'Nee, niet urgent'}
+              ` : ''}
+              
+              Gedragsregels:
+              - Reageer natuurlijk en realistisch als een echte Nederlandse burger
+              - Wees emotioneel betrokken bij de situatie
+              - Geef informatie geleidelijk prijs, niet alles tegelijk
+              - Stel soms wedervragen of vraag om verduidelijking
+              - Gebruik Nederlandse uitdrukkingen en spreektaal
+              - Blijf consistent met de situatie
+              - Als je emotioneel bent, laat dat merken in je taal
+              - Geef alleen informatie die de melder zou kunnen weten
+              `
+            },
+            ...conversationHistory.map((msg: any) => ({
+              role: msg.sender === 'caller' ? 'assistant' : 'user',
+              content: msg.message
+            })),
+            {
+              role: 'user',
+              content: message
+            }
+          ],
+          max_tokens: 200,
+          temperature: 0.8
+        })
+      });
+
+      const aiResponse = await response.json();
+      
+      if (!response.ok) {
+        throw new Error('OpenAI API error');
+      }
+
+      const aiMessage = aiResponse.choices[0].message.content;
+      
+      res.json({ 
+        message: aiMessage,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('Error in AI chat:', error);
+      res.status(500).json({ error: 'Failed to generate AI response' });
+    }
+  });
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
