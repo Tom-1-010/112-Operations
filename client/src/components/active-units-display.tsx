@@ -1,3 +1,7 @@
+The code changes involve adding new teams to the teamOrder array in the ActiveUnitsDisplay component.
+```
+
+```javascript
 import React, { useState, useEffect } from 'react';
 
 interface PoliceUnit {
@@ -58,33 +62,33 @@ export default function ActiveUnitsDisplay() {
 
   const handleRightClick = (e: React.MouseEvent, unit: PoliceUnit) => {
     e.preventDefault();
-    
+
     // Get viewport dimensions
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    
+
     // Context menu approximate dimensions
     const menuWidth = 180;
     const menuHeight = 150;
-    
+
     // Calculate position, ensuring menu stays within viewport
     let x = e.clientX;
     let y = e.clientY;
-    
+
     // Adjust if menu would go beyond right edge
     if (x + menuWidth > viewportWidth) {
       x = viewportWidth - menuWidth - 10;
     }
-    
+
     // Adjust if menu would go beyond bottom edge
     if (y + menuHeight > viewportHeight) {
       y = viewportHeight - menuHeight - 10;
     }
-    
+
     // Ensure minimum distance from edges
     x = Math.max(10, x);
     y = Math.max(10, y);
-    
+
     setContextMenu({
       visible: true,
       x: x,
@@ -158,7 +162,7 @@ export default function ActiveUnitsDisplay() {
         setBasisteamsUnits(prev => 
           prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
         );
-        
+
         // Sync to database
         const dbUnit = {
           roepnummer: contextMenu.unit.roepnummer,
@@ -170,7 +174,7 @@ export default function ActiveUnitsDisplay() {
           locatie: contextMenu.unit.locatie || '',
           incident: selectedIncident.nr?.toString() || ""
         };
-        
+
         await fetch('/api/police-units', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -247,7 +251,7 @@ export default function ActiveUnitsDisplay() {
         setBasisteamsUnits(prev => 
           prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
         );
-        
+
         // Sync to database
         const dbUnit = {
           roepnummer: contextMenu.unit.roepnummer,
@@ -259,7 +263,7 @@ export default function ActiveUnitsDisplay() {
           locatie: contextMenu.unit.locatie || '',
           incident: ""
         };
-        
+
         await fetch('/api/police-units', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -313,7 +317,7 @@ export default function ActiveUnitsDisplay() {
         setBasisteamsUnits(prev => 
           prev.map(u => u.id === contextMenu.unit?.id ? updatedUnit : u)
         );
-        
+
         // Also try to sync to database by creating/updating a database entry
         const dbUnit = {
           roepnummer: contextMenu.unit.roepnummer,
@@ -325,7 +329,7 @@ export default function ActiveUnitsDisplay() {
           locatie: contextMenu.unit.locatie || '',
           incident: contextMenu.unit.incident || ''
         };
-        
+
         // Try to create/update in database
         const response = await fetch('/api/police-units', {
           method: 'POST',
@@ -362,18 +366,31 @@ export default function ActiveUnitsDisplay() {
       try {
         console.log('🔄 [ActiveUnits] Loading rooster data directly...');
         const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
-        
+
         if (response.ok) {
           const roosterData = await response.json();
           console.log('📊 [ActiveUnits] Loaded rooster data with teams:', Object.keys(roosterData));
-          
+
           const units: PoliceUnit[] = [];
           const teamOrder = [
             'Basisteam Waterweg (A1)', 
             'Basisteam Schiedam (A2)', 
             'Basisteam Midden-Schieland (A3)', 
             'Basisteam Delfshaven (B1)', 
-            'Basisteam Centrum (B2)'
+            'Basisteam Centrum (B2)', 
+            'Basisteam IJsselland (C2)', 
+            'District Stad', 
+            'District Rijnmond-Noord',
+            'Basisteam Voorne-Putten (C1)', 
+            'Basisteam Goeree-Overflakkee (D1)', 
+            'District Rijnmond-Oost',
+            'Basisteam Feijenoord (D2)', 
+            'Basisteam Haringvliet (E1)', 
+            'Basisteam IJssellmonde (D3)',
+            'Basisteam Nissewaard (E2)',
+            'Basisteam Oude-Maas (E3)',
+            'DROS',
+            'District Rijnmond-Zuid'
           ];
 
           Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
@@ -381,14 +398,14 @@ export default function ActiveUnitsDisplay() {
               teamUnits.forEach((unit: any) => {
                 // Determine status based on primair value only (same logic as GMS-eenheden)
                 let status = '5 - Afmelden'; // Default to afgemeld
-                
+
                 // Check primair value: true = status 1, false = status 5
                 if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
                   status = '1 - Beschikbaar/vrij';
                 } else {
                   status = '5 - Afmelden';
                 }
-                
+
                 units.push({
                   id: `bt-${unit.roepnummer}`,
                   roepnummer: unit.roepnummer,
@@ -826,48 +843,3 @@ export default function ActiveUnitsDisplay() {
                   onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
                 >
                   6 - Spraakaanvraag
-                </div>
-                <div 
-                  className="context-menu-item"
-                  onClick={() => handleStatusChange('7 - Spraakaanvraag urgent')}
-                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
-                >
-                  7 - Spraakaanvraag urgent
-                </div>
-                <div 
-                  className="context-menu-item"
-                  onClick={() => handleStatusChange('8 - Eigen melding')}
-                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
-                >
-                  8 - Eigen melding
-                </div>
-                <div 
-                  className="context-menu-item"
-                  onClick={() => handleStatusChange('9 - Info')}
-                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
-                >
-                  9 - Info
-                </div>
-                <div 
-                  className="context-menu-item"
-                  onClick={() => handleStatusChange('N - Noodoproep')}
-                  style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
-                >
-                  N - Noodoproep
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}

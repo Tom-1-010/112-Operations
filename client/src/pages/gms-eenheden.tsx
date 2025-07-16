@@ -97,30 +97,43 @@ export default function GMSEenheden() {
       try {
         console.log('🔄 Loading rooster data directly...');
         const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
-        
+
         if (response.ok) {
           const roosterData = await response.json();
           console.log('📊 Loaded rooster data with teams:', Object.keys(roosterData));
-          
+
           const units: PoliceUnit[] = [];
           const teamOrder = [
             'Basisteam Waterweg (A1)', 
             'Basisteam Schiedam (A2)', 
             'Basisteam Midden-Schieland (A3)', 
             'Basisteam Delfshaven (B1)', 
-            'Basisteam Centrum (B2)'
+            'Basisteam Centrum (B2)', 
+            'Basisteam IJsselland (C2)', 
+            'District Stad', 
+            'District Rijnmond-Noord',
+            'Basisteam Voorne-Putten (C1)', 
+            'Basisteam Goeree-Overflakkee (D1)', 
+            'District Rijnmond-Oost',
+            'Basisteam Feijenoord (D2)', 
+            'Basisteam Haringvliet (E1)', 
+            'Basisteam IJssellmonde (D3)',
+            'Basisteam Nissewaard (E2)',
+            'Basisteam Oude-Maas (E3)',
+            'DROS',
+            'District Rijnmond-Zuid'
           ];
 
           Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
             console.log(`🔍 Processing ${teamName} with ${Array.isArray(teamUnits) ? teamUnits.length : 0} units`);
-            
+
             if (Array.isArray(teamUnits)) {
               teamUnits.forEach((unit: any) => {
                 console.log(`🔍 Unit ${unit.roepnummer}: primair=${unit.primair}, type=${typeof unit.primair}, kans_in_dienst=${unit.kans_in_dienst}`);
-                
+
                 // Determine status based on primair value only
                 let status = '5 - Afmelden'; // Default to afgemeld
-                
+
                 // Check primair value: true = status 1, false = status 5
                 if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
                   status = '1 - Beschikbaar/vrij';
@@ -129,10 +142,10 @@ export default function GMSEenheden() {
                   status = '5 - Afmelden';
                   console.log(`❌ Unit ${unit.roepnummer} is NOT PRIMAIR (false) - status: ${status}`);
                 }
-                
+
                 // Status is already correctly determined by primair value above
                 // No need for additional RT 11 specific logic
-                
+
                 units.push({
                   id: `bt-${unit.roepnummer}` as any,
                   roepnummer: unit.roepnummer,
@@ -144,7 +157,7 @@ export default function GMSEenheden() {
                   locatie: '',
                   incident: ''
                 });
-                
+
                 console.log(`✅ Unit ${unit.roepnummer} final status: ${status}`);
               });
             }
@@ -245,7 +258,7 @@ export default function GMSEenheden() {
       setBasisteamsUnits(prev => 
         prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
-      
+
       // Also try to sync to database by creating/updating a database entry
       const dbUnit = {
         roepnummer: unit.roepnummer,
@@ -257,7 +270,7 @@ export default function GMSEenheden() {
         locatie: unit.locatie || '',
         incident: unit.incident || ''
       };
-      
+
       createUnitMutation.mutate(dbUnit);
     }
   };
@@ -272,7 +285,7 @@ export default function GMSEenheden() {
       setBasisteamsUnits(prev => 
         prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
-      
+
       // Also try to sync to database by creating/updating a database entry
       const dbUnit = {
         roepnummer: unit.roepnummer,
@@ -284,7 +297,7 @@ export default function GMSEenheden() {
         locatie: newLocation,
         incident: unit.incident || ''
       };
-      
+
       createUnitMutation.mutate(dbUnit);
     }
   };
@@ -299,7 +312,7 @@ export default function GMSEenheden() {
       setBasisteamsUnits(prev => 
         prev.map(u => u.id === unit.id ? updatedUnit : u)
       );
-      
+
       // Also try to sync to database by creating/updating a database entry
       const dbUnit = {
         roepnummer: unit.roepnummer,
@@ -311,7 +324,7 @@ export default function GMSEenheden() {
         locatie: unit.locatie || '',
         incident: newIncident
       };
-      
+
       createUnitMutation.mutate(dbUnit);
     }
   };
