@@ -328,21 +328,7 @@ export default function ActiveUnitsDisplay() {
               newValue: JSON.stringify(updatedIncidents)
             }));
             
-            // Also update the form data roepnummer field if this is the selected incident
-            const currentSelectedId = localStorage.getItem('selectedIncidentId');
-            if (currentSelectedId === incidentId.toString()) {
-              // Update form with new roepnummer
-              const formData = JSON.parse(localStorage.getItem('gms2FormData') || '{}');
-              const newRoepnummer = assignedUnits.map(u => u.roepnummer).join(', ');
-              const updatedFormData = { ...formData, roepnummer: newRoepnummer };
-              localStorage.setItem('gms2FormData', JSON.stringify(updatedFormData));
-              
-              // Trigger form update
-              window.dispatchEvent(new StorageEvent('storage', {
-                key: 'gms2FormData',
-                newValue: JSON.stringify(updatedFormData)
-              }));
-            }
+
             
             // Update database
             try {

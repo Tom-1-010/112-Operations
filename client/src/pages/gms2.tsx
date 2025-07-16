@@ -98,8 +98,7 @@ export default function GMS2() {
     straatnaam: "",
     postcode: "",
     plaatsnaam: "",
-    functie: "",
-    roepnummer: ""
+    functie: ""
   });
 
   // Get next incident number from localStorage, starting from 20250001
@@ -131,20 +130,12 @@ export default function GMS2() {
           console.error('Error parsing updated incidents:', error);
         }
       }
-      // Also listen for form data changes to update roepnummer field
-      if (e.key === 'gms2FormData' && e.newValue) {
-        try {
-          const updatedFormData = JSON.parse(e.newValue);
-          setFormData(prev => ({ ...prev, ...updatedFormData }));
-        } catch (error) {
-          console.error('Error parsing updated form data:', error);
-        }
-      }
+
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [setIncidents, setFormData]);
+  }, [setIncidents]);
 
   // Update time every second
   useEffect(() => {
@@ -3367,20 +3358,6 @@ export default function GMS2() {
                     placeholder="Object/gebouw"
                   />
                 </div>
-
-                {/* Roepnummer Row */}
-                <div className="gms2-form-row">
-                  <span className="gms2-field-label">Roepnr:</span>
-                  <input 
-                    type="text" 
-                    className="gms2-input wide" 
-                    value={formData.roepnummer}
-                    onChange={(e) => handleFormChange('roepnummer', e.target.value)}
-                    placeholder="Toegewezen eenheden"
-                  />
-                </div>
-
-
 
                 {/* Action Buttons Row */}
                 <div className="gms2-button-row">
