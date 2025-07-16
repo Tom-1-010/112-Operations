@@ -35,7 +35,7 @@ export interface AssignedUnit {
 
 // GMS incidents table for the dispatch simulator
 export const gmsIncidents = pgTable("gms_incidents", {
-  id: serial("id").primaryKey(),
+  id: text("id").primaryKey(),
 
   // Meldergegevens
   melderNaam: text("melder_naam"),

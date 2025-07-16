@@ -120,6 +120,32 @@ export default function GMS2() {
   // Incidents state management with proper loading and saving
   const [incidents, setIncidents] = useLocalStorage<GmsIncident[]>("gms2Incidents", []);
 
+  // Listen for storage events to update incidents when units are linked
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'gms2Incidents' && e.newValue) {
+        try {
+          const updatedIncidents = JSON.parse(e.newValue);
+          setIncidents(updatedIncidents);
+        } catch (error) {
+          console.error('Error parsing updated incidents:', error);
+        }
+      }
+      // Also listen for form data changes to update roepnummer field
+      if (e.key === 'gms2FormData' && e.newValue) {
+        try {
+          const updatedFormData = JSON.parse(e.newValue);
+          setFormData(prev => ({ ...prev, ...updatedFormData }));
+        } catch (error) {
+          console.error('Error parsing updated form data:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [setIncidents, setFormData]);
+
   // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
