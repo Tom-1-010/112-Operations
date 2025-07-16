@@ -143,7 +143,7 @@ export default function ActiveUnitsDisplay() {
   useEffect(() => {
     const loadDbUnits = async () => {
       try {
-        setIsLoading(true);
+        if (isLoading) setIsLoading(true);
         const response = await fetch('/api/police-units');
         if (response.ok) {
           const data = await response.json();
@@ -154,11 +154,15 @@ export default function ActiveUnitsDisplay() {
       } catch (error) {
         setDbPoliceUnits([]);
       } finally {
-        setIsLoading(false);
+        if (isLoading) setIsLoading(false);
       }
     };
 
     loadDbUnits();
+    
+    // Auto-refresh every 30 seconds to show real-time updates
+    const interval = setInterval(loadDbUnits, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleRightClick = (e: React.MouseEvent, unit: PoliceUnit) => {
@@ -222,19 +226,95 @@ export default function ActiveUnitsDisplay() {
     setShowStatusSubmenu(false);
   };
 
-  const handleKoppelen = (unit: PoliceUnit | null) => {
+  const handleKoppelen = async (unit: PoliceUnit | null) => {
     if (unit) {
       console.log(`Koppelen ${unit.roepnummer} aan incident`);
-      // Here you would implement the logic to link the unit to an incident
-      // This could open a dialog to select an incident or use the currently selected incident
+      
+      // Simulate linking to a default incident for now
+      const incidentNumber = "2025-001234";
+      
+      try {
+        if (typeof unit.id === 'number') {
+          // Database unit - update via API
+          const updatedUnit = { 
+            ...unit, 
+            incident: incidentNumber,
+            status: '2 - Aanrijdend' 
+          };
+          
+          const response = await fetch(`/api/police-units/${unit.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedUnit),
+          });
+
+          if (response.ok) {
+            setDbPoliceUnits(prev => 
+              prev.map(u => u.id === unit.id ? updatedUnit : u)
+            );
+            console.log(`✅ Eenheid ${unit.roepnummer} gekoppeld aan incident ${incidentNumber}`);
+          }
+        } else {
+          // Basisteams unit - update local state
+          const updatedUnit = { 
+            ...unit, 
+            incident: incidentNumber,
+            status: '2 - Aanrijdend'
+          };
+          
+          setBasisteamsUnits(prev => 
+            prev.map(u => u.id === unit.id ? updatedUnit : u)
+          );
+          console.log(`✅ Eenheid ${unit.roepnummer} gekoppeld aan incident ${incidentNumber}`);
+        }
+      } catch (error) {
+        console.error('Error linking unit to incident:', error);
+      }
     }
     closeContextMenu();
   };
 
-  const handleOntkoppelen = (unit: PoliceUnit | null) => {
+  const handleOntkoppelen = async (unit: PoliceUnit | null) => {
     if (unit) {
       console.log(`Ontkoppelen ${unit.roepnummer} van incident`);
-      // Here you would implement the logic to unlink the unit from an incident
+      
+      try {
+        if (typeof unit.id === 'number') {
+          // Database unit - update via API
+          const updatedUnit = { 
+            ...unit, 
+            incident: '',
+            status: '1 - Beschikbaar/vrij'
+          };
+          
+          const response = await fetch(`/api/police-units/${unit.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedUnit),
+          });
+
+          if (response.ok) {
+            setDbPoliceUnits(prev => 
+              prev.map(u => u.id === unit.id ? updatedUnit : u)
+            );
+            console.log(`✅ Eenheid ${unit.roepnummer} ontkoppeld van incident`);
+          }
+        } else {
+          // Basisteams unit - update local state
+          const updatedUnit = { 
+            ...unit, 
+            incident: '',
+            status: '1 - Beschikbaar/vrij'
+          };
+          
+          setBasisteamsUnits(prev => 
+            prev.map(u => u.id === unit.id ? updatedUnit : u)
+          );
+          console.log(`✅ Eenheid ${unit.roepnummer} ontkoppeld van incident`);
+        }
+      } catch (error) {
+        console.error('Error unlinking unit from incident:', error);
+      }
     }
     closeContextMenu();
   };
@@ -387,9 +467,16 @@ export default function ActiveUnitsDisplay() {
               <th style={{ 
                 padding: '8px 12px', 
                 textAlign: 'left',
+                borderRight: '1px solid #dee2e6',
                 fontWeight: 'bold',
                 whiteSpace: 'nowrap'
               }}>Locatie</th>
+              <th style={{ 
+                padding: '8px 12px', 
+                textAlign: 'left',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap'
+              }}>Incident</th>
             </tr>
           </thead>
           <tbody>
@@ -441,11 +528,22 @@ export default function ActiveUnitsDisplay() {
                 </td>
                 <td style={{ 
                   padding: '4px 8px',
+                  borderRight: '1px solid #dee2e6',
                   maxWidth: '120px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
                   {unit.locatie || '-'}
+                </td>
+                <td style={{ 
+                  padding: '4px 8px',
+                  maxWidth: '100px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: unit.incident ? '#0066cc' : '#999',
+                  fontWeight: unit.incident ? 'bold' : 'normal'
+                }}>
+                  {unit.incident || '-'}
                 </td>
               </tr>
             ))}
