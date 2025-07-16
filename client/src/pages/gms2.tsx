@@ -1150,27 +1150,32 @@ export default function GMS2() {
     }
   };
 
-  // RWS NWB Highway search functions
+  // RWS NWB Highway search functions with hectometer support
   const searchRWSHighways = async (query: string) => {
     try {
       const encodedQuery = encodeURIComponent(query);
       console.log(`🛣️ Searching RWS highways for: "${query}"`);
       
-      // Check if query contains highway pattern (A1, A2, etc.)
-      const highwayMatch = query.match(/\b(A\d+|N\d+)\b/i);
+      // Check if query contains highway pattern with possible hectometer (A1 125, A20 17.1, etc.)
+      const highwayHectoMatch = query.match(/\b(A\d+|N\d+)(?:\s+(\d+(?:\.\d+)?))?\b/i);
       
-      if (highwayMatch) {
-        const highway = highwayMatch[1].toUpperCase();
-        const response = await fetch(`/api/rws/highways/${highway}?limit=20`);
+      if (highwayHectoMatch) {
+        const highway = highwayHectoMatch[1].toUpperCase();
+        const hectometer = highwayHectoMatch[2];
+        
+        // Try to get road infrastructure data
+        const response = await fetch(`/api/rws/infrastructure?roadName=${highway}&includeHectometers=true&includeJunctions=true&limit=50`);
         
         if (response.ok) {
           const data = await response.json();
+          const results = [];
           
-          if (data.features && data.features.length > 0) {
-            return data.features.map((feature: any) => ({
+          // Add highway segments
+          if (data.highways?.features?.length > 0) {
+            results.push(...data.highways.features.slice(0, 5).map((feature: any) => ({
               id: feature.properties?.id || '',
-              weergavenaam: `${feature.properties?.wegNummer || highway} (Snelweg)`,
-              straatnaam: feature.properties?.wegNummer || highway,
+              weergavenaam: `${highway} (Snelweg)`,
+              straatnaam: highway,
               huisnummer: '',
               huisletter: '',
               huisnummertoevoeging: '',
@@ -1180,10 +1185,63 @@ export default function GMS2() {
               provincie: 'Nederland',
               coordinates: feature.geometry?.coordinates?.[0] || null,
               score: 1.0,
-              volledigAdres: `${feature.properties?.wegNummer || highway} (Rijksweg)`,
+              volledigAdres: `${highway} (Rijksweg)`,
               wegType: 'highway',
               hectometer: feature.properties?.hectometrering
-            }));
+            })));
+          }
+          
+          // Add specific hectometer if requested
+          if (hectometer && data.hectometers?.features?.length > 0) {
+            const matchingHectometer = data.hectometers.features.find((feature: any) => {
+              const featureHecto = feature.properties?.AFSTAND || feature.properties?.KM_AFSTAND;
+              return featureHecto && Math.abs(parseFloat(featureHecto) - parseFloat(hectometer)) < 0.5;
+            });
+            
+            if (matchingHectometer) {
+              results.unshift({
+                id: matchingHectometer.properties?.id || '',
+                weergavenaam: `${highway} hectometer ${hectometer}`,
+                straatnaam: highway,
+                huisnummer: hectometer,
+                huisletter: '',
+                huisnummertoevoeging: '',
+                postcode: '',
+                plaatsnaam: 'Nederland',
+                gemeente: 'Rijkswegen',
+                provincie: 'Nederland',
+                coordinates: matchingHectometer.geometry?.coordinates || null,
+                score: 1.5,
+                volledigAdres: `${highway} hectometer ${hectometer} (Rijksweg)`,
+                wegType: 'hectometer',
+                markerType: 'hectometerpaaltje'
+              });
+            }
+          }
+          
+          // Add nearby junctions
+          if (data.junctions?.features?.length > 0) {
+            results.push(...data.junctions.features.slice(0, 3).map((feature: any) => ({
+              id: feature.properties?.id || '',
+              weergavenaam: `${feature.properties?.label || 'Knooppunt'} (${highway})`,
+              straatnaam: highway,
+              huisnummer: '',
+              huisletter: '',
+              huisnummertoevoeging: '',
+              postcode: '',
+              plaatsnaam: 'Nederland',
+              gemeente: 'Rijkswegen',
+              provincie: 'Nederland',
+              coordinates: feature.geometry?.coordinates || null,
+              score: 0.9,
+              volledigAdres: `${feature.properties?.label || 'Knooppunt'} (${highway})`,
+              wegType: 'junction',
+              markerType: 'knooppunt'
+            })));
+          }
+          
+          if (results.length > 0) {
+            return results;
           }
         }
       }

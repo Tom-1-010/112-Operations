@@ -1521,7 +1521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[RWS NWB] Fetching highways data`);
       
-      // Base URL for RWS NWB WFS service
+      // Base URL for RWS NWB WFS service - use simplified approach
       const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items';
       const params = new URLSearchParams({
         f: 'json',
@@ -1532,9 +1532,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (bbox) {
         params.append('bbox', bbox as string);
       }
-      
-      // Filter for highways (A-roads)
-      params.append('filter', "eigenschappen.BST_CODE IN ('HR','ORG') AND eigenschappen.WGK_CODE = '1'");
       
       const url = `${baseUrl}?${params.toString()}`;
       console.log(`[RWS NWB] URL: ${url}`);
@@ -1552,27 +1549,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const data = await response.json();
-      console.log(`[RWS NWB] Found ${data.features?.length || 0} highway segments`);
+      console.log(`[RWS NWB] Found ${data.features?.length || 0} road segments`);
       
-      // Transform data for easier use
+      // Filter for highways and transform data
       const transformedData = {
         type: 'FeatureCollection',
-        features: (data.features || []).map((feature: any) => ({
-          type: 'Feature',
-          geometry: feature.geometry,
-          properties: {
-            id: feature.properties?.identificatie,
-            wegNummer: feature.properties?.eigenschappen?.WGK_NAAM,
-            rijrichting: feature.properties?.eigenschappen?.RJR_CODE,
-            wegType: feature.properties?.eigenschappen?.BST_CODE,
-            wegCode: feature.properties?.eigenschappen?.WGK_CODE,
-            hectometrering: {
-              van: feature.properties?.eigenschappen?.BEGAFST,
-              tot: feature.properties?.eigenschappen?.ENDAFST
-            },
-            geometry: feature.geometry
-          }
-        }))
+        features: (data.features || [])
+          .filter((feature: any) => {
+            const wegNaam = feature.properties?.WGK_NAAM || '';
+            return wegNaam.match(/^(A|N)\d+$/); // Filter for highways (A1, A2, N1, etc.)
+          })
+          .map((feature: any) => ({
+            type: 'Feature',
+            geometry: feature.geometry,
+            properties: {
+              id: feature.properties?.WVK_ID || feature.properties?.identificatie,
+              wegNummer: feature.properties?.WGK_NAAM,
+              rijrichting: feature.properties?.RJR_CODE,
+              wegType: feature.properties?.BST_CODE,
+              wegCode: feature.properties?.WGK_CODE,
+              hectometrering: {
+                van: feature.properties?.BEGAFST,
+                tot: feature.properties?.ENDAFST
+              },
+              geometry: feature.geometry
+            }
+          }))
       };
       
       res.json(transformedData);
@@ -1681,9 +1683,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         params.append('bbox', bbox as string);
       }
       
-      // Filter for specific highway
-      params.append('filter', `eigenschappen.WGK_NAAM = '${roadName.toUpperCase()}' AND eigenschappen.BST_CODE IN ('HR','ORG')`);
-      
       const url = `${baseUrl}?${params.toString()}`;
       console.log(`[RWS NWB] URL: ${url}`);
       
@@ -1700,13 +1699,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const data = await response.json();
-      console.log(`[RWS NWB] Found ${data.features?.length || 0} segments for ${roadName}`);
       
-      res.json(data);
+      // Filter for specific highway
+      const filteredData = {
+        ...data,
+        features: (data.features || []).filter((feature: any) => {
+          const wegNaam = feature.properties?.WGK_NAAM || '';
+          return wegNaam.toUpperCase() === roadName.toUpperCase();
+        })
+      };
+      
+      console.log(`[RWS NWB] Found ${filteredData.features?.length || 0} segments for ${roadName}`);
+      
+      res.json(filteredData);
       
     } catch (error) {
       console.error(`[RWS NWB] Error fetching highway ${req.params.roadName}:`, error);
       res.status(500).json({ error: `Failed to fetch highway ${req.params.roadName} from RWS NWB API` });
+    }
+  });
+
+  // Get hectometer markers for highways
+  app.get('/api/rws/hectometers', async (req, res) => {
+    try {
+      const { roadName, bbox, limit = '100' } = req.query;
+      
+      console.log(`[RWS NWB] Fetching hectometer markers for road: ${roadName || 'all roads'}`);
+      
+      // Use hectometerpaaltjes collection
+      const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/hectometerpaaltjes/items';
+      const params = new URLSearchParams({
+        f: 'json',
+        limit: limit as string
+      });
+      
+      if (bbox) {
+        params.append('bbox', bbox as string);
+      }
+      
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[RWS NWB] Hectometer URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`[RWS NWB] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `RWS NWB API returned status ${response.status}` });
+      }
+      
+      const data = await response.json();
+      
+      let filteredFeatures = data.features || [];
+      
+      // Filter by road name if provided
+      if (roadName) {
+        filteredFeatures = filteredFeatures.filter((feature: any) => {
+          const wegNaam = feature.properties?.WGK_NAAM || '';
+          return wegNaam.toUpperCase().includes((roadName as string).toUpperCase());
+        });
+      }
+      
+      // Transform data for hectometer markers
+      const transformedData = {
+        type: 'FeatureCollection',
+        features: filteredFeatures.map((feature: any) => ({
+          type: 'Feature',
+          geometry: feature.geometry,
+          properties: {
+            id: feature.properties?.HMP_ID || feature.properties?.identificatie,
+            wegNummer: feature.properties?.WGK_NAAM,
+            hectometer: feature.properties?.AFSTAND || feature.properties?.KM_AFSTAND,
+            rijrichting: feature.properties?.RJR_CODE,
+            type: 'hectometer',
+            label: `${feature.properties?.WGK_NAAM || 'Onbekend'} ${feature.properties?.AFSTAND || feature.properties?.KM_AFSTAND || '?'}`,
+            markerType: 'hectometerpaaltje'
+          }
+        }))
+      };
+      
+      console.log(`[RWS NWB] Found ${transformedData.features.length} hectometer markers`);
+      
+      res.json(transformedData);
+      
+    } catch (error) {
+      console.error('[RWS NWB] Error fetching hectometer markers:', error);
+      res.status(500).json({ error: 'Failed to fetch hectometer markers from RWS NWB API' });
+    }
+  });
+
+  // Get junction points (knooppunten)
+  app.get('/api/rws/junctions', async (req, res) => {
+    try {
+      const { bbox, limit = '100' } = req.query;
+      
+      console.log(`[RWS NWB] Fetching junction points (knooppunten)`);
+      
+      // Try knooppunten collection first
+      const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/knooppunten/items';
+      const params = new URLSearchParams({
+        f: 'json',
+        limit: limit as string
+      });
+      
+      if (bbox) {
+        params.append('bbox', bbox as string);
+      }
+      
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[RWS NWB] Junctions URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`[RWS NWB] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `RWS NWB API returned status ${response.status}` });
+      }
+      
+      const data = await response.json();
+      
+      // Transform data for junction points
+      const transformedData = {
+        type: 'FeatureCollection',
+        features: (data.features || []).map((feature: any) => ({
+          type: 'Feature',
+          geometry: feature.geometry,
+          properties: {
+            id: feature.properties?.KNP_ID || feature.properties?.identificatie,
+            naam: feature.properties?.KNP_NAAM || feature.properties?.NAAM,
+            nummer: feature.properties?.KNP_NUMMER || feature.properties?.NUMMER,
+            type: 'junction',
+            label: feature.properties?.KNP_NAAM || feature.properties?.NAAM || `Knooppunt ${feature.properties?.KNP_NUMMER || '?'}`,
+            markerType: 'knooppunt',
+            wegNummers: feature.properties?.WEG_NUMMERS || []
+          }
+        }))
+      };
+      
+      console.log(`[RWS NWB] Found ${transformedData.features.length} junction points`);
+      
+      res.json(transformedData);
+      
+    } catch (error) {
+      console.error('[RWS NWB] Error fetching junction points:', error);
+      res.status(500).json({ error: 'Failed to fetch junction points from RWS NWB API' });
     }
   });
 
@@ -1770,12 +1915,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get combined road infrastructure (highways, hectometers, junctions)
+  app.get('/api/rws/infrastructure', async (req, res) => {
+    try {
+      const { bbox, roadName, includeHectometers = 'true', includeJunctions = 'true' } = req.query;
+      
+      console.log(`[RWS NWB] Fetching combined road infrastructure for: ${roadName || 'all roads'}`);
+      
+      const results: any = {
+        highways: { type: 'FeatureCollection', features: [] },
+        hectometers: { type: 'FeatureCollection', features: [] },
+        junctions: { type: 'FeatureCollection', features: [] }
+      };
+      
+      // Fetch highways
+      try {
+        const highwayParams = new URLSearchParams({ f: 'json', limit: '50' });
+        if (bbox) highwayParams.append('bbox', bbox as string);
+        
+        const highwayResponse = await fetch(
+          `https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items?${highwayParams}`,
+          { headers: { 'Accept': 'application/json', 'User-Agent': 'GMS2-Application/1.0' } }
+        );
+        
+        if (highwayResponse.ok) {
+          const highwayData = await highwayResponse.json();
+          results.highways.features = (highwayData.features || [])
+            .filter((feature: any) => {
+              const wegNaam = feature.properties?.WGK_NAAM || '';
+              const isHighway = wegNaam.match(/^(A|N)\d+$/);
+              const matchesRoad = !roadName || wegNaam.toUpperCase().includes((roadName as string).toUpperCase());
+              return isHighway && matchesRoad;
+            })
+            .map((feature: any) => ({
+              type: 'Feature',
+              geometry: feature.geometry,
+              properties: {
+                ...feature.properties,
+                type: 'highway',
+                markerType: 'wegvak'
+              }
+            }));
+        }
+      } catch (error) {
+        console.error('[RWS NWB] Error fetching highways for infrastructure:', error);
+      }
+      
+      // Fetch hectometers if requested
+      if (includeHectometers === 'true') {
+        try {
+          const hectometerParams = new URLSearchParams({ f: 'json', limit: '100' });
+          if (bbox) hectometerParams.append('bbox', bbox as string);
+          
+          const hectometerResponse = await fetch(
+            `https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/hectometerpaaltjes/items?${hectometerParams}`,
+            { headers: { 'Accept': 'application/json', 'User-Agent': 'GMS2-Application/1.0' } }
+          );
+          
+          if (hectometerResponse.ok) {
+            const hectometerData = await hectometerResponse.json();
+            results.hectometers.features = (hectometerData.features || [])
+              .filter((feature: any) => {
+                const wegNaam = feature.properties?.WGK_NAAM || '';
+                return !roadName || wegNaam.toUpperCase().includes((roadName as string).toUpperCase());
+              })
+              .map((feature: any) => ({
+                type: 'Feature',
+                geometry: feature.geometry,
+                properties: {
+                  ...feature.properties,
+                  type: 'hectometer',
+                  markerType: 'hectometerpaaltje',
+                  label: `${feature.properties?.WGK_NAAM || 'Onbekend'} ${feature.properties?.AFSTAND || feature.properties?.KM_AFSTAND || '?'}`
+                }
+              }));
+          }
+        } catch (error) {
+          console.error('[RWS NWB] Error fetching hectometers for infrastructure:', error);
+        }
+      }
+      
+      // Fetch junctions if requested
+      if (includeJunctions === 'true') {
+        try {
+          const junctionParams = new URLSearchParams({ f: 'json', limit: '50' });
+          if (bbox) junctionParams.append('bbox', bbox as string);
+          
+          const junctionResponse = await fetch(
+            `https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/knooppunten/items?${junctionParams}`,
+            { headers: { 'Accept': 'application/json', 'User-Agent': 'GMS2-Application/1.0' } }
+          );
+          
+          if (junctionResponse.ok) {
+            const junctionData = await junctionResponse.json();
+            results.junctions.features = (junctionData.features || []).map((feature: any) => ({
+              type: 'Feature',
+              geometry: feature.geometry,
+              properties: {
+                ...feature.properties,
+                type: 'junction',
+                markerType: 'knooppunt',
+                label: feature.properties?.KNP_NAAM || feature.properties?.NAAM || `Knooppunt ${feature.properties?.KNP_NUMMER || '?'}`
+              }
+            }));
+          }
+        } catch (error) {
+          console.error('[RWS NWB] Error fetching junctions for infrastructure:', error);
+        }
+      }
+      
+      const totalFeatures = results.highways.features.length + results.hectometers.features.length + results.junctions.features.length;
+      console.log(`[RWS NWB] Infrastructure summary: ${results.highways.features.length} highways, ${results.hectometers.features.length} hectometers, ${results.junctions.features.length} junctions (${totalFeatures} total)`);
+      
+      res.json(results);
+      
+    } catch (error) {
+      console.error('[RWS NWB] Error fetching road infrastructure:', error);
+      res.status(500).json({ error: 'Failed to fetch road infrastructure from RWS NWB API' });
+    }
+  });
+
   // Test endpoint for RWS NWB API
   app.get('/api/rws/test', async (req, res) => {
     try {
       console.log('[RWS NWB] Testing API connection...');
       
-      const testUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items?f=json&limit=5&filter=eigenschappen.WGK_NAAM=\'A1\'';
+      const testUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items?f=json&limit=5';
       
       const response = await fetch(testUrl, {
         headers: {
