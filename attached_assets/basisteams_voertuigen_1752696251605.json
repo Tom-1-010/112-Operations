@@ -1,0 +1,3104 @@
+{
+  "Basisteam IJsselland (C2)": [
+    {
+      "roepnummer": "RT 32.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 32.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 32.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 32.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 32.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 32.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 32.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 32.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 32.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 32.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 32.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 32.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 32.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.16",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.17",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.18",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.19",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.20",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "OSA"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 32.21",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 65
+    },
+    {
+      "roepnummer": "RT 32.22",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.23",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.24",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.25",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.26",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.27",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.28",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.29",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.30",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.31",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.32",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.33",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.34",
+      "aantal_mensen": 3,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.35",
+      "aantal_mensen": 3,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.36",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.37",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.38",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.39",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.40",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 32.41",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 32.42",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 32.43",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.44",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.45",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.46",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.47",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.48",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.49",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.50",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.51",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.52",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.53",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.54",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.55",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.56",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.57",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.58",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.59",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.60",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.61",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.62",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.63",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.64",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.65",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.66",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.67",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.68",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.69",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.70",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.71",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.72",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.73",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.74",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.75",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.76",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.77",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.78",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.79",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.80",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.81",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.82",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.83",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.84",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.85",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.86",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.87",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.88",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.89",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.90",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.91",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.92",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.93",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.94",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 32.95",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.96",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.97",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.98",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 32.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "Basisteam Maas&Rotte (C1)": [
+    {
+      "roepnummer": "RT 31.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 31.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 31.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 31.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 31.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 31.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 31.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 31.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 31.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.16",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.17",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.18",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.19",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.20",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "OSA"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 31.21",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 65
+    },
+    {
+      "roepnummer": "RT 31.22",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.23",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.24",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.25",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.26",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.27",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.28",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.29",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.30",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.31",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.32",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.33",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.34",
+      "aantal_mensen": 3,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.35",
+      "aantal_mensen": 3,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.36",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.37",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.38",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.39",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.40",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 31.41",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 31.42",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 31.43",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.44",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.45",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.46",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.47",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.48",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.49",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.50",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.51",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.52",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.53",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.54",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.55",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.56",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.57",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.58",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.59",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.60",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.61",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.62",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.63",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.64",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.65",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.66",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.67",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.68",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.69",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.70",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.71",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.72",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.73",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.74",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.75",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.76",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.77",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.78",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.79",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.80",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.81",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.82",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.83",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.84",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.85",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.86",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.87",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.88",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.89",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.90",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.91",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.92",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.93",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.94",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.95",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.96",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.97",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.98",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 31.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "Basisteam Zuidplein (D1)": [
+    {
+      "roepnummer": "RT 41.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 41.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 41.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 41.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 41.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 41.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 41.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 41.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 41.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.16",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.17",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.18",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.19",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Onopvallend"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.20",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "OSA"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 41.21",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 65
+    },
+    {
+      "roepnummer": "RT 41.22",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.23",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.24",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.25",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Motor"
+      ],
+      "soort_auto": "BPV-motor",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.26",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.27",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.28",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.29",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.30",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.31",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.32",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.33",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Voet/fiets"
+      ],
+      "soort_auto": "Fiets",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.34",
+      "aantal_mensen": 3,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.35",
+      "aantal_mensen": 3,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.36",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.37",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.38",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.39",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Studenten"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.40",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 41.41",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 41.42",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 41.43",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.44",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.45",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.46",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.47",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.48",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.49",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp",
+        "Hor/proj/demo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.50",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.51",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.52",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.53",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.54",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opsporing"
+      ],
+      "soort_auto": "BPV-onopvallend",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.55",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.56",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.57",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.58",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.59",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Uniform z. vwp",
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.60",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.61",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.62",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.63",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.64",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.65",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.66",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.67",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.68",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.69",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.70",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.71",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.72",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.73",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.74",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.75",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.76",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.77",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.78",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.79",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.80",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.81",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.82",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.83",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.84",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.85",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.86",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.87",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.88",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.89",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.90",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.91",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.92",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.93",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.94",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Wijkagent"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.95",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.96",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.97",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.98",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Reisnummer"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    },
+    {
+      "roepnummer": "RT 41.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "District Rijnmond-Oost": [
+    {
+      "roepnummer": "RT 30.91",
+      "aantal_mensen": 1,
+      "rollen": [
+        "OVD"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 0
+    }
+  ]
+}
