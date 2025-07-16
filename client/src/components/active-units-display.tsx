@@ -217,6 +217,23 @@ export default function ActiveUnitsDisplay() {
     setShowStatusSubmenu(false);
   };
 
+  const handleKoppelen = (unit: PoliceUnit | null) => {
+    if (unit) {
+      console.log(`Koppelen ${unit.roepnummer} aan incident`);
+      // Here you would implement the logic to link the unit to an incident
+      // This could open a dialog to select an incident or use the currently selected incident
+    }
+    closeContextMenu();
+  };
+
+  const handleOntkoppelen = (unit: PoliceUnit | null) => {
+    if (unit) {
+      console.log(`Ontkoppelen ${unit.roepnummer} van incident`);
+      // Here you would implement the logic to unlink the unit from an incident
+    }
+    closeContextMenu();
+  };
+
   // Combined units from both sources
   const allUnits = [...dbPoliceUnits, ...basisteamsUnits];
   
@@ -381,7 +398,7 @@ export default function ActiveUnitsDisplay() {
                 }}
               >
                 <td style={{ 
-                  padding: '6px 12px',
+                  padding: '4px 8px',
                   borderRight: '1px solid #dee2e6',
                   fontWeight: 'bold',
                   whiteSpace: 'nowrap'
@@ -389,7 +406,7 @@ export default function ActiveUnitsDisplay() {
                   {unit.roepnummer}
                 </td>
                 <td style={{ 
-                  padding: '6px 12px',
+                  padding: '4px 8px',
                   borderRight: '1px solid #dee2e6',
                   backgroundColor: getStatusColor(unit.status),
                   color: 'white',
@@ -399,7 +416,7 @@ export default function ActiveUnitsDisplay() {
                   {getStatusAbbreviation(unit.status)}
                 </td>
                 <td style={{ 
-                  padding: '6px 12px',
+                  padding: '4px 8px',
                   borderRight: '1px solid #dee2e6',
                   maxWidth: '100px',
                   overflow: 'hidden',
@@ -409,7 +426,7 @@ export default function ActiveUnitsDisplay() {
                   {Array.isArray(unit.rollen) ? unit.rollen.join(", ") : unit.rollen}
                 </td>
                 <td style={{ 
-                  padding: '6px 12px',
+                  padding: '4px 8px',
                   borderRight: '1px solid #dee2e6',
                   maxWidth: '120px',
                   overflow: 'hidden',
@@ -418,7 +435,7 @@ export default function ActiveUnitsDisplay() {
                   {unit.team}
                 </td>
                 <td style={{ 
-                  padding: '6px 12px',
+                  padding: '4px 8px',
                   maxWidth: '120px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
@@ -448,6 +465,26 @@ export default function ActiveUnitsDisplay() {
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
           }}
         >
+          <div 
+            className="context-menu-item"
+            onClick={() => handleKoppelen(contextMenu.unit)}
+            style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+          >
+            Koppelen aan incident
+          </div>
+          
+          <div 
+            className="context-menu-item"
+            onClick={() => handleOntkoppelen(contextMenu.unit)}
+            style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '12px', borderBottom: '1px solid #eee' }}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#f5f5f5'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+          >
+            Ontkoppelen van incident
+          </div>
+          
           <div 
             className="context-menu-item"
             onClick={() => setShowStatusSubmenu(!showStatusSubmenu)}
