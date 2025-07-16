@@ -1080,18 +1080,43 @@ export default function GMS2() {
     '-ambulance': { MC1: 'Gezondheid', MC2: 'Onwel/Ziekte', MC3: '', code: 'gzoz' },
     '-overval': { MC1: 'Bezitsaantasting', MC2: 'Overval', MC3: 'Bedrijf/Instelling', code: 'bzovbi' },
     '-autodiefstal': { MC1: 'Bezitsaantasting', MC2: 'Diefstal', MC3: 'Voertuig', code: 'bzdsvo' },
-    '-spookrijder': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' }
+    '-spookrijder': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' },
+    
+    // Snelweg en verkeer gerelateerde shortcuts
+    '-a1': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a2': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a4': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a12': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a13': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a15': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a16': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-a20': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' },
+    '-snelweg': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' }
   };
 
-  // PDOK Locatieserver API functions
+  // PDOK Locatieserver API functions with RWS highway integration
   const searchBAGAddress = async (query: string) => {
     try {
+      const results = [];
+      
+      // First try RWS highway search if query contains highway patterns
+      const highwayPattern = /\b(A\d+|N\d+)\b/i;
+      if (highwayPattern.test(query)) {
+        console.log(`🛣️ Detected highway pattern in query: "${query}"`);
+        const rwsResults = await searchRWSHighways(query);
+        if (rwsResults.length > 0) {
+          results.push(...rwsResults);
+          console.log(`🛣️ Found ${rwsResults.length} RWS highway results`);
+        }
+      }
+      
+      // Then search BAG for regular addresses
       const encodedQuery = encodeURIComponent(query);
       const response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=20`);
       const data = await response.json();
 
       if (data.features && data.features.length > 0) {
-        return data.features.map((feature: any) => ({
+        const bagResults = data.features.map((feature: any) => ({
           id: feature.properties.id || '',
           weergavenaam: feature.properties.weergavenaam || '',
           straatnaam: feature.properties.straatnaam || '',
@@ -1105,12 +1130,127 @@ export default function GMS2() {
           coordinates: feature.properties.coordinates || null,
           score: feature.properties.score || 0,
           volledigAdres: feature.properties.weergavenaam || 
-            `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
+            `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`,
+          wegType: 'address'
+        }));
+        results.push(...bagResults);
+        console.log(`📍 Found ${bagResults.length} BAG address results`);
+      }
+      
+      // Sort results: highways first, then by score
+      return results.sort((a, b) => {
+        if (a.wegType === 'highway' && b.wegType !== 'highway') return -1;
+        if (b.wegType === 'highway' && a.wegType !== 'highway') return 1;
+        return (b.score || 0) - (a.score || 0);
+      });
+      
+    } catch (error) {
+      console.error('Combined search error:', error);
+      return [];
+    }
+  };
+
+  // RWS NWB Highway search functions
+  const searchRWSHighways = async (query: string) => {
+    try {
+      const encodedQuery = encodeURIComponent(query);
+      console.log(`🛣️ Searching RWS highways for: "${query}"`);
+      
+      // Check if query contains highway pattern (A1, A2, etc.)
+      const highwayMatch = query.match(/\b(A\d+|N\d+)\b/i);
+      
+      if (highwayMatch) {
+        const highway = highwayMatch[1].toUpperCase();
+        const response = await fetch(`/api/rws/highways/${highway}?limit=20`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.features && data.features.length > 0) {
+            return data.features.map((feature: any) => ({
+              id: feature.properties?.id || '',
+              weergavenaam: `${feature.properties?.wegNummer || highway} (Snelweg)`,
+              straatnaam: feature.properties?.wegNummer || highway,
+              huisnummer: '',
+              huisletter: '',
+              huisnummertoevoeging: '',
+              postcode: '',
+              plaatsnaam: 'Nederland',
+              gemeente: 'Rijkswegen',
+              provincie: 'Nederland',
+              coordinates: feature.geometry?.coordinates?.[0] || null,
+              score: 1.0,
+              volledigAdres: `${feature.properties?.wegNummer || highway} (Rijksweg)`,
+              wegType: 'highway',
+              hectometer: feature.properties?.hectometrering
+            }));
+          }
+        }
+      }
+      
+      // Fallback: search all highways
+      const response = await fetch(`/api/rws/highways?limit=50`);
+      if (response.ok) {
+        const data = await response.json();
+        
+        const filtered = data.features.filter((feature: any) => 
+          feature.properties?.wegNummer?.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        return filtered.slice(0, 10).map((feature: any) => ({
+          id: feature.properties?.id || '',
+          weergavenaam: `${feature.properties?.wegNummer || 'Onbekende weg'} (Snelweg)`,
+          straatnaam: feature.properties?.wegNummer || 'Onbekende weg',
+          huisnummer: '',
+          huisletter: '',
+          huisnummertoevoeging: '',
+          postcode: '',
+          plaatsnaam: 'Nederland',
+          gemeente: 'Rijkswegen',
+          provincie: 'Nederland',
+          coordinates: feature.geometry?.coordinates?.[0] || null,
+          score: 0.8,
+          volledigAdres: `${feature.properties?.wegNummer || 'Onbekende weg'} (Rijksweg)`,
+          wegType: 'highway',
+          hectometer: feature.properties?.hectometrering
         }));
       }
+      
       return [];
     } catch (error) {
-      console.error('PDOK Locatieserver error:', error);
+      console.error('RWS NWB highway search error:', error);
+      return [];
+    }
+  };
+
+  const searchRoadsByLocation = async (lat: number, lng: number, radius: number = 1000) => {
+    try {
+      console.log(`🛣️ Searching roads near ${lat}, ${lng} within ${radius}m`);
+      
+      const response = await fetch(`/api/rws/roads/near?lat=${lat}&lon=${lng}&radius=${radius}&roadType=highway`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.features && data.features.length > 0) {
+          return data.features.map((feature: any) => ({
+            id: feature.properties?.identificatie || '',
+            weergavenaam: `${feature.properties?.eigenschappen?.WGK_NAAM || 'Onbekende weg'} (Nabij locatie)`,
+            straatnaam: feature.properties?.eigenschappen?.WGK_NAAM || 'Onbekende weg',
+            huisnummer: '',
+            plaatsnaam: 'Nederland',
+            gemeente: 'Rijkswegen',
+            coordinates: feature.geometry?.coordinates?.[0] || null,
+            score: 0.9,
+            volledigAdres: `${feature.properties?.eigenschappen?.WGK_NAAM || 'Onbekende weg'} (Rijksweg nabij locatie)`,
+            wegType: 'highway'
+          }));
+        }
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('RWS roads near location error:', error);
       return [];
     }
   };
@@ -1632,8 +1772,51 @@ export default function GMS2() {
     const incidentContext = selectedIncident ? `incident ${selectedIncident.nr}` : 'NIEUWE MELDING';
     console.log(`Shortcode detection for: "${lastLine}" | Context: ${incidentContext}`);
 
-    // Address shortcode: =[stad]/[straatnaam] [huisnummer]
+    // Address shortcode: =[stad]/[straatnaam] [huisnummer] OR =highway (A1, A2, etc.)
     if (lastLine.startsWith('=')) {
+      // Highway shortcode: =A1, =A20, etc.
+      const highwayMatch = lastLine.match(/^=(A\d+|N\d+)(?:\s+(.+))?$/i);
+      if (highwayMatch) {
+        const [, highway, additional] = highwayMatch;
+
+        console.log(`🛣️ Highway shortcode detected: ${highway}${additional ? ' ' + additional : ''}`);
+
+        // Switch to Locatietreffers tab immediately
+        setActiveLoggingTab('locatietreffers');
+
+        // Search for highway information
+        const results = await searchRWSHighways(highway);
+        if (results.length > 0) {
+          setBagSearchResults(results);
+          addLoggingEntry(`🛣️ Snelweg ${highway} gevonden via RWS Wegenbestand`);
+          
+          // Auto-fill if only one result and no additional info
+          if (results.length === 1 && !additional) {
+            const result = results[0];
+            const addressData = {
+              straatnaam: result.straatnaam,
+              huisnummer: additional || '',
+              plaatsnaam: result.plaatsnaam,
+              gemeente: result.gemeente
+            };
+
+            setFormData(prev => ({ ...prev, ...addressData }));
+            if (selectedIncident) {
+              setSelectedIncident({ ...selectedIncident, ...addressData });
+            }
+
+            addLoggingEntry(`🛣️ Snelweglocatie automatisch ingevuld: ${result.volledigAdres}`);
+            setBagSearchQuery("");
+            setBagSearchResults([]);
+          }
+        } else {
+          addLoggingEntry(`❌ Snelweg ${highway} niet gevonden in RWS Wegenbestand`);
+        }
+
+        return true;
+      }
+
+      // Regular address shortcode: =[stad]/[straatnaam] [huisnummer]
       const addressMatch = lastLine.match(/^=([^\/]+)\/(.+?)\s+(\d+)$/i);
       if (addressMatch) {
         const [, stad, straatnaam, huisnummer] = addressMatch;

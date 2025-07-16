@@ -1514,6 +1514,307 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // RWS Nationaal Wegenbestand API endpoints
+  app.get('/api/rws/highways', async (req, res) => {
+    try {
+      const { bbox, limit = '100' } = req.query;
+      
+      console.log(`[RWS NWB] Fetching highways data`);
+      
+      // Base URL for RWS NWB WFS service
+      const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items';
+      const params = new URLSearchParams({
+        f: 'json',
+        limit: limit as string
+      });
+      
+      // Add bbox if provided
+      if (bbox) {
+        params.append('bbox', bbox as string);
+      }
+      
+      // Filter for highways (A-roads)
+      params.append('filter', "eigenschappen.BST_CODE IN ('HR','ORG') AND eigenschappen.WGK_CODE = '1'");
+      
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[RWS NWB] URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`[RWS NWB] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `RWS NWB API returned status ${response.status}` });
+      }
+      
+      const data = await response.json();
+      console.log(`[RWS NWB] Found ${data.features?.length || 0} highway segments`);
+      
+      // Transform data for easier use
+      const transformedData = {
+        type: 'FeatureCollection',
+        features: (data.features || []).map((feature: any) => ({
+          type: 'Feature',
+          geometry: feature.geometry,
+          properties: {
+            id: feature.properties?.identificatie,
+            wegNummer: feature.properties?.eigenschappen?.WGK_NAAM,
+            rijrichting: feature.properties?.eigenschappen?.RJR_CODE,
+            wegType: feature.properties?.eigenschappen?.BST_CODE,
+            wegCode: feature.properties?.eigenschappen?.WGK_CODE,
+            hectometrering: {
+              van: feature.properties?.eigenschappen?.BEGAFST,
+              tot: feature.properties?.eigenschappen?.ENDAFST
+            },
+            geometry: feature.geometry
+          }
+        }))
+      };
+      
+      res.json(transformedData);
+      
+    } catch (error) {
+      console.error('[RWS NWB] Error fetching highways:', error);
+      res.status(500).json({ error: 'Failed to fetch highways from RWS NWB API' });
+    }
+  });
+
+  app.get('/api/rws/roads', async (req, res) => {
+    try {
+      const { bbox, roadType = 'all', limit = '100' } = req.query;
+      
+      console.log(`[RWS NWB] Fetching roads data for type: ${roadType}`);
+      
+      const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items';
+      const params = new URLSearchParams({
+        f: 'json',
+        limit: limit as string
+      });
+      
+      if (bbox) {
+        params.append('bbox', bbox as string);
+      }
+      
+      // Filter based on road type
+      let filter = "";
+      switch (roadType) {
+        case 'highway':
+          filter = "eigenschappen.BST_CODE IN ('HR','ORG') AND eigenschappen.WGK_CODE = '1'";
+          break;
+        case 'provincial':
+          filter = "eigenschappen.BST_CODE IN ('HR','ORG') AND eigenschappen.WGK_CODE = '2'";
+          break;
+        case 'municipal':
+          filter = "eigenschappen.BST_CODE IN ('HR','ORG') AND eigenschappen.WGK_CODE = '3'";
+          break;
+        default:
+          filter = "eigenschappen.BST_CODE IN ('HR','ORG')";
+      }
+      
+      params.append('filter', filter);
+      
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[RWS NWB] URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`[RWS NWB] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `RWS NWB API returned status ${response.status}` });
+      }
+      
+      const data = await response.json();
+      console.log(`[RWS NWB] Found ${data.features?.length || 0} road segments`);
+      
+      const transformedData = {
+        type: 'FeatureCollection',
+        features: (data.features || []).map((feature: any) => ({
+          type: 'Feature',
+          geometry: feature.geometry,
+          properties: {
+            id: feature.properties?.identificatie,
+            wegNummer: feature.properties?.eigenschappen?.WGK_NAAM,
+            wegType: feature.properties?.eigenschappen?.BST_CODE,
+            wegCode: feature.properties?.eigenschappen?.WGK_CODE,
+            rijrichting: feature.properties?.eigenschappen?.RJR_CODE,
+            hectometrering: {
+              van: feature.properties?.eigenschappen?.BEGAFST,
+              tot: feature.properties?.eigenschappen?.ENDAFST
+            },
+            geometry: feature.geometry
+          }
+        }))
+      };
+      
+      res.json(transformedData);
+      
+    } catch (error) {
+      console.error('[RWS NWB] Error fetching roads:', error);
+      res.status(500).json({ error: 'Failed to fetch roads from RWS NWB API' });
+    }
+  });
+
+  // Get highway information by name (A1, A2, etc.)
+  app.get('/api/rws/highways/:roadName', async (req, res) => {
+    try {
+      const { roadName } = req.params;
+      const { bbox, limit = '50' } = req.query;
+      
+      console.log(`[RWS NWB] Fetching highway info for: ${roadName}`);
+      
+      const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items';
+      const params = new URLSearchParams({
+        f: 'json',
+        limit: limit as string
+      });
+      
+      if (bbox) {
+        params.append('bbox', bbox as string);
+      }
+      
+      // Filter for specific highway
+      params.append('filter', `eigenschappen.WGK_NAAM = '${roadName.toUpperCase()}' AND eigenschappen.BST_CODE IN ('HR','ORG')`);
+      
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[RWS NWB] URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`[RWS NWB] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `RWS NWB API returned status ${response.status}` });
+      }
+      
+      const data = await response.json();
+      console.log(`[RWS NWB] Found ${data.features?.length || 0} segments for ${roadName}`);
+      
+      res.json(data);
+      
+    } catch (error) {
+      console.error(`[RWS NWB] Error fetching highway ${req.params.roadName}:`, error);
+      res.status(500).json({ error: `Failed to fetch highway ${req.params.roadName} from RWS NWB API` });
+    }
+  });
+
+  // Get road information near a specific location
+  app.get('/api/rws/roads/near', async (req, res) => {
+    try {
+      const { lat, lon, radius = '1000', roadType = 'all' } = req.query;
+      
+      if (!lat || !lon) {
+        return res.status(400).json({ error: 'Latitude and longitude are required' });
+      }
+      
+      const latitude = parseFloat(lat as string);
+      const longitude = parseFloat(lon as string);
+      const radiusMeters = parseInt(radius as string);
+      
+      // Calculate bbox around point (rough approximation)
+      const latOffset = radiusMeters / 111000; // ~111km per degree
+      const lonOffset = radiusMeters / (111000 * Math.cos(latitude * Math.PI / 180));
+      
+      const bbox = `${longitude - lonOffset},${latitude - latOffset},${longitude + lonOffset},${latitude + latOffset}`;
+      
+      console.log(`[RWS NWB] Fetching roads near ${lat},${lon} within ${radius}m`);
+      
+      const baseUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items';
+      const params = new URLSearchParams({
+        f: 'json',
+        bbox: bbox,
+        limit: '50'
+      });
+      
+      let filter = "eigenschappen.BST_CODE IN ('HR','ORG')";
+      if (roadType === 'highway') {
+        filter += " AND eigenschappen.WGK_CODE = '1'";
+      }
+      params.append('filter', filter);
+      
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log(`[RWS NWB] URL: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`[RWS NWB] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `RWS NWB API returned status ${response.status}` });
+      }
+      
+      const data = await response.json();
+      console.log(`[RWS NWB] Found ${data.features?.length || 0} road segments near location`);
+      
+      res.json(data);
+      
+    } catch (error) {
+      console.error('[RWS NWB] Error fetching roads near location:', error);
+      res.status(500).json({ error: 'Failed to fetch nearby roads from RWS NWB API' });
+    }
+  });
+
+  // Test endpoint for RWS NWB API
+  app.get('/api/rws/test', async (req, res) => {
+    try {
+      console.log('[RWS NWB] Testing API connection...');
+      
+      const testUrl = 'https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/collections/wegvakken/items?f=json&limit=5&filter=eigenschappen.WGK_NAAM=\'A1\'';
+      
+      const response = await fetch(testUrl, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GMS2-Application/1.0'
+        }
+      });
+      
+      const responseText = await response.text();
+      console.log(`[RWS NWB TEST] Response status: ${response.status}`);
+      console.log(`[RWS NWB TEST] Response headers:`, Object.fromEntries(response.headers.entries()));
+      console.log(`[RWS NWB TEST] Response body (first 500 chars):`, responseText.substring(0, 500));
+      
+      try {
+        const data = JSON.parse(responseText);
+        res.json({
+          status: 'success',
+          url: testUrl,
+          responseStatus: response.status,
+          data: data,
+          features: data.features?.length || 0
+        });
+      } catch (parseError: any) {
+        res.json({
+          status: 'parse_error',
+          url: testUrl,
+          responseStatus: response.status,
+          responseText: responseText.substring(0, 1000),
+          parseError: parseError?.message || 'Unknown parse error'
+        });
+      }
+    } catch (error: any) {
+      res.status(500).json({
+        status: 'fetch_error',
+        error: error?.message || 'Unknown error'
+      });
+    }
+  });
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
