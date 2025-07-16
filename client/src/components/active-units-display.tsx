@@ -431,12 +431,12 @@ export default function ActiveUnitsDisplay() {
   // Combined units from both sources
   const allUnits = [...dbPoliceUnits, ...basisteamsUnits];
   
-  // Filter to only show active units (status 1-3)
+  // Filter to only show active units (exclude status 5 - afmelden)
   const activeUnits = allUnits.filter(unit => {
     const status = unit.status;
-    return status === '1 - Beschikbaar/vrij' || 
-           status === '2 - Aanrijdend' || 
-           status === '3 - Ter plaatse';
+    return status !== '5 - Afmelden' && 
+           status !== '5 - afmelden' && 
+           !status.toLowerCase().includes('afmelden');
   });
 
   // Filter by search query
