@@ -230,20 +230,25 @@ export default function ActiveUnitsDisplay() {
     if (unit) {
       console.log(`Koppelen ${unit.roepnummer} aan incident`);
       
-      // Get current GMS incident from localStorage or use default
-      const currentIncident = localStorage.getItem('currentGmsIncident');
-      let incidentNumber = "2025-001234";
-      let incidentId = null;
+      // Get selected incident from GMS2 system
+      const selectedIncidentId = localStorage.getItem('selectedIncidentId');
+      const gmsIncidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
       
-      if (currentIncident) {
-        try {
-          const parsedIncident = JSON.parse(currentIncident);
-          incidentNumber = parsedIncident.id || parsedIncident.incidentId || "2025-001234";
-          incidentId = parsedIncident.id || parsedIncident.incidentId;
-        } catch (error) {
-          console.error('Error parsing current incident:', error);
-        }
+      if (!selectedIncidentId) {
+        console.log(`⚠️ Geen incident geselecteerd om ${unit.roepnummer} aan te koppelen`);
+        closeContextMenu();
+        return;
       }
+      
+      const selectedIncident = gmsIncidents.find((incident: any) => incident.id === parseInt(selectedIncidentId));
+      if (!selectedIncident) {
+        console.log(`⚠️ Geselecteerd incident niet gevonden voor ${unit.roepnummer}`);
+        closeContextMenu();
+        return;
+      }
+      
+      const incidentNumber = selectedIncident.nr || selectedIncident.id;
+      const incidentId = selectedIncident.id;
       
       try {
         if (typeof unit.id === 'number') {
@@ -280,54 +285,60 @@ export default function ActiveUnitsDisplay() {
           console.log(`✅ Eenheid ${unit.roepnummer} gekoppeld aan incident ${incidentNumber}`);
         }
         
-        // Also update the GMS incident with assigned units if incident exists
-        if (incidentId && currentIncident) {
-          try {
-            const parsedIncident = JSON.parse(currentIncident);
-            const assignedUnits = parsedIncident.assignedUnits || [];
+        // Update the GMS incident with assigned units
+        try {
+          const assignedUnits = selectedIncident.assignedUnits || [];
+          
+          // Check if unit is already assigned
+          const existingUnitIndex = assignedUnits.findIndex((u: any) => u.roepnummer === unit.roepnummer);
+          
+          if (existingUnitIndex === -1) {
+            // Add new unit assignment
+            const newAssignment = {
+              roepnummer: unit.roepnummer,
+              soort_voertuig: unit.soort_auto || 'Surveillancevoertuig',
+              ov_tijd: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+              ar_tijd: '',
+              tp_tijd: '',
+              nb_tijd: '',
+              am_tijd: '',
+              vr_tijd: '',
+              fd_tijd: '',
+              ga_tijd: ''
+            };
             
-            // Check if unit is already assigned
-            const existingUnitIndex = assignedUnits.findIndex((u: any) => u.roepnummer === unit.roepnummer);
+            assignedUnits.push(newAssignment);
             
-            if (existingUnitIndex === -1) {
-              // Add new unit assignment
-              const newAssignment = {
-                roepnummer: unit.roepnummer,
-                status: '2 - Aanrijdend',
-                ar_tijd: new Date().toTimeString().slice(0, 5),
-                tp_tijd: '',
-                vr_tijd: '',
-                team: unit.team,
-                rollen: unit.rollen,
-                soort_auto: unit.soort_auto
-              };
+            // Update the incident
+            const updatedIncident = {
+              ...selectedIncident,
+              assignedUnits: assignedUnits
+            };
+            
+            // Update the incidents array
+            const updatedIncidents = gmsIncidents.map((incident: any) => 
+              incident.id === selectedIncident.id ? updatedIncident : incident
+            );
+            
+            localStorage.setItem('gms2Incidents', JSON.stringify(updatedIncidents));
+            
+            // Update database
+            try {
+              await fetch(`/api/gms-incidents/${incidentId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedIncident)
+              });
               
-              assignedUnits.push(newAssignment);
-              
-              // Update the incident
-              const updatedIncident = {
-                ...parsedIncident,
-                assignedUnits: assignedUnits
-              };
-              
-              localStorage.setItem('currentGmsIncident', JSON.stringify(updatedIncident));
-              
-              // Update database if possible
-              if (incidentId) {
-                fetch(`/api/gms-incidents/${incidentId}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(updatedIncident)
-                }).catch(error => console.error('Error updating incident in database:', error));
-              }
-              
-              console.log(`✅ Eenheid ${unit.roepnummer} toegevoegd aan incident ${incidentId}`);
-            } else {
-              console.log(`⚠️ Eenheid ${unit.roepnummer} al gekoppeld aan incident ${incidentId}`);
+              console.log(`✅ Eenheid ${unit.roepnummer} gekoppeld aan incident ${incidentNumber}`);
+            } catch (error) {
+              console.error('Error updating incident in database:', error);
             }
-          } catch (error) {
-            console.error('Error updating incident with assigned unit:', error);
+          } else {
+            console.log(`⚠️ Eenheid ${unit.roepnummer} is al gekoppeld aan incident ${incidentNumber}`);
           }
+        } catch (error) {
+          console.error('Error updating incident with assigned unit:', error);
         }
         
       } catch (error) {
@@ -341,18 +352,25 @@ export default function ActiveUnitsDisplay() {
     if (unit) {
       console.log(`Ontkoppelen ${unit.roepnummer} van incident`);
       
-      // Get current GMS incident from localStorage
-      const currentIncident = localStorage.getItem('currentGmsIncident');
-      let incidentId = null;
+      // Get selected incident from GMS2 system
+      const selectedIncidentId = localStorage.getItem('selectedIncidentId');
+      const gmsIncidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
       
-      if (currentIncident) {
-        try {
-          const parsedIncident = JSON.parse(currentIncident);
-          incidentId = parsedIncident.id || parsedIncident.incidentId;
-        } catch (error) {
-          console.error('Error parsing current incident:', error);
-        }
+      if (!selectedIncidentId) {
+        console.log(`⚠️ Geen incident geselecteerd om ${unit.roepnummer} van te ontkoppelen`);
+        closeContextMenu();
+        return;
       }
+      
+      const selectedIncident = gmsIncidents.find((incident: any) => incident.id === parseInt(selectedIncidentId));
+      if (!selectedIncident) {
+        console.log(`⚠️ Geselecteerd incident niet gevonden voor ${unit.roepnummer}`);
+        closeContextMenu();
+        return;
+      }
+      
+      const incidentId = selectedIncident.id;
+      const incidentNumber = selectedIncident.nr || selectedIncident.id;
       
       try {
         if (typeof unit.id === 'number') {
@@ -389,36 +407,40 @@ export default function ActiveUnitsDisplay() {
           console.log(`✅ Eenheid ${unit.roepnummer} ontkoppeld van incident`);
         }
         
-        // Also remove from GMS incident assigned units
-        if (incidentId && currentIncident) {
+        // Remove from GMS incident assigned units
+        try {
+          const assignedUnits = selectedIncident.assignedUnits || [];
+          
+          // Remove unit from assigned units
+          const updatedAssignedUnits = assignedUnits.filter((u: any) => u.roepnummer !== unit.roepnummer);
+          
+          // Update the incident
+          const updatedIncident = {
+            ...selectedIncident,
+            assignedUnits: updatedAssignedUnits
+          };
+          
+          // Update the incidents array
+          const updatedIncidents = gmsIncidents.map((incident: any) => 
+            incident.id === selectedIncident.id ? updatedIncident : incident
+          );
+          
+          localStorage.setItem('gms2Incidents', JSON.stringify(updatedIncidents));
+          
+          // Update database
           try {
-            const parsedIncident = JSON.parse(currentIncident);
-            const assignedUnits = parsedIncident.assignedUnits || [];
+            await fetch(`/api/gms-incidents/${incidentId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updatedIncident)
+            });
             
-            // Remove unit from assigned units
-            const updatedAssignedUnits = assignedUnits.filter((u: any) => u.roepnummer !== unit.roepnummer);
-            
-            // Update the incident
-            const updatedIncident = {
-              ...parsedIncident,
-              assignedUnits: updatedAssignedUnits
-            };
-            
-            localStorage.setItem('currentGmsIncident', JSON.stringify(updatedIncident));
-            
-            // Update database if possible
-            if (incidentId) {
-              fetch(`/api/gms-incidents/${incidentId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedIncident)
-              }).catch(error => console.error('Error updating incident in database:', error));
-            }
-            
-            console.log(`✅ Eenheid ${unit.roepnummer} verwijderd van incident ${incidentId}`);
+            console.log(`✅ Eenheid ${unit.roepnummer} ontkoppeld van incident ${incidentNumber}`);
           } catch (error) {
-            console.error('Error updating incident to remove assigned unit:', error);
+            console.error('Error updating incident in database:', error);
           }
+        } catch (error) {
+          console.error('Error updating incident to remove assigned unit:', error);
         }
         
       } catch (error) {
