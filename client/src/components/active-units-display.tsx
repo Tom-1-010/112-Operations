@@ -33,6 +33,7 @@ export default function ActiveUnitsDisplay() {
   const [isLoading, setIsLoading] = useState(true);
   const [basisteamsUnits, setBasisteamsUnits] = useState<PoliceUnit[]>([]);
   const [dbPoliceUnits, setDbPoliceUnits] = useState<PoliceUnit[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Utility functions
   const formatTime = (time: Date) => {
@@ -227,11 +228,40 @@ export default function ActiveUnitsDisplay() {
            status === '3 - Ter plaatse';
   });
 
-  // Sort by team, then by roepnummer
-  const sortedUnits = activeUnits.sort((a, b) => {
+  // Filter by search query
+  const filteredUnits = activeUnits.filter(unit => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    return (
+      unit.roepnummer.toLowerCase().includes(query) ||
+      unit.team.toLowerCase().includes(query) ||
+      unit.status.toLowerCase().includes(query) ||
+      (unit.locatie && unit.locatie.toLowerCase().includes(query)) ||
+      (Array.isArray(unit.rollen) ? unit.rollen.join(' ').toLowerCase().includes(query) : unit.rollen.toLowerCase().includes(query))
+    );
+  });
+
+  // Sort by team, then by roepnummer with numerical sorting
+  const sortedUnits = filteredUnits.sort((a, b) => {
     if (a.team !== b.team) {
       return a.team.localeCompare(b.team);
     }
+    
+    // Extract numbers from roepnummer for numerical sorting
+    const extractNumber = (roepnummer: string) => {
+      const match = roepnummer.match(/(\d+)/);
+      return match ? parseInt(match[1]) : 0;
+    };
+    
+    const numA = extractNumber(a.roepnummer);
+    const numB = extractNumber(b.roepnummer);
+    
+    if (numA !== numB) {
+      return numA - numB;
+    }
+    
+    // If numbers are the same, fall back to string comparison
     return a.roepnummer.localeCompare(b.roepnummer);
   });
 
@@ -252,9 +282,30 @@ export default function ActiveUnitsDisplay() {
       <div className="active-units-header">
         <h3>Actieve Eenheden</h3>
         <div className="active-units-summary">
-          Actief: {activeUnits.length} | Beschikbaar: {activeUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}
+          Actief: {filteredUnits.length} | Beschikbaar: {filteredUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}
         </div>
         <div className="active-units-time">{formatTime(currentTime)}</div>
+      </div>
+      
+      <div className="active-units-search" style={{ 
+        padding: '8px 12px', 
+        borderBottom: '1px solid #ddd',
+        backgroundColor: '#f8f9fa' 
+      }}>
+        <input 
+          type="text"
+          placeholder="Zoek eenheden..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '6px 12px',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            fontSize: '12px',
+            outline: 'none'
+          }}
+        />
       </div>
 
       <div className="active-units-table-wrapper" style={{ 
