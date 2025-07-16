@@ -217,6 +217,11 @@ export default function ActiveUnitsDisplay() {
     setShowStatusSubmenu(false);
   };
 
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, unit: null });
+    setShowStatusSubmenu(false);
+  };
+
   const handleKoppelen = (unit: PoliceUnit | null) => {
     if (unit) {
       console.log(`Koppelen ${unit.roepnummer} aan incident`);
