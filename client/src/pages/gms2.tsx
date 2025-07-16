@@ -228,6 +228,9 @@ export default function GMS2() {
 
     // Load all incident data into form fields
     if (incident) {
+      // Get assigned roepnummers for the form
+      const assignedRoepnummers = incident.assignedUnits?.map(unit => unit.roepnummer).join(', ') || incident.roepnr || '';
+      
       const incidentFormData = {
         melderNaam: incident.melderNaam || "",
         telefoonnummer: incident.telefoonnummer || "",
@@ -239,7 +242,7 @@ export default function GMS2() {
         postcode: incident.postcode || "",
         plaatsnaam: incident.plaatsnaam || "",
         functie: incident.functie || "",
-        roepnummer: incident.roepnr || ""
+        roepnummer: assignedRoepnummers
       };
 
       console.log(`📋 Loading incident data into form:`, incidentFormData);
@@ -3165,6 +3168,8 @@ export default function GMS2() {
               {incidents.filter(incident => !incident.assignedUnits || incident.assignedUnits.length === 0).map((incident) => {
                 // Determine the most specific MC classification
                 const mcClassification = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || '';
+                // Get roepnummers of assigned units (even for openstaande incidents in case they have units)
+                const assignedRoepnummers = incident.assignedUnits?.map(unit => unit.roepnummer).join(', ') || incident.roepnr || '';
 
                 return (
                   <div 
@@ -3176,7 +3181,7 @@ export default function GMS2() {
                     <span>{incident.locatie}</span>
                     <span>{incident.plaatsnaam || incident.plaats}</span>
                     <span className="gms2-mc-cell">{mcClassification}</span>
-                    <span>{incident.roepnr}</span>
+                    <span>{assignedRoepnummers}</span>
                     <span>{incident.nr}</span>
                     <span>{incident.tijd}</span>
                     <span>{incident.positie}</span>
@@ -3331,6 +3336,18 @@ export default function GMS2() {
                     value={formData.functie}
                     onChange={(e) => handleFormChange('functie', e.target.value)}
                     placeholder="Object/gebouw"
+                  />
+                </div>
+
+                {/* Roepnummer Row */}
+                <div className="gms2-form-row">
+                  <span className="gms2-field-label">Roepnr:</span>
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    value={formData.roepnummer}
+                    onChange={(e) => handleFormChange('roepnummer', e.target.value)}
+                    placeholder="Toegewezen eenheden"
                   />
                 </div>
 
