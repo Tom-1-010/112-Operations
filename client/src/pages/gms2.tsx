@@ -211,6 +211,9 @@ export default function GMS2() {
 
     // Set selected incident first
     setSelectedIncident(incident);
+    
+    // Store selected incident ID in localStorage for unit linking
+    localStorage.setItem('selectedIncidentId', incident.id.toString());
 
     // Generate automatic pager text
     const generatePagerText = (incident: GmsIncident) => {
