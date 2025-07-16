@@ -1083,7 +1083,7 @@ export default function GMS2() {
     '-spookrijder': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: 'Spookrijder', code: 'vkwesr' }
   };
 
-  // BAG API functions
+  // PDOK Locatieserver API functions
   const searchBAGAddress = async (query: string) => {
     try {
       const encodedQuery = encodeURIComponent(query);
@@ -1092,6 +1092,8 @@ export default function GMS2() {
 
       if (data.features && data.features.length > 0) {
         return data.features.map((feature: any) => ({
+          id: feature.properties.id || '',
+          weergavenaam: feature.properties.weergavenaam || '',
           straatnaam: feature.properties.straatnaam || '',
           huisnummer: feature.properties.huisnummer || '',
           huisletter: feature.properties.huisletter || '',
@@ -1099,17 +1101,21 @@ export default function GMS2() {
           postcode: feature.properties.postcode || '',
           plaatsnaam: feature.properties.plaatsnaam || '',
           gemeente: feature.properties.gemeentenaam || '',
-          volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
+          provincie: feature.properties.provincienaam || '',
+          coordinates: feature.properties.coordinates || null,
+          score: feature.properties.score || 0,
+          volledigAdres: feature.properties.weergavenaam || 
+            `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
         }));
       }
       return [];
     } catch (error) {
-      console.error('BAG API error:', error);
+      console.error('PDOK Locatieserver error:', error);
       return [];
     }
   };
 
-  // Enhanced BAG search for specific address parts
+  // Enhanced PDOK Locatieserver search for specific address parts
   const searchBAGSpecific = async (stad: string, straat: string, huisnummer: string = '') => {
     try {
       let query: string;
@@ -1126,6 +1132,8 @@ export default function GMS2() {
 
         if (data.features && data.features.length > 0) {
           return data.features.map((feature: any) => ({
+            id: feature.properties.id || '',
+            weergavenaam: feature.properties.weergavenaam || '',
             straatnaam: feature.properties.straatnaam || '',
             huisnummer: feature.properties.huisnummer || '',
             huisletter: feature.properties.huisletter || '',
@@ -1133,7 +1141,11 @@ export default function GMS2() {
             postcode: feature.properties.postcode || '',
             plaatsnaam: feature.properties.plaatsnaam || '',
             gemeente: feature.properties.gemeentenaam || '',
-            volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
+            provincie: feature.properties.provincienaam || '',
+            coordinates: feature.properties.coordinates || null,
+            score: feature.properties.score || 0,
+            volledigAdres: feature.properties.weergavenaam || 
+              `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
           }));
         }
       }
@@ -1148,6 +1160,8 @@ export default function GMS2() {
         return data.features
           .filter((feature: any) => !huisnummer || feature.properties.huisnummer == huisnummer)
           .map((feature: any) => ({
+            id: feature.properties.id || '',
+            weergavenaam: feature.properties.weergavenaam || '',
             straatnaam: feature.properties.straatnaam || '',
             huisnummer: feature.properties.huisnummer || '',
             huisletter: feature.properties.huisletter || '',
@@ -1155,13 +1169,17 @@ export default function GMS2() {
             postcode: feature.properties.postcode || '',
             plaatsnaam: feature.properties.plaatsnaam || '',
             gemeente: feature.properties.gemeentenaam || '',
-            volledigAdres: `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
+            provincie: feature.properties.provincienaam || '',
+            coordinates: feature.properties.coordinates || null,
+            score: feature.properties.score || 0,
+            volledigAdres: feature.properties.weergavenaam || 
+              `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
           }));
       }
 
       return [];
     } catch (error) {
-      console.error('BAG API Error:', error);
+      console.error('PDOK Locatieserver Error:', error);
       return [];
     }
   };
@@ -1185,7 +1203,8 @@ export default function GMS2() {
         gemeente: bestMatch.gemeente
       };
 
-      console.log(`✅ Adres gevonden via BAG API:`, completeAddressData);
+      console.log(`✅ Adres gevonden via PDOK Locatieserver:`, completeAddressData);
+      console.log(`📊 Match score: ${bestMatch.score}, Coördinaten: ${bestMatch.coordinates ? bestMatch.coordinates.join(', ') : 'Niet beschikbaar'}`);
 
       setFormData(prev => ({
         ...prev,
@@ -1199,7 +1218,7 @@ export default function GMS2() {
         });
       }
 
-      addLoggingEntry(`📍 Adres automatisch aangevuld via BAG API: ${bestMatch.volledigAdres}`);
+      addLoggingEntry(`📍 Adres automatisch aangevuld via PDOK Locatieserver: ${bestMatch.volledigAdres} (score: ${bestMatch.score})`);
 
       // Switch to Locatietreffers tab and clear search
       setActiveLoggingTab('locatietreffers');
@@ -1209,7 +1228,7 @@ export default function GMS2() {
       return completeAddressData;
     } else {
       console.log(`❌ Geen adres gevonden voor: ${straatnaam} ${huisnummer}, ${stad}`);
-      addLoggingEntry(`❌ Geen adres gevonden in BAG API voor: ${straatnaam} ${huisnummer}, ${stad}`);
+      addLoggingEntry(`❌ Geen adres gevonden in PDOK Locatieserver voor: ${straatnaam} ${huisnummer}, ${stad}`);
       return null;
     }
   };

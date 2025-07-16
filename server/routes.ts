@@ -208,7 +208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // BAG API proxy endpoint
+  // PDOK Locatieserver API proxy endpoint
   app.get('/api/bag/search', async (req, res) => {
     try {
       const query = String(req.query.q || '');
@@ -219,61 +219,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const encodedQuery = encodeURIComponent(String(query));
-      // Use the correct PDOK Locatieserver endpoint for address search
-      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodedQuery}&rows=${limit}&fq=type:adres`;
+      // Use the PDOK Locatieserver v3_1 endpoint with advanced search parameters
+      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodedQuery}&rows=${limit}&fq=type:adres&fl=id,weergavenaam,straatnaam,huisnummer,huisletter,huisnummertoevoeging,postcode,woonplaatsnaam,gemeentenaam,provincienaam,centroide_ll&sort=score desc`;
 
-      console.log(`[BAG API] Searching for: "${query}" - URL: ${url}`);
+      console.log(`[PDOK Locatieserver] Searching for: "${query}" - URL: ${url}`);
 
       const response = await fetch(url, {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'GMS2-Application/1.0'
+          'User-Agent': 'GMS2-Application/1.0',
+          'X-Requested-With': 'XMLHttpRequest'
         }
       });
 
       if (!response.ok) {
-        console.error(`[BAG API] HTTP Error: ${response.status} - ${response.statusText}`);
-        return res.status(500).json({ error: `BAG API returned status ${response.status}` });
+        console.error(`[PDOK Locatieserver] HTTP Error: ${response.status} - ${response.statusText}`);
+        return res.status(500).json({ error: `PDOK Locatieserver returned status ${response.status}` });
       }
 
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const textResponse = await response.text();
-        console.error(`[BAG API] Non-JSON response: ${textResponse.substring(0, 200)}`);
-        return res.status(500).json({ error: 'BAG API returned non-JSON response' });
+        console.error(`[PDOK Locatieserver] Non-JSON response: ${textResponse.substring(0, 200)}`);
+        return res.status(500).json({ error: 'PDOK Locatieserver returned non-JSON response' });
       }
 
       const data = await response.json();
 
-      console.log(`[BAG API] Found ${data.response?.docs?.length || 0} results`);
+      console.log(`[PDOK Locatieserver] Found ${data.response?.docs?.length || 0} results`);
 
-      // Transform PDOK response to match expected format
+      // Transform PDOK Locatieserver response to match expected format
       const transformedData = {
-        features: (data.response?.docs || []).map((doc: any) => ({
-          properties: {
-            straatnaam: doc.straatnaam,
-            huisnummer: doc.huisnummer,
-            huisletter: doc.huisletter || '',
-            huisnummertoevoeging: doc.huisnummertoevoeging || '',
-            postcode: doc.postcode,
-            plaatsnaam: doc.woonplaatsnaam,
-            gemeentenaam: doc.gemeentenaam
+        features: (data.response?.docs || []).map((doc: any) => {
+          // Parse coordinates from centroide_ll if available
+          let coordinates = null;
+          if (doc.centroide_ll) {
+            const coords = doc.centroide_ll.split(',');
+            if (coords.length === 2) {
+              coordinates = [parseFloat(coords[1]), parseFloat(coords[0])]; // [lat, lon]
+            }
           }
-        }))
+
+          return {
+            properties: {
+              id: doc.id,
+              weergavenaam: doc.weergavenaam,
+              straatnaam: doc.straatnaam,
+              huisnummer: doc.huisnummer,
+              huisletter: doc.huisletter || '',
+              huisnummertoevoeging: doc.huisnummertoevoeging || '',
+              postcode: doc.postcode,
+              plaatsnaam: doc.woonplaatsnaam,
+              gemeentenaam: doc.gemeentenaam,
+              provincienaam: doc.provincienaam,
+              coordinates: coordinates,
+              score: doc.score
+            }
+          };
+        })
       };
 
       res.json(transformedData);
     } catch (error) {
-      console.error('[BAG API] Error:', error);
-      return res.status(500).json({ error: 'Failed to fetch from BAG API' });
+      console.error('[PDOK Locatieserver] Error:', error);
+      return res.status(500).json({ error: 'Failed to fetch from PDOK Locatieserver' });
     }
   });
 
-  // Test endpoint for BAG API debugging
+  // Test endpoint for PDOK Locatieserver debugging
   app.get('/api/bag/test', async (req, res) => {
     try {
       const testQuery = 'Rotterdam Kleiweg';
-      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(testQuery)}&rows=5&fq=type:adres`;
+      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(testQuery)}&rows=5&fq=type:adres&fl=id,weergavenaam,straatnaam,huisnummer,huisletter,huisnummertoevoeging,postcode,woonplaatsnaam,gemeentenaam,provincienaam,centroide_ll&sort=score desc`;
 
       console.log(`[BAG API TEST] Testing with URL: ${url}`);
 
