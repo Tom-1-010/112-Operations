@@ -9654,5 +9654,417 @@
       "primair": true,
       "kans_in_dienst": 0
     }
+  ],
+  "Basisteam Nissewaard (E2)": [
+    {
+      "roepnummer": "RT 52.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 52.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 52.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 52.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 52.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 52.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 52.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 52.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 52.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 52.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 52.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 52.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 52.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 52.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 52.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 52.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "Basisteam Oude-Maas (E3)": [
+    {
+      "roepnummer": "RT 53.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 53.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 53.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 53.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 53.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 53.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 53.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 53.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 53.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 53.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 53.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 53.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 53.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 53.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 53.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 53.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "DROS": [
+    {
+      "roepnummer": "RT 60.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "DROS"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 60.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "DROS"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 60.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "DROS"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 60.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "DROS"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 60.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "DROS"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 60.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "DROS chef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "District Rijnmond-Zuid": [
+    {
+      "roepnummer": "RT 50.91",
+      "aantal_mensen": 1,
+      "rollen": [
+        "OVD"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 0
+    }
   ]
 }
