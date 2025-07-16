@@ -6202,5 +6202,355 @@
       "primair": true,
       "kans_in_dienst": 0
     }
+  ],
+  "Basisteam Voorne-Putten (C1)": [
+    {
+      "roepnummer": "RT 31.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 31.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 31.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 31.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 31.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 31.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 31.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 31.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 31.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 31.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 31.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "Basisteam Goeree-Overflakkee (D1)": [
+    {
+      "roepnummer": "RT 41.01",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 41.02",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 41.03",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 41.04",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": true,
+      "kans_in_dienst": 20
+    },
+    {
+      "roepnummer": "RT 41.05",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.06",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.07",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.08",
+      "aantal_mensen": 2,
+      "rollen": [
+        "Noodhulp"
+      ],
+      "soort_auto": "BPV - bus",
+      "primair": false,
+      "kans_in_dienst": 0
+    },
+    {
+      "roepnummer": "RT 41.09",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Senior",
+        "ACO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 100
+    },
+    {
+      "roepnummer": "RT 41.10",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Opr. Expert",
+        "OPCO"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 40
+    },
+    {
+      "roepnummer": "RT 41.11",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 70
+    },
+    {
+      "roepnummer": "RT 41.12",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 50
+    },
+    {
+      "roepnummer": "RT 41.13",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.14",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.15",
+      "aantal_mensen": 1,
+      "rollen": [
+        "Noodhulp",
+        "Solo"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 10
+    },
+    {
+      "roepnummer": "RT 41.99",
+      "aantal_mensen": 1,
+      "rollen": [
+        "teamchef"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": false,
+      "kans_in_dienst": 4
+    }
+  ],
+  "District Rijnmond-Oost": [
+    {
+      "roepnummer": "RT 30.91",
+      "aantal_mensen": 1,
+      "rollen": [
+        "OVD"
+      ],
+      "soort_auto": "BPV-auto",
+      "primair": true,
+      "kans_in_dienst": 0
+    }
   ]
 }
