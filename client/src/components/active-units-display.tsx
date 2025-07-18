@@ -464,11 +464,29 @@ export default function ActiveUnitsDisplay() {
     closeContextMenu();
   };
 
-  // Combined units from both sources
-  const allUnits = [...dbPoliceUnits, ...basisteamsUnits];
+  // Combined units from both sources with database units taking precedence
+  const allUnits = () => {
+    // Create a map of database units by roepnummer
+    const dbUnitMap = new Map<string, PoliceUnit>();
+    dbPoliceUnits.forEach(unit => {
+      dbUnitMap.set(unit.roepnummer, unit);
+    });
+    
+    // Start with database units
+    const combinedUnits: PoliceUnit[] = [...dbPoliceUnits];
+    
+    // Add roster units that don't exist in database
+    basisteamsUnits.forEach(rosterUnit => {
+      if (!dbUnitMap.has(rosterUnit.roepnummer)) {
+        combinedUnits.push(rosterUnit);
+      }
+    });
+    
+    return combinedUnits;
+  };
   
   // Filter to only show active units (exclude status 5 - afmelden)
-  const activeUnits = allUnits.filter(unit => {
+  const activeUnits = allUnits().filter(unit => {
     const status = unit.status;
     return status !== '5 - Afmelden' && 
            status !== '5 - afmelden' && 
@@ -489,26 +507,34 @@ export default function ActiveUnitsDisplay() {
     );
   });
 
-  // Sort by team, then by roepnummer with numerical sorting
+  // Sort by team, then by roepnummer with proper numerical sorting
   const sortedUnits = filteredUnits.sort((a, b) => {
+    // First sort by team
     if (a.team !== b.team) {
       return a.team.localeCompare(b.team);
     }
     
-    // Extract numbers from roepnummer for numerical sorting
-    const extractNumber = (roepnummer: string) => {
-      const match = roepnummer.match(/(\d+)/);
-      return match ? parseInt(match[1]) : 0;
+    // Within the same team, sort by roepnummer numerically
+    const extractNumbers = (roepnummer: string) => {
+      // Extract all numbers from the roepnummer (e.g., RT 10.91 -> [10, 91])
+      const matches = roepnummer.match(/\d+/g);
+      return matches ? matches.map(num => parseInt(num)) : [0];
     };
     
-    const numA = extractNumber(a.roepnummer);
-    const numB = extractNumber(b.roepnummer);
+    const numsA = extractNumbers(a.roepnummer);
+    const numsB = extractNumbers(b.roepnummer);
     
-    if (numA !== numB) {
-      return numA - numB;
+    // Compare each number segment
+    for (let i = 0; i < Math.max(numsA.length, numsB.length); i++) {
+      const numA = numsA[i] || 0;
+      const numB = numsB[i] || 0;
+      
+      if (numA !== numB) {
+        return numA - numB;
+      }
     }
     
-    // If numbers are the same, fall back to string comparison
+    // If all numbers are the same, fall back to string comparison
     return a.roepnummer.localeCompare(b.roepnummer);
   });
 
