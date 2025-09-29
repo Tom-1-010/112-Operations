@@ -518,31 +518,106 @@ const KaartPage: React.FC = () => {
     return { latMove, lonMove };
   };
 
-  // Helper function to generate patrol routes (perimeter and center routes)
+  // Advanced waypoint system for realistic patrol routes
+  const generateWaypoints = (unit: PoliceUnit, basisteam: Basisteam): [number, number][] => {
+    const polygon = basisteam.polygon as [number, number][];
+    if (!polygon || polygon.length === 0) return [];
+
+    // Generate 3-5 waypoints for patrol route
+    const waypointCount = 3 + (Math.floor(unit.id) % 3); // 3-5 waypoints based on unit ID
+    const waypoints: [number, number][] = [];
+
+    // Calculate municipality bounds
+    const lats = polygon.map(p => p[0]);
+    const lngs = polygon.map(p => p[1]);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+
+    // Create systematic patrol pattern
+    for (let i = 0; i < waypointCount; i++) {
+      const angle = (2 * Math.PI * i) / waypointCount + (unit.id * 0.1); // Offset by unit ID
+      const radius = 0.8; // Stay within 80% of bounds
+      
+      const centerLat = (minLat + maxLat) / 2;
+      const centerLng = (minLng + maxLng) / 2;
+      const latRadius = (maxLat - minLat) * radius / 2;
+      const lngRadius = (maxLng - minLng) * radius / 2;
+
+      const waypointLat = centerLat + Math.cos(angle) * latRadius;
+      const waypointLng = centerLng + Math.sin(angle) * lngRadius;
+
+      waypoints.push([waypointLat, waypointLng]);
+    }
+
+    return waypoints;
+  };
+
+  // Traffic-aware routing that considers street patterns
+  const generateTrafficAwareRoute = (
+    currentPos: [number, number], 
+    targetPos: [number, number],
+    unit: PoliceUnit
+  ): number => {
+    // Calculate direct bearing
+    const directBearing = Math.atan2(
+      targetPos[1] - currentPos[1],
+      targetPos[0] - currentPos[0]
+    );
+
+    // Add street-following behavior (simulate following road network)
+    // Dutch cities have mixed grid/radial patterns
+    const streetOffset = Math.sin(unit.id * 17 + Date.now() / (1000 * 60)) * 0.3; // ±0.3 radians
+    
+    // Traffic considerations: avoid direct routes, follow probable streets
+    let adjustedBearing = directBearing + streetOffset;
+
+    // Emergency units get more direct routes
+    const statusNum = parseInt(unit.status);
+    if (statusNum === 3) { // Emergency response
+      adjustedBearing = directBearing + streetOffset * 0.3; // Less deviation for emergencies
+    }
+
+    return adjustedBearing;
+  };
+
+  // Helper function to generate patrol routes with waypoints
   const generatePatrolRoute = (unit: PoliceUnit, basisteam: Basisteam): number => {
     const polygon = basisteam.polygon as [number, number][];
     if (!polygon || polygon.length === 0) {
       return Math.random() * 2 * Math.PI; // Random fallback
     }
 
-    // Calculate polygon center
-    const centerLat = polygon.reduce((sum, p) => sum + p[0], 0) / polygon.length;
-    const centerLng = polygon.reduce((sum, p) => sum + p[1], 0) / polygon.length;
-
-    // Determine if unit should patrol perimeter or move toward center
-    const currentPos = unit.currentPosition;
-    const distanceToCenter = calculateDistance(currentPos, [centerLat, centerLng]);
-
-    // Unit patrol behavior based on distance to center
-    if (distanceToCenter > 2) {
-      // Far from center - move toward center
-      return Math.atan2(centerLng - currentPos[1], centerLat - currentPos[0]);
-    } else {
-      // Near center - patrol along perimeter direction
-      const unitSeed = (unit.id * 23 + Math.floor(Date.now() / (1000 * 60 * 10))) % polygon.length;
-      const targetPerimeterPoint = polygon[unitSeed];
-      return Math.atan2(targetPerimeterPoint[1] - currentPos[1], targetPerimeterPoint[0] - currentPos[0]);
+    // Get or generate waypoints for this unit
+    if (!unit.waypoints || unit.waypoints.length === 0) {
+      // Generate new waypoints (this should be stored on the unit)
+      const waypoints = generateWaypoints(unit, basisteam);
+      // For now, use current waypoint logic with calculated center
+      const centerLat = polygon.reduce((sum, p) => sum + p[0], 0) / polygon.length;
+      const centerLng = polygon.reduce((sum, p) => sum + p[1], 0) / polygon.length;
+      
+      return generateTrafficAwareRoute(unit.currentPosition, [centerLat, centerLng], unit);
     }
+
+    // Use waypoint system (simplified for now)
+    const currentPos = unit.currentPosition;
+    const waypoints = generateWaypoints(unit, basisteam);
+    
+    // Find closest waypoint
+    let closestWaypoint = waypoints[0];
+    let minDistance = calculateDistance(currentPos, waypoints[0]);
+    
+    for (const waypoint of waypoints) {
+      const distance = calculateDistance(currentPos, waypoint);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestWaypoint = waypoint;
+      }
+    }
+
+    // Move toward closest waypoint with traffic-aware routing
+    return generateTrafficAwareRoute(currentPos, closestWaypoint, unit);
   };
 
   // Helper function to constrain unit position within municipality bounds
@@ -599,7 +674,7 @@ const KaartPage: React.FC = () => {
         );
 
         if (assignedIncident && statusNum === 3) {
-          // Unit is responding to incident - move toward incident location
+          // Unit is responding to incident - enhanced emergency routing
           const target = assignedIncident.coordinates;
           const distance = calculateDistance(unit.currentPosition, target);
 
@@ -608,15 +683,41 @@ const KaartPage: React.FC = () => {
             const distancePerSecond = (speed * 1000) / 3600; // m/s
             const moveDistance = distancePerSecond * deltaTime / 1000; // km
 
-            // Calculate direction
-            const bearing = Math.atan2(
-              target[1] - unit.currentPosition[1],
-              target[0] - unit.currentPosition[0]
+            // Use traffic-aware routing for emergency response
+            const bearing = generateTrafficAwareRoute(unit.currentPosition, target, unit);
+
+            // Collision avoidance with other units
+            const nearbyUnits = policeUnits.filter(otherUnit => 
+              otherUnit.id !== unit.id && 
+              otherUnit.currentPosition &&
+              calculateDistance(unit.currentPosition, otherUnit.currentPosition) < 0.5 // Within 500m
             );
 
-            // Move toward target
-            const latMove = Math.cos(bearing) * moveDistance / 111; // Rough km to degrees
-            const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(unit.currentPosition[0] * Math.PI / 180));
+            let avoidanceBearing = bearing;
+            if (nearbyUnits.length > 0) {
+              // Calculate avoidance vector
+              let avoidanceX = 0, avoidanceY = 0;
+              for (const otherUnit of nearbyUnits) {
+                const distToOther = calculateDistance(unit.currentPosition, otherUnit.currentPosition);
+                if (distToOther < 0.2) { // Too close (200m)
+                  const repelBearing = Math.atan2(
+                    unit.currentPosition[1] - otherUnit.currentPosition[1],
+                    unit.currentPosition[0] - otherUnit.currentPosition[0]
+                  );
+                  const repelStrength = 0.2 / distToOther; // Stronger repel when closer
+                  avoidanceX += Math.cos(repelBearing) * repelStrength;
+                  avoidanceY += Math.sin(repelBearing) * repelStrength;
+                }
+              }
+              
+              if (avoidanceX !== 0 || avoidanceY !== 0) {
+                const avoidanceDir = Math.atan2(avoidanceY, avoidanceX);
+                avoidanceBearing = bearing + avoidanceDir * 0.3; // 30% avoidance influence
+              }
+            }
+
+            // Calculate movement with avoidance
+            const { latMove, lonMove } = calculateMovement(avoidanceBearing, moveDistance, unit.currentPosition);
 
             newPosition = [
               unit.currentPosition[0] + latMove,
@@ -655,7 +756,37 @@ const KaartPage: React.FC = () => {
             
             if (basisteam && unit.currentPosition) {
               // Follow patrol routes along municipality perimeter or through center
-              const bearing = generatePatrolRoute(unit, basisteam);
+              let bearing = generatePatrolRoute(unit, basisteam);
+              
+              // Add collision avoidance for patrol units
+              const nearbyUnits = policeUnits.filter(otherUnit => 
+                otherUnit.id !== unit.id && 
+                otherUnit.currentPosition &&
+                calculateDistance(unit.currentPosition, otherUnit.currentPosition) < 0.3 // Within 300m
+              );
+
+              if (nearbyUnits.length > 0) {
+                // Light collision avoidance for patrol units
+                let avoidanceX = 0, avoidanceY = 0;
+                for (const otherUnit of nearbyUnits) {
+                  const distToOther = calculateDistance(unit.currentPosition, otherUnit.currentPosition);
+                  if (distToOther < 0.15) { // Too close (150m)
+                    const repelBearing = Math.atan2(
+                      unit.currentPosition[1] - otherUnit.currentPosition[1],
+                      unit.currentPosition[0] - otherUnit.currentPosition[0]
+                    );
+                    const repelStrength = 0.1 / distToOther; // Gentler repel for patrols
+                    avoidanceX += Math.cos(repelBearing) * repelStrength;
+                    avoidanceY += Math.sin(repelBearing) * repelStrength;
+                  }
+                }
+                
+                if (avoidanceX !== 0 || avoidanceY !== 0) {
+                  const avoidanceDir = Math.atan2(avoidanceY, avoidanceX);
+                  bearing = bearing + avoidanceDir * 0.2; // 20% avoidance influence
+                }
+              }
+
               const { latMove, lonMove } = calculateMovement(bearing, moveDistance, unit.currentPosition);
               
               newPosition = [
