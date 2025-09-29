@@ -489,6 +489,89 @@ const KaartPage: React.FC = () => {
     return true;
   };
 
+  // Helper function to generate realistic patrol bearing
+  const generatePatrolBearing = (unit: PoliceUnit, polygon: [number, number][]): number => {
+    if (!polygon || polygon.length === 0) {
+      return Math.random() * 2 * Math.PI; // Random fallback
+    }
+
+    // Create patrol patterns based on unit ID for consistent routes
+    const unitSeed = unit.id * 17 + Date.now() / (1000 * 60 * 5); // Change every 5 minutes
+    const patternIndex = Math.floor(unitSeed) % 4;
+
+    switch (patternIndex) {
+      case 0: return 0; // North
+      case 1: return Math.PI / 2; // East
+      case 2: return Math.PI; // South
+      case 3: return 3 * Math.PI / 2; // West
+      default: return Math.random() * 2 * Math.PI;
+    }
+  };
+
+  // Helper function to calculate lat/lng movement from bearing and distance
+  const calculateMovement = (bearing: number, moveDistance: number, currentPos: [number, number]) => {
+    const latMove = Math.cos(bearing) * moveDistance / 111; // Rough km to degrees
+    const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(currentPos[0] * Math.PI / 180));
+    return { latMove, lonMove };
+  };
+
+  // Helper function to generate patrol routes (perimeter and center routes)
+  const generatePatrolRoute = (unit: PoliceUnit, basisteam: Basisteam): number => {
+    const polygon = basisteam.polygon as [number, number][];
+    if (!polygon || polygon.length === 0) {
+      return Math.random() * 2 * Math.PI; // Random fallback
+    }
+
+    // Calculate polygon center
+    const centerLat = polygon.reduce((sum, p) => sum + p[0], 0) / polygon.length;
+    const centerLng = polygon.reduce((sum, p) => sum + p[1], 0) / polygon.length;
+
+    // Determine if unit should patrol perimeter or move toward center
+    const currentPos = unit.currentPosition;
+    const distanceToCenter = calculateDistance(currentPos, [centerLat, centerLng]);
+
+    // Unit patrol behavior based on distance to center
+    if (distanceToCenter > 2) {
+      // Far from center - move toward center
+      return Math.atan2(centerLng - currentPos[1], centerLat - currentPos[0]);
+    } else {
+      // Near center - patrol along perimeter direction
+      const unitSeed = (unit.id * 23 + Math.floor(Date.now() / (1000 * 60 * 10))) % polygon.length;
+      const targetPerimeterPoint = polygon[unitSeed];
+      return Math.atan2(targetPerimeterPoint[1] - currentPos[1], targetPerimeterPoint[0] - currentPos[0]);
+    }
+  };
+
+  // Helper function to constrain unit position within municipality bounds
+  const constrainToMunicipality = (
+    position: [number, number], 
+    basisteam: Basisteam, 
+    tolerance: number = 0
+  ): [number, number] => {
+    const polygon = basisteam.polygon as [number, number][];
+    if (!polygon || polygon.length === 0) {
+      // Fallback to Rotterdam area bounds with tolerance
+      return [
+        Math.max(51.8 - tolerance, Math.min(52.1 + tolerance, position[0])),
+        Math.max(4.2 - tolerance, Math.min(4.7 + tolerance, position[1]))
+      ];
+    }
+
+    // Find bounding box with tolerance
+    const lats = polygon.map(p => p[0]);
+    const lngs = polygon.map(p => p[1]);
+    const minLat = Math.min(...lats) - tolerance;
+    const maxLat = Math.max(...lats) + tolerance;
+    const minLng = Math.min(...lngs) - tolerance;
+    const maxLng = Math.max(...lngs) + tolerance;
+
+    // Constrain position to bounds
+    return [
+      Math.max(minLat, Math.min(maxLat, position[0])),
+      Math.max(minLng, Math.min(maxLng, position[1]))
+    ];
+  };
+
   // Update unit positions based on movement simulation
   const updateUnitPositions = useCallback(() => {
     setPoliceUnits(prevUnits => {
@@ -539,28 +622,48 @@ const KaartPage: React.FC = () => {
             isMoving = true;
           }
         } else if (statusNum === 1 || statusNum === 2) {
-          // Unit is available or on patrol - random movement within municipality
+          // Unit is available or on patrol - realistic patrol patterns
           const basisteam = basisteams.find(bt => bt.id === unit.basisteam_id);
-          if (basisteam && Math.random() < 0.3) { // 30% chance to move each update
+          
+          // Different movement patterns based on status
+          if (statusNum === 1 && Math.random() < 0.1) {
+            // Available units move slowly and less frequently (10% chance)
+            const speed = getMovementSpeed(unit) * 0.5; // Half speed for available units
+            const moveDistance = (speed * 1000 / 3600) * deltaTime / 1000;
+            
+            // Prefer staying within known areas (lower random movement)
+            if (basisteam && unit.currentPosition) {
+              const bearing = generatePatrolBearing(unit, basisteam.polygon);
+              const { latMove, lonMove } = calculateMovement(bearing, moveDistance, unit.currentPosition);
+              
+              newPosition = [
+                unit.currentPosition[0] + latMove,
+                unit.currentPosition[1] + lonMove
+              ];
+              
+              // Keep within municipality bounds
+              newPosition = constrainToMunicipality(newPosition, basisteam);
+              isMoving = true;
+            }
+          } else if (statusNum === 2 && Math.random() < 0.5) {
+            // Patrol units move more actively (50% chance)
             const speed = getMovementSpeed(unit);
-            const distancePerSecond = (speed * 1000) / 3600;
-            const moveDistance = distancePerSecond * deltaTime / 1000;
-
-            // Random direction
-            const bearing = Math.random() * 2 * Math.PI;
-            const latMove = Math.cos(bearing) * moveDistance / 111;
-            const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(unit.currentPosition[0] * Math.PI / 180));
-
-            newPosition = [
-              unit.currentPosition[0] + latMove,
-              unit.currentPosition[1] + lonMove
-            ];
-
-            // Keep within reasonable bounds
-            newPosition[0] = Math.max(51.8, Math.min(52.1, newPosition[0]));
-            newPosition[1] = Math.max(4.2, Math.min(4.7, newPosition[1]));
-
-            isMoving = true;
+            const moveDistance = (speed * 1000 / 3600) * deltaTime / 1000;
+            
+            if (basisteam && unit.currentPosition) {
+              // Follow patrol routes along municipality perimeter or through center
+              const bearing = generatePatrolRoute(unit, basisteam);
+              const { latMove, lonMove } = calculateMovement(bearing, moveDistance, unit.currentPosition);
+              
+              newPosition = [
+                unit.currentPosition[0] + latMove,
+                unit.currentPosition[1] + lonMove
+              ];
+              
+              // Keep within municipality bounds with some edge tolerance for patrol routes
+              newPosition = constrainToMunicipality(newPosition, basisteam, 0.002); // 200m tolerance
+              isMoving = true;
+            }
           }
         }
 
