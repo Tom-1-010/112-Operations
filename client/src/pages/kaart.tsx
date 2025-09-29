@@ -651,6 +651,39 @@ const KaartPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Save unit positions to database
+  const saveUnitPositions = useCallback(async (unitsToSave: PoliceUnit[]) => {
+    try {
+      // Only save database units (with numeric IDs) that have moved
+      const databaseUnits = unitsToSave.filter(unit => 
+        typeof unit.id === 'number' && unit.currentPosition
+      );
+
+      if (databaseUnits.length === 0) return;
+
+      const positionUpdates = databaseUnits.map(unit => ({
+        id: unit.id as number,
+        locatie: JSON.stringify(unit.currentPosition),
+        status: unit.status
+      }));
+
+      const response = await fetch('/api/police-units/positions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ positions: positionUpdates })
+      });
+
+      if (response.ok) {
+        console.log(`💾 Saved positions for ${positionUpdates.length} units to database`);
+      } else {
+        console.warn('⚠️ Failed to save unit positions to database');
+      }
+
+    } catch (error) {
+      console.error('❌ Error saving unit positions:', error);
+    }
+  }, []);
+
   // Start movement simulation
   useEffect(() => {
     if (policeUnits.length > 0) {
@@ -664,6 +697,17 @@ const KaartPage: React.FC = () => {
       };
     }
   }, [policeUnits.length, updateUnitPositions]);
+
+  // Save positions to database every 30 seconds
+  useEffect(() => {
+    const saveInterval = setInterval(() => {
+      if (policeUnits.length > 0) {
+        saveUnitPositions(policeUnits);
+      }
+    }, 30000); // Save every 30 seconds
+
+    return () => clearInterval(saveInterval);
+  }, [policeUnits, saveUnitPositions]);
 
   // Load basisteams data
   useEffect(() => {

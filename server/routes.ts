@@ -583,6 +583,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk update police unit positions for real-time map tracking
+  app.patch("/api/police-units/positions", async (req, res) => {
+    try {
+      const positionUpdates = req.body.positions as Array<{
+        id: number;
+        locatie: string;
+        status?: string;
+      }>;
+
+      if (!Array.isArray(positionUpdates)) {
+        return res.status(400).json({ error: "positions array is required" });
+      }
+
+      console.log(`🗺️ Updating positions for ${positionUpdates.length} police units`);
+
+      // Update positions in parallel for better performance
+      const updatePromises = positionUpdates.map(async (update) => {
+        const updateData: any = { 
+          locatie: update.locatie,
+          updatedAt: new Date()
+        };
+        
+        // Include status if provided
+        if (update.status) {
+          updateData.status = update.status;
+        }
+
+        return db
+          .update(policeUnits)
+          .set(updateData)
+          .where(eq(policeUnits.id, update.id));
+      });
+
+      await Promise.all(updatePromises);
+
+      console.log(`✅ Successfully updated positions for ${positionUpdates.length} units`);
+      return res.json({ 
+        success: true, 
+        updated: positionUpdates.length,
+        message: `Updated positions for ${positionUpdates.length} units`
+      });
+
+    } catch (error) {
+      console.error("Error updating police unit positions:", error);
+      return res.status(500).json({ error: "Failed to update unit positions" });
+    }
+  });
+
   // Import police units data
   app.post("/api/police-units/import", async (req, res) => {
     try {
