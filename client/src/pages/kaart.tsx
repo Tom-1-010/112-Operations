@@ -209,6 +209,9 @@ const KaartPage: React.FC = () => {
   const [newIncidentIds, setNewIncidentIds] = useState<Set<number>>(new Set());
   const [showAdministrativeBoundaries, setShowAdministrativeBoundaries] = useState(false);
   const [pdokCapabilities, setPdokCapabilities] = useState<any>(null);
+  const [isSavingPositions, setIsSavingPositions] = useState(false);
+  const [lastPositionSave, setLastPositionSave] = useState<Date | null>(null);
+  const [positionSaveStatus, setPositionSaveStatus] = useState<string>('');
   const mapRef = useRef<L.Map | null>(null);
   const lastFetchTime = useRef<Date>(new Date());
   const movementIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -754,15 +757,22 @@ const KaartPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Save unit positions to database
+  // Save unit positions to database with enhanced feedback
   const saveUnitPositions = useCallback(async (unitsToSave: PoliceUnit[]) => {
     try {
+      setIsSavingPositions(true);
+      setPositionSaveStatus('Saving positions...');
+
       // Only save database units (with numeric IDs) that have moved
       const databaseUnits = unitsToSave.filter(unit => 
         typeof unit.id === 'number' && unit.currentPosition
       );
 
-      if (databaseUnits.length === 0) return;
+      if (databaseUnits.length === 0) {
+        setPositionSaveStatus('No positions to save');
+        setIsSavingPositions(false);
+        return;
+      }
 
       const positionUpdates = databaseUnits.map(unit => ({
         id: unit.id as number,
@@ -777,13 +787,26 @@ const KaartPage: React.FC = () => {
       });
 
       if (response.ok) {
+        const result = await response.json();
         console.log(`💾 Saved positions for ${positionUpdates.length} units to database`);
+        setPositionSaveStatus(`✅ Saved ${result.updated} positions`);
+        setLastPositionSave(new Date());
       } else {
-        console.warn('⚠️ Failed to save unit positions to database');
+        const errorText = await response.text();
+        console.warn('⚠️ Failed to save unit positions to database:', errorText);
+        setPositionSaveStatus(`❌ Save failed: ${response.status}`);
       }
 
     } catch (error) {
       console.error('❌ Error saving unit positions:', error);
+      setPositionSaveStatus(`❌ Error: ${error.message}`);
+    } finally {
+      setIsSavingPositions(false);
+
+      // Clear status after 3 seconds
+      setTimeout(() => {
+        setPositionSaveStatus('');
+      }, 3000);
     }
   }, []);
 
@@ -801,16 +824,41 @@ const KaartPage: React.FC = () => {
     }
   }, [policeUnits.length, updateUnitPositions]);
 
-  // Save positions to database every 30 seconds
+  // Save positions to database every 20 seconds for more frequent updates
   useEffect(() => {
     const saveInterval = setInterval(() => {
       if (policeUnits.length > 0) {
-        saveUnitPositions(policeUnits);
+        // Only save if there are database units with actual positions
+        const databaseUnits = policeUnits.filter(unit => 
+          typeof unit.id === 'number' && unit.currentPosition && unit.isMoving
+        );
+        
+        if (databaseUnits.length > 0) {
+          console.log(`🕐 Periodic save: ${databaseUnits.length} moving units`);
+          saveUnitPositions(policeUnits);
+        }
       }
-    }, 30000); // Save every 30 seconds
+    }, 20000); // Save every 20 seconds
 
     return () => clearInterval(saveInterval);
   }, [policeUnits, saveUnitPositions]);
+
+  // Also save positions when units change status or start/stop moving
+  useEffect(() => {
+    const hasMovingUnits = policeUnits.some(unit => 
+      typeof unit.id === 'number' && unit.isMoving
+    );
+    
+    if (hasMovingUnits && policeUnits.length > 0) {
+      // Debounced save when movement status changes
+      const timer = setTimeout(() => {
+        console.log('📍 Status change triggered position save');
+        saveUnitPositions(policeUnits);
+      }, 2000); // Wait 2 seconds after movement change
+
+      return () => clearTimeout(timer);
+    }
+  }, [policeUnits.map(u => u.isMoving).join(','), saveUnitPositions]);
 
   // Load basisteams data
   useEffect(() => {
@@ -1047,6 +1095,25 @@ const KaartPage: React.FC = () => {
       {/* Control Panel */}
       <div className="absolute top-4 left-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-xs">
         <h3 className="font-bold text-sm mb-3">GMS Incidents Kaart</h3>
+
+        {/* Real-time Position Status */}
+        <div className="mb-3 p-2 bg-gray-50 rounded text-xs">
+          <div className="flex items-center gap-2 mb-1">
+            <div className={`w-2 h-2 rounded-full ${isSavingPositions ? 'bg-orange-400 animate-pulse' : 'bg-green-400'}`}></div>
+            <span className="font-medium">Positie Updates</span>
+          </div>
+          {positionSaveStatus && (
+            <div className="text-gray-600 mb-1">{positionSaveStatus}</div>
+          )}
+          {lastPositionSave && (
+            <div className="text-gray-500">
+              Laatste save: {lastPositionSave.toLocaleTimeString('nl-NL')}
+            </div>
+          )}
+          <div className="text-gray-500">
+            {policeUnits.filter(u => typeof u.id === 'number').length} eenheden getrackt
+          </div>
+        </div>
 
         <div className="space-y-3">
           <div>
