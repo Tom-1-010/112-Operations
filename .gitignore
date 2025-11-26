@@ -9,3 +9,5 @@ vite.config.ts.*
 .local/
 .cursor/
 .vscode/
+apps/web/.next/
+apps/web/.env.local
