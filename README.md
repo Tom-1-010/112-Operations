@@ -141,6 +141,12 @@ pnpm format                 # Prettier formatting
 pnpm test                   # Run tests
 ```
 
+## Statische hosting via GitHub Pages
+
+- `npm run build:client` bouwt alleen de Vite client; `npm run build:gh-pages` voegt `VITE_BASE_URL=/112-Operations/` toe zodat de assets correct laden onder `https://Tom-1-010.github.io/112-Operations/`.
+- De GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` bouwt de client en publiceert `dist/public` naar de `gh-pages` branch. Stel GitHub Pages in op die branch (`/ (root)`).
+- Wil je handmatig testen? Gebruik `npm install && npm run build:gh-pages` en serveer `dist/public` met een statische server (`npx serve dist/public`).
+
 ## Supabase Setup
 
 Zie [supabase/README.md](./supabase/README.md) voor gedetailleerde Supabase setup instructies.

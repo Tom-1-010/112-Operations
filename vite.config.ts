@@ -6,8 +6,11 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1];
+const basePath = process.env.VITE_BASE_URL ?? (repoName ? `/${repoName}/` : '/');
 
 export default defineConfig({
+  base: basePath,
   plugins: [
     react({
       jsxRuntime: 'automatic',
