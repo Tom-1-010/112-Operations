@@ -21,7 +21,11 @@ interface ContextMenu {
   unit: PoliceUnit | null;
 }
 
-export default function ActiveUnitsDisplay() {
+interface ActiveUnitsDisplayProps {
+  units?: PoliceUnit[];
+}
+
+export default function ActiveUnitsDisplay({ units = [] }: ActiveUnitsDisplayProps = {}) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [contextMenu, setContextMenu] = useState<ContextMenu>({ 
     visible: false, 
@@ -97,47 +101,55 @@ export default function ActiveUnitsDisplay() {
     }
   }, [contextMenu.visible]);
 
-  // Load basisteams units from attached assets
+  // Use provided units or load from attached assets
   useEffect(() => {
-    const loadBasisteamsUnits = async () => {
-      try {
-        const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
-        if (response.ok) {
-          const roosterData = await response.json();
-          const units: PoliceUnit[] = [];
-          
-          Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
-            if (Array.isArray(teamUnits)) {
-              teamUnits.forEach((unit: any) => {
-                let status = '5 - Afmelden';
-                if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
-                  status = '1 - Beschikbaar/vrij';
-                }
+    if (units && units.length > 0) {
+      // Use provided units
+      setBasisteamsUnits(units);
+      console.log('🚔 ActiveUnitsDisplay: Using provided units:', units.length);
+    } else {
+      // Load basisteams units from attached assets (fallback)
+      const loadBasisteamsUnits = async () => {
+        try {
+          const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
+          if (response.ok) {
+            const roosterData = await response.json();
+            const units: PoliceUnit[] = [];
+            
+            Object.entries(roosterData).forEach(([teamName, teamUnits]: [string, any]) => {
+              // Only load A1 Waterweg units
+              if (teamName === 'Basisteam Waterweg (A1)' && Array.isArray(teamUnits)) {
+                teamUnits.forEach((unit: any) => {
+                  let status = '5 - Afmelden';
+                  if (unit.primair === true || unit.primair === 'true' || unit.primair === 1) {
+                    status = '1 - Beschikbaar/vrij';
+                  }
 
-                units.push({
-                  id: `bt-${unit.roepnummer}`,
-                  roepnummer: unit.roepnummer,
-                  aantal_mensen: unit.aantal_mensen,
-                  rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
-                  soort_auto: unit.soort_auto,
-                  team: teamName,
-                  status: status,
-                  locatie: '',
-                  incident: ''
+                  units.push({
+                    id: `bt-${unit.roepnummer}`,
+                    roepnummer: unit.roepnummer,
+                    aantal_mensen: unit.aantal_mensen,
+                    rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
+                    soort_auto: unit.soort_auto,
+                    team: teamName,
+                    status: status,
+                    locatie: 'Basisteam Waterweg, Delftseveerweg 40, Vlaardingen',
+                    incident: ''
+                  });
                 });
-              });
-            }
-          });
+              }
+            });
 
-          setBasisteamsUnits(units);
+            setBasisteamsUnits(units);
+          }
+        } catch (error) {
+          console.error('Failed to load rooster units:', error);
         }
-      } catch (error) {
-        console.error('Failed to load rooster units:', error);
-      }
-    };
+      };
 
-    loadBasisteamsUnits();
-  }, []);
+      loadBasisteamsUnits();
+    }
+  }, [units]);
 
   // Load database units
   useEffect(() => {
@@ -250,6 +262,15 @@ export default function ActiveUnitsDisplay() {
       const incidentNumber = selectedIncident.nr || selectedIncident.id;
       const incidentId = selectedIncident.id;
       
+      // Check of voertuig beschikbaar is (import functie)
+      const { isVehicleAvailable, assignVehicleToIncident } = await import('../services/globalUnitMovement');
+      if (!isVehicleAvailable(unit.roepnummer)) {
+        console.warn(`⚠️ Voertuig ${unit.roepnummer} is niet beschikbaar (al gekoppeld aan een ander incident)`);
+        alert(`Voertuig ${unit.roepnummer} is al gekoppeld aan een ander incident en kan niet opnieuw geselecteerd worden.`);
+        closeContextMenu();
+        return;
+      }
+      
       try {
         if (typeof unit.id === 'number') {
           // Database unit - update via API
@@ -293,11 +314,13 @@ export default function ActiveUnitsDisplay() {
           const existingUnitIndex = assignedUnits.findIndex((u: any) => u.roepnummer === unit.roepnummer);
           
           if (existingUnitIndex === -1) {
-            // Add new unit assignment
+            // Add new unit assignment met status OV
+            const currentTime = new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
             const newAssignment = {
               roepnummer: unit.roepnummer,
               soort_voertuig: unit.soort_auto || 'Surveillancevoertuig',
-              ov_tijd: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
+              huidige_status: 'ov', // Opdracht verstrekt
+              ov_tijd: currentTime,
               ar_tijd: '',
               tp_tijd: '',
               nb_tijd: '',
@@ -308,6 +331,9 @@ export default function ActiveUnitsDisplay() {
             };
             
             assignedUnits.push(newAssignment);
+            
+            // Koppel voertuig aan incident in movement service (zet status OV)
+            assignVehicleToIncident(unit.roepnummer, incidentId);
             
             // Update the incident
             const updatedIncident = {
@@ -552,16 +578,25 @@ export default function ActiveUnitsDisplay() {
 
   return (
     <div className="active-units-container">
-      <div className="active-units-header">
-        <h3>Actieve Eenheden</h3>
-        <div className="active-units-summary">
-          Actief: {filteredUnits.length} | Beschikbaar: {filteredUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}
+      <div className="active-units-header" style={{ 
+        padding: '8px 12px', 
+        backgroundColor: '#f8f9fa', 
+        borderBottom: '1px solid #dee2e6',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontSize: '12px'
+      }}>
+        <div style={{ fontWeight: 'bold', color: '#495057' }}>Actieve Eenheden</div>
+        <div style={{ color: '#6c757d' }}>
+          Actief: <span style={{ fontWeight: 'bold', color: '#28a745' }}>{filteredUnits.length}</span> | 
+          Beschikbaar: <span style={{ fontWeight: 'bold', color: '#007bff' }}>{filteredUnits.filter(u => u.status === '1 - Beschikbaar/vrij').length}</span>
         </div>
-        <div className="active-units-time">{formatTime(currentTime)}</div>
+        <div style={{ color: '#6c757d', fontFamily: 'monospace' }}>{formatTime(currentTime)}</div>
       </div>
       
       <div className="active-units-search" style={{ 
-        padding: '8px 12px', 
+        padding: '6px 12px', 
         borderBottom: '1px solid #ddd',
         backgroundColor: '#f8f9fa' 
       }}>
@@ -572,10 +607,10 @@ export default function ActiveUnitsDisplay() {
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
             width: '100%',
-            padding: '6px 12px',
+            padding: '4px 8px',
             border: '1px solid #ddd',
-            borderRadius: '4px',
-            fontSize: '12px',
+            borderRadius: '3px',
+            fontSize: '11px',
             outline: 'none'
           }}
         />
@@ -584,7 +619,7 @@ export default function ActiveUnitsDisplay() {
       <div className="active-units-table-wrapper" style={{ 
         overflowY: 'auto', 
         overflowX: 'auto',
-        height: '350px',
+        height: '380px',
         border: '1px solid #ddd',
         borderRadius: '4px',
         backgroundColor: '#fff',
@@ -595,8 +630,8 @@ export default function ActiveUnitsDisplay() {
         <table className="units-table" style={{ 
           width: '100%', 
           borderCollapse: 'collapse',
-          fontSize: '12px',
-          minWidth: '700px',
+          fontSize: '11px',
+          minWidth: '470px',
           flex: '1 1 auto'
         }}>
           <thead style={{ 
@@ -608,45 +643,63 @@ export default function ActiveUnitsDisplay() {
           }}>
             <tr>
               <th style={{ 
-                padding: '8px 12px', 
-                textAlign: 'left',
+                padding: '2px 3px', 
+                textAlign: 'center',
                 borderRight: '1px solid #dee2e6',
                 fontWeight: 'bold',
-                whiteSpace: 'nowrap'
-              }}>Roepnummer</th>
-              <th style={{ 
-                padding: '8px 12px', 
-                textAlign: 'left',
-                borderRight: '1px solid #dee2e6',
-                fontWeight: 'bold',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                fontSize: '10px',
+                backgroundColor: '#e9ecef',
+                height: '18px',
+                verticalAlign: 'middle',
+                width: '40px'
               }}>Status</th>
               <th style={{ 
-                padding: '8px 12px', 
+                padding: '2px 3px', 
                 textAlign: 'left',
                 borderRight: '1px solid #dee2e6',
                 fontWeight: 'bold',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                fontSize: '10px',
+                backgroundColor: '#e9ecef',
+                height: '18px',
+                verticalAlign: 'middle',
+                width: '80px'
+              }}>Roepnummer</th>
+              <th style={{ 
+                padding: '2px 3px', 
+                textAlign: 'left',
+                borderRight: '1px solid #dee2e6',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap',
+                fontSize: '10px',
+                backgroundColor: '#e9ecef',
+                height: '18px',
+                verticalAlign: 'middle',
+                width: '120px'
               }}>Inzetrol</th>
               <th style={{ 
-                padding: '8px 12px', 
+                padding: '2px 3px', 
                 textAlign: 'left',
                 borderRight: '1px solid #dee2e6',
                 fontWeight: 'bold',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                fontSize: '10px',
+                backgroundColor: '#e9ecef',
+                height: '18px',
+                verticalAlign: 'middle',
+                width: '150px'
               }}>Team</th>
               <th style={{ 
-                padding: '8px 12px', 
-                textAlign: 'left',
-                borderRight: '1px solid #dee2e6',
+                padding: '2px 3px', 
+                textAlign: 'center',
                 fontWeight: 'bold',
-                whiteSpace: 'nowrap'
-              }}>Locatie</th>
-              <th style={{ 
-                padding: '8px 12px', 
-                textAlign: 'left',
-                fontWeight: 'bold',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                fontSize: '10px',
+                backgroundColor: '#e9ecef',
+                height: '18px',
+                verticalAlign: 'middle',
+                width: '80px'
               }}>Incident</th>
             </tr>
           </thead>
@@ -657,62 +710,72 @@ export default function ActiveUnitsDisplay() {
                 onContextMenu={(e) => handleRightClick(e, unit)}
                 style={{ 
                   borderBottom: '1px solid #dee2e6',
-                  cursor: 'context-menu'
+                  cursor: 'context-menu',
+                  height: '14px',
+                  lineHeight: '1.0'
                 }}
               >
                 <td style={{ 
-                  padding: '4px 8px',
-                  borderRight: '1px solid #dee2e6',
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {unit.roepnummer}
-                </td>
-                <td style={{ 
-                  padding: '4px 8px',
+                  padding: '0px 2px',
                   borderRight: '1px solid #dee2e6',
                   backgroundColor: getStatusColor(unit.status),
                   color: 'white',
                   fontWeight: 'bold',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  fontSize: '9px',
+                  textAlign: 'center',
+                  verticalAlign: 'middle',
+                  width: '40px'
                 }}>
                   {getStatusAbbreviation(unit.status)}
                 </td>
                 <td style={{ 
-                  padding: '4px 8px',
+                  padding: '0px 2px',
                   borderRight: '1px solid #dee2e6',
-                  maxWidth: '100px',
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                  fontSize: '10px',
+                  verticalAlign: 'middle',
+                  width: '80px'
+                }}>
+                  {unit.roepnummer}
+                </td>
+                <td style={{ 
+                  padding: '0px 2px',
+                  borderRight: '1px solid #dee2e6',
+                  maxWidth: '120px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  fontSize: '10px',
+                  verticalAlign: 'middle',
+                  width: '120px'
                 }}>
                   {Array.isArray(unit.rollen) ? unit.rollen.join(", ") : unit.rollen}
                 </td>
                 <td style={{ 
-                  padding: '4px 8px',
+                  padding: '0px 2px',
                   borderRight: '1px solid #dee2e6',
-                  maxWidth: '120px',
+                  maxWidth: '150px',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  fontSize: '10px',
+                  verticalAlign: 'middle',
+                  width: '150px'
                 }}>
                   {unit.team}
                 </td>
                 <td style={{ 
-                  padding: '4px 8px',
-                  borderRight: '1px solid #dee2e6',
-                  maxWidth: '120px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {unit.locatie || '-'}
-                </td>
-                <td style={{ 
-                  padding: '4px 8px',
-                  maxWidth: '100px',
+                  padding: '0px 2px',
+                  maxWidth: '80px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   color: unit.incident ? '#0066cc' : '#999',
-                  fontWeight: unit.incident ? 'bold' : 'normal'
+                  fontWeight: unit.incident ? 'bold' : 'normal',
+                  fontSize: '10px',
+                  textAlign: 'center',
+                  verticalAlign: 'middle',
+                  width: '80px'
                 }}>
                   {unit.incident || '-'}
                 </td>

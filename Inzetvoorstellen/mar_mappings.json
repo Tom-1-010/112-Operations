@@ -1,0 +1,68 @@
+[
+  {
+    "Code": "brbtct",
+    "MC1": "Brand",
+    "MC2": "Buiten",
+    "MC3": "Container",
+    "baseInzet": ["1 TS-6"],
+    "extraInzet": [],
+    "toelichting": "Brand buiten container: standaard 1 TS-6 volgens MAR"
+  },
+  {
+    "Code": "ogwtpw",
+    "MC1": "Ongeval",
+    "MC2": "Water",
+    "MC3": "Persoon te water",
+    "baseInzet": ["1 TS-6", "1 RV", "1 WO", "1 DA-OD"],
+    "extraInzet": [],
+    "toelichting": "Persoon te water: 1 TS-6 + 1 RV + 1 WO + 1 DA-OD"
+  },
+  {
+    "ktNaam": "Inzet Brw functie",
+    "ktWaarde": "Off. van Dienst",
+    "ktCode": "ibfunc",
+    "ktParser": "-inzet brw off van dienst",
+    "baseInzet": ["1 DA-OD"],
+    "extraInzet": [],
+    "toelichting": "Inzet BRW off van dienst: 1 DA-OD",
+    "prioriteit": 10
+  },
+  {
+    "ktNaam": "Inzet Brw functie",
+    "ktWaarde": "Adv. Gev.stof",
+    "ktCode": "ibfunc",
+    "ktParser": "-inzet brw adv gevstof",
+    "baseInzet": ["1 AGS"],
+    "extraInzet": [],
+    "toelichting": "Inzet BRW Adviseur Gevaarlijke Stoffen: 1 AGS",
+    "prioriteit": 10
+  },
+  {
+    "Code": "brgb",
+    "MC1": "Brand",
+    "MC2": "Gebouw",
+    "MC3": "",
+    "baseInzet": ["1 TS-6"],
+    "extraInzet": ["1 RV"],
+    "toelichting": "Brand gebouw: 1 TS-6 + 1 RV"
+  },
+  {
+    "ktNaam": "Brand/gebouw",
+    "ktCode": "brgb",
+    "ktParser": "-brand gebouw",
+    "baseInzet": ["1 TS-6", "1 RV"],
+    "extraInzet": [],
+    "toelichting": "Brand/gebouw: 1 TS-6 + 1 RV",
+    "prioriteit": 5
+  },
+  {
+    "ktNaam": "Inzet Brw HV EH",
+    "ktWaarde": "HV",
+    "ktCode": "ibhveh",
+    "ktParser": "-inzet brw hv",
+    "baseInzet": ["1 HV"],
+    "extraInzet": [],
+    "toelichting": "Inzet BRW HV EH HV: 1 HV",
+    "prioriteit": 10
+  }
+]

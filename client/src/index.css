@@ -1,3 +1,358 @@
+/* Dashboard styling - GMS/Simulator style */
+.dashboard-container {
+  padding: 8px;
+  background: #f0f0f0;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+}
+
+.dashboard-section {
+  background: white;
+  border: 2px inset #c0c0c0;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.dashboard-section .section-header {
+  background: #c0c0c0;
+  border-bottom: 2px solid #808080;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-section .section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dashboard-section .section-title i {
+  font-size: 12px;
+}
+
+/* Meldingen Statistieken */
+.meldingen-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #f8f9fa;
+  border: 1px outset #c0c0c0;
+  font-size: 11px;
+}
+
+.stat-card.active {
+  background: #ffe6e6;
+  border-color: #dc3545;
+}
+
+.stat-card.processed {
+  background: #e6ffe6;
+  border-color: #28a745;
+}
+
+.stat-icon {
+  font-size: 16px;
+  margin-right: 8px;
+  width: 20px;
+  text-align: center;
+}
+
+.stat-card.active .stat-icon {
+  color: #dc3545;
+}
+
+.stat-card.processed .stat-icon {
+  color: #28a745;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: normal;
+}
+
+/* OVD-OC Dashboard */
+.ovd-oc-container {
+  padding: 8px;
+}
+
+.ovd-summary {
+  margin-bottom: 8px;
+}
+
+.ovd-stat-card {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #e0e0e0;
+  border: 1px outset #c0c0c0;
+  font-size: 11px;
+}
+
+.ovd-icon {
+  font-size: 16px;
+  margin-right: 8px;
+  width: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.ovd-number {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 2px;
+  color: #333;
+}
+
+.ovd-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: normal;
+}
+
+.ovd-meldingen-container {
+  background: #f8f9fa;
+  border: 1px inset #c0c0c0;
+  padding: 8px;
+}
+
+.ovd-header h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meldingen-tabel-container {
+  background: white;
+  border: 1px inset #c0c0c0;
+  overflow: hidden;
+}
+
+.meldingen-tabel {
+  width: 100%;
+  font-size: 10px;
+}
+
+.tabel-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 80px 1fr 80px;
+  gap: 4px;
+  background: #c0c0c0;
+  padding: 4px;
+  font-weight: bold;
+  color: #333;
+  font-size: 10px;
+  border-bottom: 1px solid #808080;
+}
+
+.melding-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 80px 1fr 80px;
+  gap: 4px;
+  padding: 4px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 10px;
+}
+
+.melding-row:hover {
+  background-color: #f0f0f0;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #e6f3ff !important;
+  border-left: 3px solid #007bff;
+}
+
+.melding-row:last-child {
+  border-bottom: none;
+}
+
+.melding-tijd,
+.melding-locatie,
+.melding-type,
+.melding-prioriteit,
+.melding-adres,
+.melding-plaats,
+.melding-mc,
+.melding-karakteristieken,
+.melding-eenheid {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+}
+
+.melding-tijd i,
+.melding-locatie i,
+.melding-type i,
+.melding-prioriteit i,
+.melding-adres i,
+.melding-plaats i,
+.melding-mc i,
+.melding-karakteristieken i,
+.melding-eenheid i {
+  color: #666;
+  font-size: 8px;
+}
+
+.melding-prioriteit {
+  justify-content: center;
+}
+
+.prioriteit-1 {
+  background: #dc3545;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.prioriteit-2 {
+  background: #ff8c00;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.prioriteit-3 {
+  background: #87ceeb;
+  color: black;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.prioriteit-4 {
+  background: #28a745;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.prioriteit-5 {
+  background: #6c757d;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.geen-meldingen {
+  text-align: center;
+  padding: 16px;
+  color: #666;
+  font-size: 11px;
+}
+
+.geen-meldingen i {
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.geen-meldingen p {
+  margin: 0;
+  font-size: 11px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 4px;
+  }
+  
+  .meldingen-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 4px;
+  }
+  
+  .stat-card {
+    padding: 6px;
+  }
+  
+  .stat-number {
+    font-size: 16px;
+  }
+  
+  .tabel-header,
+  .melding-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  
+  .header-cell {
+    display: none;
+  }
+  
+  .melding-tijd::before {
+    content: "Tijd: ";
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .melding-locatie::before {
+    content: "Locatie: ";
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .melding-type::before {
+    content: "Type: ";
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .melding-prioriteit::before {
+    content: "Prioriteit: ";
+    font-weight: bold;
+    color: #333;
+  }
+}
+
 /* Kaart (Map) styling */
 .kaart-container {
   display: flex;
@@ -211,14 +566,17 @@
   --radius: 0.5rem;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* Base styles - moved outside @layer to avoid Tailwind CSS processing issues */
+* {
+  border-color: hsl(var(--border));
+}
 
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
-  }
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 /* Police Dashboard Specific Styles */
@@ -242,12 +600,14 @@ body {
 /* Sidebar */
 .sidebar {
   width: 260px;
-  background: linear-gradient(180deg, hsl(208, 79%, 51%) 0%, hsl(215, 89%, 34%) 100%);
+  background: #0a4681;
   color: white;
   position: fixed;
   height: 100vh;
   overflow-y: auto;
   box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-header {
@@ -256,14 +616,62 @@ body {
   text-align: center;
 }
 
+.sidebar-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
 .sidebar-header h2 {
   font-size: 18px;
   font-weight: 600;
-  margin-top: 8px;
+  margin: 0;
+}
+
+.notification-badge {
+  background: #ff6b6b;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 24px;
+  transition: all 0.2s ease;
+}
+
+.notification-badge.clickable {
+  cursor: pointer;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.notification-badge.clickable:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+  background: #ff5252;
+}
+
+.sidebar-date-time {
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 700;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.sidebar-date-time > span {
+  font-family: 'Courier New', monospace;
 }
 
 .sidebar-nav {
   padding: 20px 0;
+  flex-grow: 1;
 }
 
 .nav-item {
@@ -585,6 +993,7 @@ body {
   margin: 0 auto;
 }
 
+.priority-0 { background-color: #8a2be2; color: white; }
 .priority-1 { background-color: #dc3545; color: white; }
 .priority-2 { background-color: #ff8c00; color: white; }
 .priority-3 { background-color: #87ceeb; color: black; }
@@ -592,6 +1001,15 @@ body {
 .priority-5 { background-color: #8a2be2; color: white; }
 
 /* Apply priority colors to entire GMS2 table rows */
+.gms2-table-row.priority-0 { 
+  background-color: #8a2be2 !important; 
+  color: white !important; 
+}
+.gms2-table-row.priority-0 span { 
+  background-color: #8a2be2 !important; 
+  color: white !important; 
+  border-color: #8a2be2 !important;
+}
 .gms2-table-row.priority-1 { 
   background-color: #dc3545 !important; 
   color: white !important; 
@@ -686,6 +1104,10 @@ body {
   font-size: 10px;
   font-weight: bold;
   color: white;
+}
+
+.priority-box-0 {
+  background: #8a2be2;
 }
 
 .priority-box-1 {
@@ -955,6 +1377,10 @@ body {
   font-weight: bold;
   color: white;
   margin-left: 8px;
+}
+
+.modal-priority-box.priority-box-0 {
+  background: #8a2be2;
 }
 
 .modal-priority-box.priority-box-1 {
@@ -2928,6 +3354,11 @@ body {
   text-align: center;
 }
 
+.priority-0 {
+  background: hsl(270, 41%, 92%);
+  color: hsl(270, 55%, 45%);
+}
+
 .priority-1 {
   background: hsl(0, 86%, 94%);
   color: hsl(0, 65%, 51%);
@@ -4494,6 +4925,11 @@ body {
   border-radius: 2px;
 }
 
+.gms2-p2000-priority.prio-0 {
+  background: #8a2be2;
+  color: #ffffff;
+}
+
 .gms2-p2000-priority.prio-1 {
   background: #ff0000;
   color: #ffffff;
@@ -4567,6 +5003,10 @@ body {
 .gms2-p2000-stat-item .stat-value {
   color: #ffffff;
   font-weight: bold;
+}
+
+.gms2-p2000-stat-item .stat-value.prio-0 {
+  color: #8a2be2;
 }
 
 .gms2-p2000-stat-item .stat-value.prio-1 {
@@ -5162,6 +5602,12 @@ body {
   border-radius: 50%;
   background: #ccc;
   transition: all 0.3s ease;
+}
+
+.gms-priority-dot.priority-0 {
+  background: #8a2be2;
+  border-color: #8a2be2;
+  box-shadow: 0 0 6px rgba(138, 43, 226, 0.5);
 }
 
 .gms-priority-dot.priority-1 {
@@ -5799,6 +6245,27 @@ body {
   outline: none;
   border-color: hsl(221, 83%, 53%);
   box-shadow: 0 0 0 2px hsl(221, 83%, 53%, 0.2);
+}
+
+.gms-dienst-button {
+  padding: 6px 12px;
+  border: 1px solid hsl(214, 13%, 91%);
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gms-dienst-button:hover {
+  background: hsl(214, 13%, 96%);
+  border-color: hsl(221, 83%, 53%);
+}
+
+.gms-dienst-button.active {
+  background: hsl(221, 83%, 53%);
+  color: white;
+  border-color: hsl(221, 83%, 53%);
 }
 
 /* Incident Display Styling */
@@ -6851,6 +7318,170 @@ body {
   background: white;
   border: 1px inset #c0c0c0;
   border-bottom: 1px solid white;
+}
+
+/* Location Details Popup Styling */
+.location-details-content {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.location-section {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+  border: 1px solid #dee2e6;
+}
+
+.location-section h3 {
+  margin: 0 0 8px 0;
+  color: #007bff;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.location-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.location-details-grid div {
+  padding: 3px 0;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 13px;
+}
+
+.location-details-grid div:last-child {
+  border-bottom: none;
+}
+
+.location-details-grid strong {
+  color: #495057;
+  font-weight: 600;
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+.location-loading {
+  text-align: center;
+  padding: 30px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Logging Tab Styling */
+.gms2-logging-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px inset #c0c0c0;
+}
+
+.gms2-logging-header {
+  background: #c0c0c0;
+  padding: 4px 8px;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gms2-logging-header h3 {
+  margin: 0;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000;
+}
+
+.gms2-logging-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 9px;
+  color: #333;
+}
+
+.gms2-logging-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gms2-logging-filters {
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.gms2-logging-search {
+  flex: 1;
+  padding: 2px 4px;
+  border: 1px inset #c0c0c0;
+  font-size: 10px;
+  background: white;
+}
+
+.gms2-logging-entries {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+}
+
+.gms2-logging-entry {
+  display: flex;
+  padding: 2px 4px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.gms2-logging-entry.priority-high {
+  background: #ffe6e6;
+  border-left: 3px solid #ff0000;
+}
+
+.gms2-logging-entry.karakteristiek {
+  background: #e6f3ff;
+  border-left: 3px solid #0066cc;
+}
+
+.gms2-logging-entry.location {
+  background: #e6ffe6;
+  border-left: 3px solid #00cc00;
+}
+
+.gms2-logging-entry.object {
+  background: #fff3e6;
+  border-left: 3px solid #ff9900;
+}
+
+.gms2-logging-entry.highway {
+  background: #f0f0ff;
+  border-left: 3px solid #6600cc;
+}
+
+.gms2-logging-time {
+  color: #666;
+  font-size: 9px;
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.gms2-logging-text {
+  flex: 1;
+  word-wrap: break-word;
 }
 
 /* Note history */
@@ -7928,4 +8559,90 @@ body {
 
 .spoed-alert svg {
   color: #dc2626;
+}
+
+/* P2000 Lightboard Styles */
+.p2000-lightboard {
+  background-color: black;
+  color: red;
+  font-family: 'Arial Black', sans-serif;
+  margin-top: auto;
+  border-top: 2px solid #333;
+}
+
+.p2000-header {
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-bottom: 2px solid #333;
+  text-align: center;
+}
+
+.p2000-title {
+  font-weight: bold;
+}
+
+.p2000-content {
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.3em;
+  text-transform: uppercase;
+}
+
+.p2000-alarm-id {
+  font-size: 12px;
+  color: red;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.p2000-alarm-time {
+  font-size: 10px;
+  color: #ccc;
+  margin-bottom: 6px;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+}
+
+.p2000-alarm-type {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.p2000-alarm-location {
+  font-size: 12px;
+  color: white;
+}
+
+.p2000-waiting {
+  text-align: center;
+  padding: 20px 12px;
+}
+
+.p2000-waiting-text {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
+.p2000-proc-text {
+  font-size: 12px;
+  color: red;
+  font-weight: bold;
+  line-height: 1.2em;
+  word-wrap: break-word;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.p2000-content.blink {
+  animation: p2000-blink 1s infinite;
+}
+
+@keyframes p2000-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
 }

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check localStorage for Incident #20250101</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .result {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .found {
+            border-left: 4px solid #28a745;
+        }
+        .not-found {
+            border-left: 4px solid #dc3545;
+        }
+        .incident-details {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Check Incident #20250101 (Rijksweg nr 20)</h1>
+    
+    <div id="results"></div>
+    
+    <button onclick="checkIncident()">🔍 Check Incident #20250101</button>
+    <button onclick="checkAllIncidents()">📋 Show All Incidents</button>
+    <button onclick="checkLocalStorage()">💾 Check localStorage Contents</button>
+    
+    <script>
+        function checkIncident() {
+            const incidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
+            const results = document.getElementById('results');
+            
+            // Zoek naar incident #20250101
+            const targetIncident = incidents.find(incident => 
+                incident.nr === 20250101 || incident.id === 20250101
+            );
+            
+            if (targetIncident) {
+                const hasCoords = targetIncident.coordinates && targetIncident.coordinates.length === 2;
+                const coordInfo = hasCoords ? 
+                    `✅ Coördinaten: [${targetIncident.coordinates[0]}, ${targetIncident.coordinates[1]}]` : 
+                    '❌ Geen coördinaten';
+                
+                results.innerHTML = `
+                    <div class="result found">
+                        <h2>✅ Incident #20250101 GEVONDEN!</h2>
+                        <div class="incident-details">
+                            <p><strong>Incident #:</strong> ${targetIncident.nr || targetIncident.id}</p>
+                            <p><strong>MC:</strong> ${targetIncident.mc || 'Geen'}</p>
+                            <p><strong>Locatie:</strong> ${targetIncident.locatie || 'Geen'}</p>
+                            <p><strong>Plaats:</strong> ${targetIncident.plaats || 'Geen'}</p>
+                            <p><strong>Prioriteit:</strong> ${targetIncident.prio || targetIncident.prioriteit || 'Geen'}</p>
+                            <p><strong>Tijd:</strong> ${targetIncident.tijd || 'Geen'}</p>
+                            <p><strong>Status:</strong> ${targetIncident.status || 'Onbekend'}</p>
+                            <p><strong>Functie:</strong> ${targetIncident.functie || 'Geen'}</p>
+                            <p><strong>Straat:</strong> ${targetIncident.straatnaam || 'Geen'} ${targetIncident.huisnummer || ''}</p>
+                            <p><strong>Postcode:</strong> ${targetIncident.postcode || 'Geen'}</p>
+                            <p><strong>Plaatsnaam:</strong> ${targetIncident.plaatsnaam || 'Geen'}</p>
+                            <p>${coordInfo}</p>
+                            ${targetIncident.assignedUnits && targetIncident.assignedUnits.length > 0 ? 
+                                `<p><strong>Eenheden:</strong> ${targetIncident.assignedUnits.map(u => u.roepnummer).join(', ')}</p>` : 
+                                '<p><strong>Eenheden:</strong> Geen</p>'
+                            }
+                        </div>
+                        <h3>Volledige JSON:</h3>
+                        <pre>${JSON.stringify(targetIncident, null, 2)}</pre>
+                    </div>
+                `;
+            } else {
+                results.innerHTML = `
+                    <div class="result not-found">
+                        <h2>❌ Incident #20250101 NIET GEVONDEN</h2>
+                        <p>Er zijn ${incidents.length} incidenten in localStorage, maar incident #20250101 is niet gevonden.</p>
+                        <p><strong>Beschikbare incident nummers:</strong> ${incidents.map(i => i.nr || i.id).join(', ')}</p>
+                        <p><strong>Mogelijke oorzaken:</strong></p>
+                        <ul>
+                            <li>Incident is nog niet aangemaakt</li>
+                            <li>Incident heeft een ander nummer</li>
+                            <li>Incident is opgeslagen in een andere browser/tab</li>
+                            <li>localStorage is geleegd</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+        
+        function checkAllIncidents() {
+            const incidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
+            const results = document.getElementById('results');
+            
+            if (incidents.length === 0) {
+                results.innerHTML = `
+                    <div class="result not-found">
+                        <h2>❌ Geen incidenten gevonden</h2>
+                        <p>localStorage bevat geen gms2Incidents data.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="result">
+                    <h2>📋 Alle incidenten (${incidents.length} totaal)</h2>
+            `;
+            
+            incidents.forEach((incident, index) => {
+                const hasCoords = incident.coordinates && incident.coordinates.length === 2;
+                html += `
+                    <div class="incident-details">
+                        <h3>Incident #${incident.nr || incident.id || index} (Index: ${index})</h3>
+                        <p><strong>MC:</strong> ${incident.mc || 'Geen'}</p>
+                        <p><strong>Locatie:</strong> ${incident.locatie || 'Geen'}</p>
+                        <p><strong>Plaats:</strong> ${incident.plaats || 'Geen'}</p>
+                        <p><strong>Straat:</strong> ${incident.straatnaam || 'Geen'} ${incident.huisnummer || ''}</p>
+                        <p><strong>Coördinaten:</strong> ${hasCoords ? `✅ [${incident.coordinates[0]}, ${incident.coordinates[1]}]` : '❌ Geen'}</p>
+                        <p><strong>Prioriteit:</strong> ${incident.prio || incident.prioriteit || 'Geen'}</p>
+                        <p><strong>Tijd:</strong> ${incident.tijd || 'Geen'}</p>
+                        <p><strong>Status:</strong> ${incident.status || 'Onbekend'}</p>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            results.innerHTML = html;
+        }
+        
+        function checkLocalStorage() {
+            const results = document.getElementById('results');
+            const keys = Object.keys(localStorage);
+            
+            let html = `
+                <div class="result">
+                    <h2>💾 localStorage Inhoud</h2>
+                    <p><strong>Gevonden keys:</strong> ${keys.length}</p>
+                    <ul>
+            `;
+            
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                html += `<li><strong>${key}:</strong> ${value.length > 100 ? value.substring(0, 100) + '...' : value}</li>`;
+            });
+            
+            html += '</ul></div>';
+            results.innerHTML = html;
+        }
+        
+        // Auto-check bij laden
+        window.onload = function() {
+            checkIncident();
+        };
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kazernes op kaart</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    #map { 
+      height: 100vh; 
+      width: 100%; 
+    }
+    #status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="status">Kazernes laden...</div>
+
+  <script>
+    // Lijst met kazernes (naam + adres)
+    const kazernes = [
+      { naam: "Brandweerkazerne Rotterdam-Centrum", adres: "Weena 505, Rotterdam" },
+      { naam: "Politie Rotterdam Zuidplein", adres: "Annie M.G. Schmidtplein 10, Rotterdam" },
+      { naam: "Brandweerkazerne Schiedam", adres: "Hargalaan 20, Schiedam" },
+      { naam: "Kazerne Hoek van Holland", adres: "Planciushof 80, Hoek van Holland" },
+      { naam: "Kazerne Maassluis", adres: "Elektraweg 3, Maassluis" },
+      { naam: "Brandweerkazerne Vlaardingen", adres: "Wilhelminaplein 1, Vlaardingen" }
+    ];
+
+    // Initialiseer kaart, gecentreerd op Nederland
+    const map = L.map('map').setView([52.1, 5.3], 8);
+    
+    // Voeg OpenStreetMap tile layer toe
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap-bijdragers'
+    }).addTo(map);
+
+    // Status bijwerken
+    function updateStatus(text) {
+      document.getElementById('status').textContent = text;
+    }
+
+    // Geocodeer adres met PDOK Locatieserver (BAG-gebaseerd)
+    async function geocodePDOK(adres) {
+      try {
+        const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(adres)}&rows=5&fq=type:adres&fl=id,weergavenaam,centroide_ll&sort=score desc`;
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'MeldkamerSimulator/1.0'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`PDOK API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // PDOK retourneert { response: { docs: [...] } }
+        if (data && data.response && data.response.docs && data.response.docs.length > 0) {
+          // Prioriteit: adres → verblijfsobject → openbareruimte → rest
+          const docs = data.response.docs;
+          const resultaat = docs.find(d => d.type === 'adres') || 
+                           docs.find(d => d.type === 'verblijfsobject') || 
+                           docs.find(d => d.type === 'openbareruimte') || 
+                           docs[0];
+          
+          if (resultaat.centroide_ll) {
+            // centroide_ll kan zijn: "POINT(lon lat)" of "lon,lat"
+            let coords = null;
+            
+            // Probeer POINT(lon lat) formaat
+            const pointMatch = resultaat.centroide_ll.match(/POINT\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+            if (pointMatch) {
+              const lon = parseFloat(pointMatch[1]);
+              const lat = parseFloat(pointMatch[2]);
+              if (Number.isFinite(lat) && Number.isFinite(lon)) {
+                coords = { lat, lon };
+              }
+            } else {
+              // Probeer "lon,lat" formaat (PDOK gebruikt lon eerst, dan lat)
+              const parts = resultaat.centroide_ll.split(',');
+              if (parts.length === 2) {
+                const lon = parseFloat(parts[0].trim());
+                const lat = parseFloat(parts[1].trim());
+                if (Number.isFinite(lat) && Number.isFinite(lon)) {
+                  coords = { lat, lon };
+                }
+              }
+            }
+            
+            if (coords) {
+              return coords;
+            }
+          }
+        }
+        return null;
+      } catch (error) {
+        console.warn(`PDOK API fout voor "${adres}":`, error.message);
+        return null;
+      }
+    }
+
+    // Geocodeer adres met Nominatim (fallback)
+    async function geocodeNominatim(adres) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(adres + ', Nederland')}&limit=1`;
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'MeldkamerSimulator/1.0'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Nominatim error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          return { 
+            lat: parseFloat(data[0].lat), 
+            lon: parseFloat(data[0].lon) 
+          };
+        }
+        return null;
+      } catch (error) {
+        console.warn(`Nominatim fout voor "${adres}":`, error.message);
+        return null;
+      }
+    }
+
+    // Geocodeer adres (probeer eerst PDOK, dan Nominatim)
+    async function getCoords(adres) {
+      // Probeer eerst PDOK Locatieserver (BAG-gebaseerd)
+      let coords = await geocodePDOK(adres);
+      
+      if (coords) {
+        console.log(`✅ PDOK gevonden voor: ${adres}`, coords);
+        return coords;
+      }
+      
+      // Wacht even voordat we Nominatim proberen (rate limiting)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Fallback naar Nominatim
+      coords = await geocodeNominatim(adres);
+      
+      if (coords) {
+        console.log(`✅ Nominatim gevonden voor: ${adres}`, coords);
+        return coords;
+      }
+      
+      console.warn(`❌ Niet gevonden: ${adres}`);
+      return null;
+    }
+
+    // Plaats alle kazernes op de kaart
+    async function plaatsKazernes() {
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (let i = 0; i < kazernes.length; i++) {
+        const kazerne = kazernes[i];
+        updateStatus(`Geocodeer ${i + 1}/${kazernes.length}: ${kazerne.naam}...`);
+        
+        const coords = await getCoords(kazerne.adres);
+        
+        if (coords) {
+          // Voeg marker toe aan kaart
+          L.marker([coords.lat, coords.lon])
+            .addTo(map)
+            .bindPopup(`<b>${kazerne.naam}</b><br>${kazerne.adres}`);
+          successCount++;
+        } else {
+          failCount++;
+          console.error(`Kon coördinaten niet vinden voor: ${kazerne.naam} - ${kazerne.adres}`);
+        }
+        
+        // Wacht even tussen requests om rate limiting te voorkomen
+        if (i < kazernes.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      updateStatus(`Klaar! ${successCount} gevonden, ${failCount} niet gevonden.`);
+      
+      // Als er markers zijn, pas de view aan om alle markers te tonen
+      if (successCount > 0) {
+        const markers = [];
+        map.eachLayer((layer) => {
+          if (layer instanceof L.Marker) {
+            markers.push(layer.getLatLng());
+          }
+        });
+        
+        if (markers.length > 0) {
+          const group = new L.featureGroup(markers.map(latlng => L.marker(latlng)));
+          map.fitBounds(group.getBounds().pad(0.1));
+        }
+      }
+    }
+
+    // Start het proces
+    plaatsKazernes();
+  </script>
+</body>
+</html>
+

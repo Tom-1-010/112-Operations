@@ -1,0 +1,280 @@
+[
+  {
+    "id": "kazerne-001",
+    "naam": "Brandweerkazerne Maassluis",
+    "adres": "Lange Boonestraat 12",
+    "postcode": "3141 AA",
+    "plaats": "Maassluis",
+    "type": "Beroeps",
+    "telefoonnummer": "010-5912345",
+    "email": "maassluis@brandweer.nl",
+    "capaciteit": 25,
+    "actief": true,
+    "latitude": "51.9208",
+    "longitude": "4.2508",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Hoofdkazerne Maassluis"
+  },
+  {
+    "id": "kazerne-002",
+    "naam": "Brandweerkazerne Vlaardingen",
+    "adres": "Wilhelminaplein 1",
+    "postcode": "3132 AA",
+    "plaats": "Vlaardingen",
+    "type": "Beroeps",
+    "telefoonnummer": "010-5912346",
+    "email": "vlaardingen@brandweer.nl",
+    "capaciteit": 30,
+    "actief": true,
+    "latitude": "51.9056",
+    "longitude": "4.3292",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Hoofdkazerne Vlaardingen"
+  },
+  {
+    "id": "kazerne-003",
+    "naam": "Brandweerkazerne Schiedam",
+    "adres": "Marktplein 15",
+    "postcode": "3111 AA",
+    "plaats": "Schiedam",
+    "type": "Beroeps",
+    "telefoonnummer": "010-5912347",
+    "email": "schiedam@brandweer.nl",
+    "capaciteit": 28,
+    "actief": true,
+    "latitude": "51.9194",
+    "longitude": "4.3889",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Hoofdkazerne Schiedam"
+  },
+  {
+    "id": "kazerne-004",
+    "naam": "Brandweerkazerne Rotterdam Centrum",
+    "adres": "Stationsplein 8",
+    "postcode": "3013 AA",
+    "plaats": "Rotterdam",
+    "type": "Beroeps",
+    "telefoonnummer": "010-5912348",
+    "email": "rotterdam@brandweer.nl",
+    "capaciteit": 50,
+    "actief": true,
+    "latitude": "51.9225",
+    "longitude": "4.4792",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Hoofdkazerne Rotterdam"
+  },
+  {
+    "id": "kazerne-005",
+    "naam": "Brandweerkazerne Spijkenisse",
+    "adres": "Parkweg 22",
+    "postcode": "3201 AA",
+    "plaats": "Spijkenisse",
+    "type": "Vrijwilligers",
+    "telefoonnummer": "010-5912349",
+    "email": "spijkenisse@brandweer.nl",
+    "capaciteit": 20,
+    "actief": true,
+    "latitude": "51.8450",
+    "longitude": "4.3292",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Vrijwilligerskazerne"
+  },
+  {
+    "id": "kazerne-006",
+    "naam": "Brandweerkazerne Capelle aan den IJssel",
+    "adres": "Centrumstraat 33",
+    "postcode": "2901 AA",
+    "plaats": "Capelle aan den IJssel",
+    "type": "Beroeps",
+    "telefoonnummer": "010-5912350",
+    "email": "capelle@brandweer.nl",
+    "capaciteit": 25,
+    "actief": true,
+    "latitude": "51.9292",
+    "longitude": "4.5781",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Hoofdkazerne Capelle"
+  },
+  {
+    "id": "kazerne-007",
+    "naam": "Brandweerkazerne Ridderkerk",
+    "adres": "Stadhuisplein 1",
+    "postcode": "2981 AA",
+    "plaats": "Ridderkerk",
+    "type": "Vrijwilligers",
+    "telefoonnummer": "010-5912351",
+    "email": "ridderkerk@brandweer.nl",
+    "capaciteit": 18,
+    "actief": true,
+    "latitude": "51.8725",
+    "longitude": "4.6028",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Vrijwilligerskazerne"
+  },
+  {
+    "id": "kazerne-008",
+    "naam": "Brandweerkazerne Amsterdam Centrum",
+    "adres": "Damrak 1",
+    "postcode": "1012 AA",
+    "plaats": "Amsterdam",
+    "type": "Beroeps",
+    "telefoonnummer": "020-5912345",
+    "email": "amsterdam@brandweer.nl",
+    "capaciteit": 60,
+    "actief": true,
+    "latitude": "52.3676",
+    "longitude": "4.9041",
+    "regio": "Noord-Holland",
+    "opmerkingen": "Hoofdkazerne Amsterdam"
+  },
+  {
+    "id": "kazerne-009",
+    "naam": "Brandweerkazerne Den Haag",
+    "adres": "Spui 1",
+    "postcode": "2511 AA",
+    "plaats": "Den Haag",
+    "type": "Beroeps",
+    "telefoonnummer": "070-5912345",
+    "email": "denhaag@brandweer.nl",
+    "capaciteit": 45,
+    "actief": true,
+    "latitude": "52.0116",
+    "longitude": "4.3571",
+    "regio": "Zuid-Holland",
+    "opmerkingen": "Hoofdkazerne Den Haag"
+  },
+  {
+    "id": "kazerne-010",
+    "naam": "Brandweerkazerne Utrecht",
+    "adres": "Domplein 1",
+    "postcode": "3512 AA",
+    "plaats": "Utrecht",
+    "type": "Beroeps",
+    "telefoonnummer": "030-5912345",
+    "email": "utrecht@brandweer.nl",
+    "capaciteit": 40,
+    "actief": true,
+    "latitude": "52.0907",
+    "longitude": "5.1214",
+    "regio": "Utrecht",
+    "opmerkingen": "Hoofdkazerne Utrecht"
+  },
+  {
+    "id": "kazerne-011",
+    "naam": "Brandweerkazerne Eindhoven",
+    "adres": "Markt 1",
+    "postcode": "5611 AA",
+    "plaats": "Eindhoven",
+    "type": "Beroeps",
+    "telefoonnummer": "040-5912345",
+    "email": "eindhoven@brandweer.nl",
+    "capaciteit": 35,
+    "actief": true,
+    "latitude": "51.4416",
+    "longitude": "5.4697",
+    "regio": "Noord-Brabant",
+    "opmerkingen": "Hoofdkazerne Eindhoven"
+  },
+  {
+    "id": "kazerne-012",
+    "naam": "Brandweerkazerne Groningen",
+    "adres": "Grote Markt 1",
+    "postcode": "9712 AA",
+    "plaats": "Groningen",
+    "type": "Beroeps",
+    "telefoonnummer": "050-5912345",
+    "email": "groningen@brandweer.nl",
+    "capaciteit": 30,
+    "actief": true,
+    "latitude": "53.2194",
+    "longitude": "6.5665",
+    "regio": "Groningen",
+    "opmerkingen": "Hoofdkazerne Groningen"
+  },
+  {
+    "id": "kazerne-013",
+    "naam": "Brandweerkazerne Nijmegen",
+    "adres": "Grote Markt 1",
+    "postcode": "6511 AA",
+    "plaats": "Nijmegen",
+    "type": "Beroeps",
+    "telefoonnummer": "024-5912345",
+    "email": "nijmegen@brandweer.nl",
+    "capaciteit": 25,
+    "actief": true,
+    "latitude": "51.8426",
+    "longitude": "5.8597",
+    "regio": "Gelderland",
+    "opmerkingen": "Hoofdkazerne Nijmegen"
+  },
+  {
+    "id": "kazerne-014",
+    "naam": "Brandweerkazerne Arnhem",
+    "adres": "Markt 1",
+    "postcode": "6811 AA",
+    "plaats": "Arnhem",
+    "type": "Beroeps",
+    "telefoonnummer": "026-5912345",
+    "email": "arnhem@brandweer.nl",
+    "capaciteit": 28,
+    "actief": true,
+    "latitude": "51.9851",
+    "longitude": "5.8987",
+    "regio": "Gelderland",
+    "opmerkingen": "Hoofdkazerne Arnhem"
+  },
+  {
+    "id": "kazerne-015",
+    "naam": "Brandweerkazerne Enschede",
+    "adres": "Markt 1",
+    "postcode": "7511 AA",
+    "plaats": "Enschede",
+    "type": "Beroeps",
+    "telefoonnummer": "053-5912345",
+    "email": "enschede@brandweer.nl",
+    "capaciteit": 22,
+    "actief": true,
+    "latitude": "52.2215",
+    "longitude": "6.8937",
+    "regio": "Overijssel",
+    "opmerkingen": "Hoofdkazerne Enschede"
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

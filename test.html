@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Test</title>
+</head>
+<body>
+    <h1>Server Test</h1>
+    <p>Als je dit ziet, werkt de server!</p>
+    <script>
+        fetch('/api/health')
+            .then(res => res.json())
+            .then(data => {
+                document.body.innerHTML += '<p>API Health: ' + JSON.stringify(data) + '</p>';
+            })
+            .catch(err => {
+                document.body.innerHTML += '<p>API Error: ' + err.message + '</p>';
+            });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

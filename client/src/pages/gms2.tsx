@@ -1,6 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
-import ActiveUnitsDisplay from "../components/active-units-display";
+import { generateInzetvoorstelFromMapping, loadMarMappings } from "../../../Inzetvoorstellen/inzetvoorstel-mapping";
+import { routingService, calculateETA as calculateETAService, formatETA as formatETAService } from "../services/routingService";
+import { getVoertuigMarkers } from "../lib/renderEenhedenOpKaart";
+import { normalizeRoepnummer } from "../lib/renderEenhedenOpKaart";
+import { setStatus as setUnitStatusCentral, hasStatus, STATUS_COLUMN_MAPPING, getStatusDef, getDefaultStatus, getAllStatusesSync, statusEventBus } from "../lib/brw-status";
+import { getUnitPosition, getUnitPositions, saveUnitPositions, updateVehicleStatus } from "../services/globalUnitMovement";
+import { getInzetrolForIncidentAndVehicle, getVoertuigenFromInzetvoorstellenRT } from "../services/inzetvoorstellenRT";
+import MapComponent, { GmsIncident as MapGmsIncident, Kazerne } from "../components/Map";
+import { useUnitsMovement, Eenheid } from "../hooks/useUnitsMovement";
+import { useQuery } from "@tanstack/react-query";
+import { initKazernes, KazerneMetCoords } from "../lib/kazerne-geocoding";
+import L from "leaflet";
 
 interface LMCClassification {
   MC1: string;
@@ -30,12 +41,14 @@ interface GmsIncident {
   postcode?: string;
   plaatsnaam?: string;
   gemeente?: string;
+  coordinates?: [number, number] | null; // [longitude, latitude] from PDOK BAG API
   mc1?: string;
   mc2?: string;
   mc3?: string;
   notities?: string;
   karakteristieken?: any[];
   status?: string;
+  object?: string;
   functie?: string;
   meldingslogging?: string;
   tijdstip?: string;
@@ -46,17 +59,21 @@ interface GmsIncident {
 interface AssignedUnit {
   roepnummer: string;
   soort_voertuig: string;
+  inzetrol?: string; // Inzetrol bepaald op basis van Inzetvoorstellen RT basis.json
+  huidige_status?: string; // Actieve status: 'ov', 'ar', 'tp', 'nb', 'ir', 'bs', 'kz', 'vr', 'fd', 'GA'
   ov_tijd?: string;
   ar_tijd?: string;
   tp_tijd?: string;
   nb_tijd?: string;
-  am_tijd?: string;
+  ir_tijd?: string;
+  bs_tijd?: string;
+  kz_tijd?: string;
   vr_tijd?: string;
   fd_tijd?: string;
   ga_tijd?: string;
 }
 
-export default function GMS2() {
+export default function GMS2({ onOvdOcActivation }: { onOvdOcActivation?: () => void }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedIncident, setSelectedIncident] = useState<GmsIncident | null>(null);
   const [kladblokText, setKladblokText] = useState("");
@@ -65,6 +82,11 @@ export default function GMS2() {
   const [notitiesText, setNotitiesText] = useState("");
   const [priorityValue, setPriorityValue] = useState(2);
   const [loggingEntries, setLoggingEntries] = useState<Array<{
+    id: number;
+    timestamp: string;
+    message: string;
+  }>>([]);
+  const [loggingTabEntries, setLoggingTabEntries] = useState<Array<{
     id: number;
     timestamp: string;
     message: string;
@@ -81,11 +103,82 @@ export default function GMS2() {
   const [selectedKarakteristieken, setSelectedKarakteristieken] = useState<any[]>([]);
   const [showP2000Screen, setShowP2000Screen] = useState(false);
   const [pagerText, setPagerText] = useState("");
+  const [incidentKanaal, setIncidentKanaal] = useState("1"); // Default incidentkanaal
   const [showKarakteristiekenDialog, setShowKarakteristiekenDialog] = useState(false);
   const [karakteristiekenSearchQuery, setKarakteristiekenSearchQuery] = useState("");
   const [filteredKarakteristieken, setFilteredKarakteristieken] = useState<any[]>([]);
   const [showDubContent, setShowDubContent] = useState(false);
+  const [a1Units, setA1Units] = useState<any[]>([]);
+  const [showLocationDetails, setShowLocationDetails] = useState(false);
+  const [locationDetails, setLocationDetails] = useState<any>(null);
+  const [shouldAutoCheckFOPiket, setShouldAutoCheckFOPiket] = useState(false);
+  const [foPiketChecked, setFoPiketChecked] = useState(false);
+  const [inzetvoorstel, setInzetvoorstel] = useState<any | null>(null);
+  const [showInzetvoorstel, setShowInzetvoorstel] = useState(false);
+  const [brwUnitsMap, setBrwUnitsMap] = useState<Record<string, {
+    roepnummer: string;
+    gmsNaam: string;
+    post: string;
+    rollen: string[];
+    alternatieven: string[];
+    status: string;
+  }>>({});
+  // ETA state: map van roepnummer -> ETA in seconden
+  const [unitETAs, setUnitETAs] = useState<Record<string, number>>({});
+  const etaUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const handleNieuwRef = useRef<(() => void) | null>(null);
+  const handleUitgifteRef = useRef<(() => Promise<void>) | null>(null);
   
+  // Filter state voor Inzetvoorstel
+  const [ivFilterType, setIvFilterType] = useState<string>(''); // TS-6, RV, HV, etc.
+  const [ivFilterStatus, setIvFilterStatus] = useState<string>(''); // BS, KZ, NB
+  const [ivFilterMaxETA, setIvFilterMaxETA] = useState<number>(999999); // max ETA in seconden
+  const [ivShowAllUnits, setIvShowAllUnits] = useState<boolean>(false); // toon alle eenheden
+  const [ivShowOnlyAvailable, setIvShowOnlyAvailable] = useState<boolean>(true); // alleen beschikbare
+  const [ivFiltersEnabled, setIvFiltersEnabled] = useState<boolean>(false); // filters standaard UIT
+  const [ivSelectedUnits, setIvSelectedUnits] = useState<Set<string>>(new Set()); // geselecteerde eenheden in IV (nog niet gekoppeld)
+  const [ivUnitRoles, setIvUnitRoles] = useState<Map<string, string>>(new Map()); // Map van roepnummer -> inzetrol
+  const [ivAllBrwUnits, setIvAllBrwUnits] = useState<Array<{
+    roepnummer: string;
+    gmsNaam: string;
+    post: string;
+    rollen: string[];
+    alternatieven: string[];
+    status: string;
+    eta?: number | null;
+    type?: string; // eerste rol als type
+  }>>([]);
+  
+  // Map component state (synchroon met map.tsx)
+  const [mapEenheden, setMapEenheden] = useState<Eenheid[]>([]);
+  const [geocodeerdeKazernes, setGeocodeerdeKazernes] = useState<KazerneMetCoords[]>([]);
+  const [showVoertuigen, setShowVoertuigen] = useState(false);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const {
+    eenhedenPosities,
+    beweegNaarActiefIncident,
+    beweegNaarLocatie,
+    stopAlleAnimaties,
+  } = useUnitsMovement(mapEenheden, {
+    snelheid: 30,
+    animatieDuur: 5000,
+  });
+
+  // Functie om in te zoomen op incidentlocatie
+  const zoomToIncident = (coordinates: [number, number] | null) => {
+    if (!coordinates || !mapInstanceRef.current) return;
+    
+    const [lng, lat] = coordinates; // GeoJSON format: [longitude, latitude]
+    mapInstanceRef.current.setView([lat, lng], 15, {
+      animate: true,
+      duration: 0.5
+    });
+  };
+
+  // Fetch kazernes met voertuigen
+  const { data: kazernesData = [] } = useQuery<any[]>({
+    queryKey: ['/api/kazernes-with-voertuigen'],
+  });
 
   // Form state for new incidents
   const [formData, setFormData] = useState({
@@ -98,7 +191,11 @@ export default function GMS2() {
     straatnaam: "",
     postcode: "",
     plaatsnaam: "",
-    functie: ""
+    object: "",
+    functie: "",
+    roepnummer: "",
+    extra: "",
+    coordinates: null as [number, number] | null
   });
 
   // Get next incident number from localStorage, starting from 20250001
@@ -145,6 +242,407 @@ export default function GMS2() {
     return () => clearInterval(timer);
   }, []);
 
+  // Handle keyboard shortcuts: ESC to close inzetvoorstel modal, F2 to create new incident, F4 for uitgifte
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // F2: Open nieuwe melding
+      if (e.key === 'F2') {
+        e.preventDefault();
+        if (handleNieuwRef.current) {
+          handleNieuwRef.current();
+        }
+        return;
+      }
+      // F4: Uitgifte van melding
+      if (e.key === 'F4') {
+        e.preventDefault();
+        if (handleUitgifteRef.current) {
+          handleUitgifteRef.current();
+        }
+        return;
+      }
+      // ESC: Close inzetvoorstel modal
+      if (e.key === 'Escape' && showInzetvoorstel) {
+        setShowInzetvoorstel(false);
+        setInzetvoorstel(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showInzetvoorstel]);
+
+  // Cleanup ETA update interval bij unmount
+  useEffect(() => {
+    return () => {
+      if (etaUpdateIntervalRef.current) {
+        clearInterval(etaUpdateIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // Herbereken inzetrollen wanneer meldingsclassificatie of karakteristieken wijzigen
+  useEffect(() => {
+    if (showInzetvoorstel && ivSelectedUnits.size > 0 && selectedIncident) {
+      // Debounce: wacht 500ms na laatste wijziging voordat we herberekenen
+      const timeoutId = setTimeout(async () => {
+        const mc1 = selectedIncident.mc1 || selectedMC1 || '';
+        const mc2 = selectedIncident.mc2 || selectedMC2 || '';
+        const karakteristieken = selectedKarakteristieken || [];
+
+        const newRoles = new Map<string, string>();
+
+        // Herbereken voor alle geselecteerde eenheden
+        for (const roepnummer of ivSelectedUnits) {
+          const unit = brwUnitsMap[roepnummer] || ivAllBrwUnits.find(u => u.roepnummer === roepnummer);
+          if (!unit) continue;
+
+          const voertuigtype = unit.type || unit.rollen[0] || 'Onbekend';
+
+          try {
+            const inzetrol = await getInzetrolForIncidentAndVehicle(
+              mc1,
+              mc2,
+              karakteristieken,
+              voertuigtype
+            );
+
+            if (inzetrol) {
+              newRoles.set(roepnummer, inzetrol);
+            }
+          } catch (error) {
+            console.error(`❌ Fout bij herberekenen inzetrol voor ${roepnummer}:`, error);
+          }
+        }
+
+        // Update state
+        setIvUnitRoles(newRoles);
+      }, 500);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selectedMC1, selectedMC2, selectedMC3, selectedKarakteristieken, showInzetvoorstel, selectedIncident, ivSelectedUnits, brwUnitsMap, ivAllBrwUnits]);
+
+  // Functie om alle ETA's te herberekenen (gebruikt Leaflet marker posities)
+  const recalcETAs = async () => {
+    if (!showInzetvoorstel || !inzetvoorstel?.brwMatches || !selectedIncident?.coordinates) {
+      return;
+    }
+
+    const incidentCoords = selectedIncident.coordinates;
+    const newEtaMap: Record<string, number> = {};
+    const updatePromises: Promise<void>[] = [];
+
+    Object.values(inzetvoorstel.brwMatches).forEach((match) => {
+      match.beschikbaar.forEach((unit) => {
+        const roepnummer = typeof unit === 'string' ? unit : unit.roepnummer;
+        updatePromises.push(
+          calculateETAForUnit(roepnummer, incidentCoords as [number, number]).then((eta) => {
+            if (eta !== null) {
+              newEtaMap[roepnummer] = eta;
+            }
+          })
+        );
+      });
+    });
+
+    await Promise.all(updatePromises);
+    setUnitETAs(prev => ({ ...prev, ...newEtaMap }));
+  };
+
+  // Live updates bij verplaatsing van eenheid (gebruikt Leaflet marker positie)
+  useEffect(() => {
+    const handleUnitMovement = (event: CustomEvent) => {
+      const { roepnummer } = event.detail;
+      // Herbereken ETA als inzetvoorstel open is en incident coördinaten beschikbaar zijn
+      if (showInzetvoorstel && selectedIncident?.coordinates && roepnummer) {
+        calculateETAForUnit(roepnummer, selectedIncident.coordinates as [number, number]).then((eta) => {
+          if (eta !== null) {
+            setUnitETAs(prev => ({ ...prev, [roepnummer]: eta }));
+          }
+        });
+      }
+      
+      // Herbereken alle ETA's bij movement (marker positie is veranderd)
+      if (showInzetvoorstel) {
+        recalcETAs();
+      }
+    };
+
+    window.addEventListener('unitMovement', handleUnitMovement as EventListener);
+    window.addEventListener('unitPositionsUpdated', handleUnitMovement as EventListener);
+    
+    return () => {
+      window.removeEventListener('unitMovement', handleUnitMovement as EventListener);
+      window.removeEventListener('unitPositionsUpdated', handleUnitMovement as EventListener);
+    };
+  }, [showInzetvoorstel, selectedIncident, inzetvoorstel]);
+
+  // Automatische IV-refresh bij statuswijzigingen
+  useEffect(() => {
+    // Functie om te checken of IV opnieuw moet worden gegenereerd
+    const shouldRefreshIV = (oldStatusCode: string | undefined, newStatusCode: string): boolean => {
+      const old = (oldStatusCode || '').toLowerCase();
+      const new_ = newStatusCode.toLowerCase();
+      
+      // IV moet opnieuw worden gegenereerd wanneer:
+      // 1. Status verandert van beschikbaar (KZ/IR/BS) naar ingezet (OV/UT/TP)
+      const fromAvailable = old === 'kz' || old === 'ir' || old === 'bs';
+      const toInzet = new_ === 'ov' || new_ === 'ut' || new_ === 'tp';
+      if (fromAvailable && toInzet) {
+        return true;
+      }
+      
+      // 2. Status verandert van ingezet naar beschikbaar (TP → IR, IR → BS, BS → KZ)
+      const fromInzet = old === 'tp' || old === 'ut' || old === 'ov';
+      const toAvailable = new_ === 'ir' || new_ === 'bs' || new_ === 'kz';
+      if (fromInzet && toAvailable) {
+        return true;
+      }
+      
+      // 3. Status verandert binnen beschikbaar (IR → BS, BS → KZ)
+      if ((old === 'ir' && new_ === 'bs') || (old === 'bs' && new_ === 'kz')) {
+        return true;
+      }
+      
+      return false;
+    };
+
+    // Handler voor statuswijzigingen via statusEventBus
+    const handleStatusChanged = (data: any) => {
+      const { roepnummer, oldStatusCode, newStatusCode, incidentId } = data;
+      
+      // Check of IV moet worden ververst
+      if (shouldRefreshIV(oldStatusCode, newStatusCode)) {
+        // Alleen refresh als IV open is en voor het geselecteerde incident
+        if (showInzetvoorstel && selectedIncident && 
+            (!incidentId || incidentId === selectedIncident.id)) {
+          console.log(`🔄 IV auto-refresh: ${roepnummer} status ${oldStatusCode || 'geen'} → ${newStatusCode}`);
+          // Genereer IV opnieuw
+          void generateInzetvoorstel(inzetvoorstel?.extended || false);
+        }
+      }
+    };
+
+    // Handler voor unitStatusChanged events (van globalUnitMovement)
+    const handleUnitStatusChanged = (event: CustomEvent) => {
+      const { roepnummer, oldStatusCode, newStatusCode, incidentId } = event.detail;
+      
+      // Check of IV moet worden ververst
+      if (shouldRefreshIV(oldStatusCode, newStatusCode)) {
+        // Alleen refresh als IV open is en voor het geselecteerde incident
+        if (showInzetvoorstel && selectedIncident && 
+            (!incidentId || incidentId === selectedIncident.id)) {
+          console.log(`🔄 IV auto-refresh: ${roepnummer} status ${oldStatusCode || 'geen'} → ${newStatusCode}`);
+          // Genereer IV opnieuw
+          void generateInzetvoorstel(inzetvoorstel?.extended || false);
+        }
+      }
+    };
+
+    // Handler voor unitArrivedAtStation events (voertuig aangekomen op kazerne: BS → KZ)
+    const handleUnitArrivedAtStation = (event: CustomEvent) => {
+      const { roepnummer, status } = event.detail;
+      
+      // Bij aankomst op kazerne (BS → KZ): refresh IV zodat eenheid weer beschikbaar is
+      if (status === 'kz') {
+        if (showInzetvoorstel && selectedIncident) {
+          console.log(`🔄 IV auto-refresh: ${roepnummer} aangekomen op kazerne (BS → KZ), eenheid weer beschikbaar`);
+          // Genereer IV opnieuw zodat eenheid weer in beschikbare lijst staat
+          void generateInzetvoorstel(inzetvoorstel?.extended || false);
+        }
+      }
+    };
+
+    // Luister naar statusEventBus events
+    statusEventBus.on('statusChanged', handleStatusChanged);
+    
+    // Luister naar unitStatusChanged events
+    window.addEventListener('unitStatusChanged', handleUnitStatusChanged as EventListener);
+    
+    // Luister naar unitArrivedAtStation events (voertuig aangekomen op kazerne)
+    window.addEventListener('unitArrivedAtStation', handleUnitArrivedAtStation as EventListener);
+    
+    return () => {
+      statusEventBus.off('statusChanged', handleStatusChanged);
+      window.removeEventListener('unitStatusChanged', handleUnitStatusChanged as EventListener);
+      window.removeEventListener('unitArrivedAtStation', handleUnitArrivedAtStation as EventListener);
+    };
+  }, [showInzetvoorstel, selectedIncident, inzetvoorstel]);
+
+  // Load A1 Waterweg units from rooster data
+  useEffect(() => {
+    const loadA1Units = async () => {
+      try {
+        const response = await fetch('/attached_assets/rooster_eenheden_per_team_detailed_1751227112307.json');
+        if (response.ok) {
+          const roosterData = await response.json();
+          const a1TeamUnits = roosterData['Basisteam Waterweg (A1)'] || [];
+          
+          const processedUnits = a1TeamUnits.map((unit: any) => ({
+            id: `a1-${unit.roepnummer}`,
+            roepnummer: unit.roepnummer,
+            aantal_mensen: unit.aantal_mensen,
+            rollen: Array.isArray(unit.rollen) ? unit.rollen : [unit.rollen],
+            soort_auto: unit.soort_auto,
+            team: 'Basisteam Waterweg (A1)',
+            status: unit.primair ? getDefaultStatus().afkorting : 'bd', // Primair: kz, anders: bd (buiten dienst)
+            locatie: 'Basisteam Waterweg, Delftseveerweg 40, Vlaardingen',
+            incident: '',
+            coordinates: [4.34367832, 51.91387332], // Bureau coordinates [lng, lat]
+            type: unit.soort_auto || 'BPV-auto',
+            primair: unit.primair,
+            kans_in_dienst: unit.kans_in_dienst
+          }));
+
+          setA1Units(processedUnits);
+          console.log('🚔 GMS2: A1 Waterweg units loaded:', processedUnits.length);
+        }
+      } catch (error) {
+        console.error('Failed to load A1 units:', error);
+      }
+    };
+
+    loadA1Units();
+  }, []);
+
+  // Initialize kazernes for Map component (synchroon met map.tsx)
+  useEffect(() => {
+    let cancelled = false;
+
+    const initializeKazernes = async () => {
+      try {
+        console.log('🔄 GMS2 Map: Automatisch geocoderen van alle kazernes...');
+        const kazernesMetCoords = await initKazernes(
+          (done, total, current) => {
+            if (!cancelled) {
+              // Progress callback (optioneel)
+            }
+          }
+        );
+
+        if (!cancelled) {
+          setGeocodeerdeKazernes(kazernesMetCoords);
+          console.log(`✅ GMS2 Map: ${kazernesMetCoords.length} kazernes geladen`);
+        }
+      } catch (error) {
+        console.error('❌ GMS2 Map: Fout bij initialiseren kazernes:', error);
+      }
+    };
+
+    initializeKazernes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Synchronize eenheden from global positions (synchroon met map.tsx)
+  useEffect(() => {
+    const updateFromGlobalPositions = () => {
+      const globalPositions = getUnitPositions();
+      
+      if (globalPositions.size === 0) return;
+      
+      setMapEenheden((prev) => {
+        const updated: Eenheid[] = [];
+        const seen = new Set<string>();
+        
+        globalPositions.forEach((position, roepnummer) => {
+          seen.add(roepnummer);
+          const existing = prev.find(e => e.id === roepnummer || e.naam === roepnummer);
+          
+          updated.push({
+            id: roepnummer,
+            naam: roepnummer,
+            lat: position.lat,
+            lng: position.lng,
+            status: position.status === 'beschikbaar' ? 'beschikbaar' :
+                    position.status === 'onderweg' ? 'onderweg' :
+                    position.status === 'ter_plaatse' ? 'ter_plaatse' :
+                    'beschikbaar',
+          });
+        });
+        
+        return updated;
+      });
+    };
+
+    updateFromGlobalPositions();
+
+    const handlePositionUpdate = (e: CustomEvent) => {
+      updateFromGlobalPositions();
+    };
+
+    window.addEventListener('unitPositionsUpdated', handlePositionUpdate as EventListener);
+    window.addEventListener('unitMovementStarted', handlePositionUpdate as EventListener);
+
+    const interval = setInterval(updateFromGlobalPositions, 1000);
+
+    return () => {
+      window.removeEventListener('unitPositionsUpdated', handlePositionUpdate as EventListener);
+      window.removeEventListener('unitMovementStarted', handlePositionUpdate as EventListener);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Convert geocodeerde kazernes to Kazerne format for Map component
+  const kazernes: Kazerne[] = useMemo(() => {
+    if (geocodeerdeKazernes.length === 0) return [];
+
+    return geocodeerdeKazernes
+      .filter((k) => {
+        const isValid = Number.isFinite(k.lat) && Number.isFinite(k.lng) && k.lat !== 0 && k.lng !== 0;
+        return isValid;
+      })
+      .map((k) => {
+        // Find voertuigen from kazernesData
+        const kazerneData = kazernesData.find((kd: any) => kd.id === k.id);
+        
+        return {
+          id: k.id,
+          naam: k.naam,
+          adres: k.adres,
+          postcode: k.postcode,
+          plaats: k.plaats,
+          type: k.type || undefined,
+          telefoonnummer: k.telefoonnummer || undefined,
+          email: k.email || undefined,
+          capaciteit: k.capaciteit,
+          actief: k.actief,
+          latitude: k.lat.toString(),
+          longitude: k.lng.toString(),
+          regio: k.regio || undefined,
+          voertuigen: kazerneData?.voertuigen || undefined,
+        };
+      });
+  }, [geocodeerdeKazernes, kazernesData]);
+
+  // Convert GMS2 incidents to Map format
+  const mapIncidenten: MapGmsIncident[] = useMemo(() => {
+    return incidents
+      .filter(inc => inc.coordinates && Array.isArray(inc.coordinates) && inc.coordinates.length === 2)
+      .map(inc => ({
+        id: inc.id,
+        nr: inc.nr,
+        prio: inc.prio,
+        tijd: inc.tijd,
+        mc: inc.mc,
+        locatie: inc.locatie,
+        plaats: inc.plaats,
+        straatnaam: inc.straatnaam,
+        huisnummer: inc.huisnummer,
+        postcode: inc.postcode,
+        plaatsnaam: inc.plaatsnaam,
+        coordinates: inc.coordinates,
+        mc1: inc.mc1,
+        mc2: inc.mc2,
+        mc3: inc.mc3,
+        status: inc.status,
+        melderNaam: inc.melderNaam,
+        assignedUnits: inc.assignedUnits,
+      }));
+  }, [incidents]);
+
   // Auto-selection disabled to ensure "Nieuw" workflow works correctly
   // No automatic incident selection - user must manually select incidents
 
@@ -162,27 +660,40 @@ export default function GMS2() {
     };
 
     loadLMCClassifications();
+    
+    // Laad ook MAR mappings voor inzetvoorstellen
+    loadMarMappings();
   }, []);
 
-  // Load karakteristieken database
+  // Load karakteristieken database from JSON file
   useEffect(() => {
     const loadKarakteristieken = async () => {
       try {
-        const response = await fetch('/api/karakteristieken');
+        const response = await fetch('/karakteristieken.json');
         const data = await response.json();
-        setKarakteristiekenDatabase(data);
-        console.log('Loaded karakteristieken database:', data.length, 'entries');
+        
+        // Transform field names from snake_case to camelCase
+        const transformedData = data.map((k: any) => ({
+          ktNaam: k.kt_naam || '',
+          ktType: k.kt_type || '',
+          ktWaarde: k.kt_waarde || null,
+          ktCode: k.kt_code || null,
+          ktParser: k.kt_parser || null
+        }));
+        
+        setKarakteristiekenDatabase(transformedData);
+        console.log('✅ Loaded karakteristieken from JSON:', transformedData.length, 'entries');
 
         // Debug: Show sample codes
-        if (data.length > 0) {
-          console.log('📋 Sample karakteristieken codes:', data.slice(0, 10).map(k => ({
+        if (transformedData.length > 0) {
+          console.log('📋 Sample karakteristieken codes:', transformedData.slice(0, 10).map(k => ({
             code: k.ktCode,
             naam: k.ktNaam,
             type: k.ktType
           })));
 
           // Check specifically for ovdp-related codes
-          const ovdpCodes = data.filter(k => 
+          const ovdpCodes = transformedData.filter(k => 
             k.ktCode && k.ktCode.toLowerCase().includes('ovdp') ||
             k.ktNaam && k.ktNaam.toLowerCase().includes('ovdp')
           );
@@ -193,12 +704,75 @@ export default function GMS2() {
           }
         }
       } catch (error) {
-        console.error('Error loading karakteristieken:', error);
+        console.error('❌ Error loading karakteristieken from JSON:', error);
       }
     };
 
     loadKarakteristieken();
   }, []);
+
+  // Load BRW units dataset once for linking in IV
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/data/brw_eenheden_structured.json');
+        if (!res.ok) return;
+        const ds = await res.json();
+        let overrides: Record<string, string> = {};
+        try {
+          const raw = localStorage.getItem('brwStatusOverrides');
+          if (raw) overrides = JSON.parse(raw);
+        } catch {}
+        const map: Record<string, any> = {};
+        Object.entries(ds || {}).forEach(([rn, v]: any) => {
+          map[rn] = {
+            roepnummer: rn,
+            gmsNaam: v?.["GMS-naam"] || '',
+            post: v?.post || '',
+            rollen: Array.isArray(v?.["inzetrollen GMS"]) ? v["inzetrollen GMS"] : [],
+            alternatieven: Array.isArray(v?.["alternatief benaming"]) ? v["alternatief benaming"] : [],
+            status: overrides[rn] ?? getDefaultStatus().afkorting // Default naar "kz" (op kazerne)
+          };
+        });
+        setBrwUnitsMap(map);
+      } catch {}
+    };
+    load();
+  }, []);
+
+  const isBrwUnitAssigned = (roepnummer: string): boolean => {
+    return !!selectedIncident?.assignedUnits?.some(u => u.roepnummer === roepnummer);
+  };
+
+  const toggleAssignBrwUnit = (roepnummer: string) => {
+    if (!selectedIncident) {
+      addSystemLoggingEntry('❌ Geen incident geselecteerd voor koppelen van eenheid');
+      return;
+    }
+
+    const unit = brwUnitsMap[roepnummer];
+    const soort_voertuig = unit?.gmsNaam || (unit?.rollen?.[0] || 'BRW-eenheid');
+
+    const already = selectedIncident.assignedUnits?.some(u => u.roepnummer === roepnummer);
+    let updatedAssigned = Array.isArray(selectedIncident.assignedUnits) ? [...selectedIncident.assignedUnits] : [];
+    if (already) {
+      updatedAssigned = updatedAssigned.filter(u => u.roepnummer !== roepnummer);
+      addSystemLoggingEntry(`🧹 Eenheid ${roepnummer} ontkoppeld van incident #${selectedIncident.nr}`);
+    } else {
+      const now = new Date().toTimeString().slice(0, 5);
+      updatedAssigned.push({ 
+        roepnummer, 
+        soort_voertuig, 
+        huidige_status: 'ov', // Opdracht verstrekt
+        ov_tijd: now 
+      });
+      addSystemLoggingEntry(`🧩 Eenheid ${roepnummer} gekoppeld aan incident #${selectedIncident.nr} - Status: OV`);
+    }
+
+    const updatedIncident = { ...selectedIncident, assignedUnits: updatedAssigned } as any;
+    setSelectedIncident(updatedIncident);
+    setIncidents(prev => prev.map(inc => inc.id === updatedIncident.id ? updatedIncident : inc));
+  };
 
   // Initialize dropdowns when classifications are loaded
   useEffect(() => {
@@ -226,6 +800,35 @@ export default function GMS2() {
   const handleIncidentSelect = (incident: GmsIncident) => {
     console.log(`📋 Selecting incident ${incident.nr} for editing`);
 
+    // Zoom naar incidentlocatie op de kaart
+    if (incident.coordinates) {
+      zoomToIncident(incident.coordinates);
+    }
+
+    // Reset all PROC checkboxes first
+    const procCheckboxes = [
+      'persvoorlichting',
+      'tev-piket', 
+      'officier-dienst',
+      'bvt',
+      'hovj',
+      'verkeersongevallenanalyse',
+      'coordinatie-centrum',
+      'forensische-opsporing',
+      'fo-piket-rotterdam'
+    ];
+    
+    procCheckboxes.forEach(id => {
+      const checkbox = document.getElementById(id) as HTMLInputElement;
+      if (checkbox) {
+        checkbox.checked = false;
+      }
+    });
+
+    // Reset auto-check flag and checkbox state
+    setShouldAutoCheckFOPiket(false);
+    setFoPiketChecked(false);
+
     // Set selected incident first
     setSelectedIncident(incident);
     
@@ -238,9 +841,28 @@ export default function GMS2() {
       const classificatie = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || "Onbekend";
       const adres = incident.locatie || "Adres onbekend";
       const plaats = incident.plaatsnaam || incident.plaats || "Plaats onbekend";
-      const incidentNummer = incident.nr || "000000";
+      const roepnummers = incident.assignedUnits?.length ? incident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
       
-      return `${prio} ${classificatie} ${adres} ${plaats} ICNUM ${incidentNummer}`;
+      // Check for gespreksgroep karakteristiek (code "gg")
+      const gespreksgroepKarakteristiek = incident.karakteristieken?.find(
+        k => k.ktCode === 'gg' || k.ktCode === 'GG'
+      );
+      
+      // Use gespreksgroep waarde if available, otherwise use default "1"
+      const kanaalOfGroep = gespreksgroepKarakteristiek?.waarde 
+        ? gespreksgroepKarakteristiek.waarde.toUpperCase()
+        : "1";
+      
+      const parts = [
+        `P${prio}`,
+        kanaalOfGroep,
+        classificatie,
+        adres.toUpperCase(),
+        plaats.toUpperCase(),
+        roepnummers
+      ].filter(part => part && part.trim() !== "");
+      
+      return parts.join(" ");
     };
 
     // Set pager text automatically
@@ -261,11 +883,14 @@ export default function GMS2() {
         straatnaam: incident.straatnaam || "",
         postcode: incident.postcode || "",
         plaatsnaam: incident.plaatsnaam || "",
+        object: incident.object || "",
         functie: incident.functie || "",
-        roepnummer: assignedRoepnummers
+        roepnummer: assignedRoepnummers,
+        coordinates: incident.coordinates || null
       };
 
       console.log(`📋 Loading incident data into form:`, incidentFormData);
+      console.log(`📋 Incident coordinates:`, incident.coordinates);
       setFormData(incidentFormData);
 
       // Set MC classifications immediately and ensure they persist
@@ -288,9 +913,46 @@ export default function GMS2() {
       // Load karakteristieken if available
       if (incident.karakteristieken && Array.isArray(incident.karakteristieken)) {
         setSelectedKarakteristieken(incident.karakteristieken);
+        
+        // Debug: Log all karakteristieken to see what's available
+        console.log('🔍 Incident karakteristieken:', incident.karakteristieken?.map(k => ({ name: k.ktNaam, code: k.ktCode })));
+        
+        // Check if incident has "Inzet Pol recherche FO" karakteristiek and auto-check FO piket Rotterdam
+        const hasInzetPolRechercheFO = incident.karakteristieken?.some(k => 
+          k.ktNaam === 'Inzet Pol recherche FO' ||
+          k.ktNaam === 'Inzet Pol Recherche FO' ||
+          k.ktNaam === 'inzet pol recherche fo' ||
+          k.ktNaam === 'Inzet Pol recherche' ||
+          k.ktNaam?.toLowerCase().includes('inzet pol recherche') ||
+          k.ktCode === 'ipr' ||
+          k.ktCode === 'IPR'
+        );
+        
+        if (hasInzetPolRechercheFO) {
+          console.log('🕵️ Incident has "Inzet Pol recherche FO" karakteristiek - auto-checking FO piket');
+          addSystemLoggingEntry('🕵️ Incident geladen met Inzet Pol recherche FO - FO piket Rotterdam automatisch aangevinkt');
+          setFoPiketChecked(true);
+          
+          // Also add capcode to pager text if not already present
+          setPagerText(prev => {
+            if (!prev.includes('1430100')) {
+              const newText = prev + " 1430100";
+              console.log('📝 Adding capcode 1430100 to pager text:', newText);
+              return newText;
+            }
+            return prev;
+          });
+        } else {
+          setShouldAutoCheckFOPiket(false);
+        }
       } else {
         setSelectedKarakteristieken([]);
       }
+      
+      // Reset inzetvoorstel view when selecting a different incident
+      // This ensures old inzetvoorstel doesn't persist from previous incident
+      setShowInzetvoorstel(false);
+      setInzetvoorstel(null);
 
       // Load logging history if available - IMPORTANT: Clear first, then load
       setLoggingEntries([]); // Clear any existing entries first
@@ -384,7 +1046,7 @@ export default function GMS2() {
   };
 
   // Handle "Update" button click for existing incidents
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (selectedIncident) {
       const now = new Date();
       const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -424,6 +1086,23 @@ export default function GMS2() {
         ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
         : formData.straatnaam?.toUpperCase() || "";
 
+      // Auto-geocode if address exists but no coordinates
+      let finalCoordinates = formData.coordinates;
+      if (!finalCoordinates && formData.straatnaam && formData.plaatsnaam) {
+        console.log(`🔄 Auto-geocoding: ${formData.straatnaam} ${formData.huisnummer || ''}, ${formData.plaatsnaam}`);
+        try {
+          const geocodeQuery = `${formData.straatnaam} ${formData.huisnummer || ''} ${formData.plaatsnaam}`.trim();
+          const results = await searchBAGAddress(geocodeQuery);
+          if (results.length > 0 && results[0].coordinates) {
+            finalCoordinates = results[0].coordinates;
+            console.log(`✅ Auto-geocoded: [${finalCoordinates[0]}, ${finalCoordinates[1]}]`);
+            addSystemLoggingEntry(`📍 Locatie automatisch gegeocodeerd: [${finalCoordinates[0].toFixed(4)}, ${finalCoordinates[1].toFixed(4)}]`);
+          }
+        } catch (error) {
+          console.error('Auto-geocoding failed:', error);
+        }
+      }
+
       const updatedIncident: GmsIncident = {
         ...selectedIncident,
         prio: priorityValue,
@@ -439,6 +1118,8 @@ export default function GMS2() {
         postcode: formData.postcode,
         plaatsnaam: formData.plaatsnaam,
         gemeente: formData.gemeente,
+        coordinates: finalCoordinates,
+        object: formData.object,
         functie: formData.functie,
         mc1: currentMC1,
         mc2: currentMC2,
@@ -448,6 +1129,8 @@ export default function GMS2() {
         meldingslogging: loggingEntries.map(entry => `${entry.timestamp} ${entry.message}`).join('\n'),
         prioriteit: priorityValue
       };
+
+      console.log(`💾 Saving incident with coordinates:`, updatedIncident.coordinates);
 
       // Update state variables to match what we just saved
       setSelectedMC1(currentMC1);
@@ -467,7 +1150,7 @@ export default function GMS2() {
   };
 
   // Handle "Uitgifte" button click
-  const handleUitgifte = () => {
+  const handleUitgifte = async () => {
     const now = new Date();
     const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const newIncidentNumber = getNextIncidentNumber();
@@ -495,6 +1178,23 @@ export default function GMS2() {
       ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
       : formData.straatnaam?.toUpperCase() || "";
 
+    // Auto-geocode if address exists but no coordinates
+    let finalCoordinates = formData.coordinates;
+    if (!finalCoordinates && formData.straatnaam && formData.plaatsnaam) {
+      console.log(`🔄 Auto-geocoding bij Uitgifte: ${formData.straatnaam} ${formData.huisnummer || ''}, ${formData.plaatsnaam}`);
+      try {
+        const geocodeQuery = `${formData.straatnaam} ${formData.huisnummer || ''} ${formData.plaatsnaam}`.trim();
+        const results = await searchBAGAddress(geocodeQuery);
+        if (results.length > 0 && results[0].coordinates) {
+          finalCoordinates = results[0].coordinates;
+          console.log(`✅ Auto-geocoded bij Uitgifte: [${finalCoordinates[0]}, ${finalCoordinates[1]}]`);
+          addSystemLoggingEntry(`📍 Locatie automatisch gegeocodeerd: [${finalCoordinates[0].toFixed(4)}, ${finalCoordinates[1].toFixed(4)}]`);
+        }
+      } catch (error) {
+        console.error('Auto-geocoding failed bij Uitgifte:', error);
+      }
+    }
+
     const newIncident: GmsIncident = {
       id: Date.now(),
       nr: newIncidentNumber,
@@ -514,6 +1214,8 @@ export default function GMS2() {
       postcode: formData.postcode,
       plaatsnaam: formData.plaatsnaam,
       gemeente: formData.gemeente,
+      coordinates: finalCoordinates,
+      object: formData.object,
       functie: formData.functie,
       mc1: selectedMC1,
       mc2: selectedMC2,
@@ -525,6 +1227,8 @@ export default function GMS2() {
       tijdstip: new Date().toISOString(),
       prioriteit: priorityValue
     };
+    
+    console.log(`💾 Nieuwe melding aangemaakt met coordinates:`, finalCoordinates);
 
     // Generate automatic pager text for new incident
     const generatePagerText = (incident: GmsIncident) => {
@@ -532,9 +1236,28 @@ export default function GMS2() {
       const classificatie = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || "Onbekend";
       const adres = incident.locatie || "Adres onbekend";
       const plaats = incident.plaatsnaam || incident.plaats || "Plaats onbekend";
-      const incidentNummer = incident.nr || "000000";
+      const roepnummers = incident.assignedUnits?.length ? incident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
       
-      return `${prio} ${classificatie} ${adres} ${plaats} ICNUM ${incidentNummer}`;
+      // Check for gespreksgroep karakteristiek (code "gg")
+      const gespreksgroepKarakteristiek = incident.karakteristieken?.find(
+        k => k.ktCode === 'gg' || k.ktCode === 'GG'
+      );
+      
+      // Use gespreksgroep waarde if available, otherwise use default "1"
+      const kanaalOfGroep = gespreksgroepKarakteristiek?.waarde 
+        ? gespreksgroepKarakteristiek.waarde.toUpperCase()
+        : "1";
+      
+      const parts = [
+        `P${prio}`,
+        kanaalOfGroep,
+        classificatie,
+        adres.toUpperCase(),
+        plaats.toUpperCase(),
+        roepnummers
+      ].filter(part => part && part.trim() !== "");
+      
+      return parts.join(" ");
     };
 
     // Set pager text for new incident
@@ -542,6 +1265,16 @@ export default function GMS2() {
 
     // Add to incidents list (at the beginning for newest first)
     setIncidents(prev => [newIncident, ...prev]);
+    
+    // Dispatch custom event voor real-time map updates
+    window.dispatchEvent(new CustomEvent('gms2IncidentsUpdated'));
+
+    // Zoom naar nieuwe incidentlocatie op de kaart
+    if (finalCoordinates) {
+      setTimeout(() => {
+        zoomToIncident(finalCoordinates);
+      }, 100); // Kleine delay om ervoor te zorgen dat de map klaar is
+    }
 
     // Clear selected incident so "Uitgifte" button stays for next incident
     setSelectedIncident(null);
@@ -563,78 +1296,282 @@ export default function GMS2() {
     if (mc3Select) mc3Select.innerHTML = '<option value="">Selecteer MC3...</option>';
   };
 
+  // Update ref when handleUitgifte is defined (runs after handleUitgifte is defined)
+  useEffect(() => {
+    handleUitgifteRef.current = handleUitgifte;
+  });
+
   // Handle "Archiveer" button click
   const handleArchiveer = async () => {
-    if (selectedIncident) {
-      // Update status of all assigned units to "1 - Beschikbaar/vrij" with "vr" time
-      if (selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0) {
-        const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
-        
-        // First update the assigned units with "vr" time before archiving
-        const updatedAssignedUnits = selectedIncident.assignedUnits.map(unit => ({
-          ...unit,
-          vr_tijd: currentTime
-        }));
+    if (!selectedIncident) {
+      return;
+    }
 
-        const updatedIncidentWithTimes = {
-          ...selectedIncident,
-          assignedUnits: updatedAssignedUnits
-        };
+    const assignedUnits = selectedIncident.assignedUnits || [];
+    const currentTime = new Date().toTimeString().slice(0, 5);
+    const globalPositions = getUnitPositions();
+    let positionsChanged = false;
 
-        setSelectedIncident(updatedIncidentWithTimes);
+    const processedUnits: Array<{
+      roepnummer: string;
+      normalized: string;
+      kazerneNaam?: string;
+      movementStarted: boolean;
+    }> = [];
+    const unitsAwaitingArrival = new Set<string>();
 
-        try {
-          // Get all police units to find the ones that need updating
-          const response = await fetch('/api/police-units');
-          if (response.ok) {
-            const allUnits = await response.json();
-            
-            // Update each assigned unit's status
-            for (const assignedUnit of selectedIncident.assignedUnits) {
-              const unitToUpdate = allUnits.find((unit: any) => unit.roepnummer === assignedUnit.roepnummer);
-              
-              if (unitToUpdate) {
-                const updatedUnit = {
-                  ...unitToUpdate,
-                  status: "1 - Beschikbaar/vrij",
-                  incident: ""
-                };
+    const findKazerneCoordsForUnit = (roepnummer: string) => {
+      const normalizedRoepnummer = normalizeRoepnummer(roepnummer);
+      let kazerneMatch: any | undefined;
 
-                await fetch(`/api/police-units/${unitToUpdate.id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(updatedUnit),
-                });
-
-                console.log(`✅ Eenheid ${assignedUnit.roepnummer} status automatisch gewijzigd naar "1 - Beschikbaar/vrij" na archivering om ${currentTime}`);
-              }
-            }
-
-            addLoggingEntry(`📋 Incident gearchiveerd - ${selectedIncident.assignedUnits.length} eenhe${selectedIncident.assignedUnits.length === 1 ? 'id' : 'den'} vrijgegeven`);
-          }
-        } catch (error) {
-          console.error('Error updating unit statuses after archiving:', error);
-          addLoggingEntry(`⚠️ Fout bij vrijgeven eenheden na archivering`);
+      for (const kazerne of kazernesData || []) {
+        if (!kazerne?.voertuigen || kazerne.voertuigen.length === 0) continue;
+        if (kazerne.voertuigen.some((voertuig: any) => normalizeRoepnummer(voertuig.roepnummer) === normalizedRoepnummer)) {
+          kazerneMatch = kazerne;
+          break;
         }
       }
 
-      const updatedIncident = {
-        ...selectedIncident,
-        status: "Gearchiveerd"
+      if (!kazerneMatch) {
+        return null;
+      }
+
+      const geocodeerdeMatch = geocodeerdeKazernes.find(k => k.id === kazerneMatch.id);
+      const lat = Number(geocodeerdeMatch?.lat ?? kazerneMatch.lat ?? kazerneMatch.latitude);
+      const lng = Number(geocodeerdeMatch?.lng ?? kazerneMatch.lng ?? kazerneMatch.longitude);
+
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        return null;
+      }
+
+      return {
+        lat,
+        lng,
+        naam: geocodeerdeMatch?.naam || kazerneMatch.naam || kazerneMatch.plaats || undefined,
       };
+    };
 
-      // Update incident in list
-      setIncidents(prev => prev.map(inc => 
-        inc.id === selectedIncident.id ? updatedIncident : inc
-      ));
+    const getUnitCoordinates = (roepnummer: string) => {
+      const normalized = normalizeRoepnummer(roepnummer);
+      const position = globalPositions.get(normalized);
+      if (position?.lat && position?.lng) {
+        return { lat: position.lat, lng: position.lng };
+      }
 
-      // Remove from openstaande incidenten by filtering out archived ones
-      setIncidents(prev => prev.filter(inc => inc.id !== selectedIncident.id));
+      const mapEenheid = mapEenheden.find(
+        (eenheid) =>
+          normalizeRoepnummer(eenheid.id) === normalized ||
+          normalizeRoepnummer(eenheid.naam) === normalized
+      );
 
-      // Select first remaining incident or clear selection
-      const remainingIncidents = incidents.filter(inc => inc.id !== selectedIncident.id);
-      setSelectedIncident(remainingIncidents.length > 0 ? remainingIncidents[0] : null);
+      if (mapEenheid) {
+        return { lat: mapEenheid.lat, lng: mapEenheid.lng };
+      }
+
+      if (selectedIncident.coordinates && selectedIncident.coordinates.length === 2) {
+        const [lng, lat] = selectedIncident.coordinates;
+        return { lat, lng };
+      }
+
+      return null;
+    };
+
+    for (const assignedUnit of assignedUnits) {
+      const roepnummer = assignedUnit.roepnummer;
+      if (!roepnummer) continue;
+
+      const normalized = normalizeRoepnummer(roepnummer);
+      const currentPosition = globalPositions.get(normalized) || getUnitPosition(roepnummer);
+      const currentStatusCode =
+        currentPosition?.statusCode?.toLowerCase() ||
+        assignedUnit.huidige_status?.toLowerCase();
+
+      if (currentStatusCode === 'kz') {
+        console.log(`ℹ️ Eenheid ${roepnummer} staat al op de kazerne, overslaan.`);
+        continue;
+      }
+
+      const kazerneInfo = findKazerneCoordsForUnit(roepnummer);
+      if (!kazerneInfo) {
+        console.warn(`⚠️ Geen kazerne gevonden voor ${roepnummer}. Status ongewijzigd.`);
+        continue;
+      }
+
+      const unitCoords = getUnitCoordinates(roepnummer);
+      if (!unitCoords) {
+        console.warn(`⚠️ Geen huidige positie gevonden voor ${roepnummer}.`);
+        continue;
+      }
+
+      let routeCalculated = true;
+      try {
+        const routeResult = await routingService.getRoute(
+          [unitCoords.lat, unitCoords.lng],
+          [kazerneInfo.lat, kazerneInfo.lng]
+        );
+        if (routeResult) {
+          console.log(
+            `🗺️ Route voor ${roepnummer}: ${(routeResult.distance / 1000).toFixed(1)} km, ${(routeResult.duration / 60).toFixed(1)} min`
+          );
+        }
+      } catch (routeError) {
+        routeCalculated = false;
+        console.warn(`⚠️ Routeberekening mislukt voor ${roepnummer}. Status blijft BS, geen automatische rit.`, routeError);
+      }
+
+      let positionToUpdate = globalPositions.get(normalized);
+      if (!positionToUpdate) {
+        positionToUpdate = {
+          roepnummer: normalized,
+          lat: unitCoords.lat,
+          lng: unitCoords.lng,
+          status: 'beschikbaar',
+          statusCode: 'bs',
+          activeIncidentId: selectedIncident.id,
+          lastUpdate: Date.now(),
+        } as any;
+        globalPositions.set(normalized, positionToUpdate);
+      }
+
+      if (routeCalculated) {
+        positionToUpdate.targetLat = kazerneInfo.lat;
+        positionToUpdate.targetLng = kazerneInfo.lng;
+        positionToUpdate.targetType = 'kazerne';
+        positionToUpdate.status = 'terug_naar_kazerne';
+        unitsAwaitingArrival.add(normalized);
+      } else {
+        positionToUpdate.targetLat = undefined;
+        positionToUpdate.targetLng = undefined;
+        positionToUpdate.targetType = undefined;
+        positionToUpdate.status = 'beschikbaar';
+      }
+
+      positionToUpdate.lastUpdate = Date.now();
+      positionToUpdate.activeIncidentId = selectedIncident.id;
+
+      updateVehicleStatus(positionToUpdate as any, 'bs', selectedIncident.id);
+      positionsChanged = true;
+
+      setUnitStatus(roepnummer, 'bs');
+
+      processedUnits.push({
+        roepnummer,
+        normalized,
+        kazerneNaam: kazerneInfo.naam,
+        movementStarted: routeCalculated,
+      });
     }
+
+    if (positionsChanged) {
+      saveUnitPositions(globalPositions);
+      window.dispatchEvent(
+        new CustomEvent('unitPositionsUpdated', {
+          detail: Object.fromEntries(globalPositions),
+        })
+      );
+    }
+
+    if (unitsAwaitingArrival.size > 0) {
+      const arrivalListener = ((event: Event) => {
+        const detail = (event as CustomEvent).detail as { roepnummer?: string };
+        if (!detail?.roepnummer) return;
+
+        const normalized = normalizeRoepnummer(detail.roepnummer);
+        if (!unitsAwaitingArrival.has(normalized)) return;
+
+        setUnitStatus(detail.roepnummer, 'kz');
+        unitsAwaitingArrival.delete(normalized);
+
+        if (unitsAwaitingArrival.size === 0) {
+          window.removeEventListener('unitArrivedAtStation', arrivalListener);
+        }
+      }) as EventListener;
+
+      window.addEventListener('unitArrivedAtStation', arrivalListener);
+
+      setTimeout(() => {
+        window.removeEventListener('unitArrivedAtStation', arrivalListener);
+      }, 10 * 60 * 1000);
+    }
+
+    const processedSet = new Set(processedUnits.map((unit) => unit.normalized));
+    const updatedAssignedUnits = (selectedIncident.assignedUnits || []).map((unit) => {
+      const normalized = normalizeRoepnummer(unit.roepnummer);
+      if (!processedSet.has(normalized)) {
+        return unit;
+      }
+
+      return {
+        ...unit,
+        huidige_status: 'bs',
+        ir_tijd: unit.ir_tijd || currentTime,
+        bs_tijd: currentTime,
+      };
+    });
+
+    const incidentWithUpdatedUnits = {
+      ...selectedIncident,
+      assignedUnits: updatedAssignedUnits,
+    };
+
+    if (processedUnits.length > 0) {
+      try {
+        const response = await fetch('/api/police-units');
+        if (response.ok) {
+          const allUnits = await response.json();
+
+          for (const processed of processedUnits) {
+            const unitToUpdate = allUnits.find(
+              (unit: any) => normalizeRoepnummer(unit.roepnummer) === processed.normalized
+            );
+
+            if (unitToUpdate) {
+              const updatedUnit = {
+                ...unitToUpdate,
+                status: 'bs',
+                incident: '',
+              };
+
+              await fetch(`/api/police-units/${unitToUpdate.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedUnit),
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error updating unit statuses after archiving:', error);
+        addSystemLoggingEntry(`⚠️ Fout bij vrijgeven eenheden na archivering`);
+      }
+
+      const retourSamenvatting = processedUnits
+        .map((unit) => (unit.kazerneNaam ? `${unit.roepnummer}→${unit.kazerneNaam}` : unit.roepnummer))
+        .join(', ');
+
+      addSystemLoggingEntry(
+        `📦 Incident afgesloten - ${processedUnits.length} eenhe${processedUnits.length === 1 ? 'id' : 'den'} retour (BS): ${retourSamenvatting}`
+      );
+    } else {
+      addSystemLoggingEntry(`📦 Incident afgesloten - geen actieve eenheden gevonden`);
+    }
+
+    const archivedIncident = {
+      ...incidentWithUpdatedUnits,
+      status: "Afgesloten"
+    };
+
+    setIncidents(prev => prev.map(inc => 
+      inc.id === archivedIncident.id ? archivedIncident : inc
+    ));
+
+    setIncidents(prev => prev.filter(inc => inc.id !== archivedIncident.id));
+    
+    window.dispatchEvent(new CustomEvent('gms2IncidentsUpdated'));
+    window.dispatchEvent(new CustomEvent('gms2IncidentArchived', { detail: archivedIncident }));
+
+    const remainingIncidents = incidents.filter(inc => inc.id !== archivedIncident.id);
+    setSelectedIncident(remainingIncidents.length > 0 ? remainingIncidents[0] : null);
   };
 
   // Handle "Nieuw" button click - Complete reset for new incident
@@ -658,8 +1595,10 @@ export default function GMS2() {
       straatnaam: "",
       postcode: "",
       plaatsnaam: "",
+      object: "",
       functie: "",
-      roepnummer: ""
+      roepnummer: "",
+      coordinates: null as [number, number] | null
     };
     setFormData(cleanFormData);
 
@@ -674,6 +1613,8 @@ export default function GMS2() {
     // STEP 4: Clear kladblok and logging IMMEDIATELY - NO ADDING ENTRIES
     setKladblokText(""); // Keep kladblok completely empty
     setLoggingEntries([]); // Complete immediate reset - no entries at all
+    setShowInzetvoorstel(false); // Clear inzetvoorstel view
+    setInzetvoorstel(null);
 
     // STEP 5: Force DOM elements to reset without delays
     const mc1Select = document.getElementById('gms2-mc1-select') as HTMLSelectElement;
@@ -716,6 +1657,11 @@ export default function GMS2() {
     console.log(`✅ New incident reset complete - session: ${newSessionId} - completely clean state`);
   };
 
+  // Update ref when handleNieuw is defined (runs after handleNieuw is defined)
+  useEffect(() => {
+    handleNieuwRef.current = handleNieuw;
+  });
+
   const addLoggingEntry = (message: string) => {
     const now = new Date();
     const dateStr = String(now.getDate()).padStart(2, '0');
@@ -732,6 +1678,29 @@ export default function GMS2() {
     };
 
     setLoggingEntries(prev => [newEntry, ...prev]);
+    
+    // Also add to logging tab entries for detailed logging view
+    setLoggingTabEntries(prev => [newEntry, ...prev]);
+  };
+
+  // Separate function for automatic system logging (only goes to Logging tab)
+  const addSystemLoggingEntry = (message: string) => {
+    const now = new Date();
+    const dateStr = String(now.getDate()).padStart(2, '0');
+    const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+    const yearStr = now.getFullYear();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const timestamp = `${dateStr}:${monthStr} ${yearStr} ${timeStr} OC RTD`;
+
+    const newEntry = {
+      id: Date.now(),
+      timestamp,
+      message: message.trim()
+    };
+
+    // Only add to logging tab entries (not to hist-meldblok)
+    setLoggingTabEntries(prev => [newEntry, ...prev]);
   };
 
   // Handle Werkplek popup window
@@ -919,30 +1888,85 @@ export default function GMS2() {
     }
   };
 
-  // Function to update unit status times based on status changes
-  const updateUnitStatusTime = (roepnummer: string, newStatus: string) => {
+  // Function to set unit status (gebruikt centrale statusmodule)
+  const setUnitStatus = (roepnummer: string, statusCode: string) => {
     if (!selectedIncident || !selectedIncident.assignedUnits) return;
 
     const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM format
     
+    // Map "ar" naar "ut" voor interne opslag (AR kolom toont UT status)
+    const internalStatusCode = statusCode === 'ar' ? 'ut' : statusCode;
+    
     const updatedAssignedUnits = selectedIncident.assignedUnits.map(unit => {
       if (unit.roepnummer === roepnummer) {
-        const updatedUnit = { ...unit };
+        const updatedUnit: AssignedUnit = { 
+          ...unit,
+          huidige_status: internalStatusCode // Nieuwe status actief (gebruik interne code)
+        };
         
-        // Update specific time field based on status
-        switch (newStatus) {
-          case "2 - Aanrijdend":
-            updatedUnit.ar_tijd = currentTime;
+        // Behoud alle bestaande tijden - wis ze NIET
+        // Alleen zet tijd voor nieuwe status als deze nog niet bestaat
+        // Voor UT (AR): zet altijd tijd als status naar UT gaat (ook als er al een tijd was)
+        const oldStatus = unit.huidige_status;
+        switch (internalStatusCode) {
+          case 'ov':
+            if (!updatedUnit.ov_tijd) {
+              updatedUnit.ov_tijd = currentTime;
+            }
             break;
-          case "3 - Ter plaatse":
-            updatedUnit.tp_tijd = currentTime;
+          case 'ut': // AR kolom toont UT status
+            // Zet altijd tijd wanneer status naar UT gaat (ook als er al een tijd was)
+            // Alleen als de oude status niet UT was, zet nieuwe tijd
+            if (!updatedUnit.ar_tijd || oldStatus !== 'ut') {
+              updatedUnit.ar_tijd = currentTime;
+            }
             break;
-          case "1 - Beschikbaar/vrij":
-            updatedUnit.vr_tijd = currentTime;
+          case 'tp':
+            if (!updatedUnit.tp_tijd) {
+              updatedUnit.tp_tijd = currentTime;
+            }
             break;
-          default:
+          case 'nb':
+            if (!updatedUnit.nb_tijd) {
+              updatedUnit.nb_tijd = currentTime;
+            }
+            break;
+          case 'ir':
+            if (!updatedUnit.ir_tijd) {
+              updatedUnit.ir_tijd = currentTime;
+            }
+            break;
+          case 'bs':
+            if (!updatedUnit.bs_tijd) {
+              updatedUnit.bs_tijd = currentTime;
+            }
+            break;
+          case 'kz':
+            if (!updatedUnit.kz_tijd) {
+              updatedUnit.kz_tijd = currentTime;
+            }
+            break;
+          case 'vr':
+            if (!updatedUnit.vr_tijd) {
+              updatedUnit.vr_tijd = currentTime;
+            }
+            break;
+          case 'fd':
+            if (!updatedUnit.fd_tijd) {
+              updatedUnit.fd_tijd = currentTime;
+            }
+            break;
+          case 'GA':
+            if (!updatedUnit.ga_tijd) {
+              updatedUnit.ga_tijd = currentTime;
+            }
             break;
         }
+        
+        // Gebruik centrale statusmodule
+        setUnitStatusCentral(updatedUnit, internalStatusCode, {
+          incidentId: selectedIncident.id
+        });
         
         return updatedUnit;
       }
@@ -959,7 +1983,41 @@ export default function GMS2() {
       inc.id === updatedIncident.id ? updatedIncident : inc
     ));
 
-    console.log(`⏰ Status tijd bijgewerkt voor ${roepnummer}: ${newStatus} om ${currentTime}`);
+    // Trigger update voor database
+    updateSelectedIncident(updatedIncident);
+
+    const statusNamen: Record<string, string> = {
+      'ov': 'Opdracht verstrekt',
+      'ut': 'Uitgerukt',
+      'ar': 'Aanrijdend', // UI naam voor UT
+      'tp': 'Ter plaatse',
+      'nb': 'Niet bezet',
+      'ir': 'Ingerukt',
+      'bs': 'Beschikbaar',
+      'kz': 'Op kazerne',
+      'vr': 'Vrij',
+      'fd': 'Buiten dienst',
+      'GA': 'Spraakaanvraag'
+    };
+
+    console.log(`⏰ Status bijgewerkt voor ${roepnummer}: ${statusNamen[statusCode] || statusCode} om ${currentTime}`);
+    addSystemLoggingEntry(`📊 ${roepnummer}: ${statusNamen[statusCode] || statusCode} (${currentTime})`);
+  };
+
+  // Function to update unit status times based on status changes (legacy support)
+  const updateUnitStatusTime = (roepnummer: string, newStatus: string) => {
+    // Map oude status strings naar nieuwe codes
+    const statusMap: Record<string, string> = {
+      "2 - Aanrijdend": "ar",
+      "3 - Ter plaatse": "tp",
+      // Legacy mapping voor backwards compatibility
+      "1 - Beschikbaar/vrij": "bs",
+      "4 - Niet inzetbaar": "fd",
+      "5 - Afmelden": "kz"
+    };
+    
+    const statusCode = statusMap[newStatus] || newStatus.toLowerCase();
+    setUnitStatus(roepnummer, statusCode);
   };
 
   // Function to update selected incident from external components
@@ -1011,7 +2069,7 @@ export default function GMS2() {
           const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
           const assignedCount = updatedIncident.assignedUnits?.length || 0;
           
-          addLoggingEntry(`🚔 Eenheden bijgewerkt: ${assignedCount} eenhe${assignedCount === 1 ? 'id' : 'den'} gekoppeld`);
+          addSystemLoggingEntry(`🚔 Eenheden bijgewerkt: ${assignedCount} eenhe${assignedCount === 1 ? 'id' : 'den'} gekoppeld`);
         } else {
           console.error('Failed to save incident assignments to database');
         }
@@ -1029,7 +2087,185 @@ export default function GMS2() {
     (window as any).gms2Incidents = incidents;
     (window as any).updateSelectedIncident = updateSelectedIncident;
     (window as any).updateUnitStatusTime = updateUnitStatusTime;
+    (window as any).setUnitStatus = setUnitStatus;
   }, [selectedIncident, incidents]);
+
+  // Automatische statusafhandeling op basis van beweging en incidenten
+  useEffect(() => {
+    if (!selectedIncident || !selectedIncident.assignedUnits || selectedIncident.assignedUnits.length === 0) {
+      return;
+    }
+
+    // Luister naar statuswijzigingen van globalUnitMovement service
+    const handleUnitStatusChanged = (event: CustomEvent) => {
+      const { roepnummer, oldStatusCode, newStatusCode, incidentId } = event.detail;
+      
+      console.log(`📥 GMS2 ontvangt unitStatusChanged event:`, { roepnummer, oldStatusCode, newStatusCode, incidentId, selectedIncidentId: selectedIncident?.id });
+      
+      // Normaliseer roepnummer voor matching (zoals in globalUnitMovement)
+      const normalizeRoepnummer = (rn: string) => {
+        if (!rn) return '';
+        let normalized = rn.trim().toLowerCase();
+        normalized = normalized.replace(/\s+/g, '-');
+        if (/^\d{6}$/.test(normalized)) {
+          normalized = normalized.slice(0, 2) + '-' + normalized.slice(2);
+        }
+        return normalized;
+      };
+      
+      const normalizedEventRoepnummer = normalizeRoepnummer(roepnummer);
+      
+      // Check of deze eenheid bij het geselecteerde incident hoort
+      const unit = selectedIncident.assignedUnits?.find(u => {
+        const normalizedUnitRoepnummer = normalizeRoepnummer(u.roepnummer);
+        // Exacte match op genormaliseerd roepnummer
+        if (normalizedUnitRoepnummer === normalizedEventRoepnummer) return true;
+        // Fallback: probeer exacte match
+        if (u.roepnummer === roepnummer) return true;
+        // Fallback: case-insensitive match
+        if (u.roepnummer.toLowerCase() === roepnummer.toLowerCase()) return true;
+        // Fallback: zonder spaties/strepjes
+        const uClean = u.roepnummer.replace(/[\s-]/g, '').toLowerCase();
+        const rClean = roepnummer.replace(/[\s-]/g, '').toLowerCase();
+        return uClean === rClean;
+      });
+      
+      if (!unit) {
+        console.log(`⚠️ Eenheid ${roepnummer} (genormaliseerd: ${normalizedEventRoepnummer}) niet gevonden in assignedUnits. Beschikbare eenheden:`, 
+          selectedIncident.assignedUnits?.map(u => `${u.roepnummer} (${normalizeRoepnummer(u.roepnummer)})`));
+        return; // Eenheid niet bij dit incident
+      }
+      
+      if (incidentId && incidentId !== selectedIncident.id) {
+        console.log(`⚠️ Incident ID mismatch bij statusChanged: event=${incidentId}, selected=${selectedIncident.id}`);
+        return; // Verkeerd incident
+      }
+
+      // Map interne statuscode naar UI code (ut -> ar voor AR kolom)
+      const uiStatusCode = newStatusCode === 'ut' ? 'ar' : newStatusCode;
+      
+      // Update status alleen als deze is veranderd
+      if (unit.huidige_status !== newStatusCode) {
+        console.log(`🔄 Update status voor ${unit.roepnummer}: ${unit.huidige_status || 'geen'} -> ${newStatusCode} (UI: ${uiStatusCode})`);
+        setUnitStatus(unit.roepnummer, uiStatusCode);
+      } else {
+        console.log(`⏭️ Status niet gewijzigd voor ${unit.roepnummer} (al ${newStatusCode})`);
+      }
+    };
+
+    // Luister naar movement events van de kaart
+    const handleUnitMovement = (event: CustomEvent) => {
+      const { roepnummer, status, coordinates, incidentId } = event.detail;
+      
+      console.log(`📥 GMS2 ontvangt unitMovement event:`, { roepnummer, status, incidentId, selectedIncidentId: selectedIncident?.id });
+      
+      // Check of deze eenheid bij het geselecteerde incident hoort
+      const unit = selectedIncident.assignedUnits?.find(u => {
+        // Probeer exacte match eerst
+        if (u.roepnummer === roepnummer) return true;
+        // Probeer case-insensitive match
+        if (u.roepnummer.toLowerCase() === roepnummer.toLowerCase()) return true;
+        // Probeer zonder spaties/strepjes
+        const uClean = u.roepnummer.replace(/[\s-]/g, '').toLowerCase();
+        const rClean = roepnummer.replace(/[\s-]/g, '').toLowerCase();
+        return uClean === rClean;
+      });
+      
+      if (!unit) {
+        console.log(`⚠️ Eenheid ${roepnummer} niet gevonden in assignedUnits. Beschikbare eenheden:`, 
+          selectedIncident.assignedUnits?.map(u => u.roepnummer));
+        return;
+      }
+      
+      if (incidentId && incidentId !== selectedIncident.id) {
+        console.log(`⚠️ Incident ID mismatch: event=${incidentId}, selected=${selectedIncident.id}`);
+        return;
+      }
+
+      // Status is al in GMS formaat (ut, tp, etc.)
+      // Map "ut" naar "ar" voor UI (AR kolom toont UT status)
+      const gmsStatus = status === 'ut' ? 'ar' : status;
+      const internalStatus = status; // Gebruik interne status (ut) voor opslag
+      console.log(`✅ Eenheid ${roepnummer} gevonden, huidige status: ${unit.huidige_status}, nieuwe status: ${internalStatus}`);
+      
+      if (internalStatus && unit.huidige_status !== internalStatus) {
+        console.log(`🔄 Update status voor ${roepnummer}: ${unit.huidige_status} -> ${internalStatus}`);
+        // setUnitStatus verwacht UI code (ar), maar slaat intern op als ut
+        setUnitStatus(roepnummer, gmsStatus);
+      } else {
+        console.log(`⏭️ Status niet gewijzigd voor ${roepnummer} (al ${internalStatus})`);
+      }
+    };
+
+    // Luister naar arrival events
+    const handleUnitArrival = (event: CustomEvent) => {
+      const { roepnummer, incidentId } = event.detail;
+      
+      console.log(`📥 GMS2 ontvangt unitArrival event:`, { roepnummer, incidentId, selectedIncidentId: selectedIncident?.id });
+      
+      const unit = selectedIncident.assignedUnits?.find(u => {
+        // Probeer exacte match eerst
+        if (u.roepnummer === roepnummer) return true;
+        // Probeer case-insensitive match
+        if (u.roepnummer.toLowerCase() === roepnummer.toLowerCase()) return true;
+        // Probeer zonder spaties/strepjes
+        const uClean = u.roepnummer.replace(/[\s-]/g, '').toLowerCase();
+        const rClean = roepnummer.replace(/[\s-]/g, '').toLowerCase();
+        return uClean === rClean;
+      });
+      
+      if (!unit) {
+        console.log(`⚠️ Eenheid ${roepnummer} niet gevonden in assignedUnits voor arrival. Beschikbare eenheden:`, 
+          selectedIncident.assignedUnits?.map(u => u.roepnummer));
+        return;
+      }
+      
+      if (incidentId && incidentId !== selectedIncident.id) {
+        console.log(`⚠️ Incident ID mismatch bij arrival: event=${incidentId}, selected=${selectedIncident.id}`);
+        return;
+      }
+      
+      // Eenheid is aangekomen op incidentlocatie
+      if (unit.huidige_status !== 'tp') {
+        console.log(`🔄 Update status voor ${roepnummer} naar TP (ter plaatse)`);
+        setUnitStatus(roepnummer, 'tp');
+      } else {
+        console.log(`⏭️ Status al TP voor ${roepnummer}`);
+      }
+    };
+
+    // Luister naar custom events
+    window.addEventListener('unitStatusChanged', handleUnitStatusChanged as EventListener);
+    window.addEventListener('unitMovement', handleUnitMovement as EventListener);
+    window.addEventListener('unitArrival', handleUnitArrival as EventListener);
+
+    return () => {
+      window.removeEventListener('unitStatusChanged', handleUnitStatusChanged as EventListener);
+      window.removeEventListener('unitMovement', handleUnitMovement as EventListener);
+      window.removeEventListener('unitArrival', handleUnitArrival as EventListener);
+    };
+  }, [selectedIncident, setUnitStatus]);
+
+  // Automatische status updates bij koppeling incident
+  useEffect(() => {
+    if (!selectedIncident || !selectedIncident.assignedUnits) {
+      return;
+    }
+
+    // Check of er nieuwe eenheden zijn gekoppeld (zonder huidige_status)
+    const newUnits = selectedIncident.assignedUnits.filter(
+      unit => !unit.huidige_status && unit.ov_tijd
+    );
+
+    if (newUnits.length > 0) {
+      // Nieuwe eenheden krijgen automatisch status 'ov' (Opdracht verstrekt)
+      newUnits.forEach(unit => {
+        if (!unit.huidige_status) {
+          setUnitStatus(unit.roepnummer, 'ov');
+        }
+      });
+    }
+  }, [selectedIncident?.assignedUnits?.length, setUnitStatus]);
 
   // Enhanced shortcode mapping with official LMC codes
   const shortcodeMappings = {
@@ -1043,6 +2279,7 @@ export default function GMS2() {
     // Geweld & Veiligheid codes
     '-steekpartij': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Steekpartij', code: 'vogwst' },
     '-vogwst': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Steekpartij', code: 'vogwst' },
+    '-htd': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Heterdaad', code: 'vogwht' },
     '-schietpartij': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Schietpartij', code: 'vogwsi' },
     '-vogwsi': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Schietpartij', code: 'vogwsi' },
     '-mishandeling': { MC1: 'Veiligheid en openbare orde', MC2: 'Geweld', MC3: 'Mishandeling', code: 'vogwmh' },
@@ -1117,9 +2354,243 @@ export default function GMS2() {
     '-snelweg': { MC1: 'Verkeer', MC2: 'Wegverkeer', MC3: '', code: 'vkwesr' }
   };
 
+  // Function to translate building function from English/Dutch to Dutch
+  const translateBuildingFunction = (functionName: string | null | undefined): string => {
+    if (!functionName) return '';
+    
+    const functionLower = functionName.toLowerCase().trim();
+    
+    // Handle shop_ prefix (e.g., shop_supermarket -> Supermarkt)
+    if (functionLower.startsWith('shop_')) {
+      const shopType = functionLower.substring(5);
+      const shopTranslations: Record<string, string> = {
+        'supermarket': 'Supermarkt',
+        'convenience': 'Buurtwinkel',
+        'bakery': 'Bakkerij',
+        'butcher': 'Slagerij',
+        'clothes': 'Kledingwinkel',
+        'shoes': 'Schoenwinkel',
+        'jewelry': 'Juwelier',
+        'pharmacy': 'Apotheek',
+        'florist': 'Bloemenwinkel',
+        'bookstore': 'Boekwinkel',
+        'electronics': 'Electronica winkel',
+        'department_store': 'Warenhuis',
+        'mall': 'Winkelcentrum',
+        'alcohol': 'Slijterij',
+        'beverages': 'Drankenwinkel',
+        'car_repair': 'Autowerkplaats',
+        'car': 'Autobedrijf',
+        'fuel': 'Tankstation',
+        'hardware': 'Gereedschapswinkel',
+        'furniture': 'Meubelwinkel'
+      };
+      
+      if (shopTranslations[shopType]) {
+        return shopTranslations[shopType];
+      }
+      // If specific shop type not found, return "Winkel"
+      return 'Winkel';
+    }
+    
+    // Handle office_ prefix (e.g., office_government -> Overheidskantoor)
+    if (functionLower.startsWith('office_')) {
+      const officeType = functionLower.substring(7);
+      const officeTranslations: Record<string, string> = {
+        'government': 'Overheidskantoor',
+        'company': 'Kantoor',
+        'estate_agent': 'Makelaarskantoor',
+        'lawyer': 'Advocatenkantoor',
+        'accountant': 'Accountantskantoor',
+        'insurance': 'Verzekeringskantoor',
+        'tax_advisor': 'Belastingadvieskantoor',
+        'financial': 'Financieel kantoor'
+      };
+      
+      if (officeTranslations[officeType]) {
+        return officeTranslations[officeType];
+      }
+      return 'Kantoor';
+    }
+    
+    // Translation mapping for common building functions
+    const translations: Record<string, string> = {
+      // BAG gebruiksfunctie translations
+      'woonfunctie': 'Woning',
+      'bijeenkomstfunctie': 'Bijeenkomstgebouw',
+      'celfunctie': 'Cellencomplex',
+      'gezondheidszorgfunctie': 'Zorginstelling',
+      'industriefunctie': 'Industriegebouw',
+      'kantoorfunctie': 'Kantoorgebouw',
+      'logiesfunctie': 'Hotel/Logies',
+      'onderwijsfunctie': 'Onderwijsinstelling',
+      'sportfunctie': 'Sportaccommodatie',
+      'winkelfunctie': 'Winkel',
+      'overige gebruiksfunctie': 'Overig gebouw',
+      
+      // OSM amenity translations
+      'hospital': 'Ziekenhuis',
+      'school': 'School',
+      'university': 'Universiteit',
+      'college': 'Hogeschool',
+      'kindergarten': 'Kleuterschool',
+      'library': 'Bibliotheek',
+      'police': 'Politiebureau',
+      'fire_station': 'Brandweerkazerne',
+      'post_office': 'Postkantoor',
+      'bank': 'Bank',
+      'atm': 'Geldautomaat',
+      'restaurant': 'Restaurant',
+      'cafe': 'Café',
+      'fast_food': 'Fastfood',
+      'bar': 'Café',
+      'pub': 'Café',
+      'pharmacy': 'Apotheek',
+      'doctor': 'Huisartspraktijk',
+      'dentist': 'Tandartspraktijk',
+      'veterinary': 'Dierenartspraktijk',
+      'fuel': 'Tankstation',
+      'parking': 'Parkeerplaats',
+      'cinema': 'Bioscoop',
+      'theatre': 'Theater',
+      'museum': 'Museum',
+      'gallery': 'Galerij',
+      'community_centre': 'Buurtcentrum',
+      'townhall': 'Gemeentehuis',
+      'courthouse': 'Rechtbank',
+      'place_of_worship': 'Gebedshuis',
+      'church': 'Kerk',
+      'mosque': 'Moskee',
+      'synagogue': 'Synagoge',
+      'temple': 'Tempel',
+      'marketplace': 'Markt',
+      'supermarket': 'Supermarkt',
+      'convenience': 'Buurtwinkel',
+      'shop': 'Winkel',
+      
+      // OSM building/office types
+      'office': 'Kantoor',
+      'commercial': 'Commercieel gebouw',
+      'retail': 'Winkel',
+      'industrial': 'Industrie',
+      'warehouse': 'Magazijn',
+      'garage': 'Garage',
+      'hangar': 'Hangaar',
+      'train_station': 'Treinstation',
+      'bus_station': 'Busstation',
+      'airport': 'Luchthaven',
+      'sports_centre': 'Sportcentrum',
+      'stadium': 'Stadion',
+      'swimming_pool': 'Zwembad',
+      'hotel': 'Hotel',
+      'hostel': 'Hostel',
+      'apartment': 'Appartement',
+      'house': 'Woning',
+      'residential': 'Woning',
+      'farm': 'Boerderij',
+      'barn': 'Schuur',
+      'greenhouse': 'Kas',
+      'bunker': 'Bunker'
+    };
+    
+    // Direct match
+    if (translations[functionLower]) {
+      return translations[functionLower];
+    }
+    
+    // Partial match (contains)
+    for (const [key, translation] of Object.entries(translations)) {
+      if (functionLower.includes(key) || key.includes(functionLower)) {
+        return translation;
+      }
+    }
+    
+    // If no translation found, capitalize first letter and return as-is
+    return functionName.charAt(0).toUpperCase() + functionName.slice(1).toLowerCase();
+  };
+
+  // Function to get building function from coordinates using reverse geocoding
+  const getBuildingFunctionFromCoordinates = async (coordinates: [number, number]): Promise<string> => {
+    if (!coordinates || coordinates.length !== 2) return '';
+    
+    try {
+      const [lng, lat] = coordinates;
+      
+      // Try OSM reverse geocoding first (usually faster and more detailed)
+      try {
+        const osmUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+        const osmResponse = await fetch(osmUrl);
+        
+        if (osmResponse.ok) {
+          const osmData = await osmResponse.json();
+          
+          // Check for amenity (most common for public buildings)
+          if (osmData.amenity) {
+            return translateBuildingFunction(osmData.amenity);
+          }
+          
+          // Check for building type
+          if (osmData.building) {
+            return translateBuildingFunction(osmData.building);
+          }
+          
+          // Check for shop
+          if (osmData.shop) {
+            return translateBuildingFunction(`shop_${osmData.shop}`);
+          }
+          
+          // Check for office
+          if (osmData.office) {
+            return translateBuildingFunction(`office_${osmData.office}`);
+          }
+          
+          // Check for tourism
+          if (osmData.tourism) {
+            return translateBuildingFunction(osmData.tourism);
+          }
+          
+          // Check for leisure
+          if (osmData.leisure) {
+            return translateBuildingFunction(osmData.leisure);
+          }
+        }
+      } catch (osmError) {
+        console.log('OSM reverse geocoding not available:', osmError);
+      }
+      
+      // Try BAG API for gebruiksfunctie
+      try {
+        const bagUrl = `/api/bag/search?q=${lat},${lng}&limit=1`;
+        const bagResponse = await fetch(bagUrl);
+        
+        if (bagResponse.ok) {
+          const bagData = await bagResponse.json();
+          if (bagData.features && bagData.features.length > 0) {
+            const feature = bagData.features[0];
+            // BAG properties might have gebruiksdoel or gebruiksfunctie
+            if (feature.properties?.gebruiksdoel) {
+              return translateBuildingFunction(feature.properties.gebruiksdoel);
+            }
+            if (feature.properties?.gebruiksfunctie) {
+              return translateBuildingFunction(feature.properties.gebruiksfunctie);
+            }
+          }
+        }
+      } catch (bagError) {
+        console.log('BAG API not available:', bagError);
+      }
+      
+    } catch (error) {
+      console.error('Error getting building function:', error);
+    }
+    
+    return '';
+  };
+
   // PDOK Locatieserver API functions with RWS highway integration
   const searchBAGAddress = async (query: string) => {
     try {
+      console.log(`🔍 searchBAGAddress called with query: "${query}"`);
       const results = [];
       
       // First try RWS highway search if query contains highway patterns
@@ -1135,29 +2606,57 @@ export default function GMS2() {
       
       // Then search BAG for regular addresses
       const encodedQuery = encodeURIComponent(query);
-      const response = await fetch(`/api/bag/search?q=${encodedQuery}&limit=20`);
+      const apiUrl = `/api/bag/search?q=${encodedQuery}&limit=20`;
+      console.log(`📡 Fetching BAG API: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl);
+      console.log(`📡 BAG API Response status: ${response.status}`);
+      
       const data = await response.json();
+      console.log(`📡 BAG API Data received:`, data);
 
       if (data.features && data.features.length > 0) {
-        const bagResults = data.features.map((feature: any) => ({
-          id: feature.properties.id || '',
-          weergavenaam: feature.properties.weergavenaam || '',
-          straatnaam: feature.properties.straatnaam || '',
-          huisnummer: feature.properties.huisnummer || '',
-          huisletter: feature.properties.huisletter || '',
-          huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
-          postcode: feature.properties.postcode || '',
-          plaatsnaam: feature.properties.plaatsnaam || '',
-          gemeente: feature.properties.gemeentenaam || '',
-          provincie: feature.properties.provincienaam || '',
-          coordinates: feature.properties.coordinates || null,
-          score: feature.properties.score || 0,
-          volledigAdres: feature.properties.weergavenaam || 
-            `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`,
-          wegType: 'address'
-        }));
+        console.log(`📍 Processing ${data.features.length} BAG features...`);
+        
+        const bagResults = data.features.map((feature: any, index: number) => {
+          const coords = feature.properties.coordinates;
+          console.log(`  [${index}] ${feature.properties.weergavenaam}`, {
+            hasCoordinates: !!coords,
+            coordinates: coords,
+            isArray: Array.isArray(coords),
+            length: coords?.length
+          });
+          
+          // Extract building function if available
+          const gebruiksfunctie = feature.properties?.gebruiksfunctie || 
+                                   feature.properties?.gebruiksdoel || 
+                                   feature.properties?.type?.gebruiksfunctie || 
+                                   '';
+          
+          return {
+            id: feature.properties.id || '',
+            weergavenaam: feature.properties.weergavenaam || '',
+            straatnaam: feature.properties.straatnaam || '',
+            huisnummer: feature.properties.huisnummer || '',
+            huisletter: feature.properties.huisletter || '',
+            huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
+            postcode: feature.properties.postcode || '',
+            plaatsnaam: feature.properties.plaatsnaam || '',
+            gemeente: feature.properties.gemeentenaam || '',
+            provincie: feature.properties.provincienaam || '',
+            coordinates: coords,
+            score: feature.properties.score || 0,
+            volledigAdres: feature.properties.weergavenaam || 
+              `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`,
+            wegType: 'address',
+            gebruiksfunctie: gebruiksfunctie,
+            functie: gebruiksfunctie ? translateBuildingFunction(gebruiksfunctie) : ''
+          };
+        });
+        
         results.push(...bagResults);
-        console.log(`📍 Found ${bagResults.length} BAG address results`);
+        console.log(`✅ Found ${bagResults.length} BAG address results`);
+        console.log(`✅ First result coordinates:`, bagResults[0]?.coordinates);
       }
       
       // Sort results: highways first, then by score
@@ -1173,18 +2672,244 @@ export default function GMS2() {
     }
   };
 
+  // OSM Objects search function
+  const searchOSMObjects = async (query: string) => {
+    try {
+      console.log(`🏢 Searching OSM objects for: "${query}"`);
+      
+      const encodedQuery = encodeURIComponent(query);
+      const apiUrl = `/api/osm/search?q=${encodedQuery}&limit=20`;
+      console.log(`📡 Fetching OSM API: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl);
+      console.log(`📡 OSM API Response status: ${response.status}`);
+      
+      const data = await response.json();
+      console.log(`📡 OSM API Data received:`, data);
+
+      if (data.features && data.features.length > 0) {
+        console.log(`🏢 Processing ${data.features.length} OSM object features...`);
+        
+        const osmResults = data.features.map((feature: any, index: number) => {
+          const coords = feature.coordinates;
+          console.log(`  [${index}] ${feature.weergavenaam}`, {
+            hasCoordinates: !!coords,
+            coordinates: coords,
+            amenity: feature.amenity,
+            type: feature.type
+          });
+          
+          // Extract function from OSM data (prioritize amenity, then category, then class)
+          let osmFunctie = feature.amenity || feature.category || feature.class || feature.type || '';
+          if (feature.office) osmFunctie = `office_${feature.office}`;
+          if (feature.shop) osmFunctie = `shop_${feature.shop}`;
+          if (feature.tourism) osmFunctie = feature.tourism;
+          if (feature.leisure) osmFunctie = feature.leisure;
+          
+          return {
+            id: feature.id || '',
+            weergavenaam: feature.weergavenaam || '',
+            naam: feature.naam || '',
+            straatnaam: feature.straatnaam || '',
+            huisnummer: feature.huisnummer || '',
+            huisletter: '',
+            huisnummertoevoeging: '',
+            postcode: feature.postcode || '',
+            plaatsnaam: feature.plaatsnaam || '',
+            gemeente: feature.gemeente || '',
+            provincie: feature.provincie || '',
+            coordinates: coords,
+            score: feature.score || 0,
+            volledigAdres: feature.volledigAdres || feature.weergavenaam,
+            wegType: 'object',
+            amenity: feature.amenity || '',
+            category: feature.category || '',
+            osm_type: feature.osm_type || '',
+            osm_id: feature.osm_id || '',
+            class: feature.class || '',
+            extratags: feature.extratags || {},
+            functie: osmFunctie ? translateBuildingFunction(osmFunctie) : (feature.naam || '')
+          };
+        });
+        
+        console.log(`✅ Found ${osmResults.length} OSM object results`);
+        return osmResults;
+      }
+      
+      return [];
+      
+    } catch (error) {
+      console.error('OSM search error:', error);
+      return [];
+    }
+  };
+
+  // PDOK Hydrografie – Netwerk: zoek waternetwerk nabij coördinaten
+  const searchHydrografieNear = async (lat: number, lng: number, radiusMeters: number = 1500) => {
+    try {
+      // Benadering: 1° lat ~ 111.32 km; 1° lon ~ 111.32 km * cos(lat)
+      const dLat = radiusMeters / 111320; // meters -> graden
+      const dLng = radiusMeters / (111320 * Math.cos((lat * Math.PI) / 180));
+
+      const minLng = lng - dLng;
+      const minLat = lat - dLat;
+      const maxLng = lng + dLng;
+      const maxLat = lat + dLat;
+      const bbox = `${minLng},${minLat},${maxLng},${maxLat}`;
+
+      // Probeer meerdere mogelijke typeNames voor PDOK HY Netwerk
+      const candidateTypes = ['hy:Network', 'hy:HydroLink', 'hy:HydroNode', 'hy:HydroGraphicNetwork'];
+      let data: any = null;
+      let usedType = '';
+      let lastError: string = '';
+      for (const t of candidateTypes) {
+        const url = `/api/pdok/hydrografie/features?typeNames=${encodeURIComponent(t)}&bbox=${encodeURIComponent(bbox)}&srsName=EPSG:4326&count=500`;
+        console.log(`🌊 Hydrografie search URL: ${url}`);
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+            console.warn(`Hydrografie WFS ${t} response not ok:`, response.status, errorData);
+            lastError = errorData.error || errorData.details || `HTTP ${response.status}`;
+            continue;
+          }
+          const json = await response.json();
+          if (json?.features?.length) {
+            data = json;
+            usedType = t;
+            break;
+          } else if (json?.features && json.features.length === 0) {
+            // Empty result but valid response
+            console.log(`🌊 ${t} returned empty result`);
+          }
+        } catch (err: any) {
+          console.error(`Error fetching ${t}:`, err);
+          lastError = err.message || String(err);
+        }
+      }
+      
+      if (!data && lastError) {
+        console.error(`🌊 All hydrografie typeNames failed. Last error: ${lastError}`);
+      }
+
+      if (!data || !data.features || data.features.length === 0) {
+        return [] as any[];
+      }
+
+      // Map features naar generieke resultaten voor locatietreffers
+      const results = data.features.slice(0, 50).map((feature: any, index: number) => {
+        const geom = feature.geometry;
+        let reprCoords: [number, number] | null = null;
+        if (geom?.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 0) {
+          // Pak middenpunt van de lijn benaderend
+          const mid = geom.coordinates[Math.floor(geom.coordinates.length / 2)];
+          reprCoords = [mid[0], mid[1]]; // [lng, lat]
+        } else if (geom?.type === 'MultiLineString' && Array.isArray(geom.coordinates) && geom.coordinates[0]?.length > 0) {
+          const first = geom.coordinates[0];
+          const mid = first[Math.floor(first.length / 2)] || first[0];
+          reprCoords = [mid[0], mid[1]];
+        }
+
+        const name = feature.properties?.naam || feature.properties?.label || feature.id || `Watersegment ${index + 1}`;
+
+        return {
+          id: feature.id || `${Date.now()}-${index}`,
+          weergavenaam: name,
+          naam: name,
+          coordinates: reprCoords,
+          wegType: 'hydro',
+          source: `PDOK Hydrografie – Netwerk (${usedType})`,
+          volledigAdres: name
+        };
+      });
+
+      return results;
+    } catch (error) {
+      console.error('Hydrografie search error:', error);
+      return [] as any[];
+    }
+  };
+
+  // PDOK NWB Wegen WFS: zoek wegvakken nabij coördinaten
+  const searchNwbWegenNear = async (lat: number, lng: number, radiusMeters: number = 1500, typeNames: string = 'nwb:Wegvakken', filter?: string) => {
+    try {
+      const dLat = radiusMeters / 111320;
+      const dLng = radiusMeters / (111320 * Math.cos((lat * Math.PI) / 180));
+
+      const minLng = lng - dLng;
+      const minLat = lat - dLat;
+      const maxLng = lng + dLng;
+      const maxLat = lat + dLat;
+      const bbox = `${minLng},${minLat},${maxLng},${maxLat}`;
+
+      const params = new URLSearchParams({
+        typeNames,
+        bbox,
+        srsName: 'EPSG:4326',
+        count: '500',
+      });
+      if (filter) params.set('filter', filter);
+      const url = `/api/pdok/nwb-wegen/features?${params.toString()}`;
+      console.log(`🛣️ NWB Wegen search URL: ${url}`);
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+        console.warn(`NWB Wegen WFS response not ok:`, response.status, errorData);
+        return [] as any[];
+      }
+
+      const json = await response.json();
+      if (!json?.features?.length) return [] as any[];
+
+      // Map features naar generieke locatietreffers
+      const results = json.features.slice(0, 50).map((feature: any, index: number) => {
+        const geom = feature.geometry;
+        let reprCoords: [number, number] | null = null;
+        if (geom?.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 0) {
+          const mid = geom.coordinates[Math.floor(geom.coordinates.length / 2)];
+          reprCoords = [mid[0], mid[1]];
+        } else if (geom?.type === 'MultiLineString' && Array.isArray(geom.coordinates) && geom.coordinates[0]?.length > 0) {
+          const first = geom.coordinates[0];
+          const mid = first[Math.floor(first.length / 2)] || first[0];
+          reprCoords = [mid[0], mid[1]];
+        }
+
+        const p = feature.properties || {};
+        const wegNummer = p.WEGNUMMER || p.wegNummer || p.wegnummer || p.WGK_NAAM || p.naam || 'Wegsegment';
+        const name = `${wegNummer}`;
+
+        return {
+          id: feature.id || `${Date.now()}-${index}`,
+          weergavenaam: name,
+          naam: name,
+          coordinates: reprCoords,
+          wegType: 'highway',
+          source: 'PDOK NWB Wegen – Wegvakken',
+          volledigAdres: name
+        };
+      });
+
+      return results;
+    } catch (error) {
+      console.error('NWB Wegen search error:', error);
+      return [] as any[];
+    }
+  };
+
   // RWS NWB Highway search functions with hectometer support
   const searchRWSHighways = async (query: string) => {
     try {
       const encodedQuery = encodeURIComponent(query);
       console.log(`🛣️ Searching RWS highways for: "${query}"`);
       
-      // Check if query contains highway pattern with possible hectometer (A1 125, A20 17.1, etc.)
-      const highwayHectoMatch = query.match(/\b(A\d+|N\d+)(?:\s+(\d+(?:\.\d+)?))?\b/i);
+      // Check if query contains highway pattern with possible hectometer (A1 125, A20 17.1, A20 17,1, etc.)
+      const highwayHectoMatch = query.match(/\b(A\d+|N\d+)(?:\s+(\d+(?:[\.,]\d+)?))?\b/i);
       
       if (highwayHectoMatch) {
         const highway = highwayHectoMatch[1].toUpperCase();
-        const hectometer = highwayHectoMatch[2];
+        const hectometerRaw = highwayHectoMatch[2];
+        const hectometer = hectometerRaw ? hectometerRaw.replace(',', '.') : undefined;
         
         // Try to get road infrastructure data
         const response = await fetch(`/api/rws/infrastructure?roadName=${highway}&includeHectometers=true&includeJunctions=true&limit=50`);
@@ -1218,7 +2943,9 @@ export default function GMS2() {
           if (hectometer && data.hectometers?.features?.length > 0) {
             const matchingHectometer = data.hectometers.features.find((feature: any) => {
               const featureHecto = feature.properties?.AFSTAND || feature.properties?.KM_AFSTAND;
-              return featureHecto && Math.abs(parseFloat(featureHecto) - parseFloat(hectometer)) < 0.5;
+              const featureVal = featureHecto ? parseFloat(String(featureHecto).toString().replace(',', '.')) : undefined;
+              const targetVal = parseFloat(hectometer);
+              return featureVal !== undefined && !Number.isNaN(targetVal) && Math.abs(featureVal - targetVal) < 0.5;
             });
             
             if (matchingHectometer) {
@@ -1337,6 +3064,55 @@ export default function GMS2() {
   };
 
   // Enhanced PDOK Locatieserver search for specific address parts
+  // Function to get detailed location information from BAG and OSM
+  const getDetailedLocationInfo = async (coordinates: [number, number]) => {
+    try {
+      const [lng, lat] = coordinates;
+      
+      // Get BAG information for the coordinates
+      const bagUrl = `https://api.pdok.nl/bag/v2/nummeraanduiding?geometrie=contains&geometrie=${encodeURIComponent(`POINT(${lng} ${lat})`)}&format=json`;
+      
+      let bagInfo = null;
+      try {
+        const bagResponse = await fetch(bagUrl);
+        if (bagResponse.ok) {
+          const bagData = await bagResponse.json();
+          if (bagData.results && bagData.results.length > 0) {
+            bagInfo = bagData.results[0];
+          }
+        }
+      } catch (error) {
+        console.log('BAG API not available or no results');
+      }
+
+      // Get OSM information for the coordinates (reverse geocoding)
+      const osmUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+      
+      let osmInfo = null;
+      try {
+        const osmResponse = await fetch(osmUrl);
+        if (osmResponse.ok) {
+          osmInfo = await osmResponse.json();
+        }
+      } catch (error) {
+        console.log('OSM API not available');
+      }
+
+      // Combine information
+      const locationInfo = {
+        coordinates: { lat, lng },
+        bag: bagInfo,
+        osm: osmInfo,
+        timestamp: new Date().toISOString()
+      };
+
+      return locationInfo;
+    } catch (error) {
+      console.error('Error fetching location details:', error);
+      return null;
+    }
+  };
+
   const searchBAGSpecific = async (stad: string, straat: string, huisnummer: string = '') => {
     try {
       let query: string;
@@ -1352,22 +3128,30 @@ export default function GMS2() {
         data = await response.json();
 
         if (data.features && data.features.length > 0) {
-          return data.features.map((feature: any) => ({
-            id: feature.properties.id || '',
-            weergavenaam: feature.properties.weergavenaam || '',
-            straatnaam: feature.properties.straatnaam || '',
-            huisnummer: feature.properties.huisnummer || '',
-            huisletter: feature.properties.huisletter || '',
-            huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
-            postcode: feature.properties.postcode || '',
-            plaatsnaam: feature.properties.plaatsnaam || '',
-            gemeente: feature.properties.gemeentenaam || '',
-            provincie: feature.properties.provincienaam || '',
-            coordinates: feature.properties.coordinates || null,
-            score: feature.properties.score || 0,
-            volledigAdres: feature.properties.weergavenaam || 
-              `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
-          }));
+          return data.features.map((feature: any) => {
+            const gebruiksfunctie = feature.properties?.gebruiksfunctie || 
+                                     feature.properties?.gebruiksdoel || 
+                                     feature.properties?.type?.gebruiksfunctie || 
+                                     '';
+            return {
+              id: feature.properties.id || '',
+              weergavenaam: feature.properties.weergavenaam || '',
+              straatnaam: feature.properties.straatnaam || '',
+              huisnummer: feature.properties.huisnummer || '',
+              huisletter: feature.properties.huisletter || '',
+              huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
+              postcode: feature.properties.postcode || '',
+              plaatsnaam: feature.properties.plaatsnaam || '',
+              gemeente: feature.properties.gemeentenaam || '',
+              provincie: feature.properties.provincienaam || '',
+              coordinates: feature.properties.coordinates || null,
+              score: feature.properties.score || 0,
+              volledigAdres: feature.properties.weergavenaam || 
+                `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`,
+              gebruiksfunctie: gebruiksfunctie,
+              functie: gebruiksfunctie ? translateBuildingFunction(gebruiksfunctie) : ''
+            };
+          });
         }
       }
 
@@ -1380,22 +3164,30 @@ export default function GMS2() {
       if (data.features && data.features.length > 0) {
         return data.features
           .filter((feature: any) => !huisnummer || feature.properties.huisnummer == huisnummer)
-          .map((feature: any) => ({
-            id: feature.properties.id || '',
-            weergavenaam: feature.properties.weergavenaam || '',
-            straatnaam: feature.properties.straatnaam || '',
-            huisnummer: feature.properties.huisnummer || '',
-            huisletter: feature.properties.huisletter || '',
-            huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
-            postcode: feature.properties.postcode || '',
-            plaatsnaam: feature.properties.plaatsnaam || '',
-            gemeente: feature.properties.gemeentenaam || '',
-            provincie: feature.properties.provincienaam || '',
-            coordinates: feature.properties.coordinates || null,
-            score: feature.properties.score || 0,
-            volledigAdres: feature.properties.weergavenaam || 
-              `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`
-          }));
+          .map((feature: any) => {
+            const gebruiksfunctie = feature.properties?.gebruiksfunctie || 
+                                     feature.properties?.gebruiksdoel || 
+                                     feature.properties?.type?.gebruiksfunctie || 
+                                     '';
+            return {
+              id: feature.properties.id || '',
+              weergavenaam: feature.properties.weergavenaam || '',
+              straatnaam: feature.properties.straatnaam || '',
+              huisnummer: feature.properties.huisnummer || '',
+              huisletter: feature.properties.huisletter || '',
+              huisnummertoevoeging: feature.properties.huisnummertoevoeging || '',
+              postcode: feature.properties.postcode || '',
+              plaatsnaam: feature.properties.plaatsnaam || '',
+              gemeente: feature.properties.gemeentenaam || '',
+              provincie: feature.properties.provincienaam || '',
+              coordinates: feature.properties.coordinates || null,
+              score: feature.properties.score || 0,
+              volledigAdres: feature.properties.weergavenaam || 
+                `${feature.properties.straatnaam || ''} ${feature.properties.huisnummer || ''}${feature.properties.huisletter || ''}${feature.properties.huisnummertoevoeging ? '-' + feature.properties.huisnummertoevoeging : ''}, ${feature.properties.postcode || ''} ${feature.properties.plaatsnaam || ''}`,
+              gebruiksfunctie: gebruiksfunctie,
+              functie: gebruiksfunctie ? translateBuildingFunction(gebruiksfunctie) : ''
+            };
+          });
       }
 
       return [];
@@ -1416,16 +3208,32 @@ export default function GMS2() {
       // Combine number and additions properly
       const fullHuisnummer = `${bestMatch.huisnummer}${bestMatch.huisletter || ''}${bestMatch.huisnummertoevoeging ? '-' + bestMatch.huisnummertoevoeging : ''}`;
 
+      // Get building function - first try from result, then from coordinates
+      let buildingFunctie = bestMatch.functie || '';
+      
+      // If no function in result but coordinates available, fetch it
+      if (!buildingFunctie && bestMatch.coordinates && Array.isArray(bestMatch.coordinates) && bestMatch.coordinates.length === 2) {
+        console.log(`🏢 Ophalen gebouwfunctie van coördinaten...`);
+        buildingFunctie = await getBuildingFunctionFromCoordinates(bestMatch.coordinates as [number, number]);
+        if (buildingFunctie) {
+          console.log(`✅ Gebouwfunctie opgehaald: ${buildingFunctie}`);
+        }
+      }
+
       const completeAddressData = {
         straatnaam: bestMatch.straatnaam,
         huisnummer: fullHuisnummer,
         postcode: bestMatch.postcode,
         plaatsnaam: bestMatch.plaatsnaam,
-        gemeente: bestMatch.gemeente
+        gemeente: bestMatch.gemeente,
+        coordinates: bestMatch.coordinates,
+        object: '', // BAG addresses don't have object names, only functions
+        functie: buildingFunctie || ''
       };
 
       console.log(`✅ Adres gevonden via PDOK Locatieserver:`, completeAddressData);
       console.log(`📊 Match score: ${bestMatch.score}, Coördinaten: ${bestMatch.coordinates ? bestMatch.coordinates.join(', ') : 'Niet beschikbaar'}`);
+      console.log(`🏢 Gebouwfunctie: ${buildingFunctie}`);
 
       setFormData(prev => ({
         ...prev,
@@ -1439,7 +3247,17 @@ export default function GMS2() {
         });
       }
 
-      addLoggingEntry(`📍 Adres automatisch aangevuld via PDOK Locatieserver: ${bestMatch.volledigAdres} (score: ${bestMatch.score})`);
+      // Enhanced logging with coordinates and function
+      if (bestMatch.coordinates) {
+        console.log(`📍 Coördinaten opgeslagen via fillAddressFromBAG: [${bestMatch.coordinates[0]}, ${bestMatch.coordinates[1]}]`);
+        if (buildingFunctie) {
+          addSystemLoggingEntry(`📍 Adres automatisch aangevuld via PDOK Locatieserver: ${bestMatch.volledigAdres} (${bestMatch.coordinates[0].toFixed(4)}, ${bestMatch.coordinates[1].toFixed(4)}) - ${buildingFunctie}`);
+        } else {
+          addSystemLoggingEntry(`📍 Adres automatisch aangevuld via PDOK Locatieserver: ${bestMatch.volledigAdres} (${bestMatch.coordinates[0].toFixed(4)}, ${bestMatch.coordinates[1].toFixed(4)})`);
+        }
+      } else {
+        addSystemLoggingEntry(`📍 Adres automatisch aangevuld via PDOK Locatieserver: ${bestMatch.volledigAdres} (score: ${bestMatch.score})`);
+      }
 
       // Switch to Locatietreffers tab and clear search
       setActiveLoggingTab('locatietreffers');
@@ -1449,7 +3267,7 @@ export default function GMS2() {
       return completeAddressData;
     } else {
       console.log(`❌ Geen adres gevonden voor: ${straatnaam} ${huisnummer}, ${stad}`);
-      addLoggingEntry(`❌ Geen adres gevonden in PDOK Locatieserver voor: ${straatnaam} ${huisnummer}, ${stad}`);
+      addSystemLoggingEntry(`❌ Geen adres gevonden in PDOK Locatieserver voor: ${straatnaam} ${huisnummer}, ${stad}`);
       return null;
     }
   };
@@ -1471,6 +3289,10 @@ export default function GMS2() {
     if (!lastLine.startsWith('-')) {
       return false;
     }
+
+    // GEEN woordlimiet meer - karakteristieken kunnen ook meerdere woorden hebben
+    // Bijvoorbeeld: "-inzet brw off van dienst"
+    // De volgorde van verwerking (eerst classificaties, dan karakteristieken) voorkomt verkeerde matches
 
     // Improved parsing - handle "-code value" patterns
     const codePattern = /-(\w+)(?:\s+(.+?))?(?=\s+-|\s*$)/g;
@@ -1518,15 +3340,8 @@ export default function GMS2() {
     return processed;
   };
 
-  // Check for OVDP-related codes
-    console.log("🔍 Found OVDP-related codes:", karakteristiekenDatabase.filter(k => 
-      k.ktCode?.toLowerCase().includes('ovdp') || 
-      k.ktNaam?.toLowerCase().includes('overval') ||
-      k.ktNaam?.toLowerCase().includes('diefstal')
-    ).slice(0, 10));
-
-    // Common abbreviations mapping for better shortcode detection
-    const commonAbbreviations: Record<string, string[]> = {
+  // Common abbreviations mapping for better shortcode detection
+  const commonAbbreviations: Record<string, string[]> = {
       'pol': ['politie', 'police'],
       'brw': ['brandweer', 'brand'],
       'ambu': ['ambulance', 'ambu'],
@@ -1568,48 +3383,98 @@ export default function GMS2() {
       finalValue = foundKarakteristiek.ktWaarde || value;
     }
 
-    // Step 1b: If no exact match, try partial parser matching
+    // Step 1b: Partial matching voor karakteristieken (bijv. "-auto" matcht "personenauto")
+    // Dit is nodig omdat gebruikers vaak korte termen gebruiken, maar we moeten mis-matches voorkomen
     if (!foundKarakteristiek) {
       const partialMatches = karakteristiekenDatabase.filter(k => {
-        if (!k.ktParser) return false;
-        const parser = k.ktParser.toLowerCase().trim();
-        const searchInput = `-${fullInput}`.toLowerCase().trim();
-
-        // Check if the search input matches the parser pattern closely
-        const parserWords = parser.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
-        const inputWords = searchInput.replace(/[^a-zA-Z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
-
-        // Count matching words
-        let matchCount = 0;
-        for (const inputWord of inputWords) {
-          for (const parserWord of parserWords) {
-            if (inputWord === parserWord || inputWord.includes(parserWord) || parserWord.includes(inputWord)) {
-              matchCount++;
-              break;
-            }
+        if (!k.ktParser && !k.ktNaam) return false;
+        
+        const parser = (k.ktParser || '').toLowerCase().trim().replace(/^-/, ''); // Verwijder leading '-'
+        const naam = (k.ktNaam || '').toLowerCase().trim();
+        const searchInput = fullInput.toLowerCase().trim();
+        
+        // Minimum lengte check: zoekterm moet minimaal 3 karakters zijn
+        if (searchInput.length < 3) return false;
+        
+        // Check 1: Exacte substring match (bijv. "auto" in "personenauto" of "inzet brw off van dienst" in parser/naam)
+        // Dit is de meest betrouwbare match
+        const parserExactSubstring = parser && parser.includes(searchInput);
+        const naamExactSubstring = naam && naam.includes(searchInput);
+        
+        // Check 1b: Exacte match (volledige overeenkomst)
+        const parserExact = parser && parser === searchInput;
+        const naamExact = naam && naam === searchInput;
+        
+        // Check 2: Volledige parser/naam komt voor in zoekterm (bijv. "dubbeldekkerbus" in "soort voertuig dubbeldekkerbus")
+        // Alleen als de parser/naam minimaal 5 karakters is (om te korte matches te voorkomen)
+        const parserInSearch = parser && parser.length >= 5 && searchInput.includes(parser);
+        const naamInSearch = naam && naam.length >= 5 && searchInput.includes(naam);
+        
+        // Check 3: Woord-voor-woord matching voor meerdere woorden
+        // Voor meerdere woorden: alle belangrijke woorden (minimaal 3 karakters) moeten matchen
+        const searchWords = searchInput.split(/\s+/).filter(w => w.length >= 3);
+        if (searchWords.length > 1) {
+          const parserWords = parser.split(/\s+/);
+          const naamWords = naam.split(/\s+/);
+          
+          // Alle belangrijke woorden moeten voorkomen in parser of naam
+          // Bijvoorbeeld: "inzet brw off van dienst" moet matchen met "inzet brw off van dienst"
+          const allWordsInParser = searchWords.every(word => 
+            parserWords.some(pw => pw === word || pw.includes(word) || word.includes(pw))
+          );
+          const allWordsInNaam = searchWords.every(word => 
+            naamWords.some(nw => nw === word || nw.includes(word) || word.includes(nw))
+          );
+          
+          if (allWordsInParser || allWordsInNaam) {
+            return true;
           }
         }
-
-        // Require at least 80% word match
-        const matchRatio = matchCount / Math.max(inputWords.length, parserWords.length);
-        return matchRatio >= 0.8;
+        
+        // Alleen accepteren als het een exacte match, exacte substring match, of een volledige parser/naam match is
+        return parserExact || naamExact || parserExactSubstring || naamExactSubstring || parserInSearch || naamInSearch;
       });
 
       if (partialMatches.length > 0) {
-        // Sort by best match (most matching words)
+        // Sorteer op beste match (exacte matches eerst, dan op beste overlap)
         partialMatches.sort((a, b) => {
-          const aParser = a.ktParser.toLowerCase();
-          const bParser = b.ktParser.toLowerCase();
-          const searchInput = `-${fullInput}`.toLowerCase();
-
-          const aScore = aParser.split(' ').filter(word => searchInput.includes(word)).length;
-          const bScore = bParser.split(' ').filter(word => searchInput.includes(word)).length;
-
-          return bScore - aScore;
+          const aParser = (a.ktParser || '').toLowerCase().replace(/^-/, '');
+          const bParser = (b.ktParser || '').toLowerCase().replace(/^-/, '');
+          const aNaam = (a.ktNaam || '').toLowerCase();
+          const bNaam = (b.ktNaam || '').toLowerCase();
+          const searchInput = fullInput.toLowerCase();
+          
+          // Exacte match krijgt hoogste score
+          const aExact = (aParser === searchInput || aNaam === searchInput) ? 1000 : 0;
+          const bExact = (bParser === searchInput || bNaam === searchInput) ? 1000 : 0;
+          
+          // Exacte substring match (volledige zoekterm komt voor) krijgt ook hoge score
+          const aExactSubstring = (aParser.includes(searchInput) || aNaam.includes(searchInput)) ? 500 : 0;
+          const bExactSubstring = (bParser.includes(searchInput) || bNaam.includes(searchInput)) ? 500 : 0;
+          
+          // Bereken overlap score (hoeveel van de zoekterm komt overeen)
+          // Hogere score = betere match
+          const aParserOverlap = aParser.includes(searchInput) ? (searchInput.length / Math.max(aParser.length, 1)) * 100 : 0;
+          const aNaamOverlap = aNaam.includes(searchInput) ? (searchInput.length / Math.max(aNaam.length, 1)) * 100 : 0;
+          const aOverlap = Math.max(aParserOverlap, aNaamOverlap);
+          
+          const bParserOverlap = bParser.includes(searchInput) ? (searchInput.length / Math.max(bParser.length, 1)) * 100 : 0;
+          const bNaamOverlap = bNaam.includes(searchInput) ? (searchInput.length / Math.max(bNaam.length, 1)) * 100 : 0;
+          const bOverlap = Math.max(bParserOverlap, bNaamOverlap);
+          
+          // Check of de match aan het begin staat (betere match)
+          const aStartsAtBeginning = (aParser.startsWith(searchInput) || aNaam.startsWith(searchInput)) ? 50 : 0;
+          const bStartsAtBeginning = (bParser.startsWith(searchInput) || bNaam.startsWith(searchInput)) ? 50 : 0;
+          
+          // Sorteer: exacte match eerst, dan exacte substring match, dan matches die beginnen met de zoekterm, dan beste overlap, dan kortere matches (specifieker)
+          const aLength = Math.min(aParser.length || 999, aNaam.length || 999);
+          const bLength = Math.min(bParser.length || 999, bNaam.length || 999);
+          
+          return (bExact - aExact) || (bExactSubstring - aExactSubstring) || (bStartsAtBeginning - aStartsAtBeginning) || (bOverlap - aOverlap) || (aLength - bLength);
         });
 
         foundKarakteristiek = partialMatches[0];
-        console.log(`✅ Found partial parser match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}"`);
+        console.log(`✅ Found partial match: "${foundKarakteristiek.ktNaam}" via parser "${foundKarakteristiek.ktParser}" or naam "${foundKarakteristiek.ktNaam}"`);
         finalValue = foundKarakteristiek.ktWaarde || value;
       }
     }
@@ -1826,6 +3691,138 @@ export default function GMS2() {
           console.log(`📝 Set first value for existing karakteristiek: ${finalValue}`);
         }
 
+        // Check for OVD-OC activation on existing karakteristiek update
+        if (foundKarakteristiek.ktNaam === "Inzet Pol algemeen" && finalValue === "OVD-OC") {
+          console.log("🚨 OVD-OC detected in existing karakteristiek update!");
+          addSystemLoggingEntry('🚨 OVD-OC karakteristiek geactiveerd - Operationeel Centrum geïnformeerd');
+          
+          // Trigger OVD-OC popup notification
+          if (onOvdOcActivation) {
+            console.log('🚨 Calling onOvdOcActivation callback');
+            onOvdOcActivation();
+          } else {
+            console.log('❌ onOvdOcActivation callback not available');
+          }
+        }
+
+        // Check for Persalarm activation on existing karakteristiek update
+        if (code.toLowerCase() === 'persalarm' && finalValue.toLowerCase() === 'ja') {
+          console.log('🚨 Persalarm detected in existing karakteristiek update - triggering automatic PROC!');
+          addSystemLoggingEntry('🚨 Persalarm karakteristiek geactiveerd - automatische PROC uitgevoerd');
+          
+          // Generate automatic PROC text
+          const now = new Date();
+          const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          
+          // Create PROC text based on current incident data
+          const priority = selectedIncident?.prio || priorityValue;
+          const classification = selectedMC3 || selectedMC2 || selectedMC1 || selectedIncident?.mc || "ALARM";
+          const adres = selectedIncident?.straatnaam && selectedIncident?.huisnummer 
+            ? `${selectedIncident.straatnaam.toUpperCase()} ${selectedIncident.huisnummer}${selectedIncident.toevoeging ? selectedIncident.toevoeging : ''}`
+            : formData.straatnaam && formData.huisnummer 
+              ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+              : (selectedIncident?.locatie || "").toUpperCase();
+          const plaatsnaam = (selectedIncident?.plaatsnaam || formData.plaatsnaam || "").toUpperCase();
+          const roepnummers = selectedIncident?.assignedUnits?.length ? selectedIncident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
+          
+          // Check for gespreksgroep karakteristiek (code "gg")
+          const gespreksgroepKarakteristiek = [...selectedKarakteristieken, ...(selectedIncident?.karakteristieken || [])].find(
+            k => k.ktCode === 'gg' || k.ktCode === 'GG'
+          );
+          
+          // Use gespreksgroep waarde if available, otherwise use default "1"
+          const kanaalOfGroep = gespreksgroepKarakteristiek?.waarde 
+            ? gespreksgroepKarakteristiek.waarde.toUpperCase()
+            : "1";
+          
+          const parts = [
+            `P${priority}`,
+            kanaalOfGroep,
+            classification,
+            adres,
+            plaatsnaam,
+            roepnummers
+          ].filter(part => part && part.trim() !== "");
+          
+          const autoProcText = parts.join(" ");
+          
+          // Set the PROC text
+          setPagerText(autoProcText);
+          
+          // Dispatch P2000 alarm event to lightboard
+          const incidentNr = selectedIncident?.nr || getNextIncidentNumber();
+          const location = adres && plaatsnaam ? `${adres} ${plaatsnaam}` : "LOCATIE ONBEKEND";
+          const alarmEvent = new CustomEvent('p2000-alarm', {
+            detail: {
+              id: incidentNr.toString(),
+              type: classification,
+              location: location,
+              pagerText: autoProcText
+            }
+          });
+          window.dispatchEvent(alarmEvent);
+          
+          // Add to logging
+          addLoggingEntry(`🚨 AUTOMATISCHE PROC VERZONDEN: "${autoProcText}" om ${timeStr}`);
+          
+          console.log(`✅ Automatic PROC sent: "${autoProcText}"`);
+        }
+
+        // Check for Inzet Pol recherche FO activation on existing karakteristiek update
+        // Try multiple variations of the name
+        const isInzetPolRechercheFO = foundKarakteristiek.ktNaam === 'Inzet Pol recherche FO' ||
+                                     foundKarakteristiek.ktNaam === 'Inzet Pol Recherche FO' ||
+                                     foundKarakteristiek.ktNaam === 'inzet pol recherche fo' ||
+                                     foundKarakteristiek.ktNaam === 'Inzet Pol recherche' ||
+                                     foundKarakteristiek.ktNaam?.toLowerCase().includes('inzet pol recherche') ||
+                                     foundKarakteristiek.ktCode === 'ipr' ||
+                                     foundKarakteristiek.ktCode === 'IPR';
+        
+        if (isInzetPolRechercheFO) {
+          console.log('🕵️ Inzet Pol recherche FO detected in existing karakteristiek update - triggering automatic FO piket Rotterdam selection!');
+          console.log('🕵️ Matched on:', foundKarakteristiek.ktNaam, 'Code:', foundKarakteristiek.ktCode);
+          addSystemLoggingEntry('🕵️ Inzet Pol recherche FO karakteristiek geactiveerd - FO piket Rotterdam automatisch geselecteerd');
+          
+          // Directly add capcode to pager text and check the checkbox
+          setPagerText(prev => {
+            const newText = prev + " 1430100";
+            console.log('📝 Adding capcode 1430100 to pager text:', newText);
+            return newText;
+          });
+          setFoPiketChecked(true);
+          addSystemLoggingEntry("🕵️ FO piket Rotterdam (capcode: 1430100) toegevoegd");
+          
+          console.log('✅ FO piket Rotterdam capcode added and checkbox checked');
+        }
+
+        // Check for gespreksgroep karakteristiek - automatically generate PROC text
+        if ((foundKarakteristiek.ktCode === 'gg' || foundKarakteristiek.ktCode === 'GG') && finalValue) {
+          console.log('📞 Gespreksgroep karakteristiek detected - automatically generating PROC text');
+          // Generate PROC text with the new gespreksgroep value
+          const prio = selectedIncident?.prio || priorityValue;
+          const mc = selectedIncident?.mc3 || selectedMC3 || selectedIncident?.mc2 || selectedMC2 || selectedIncident?.mc1 || selectedMC1 || "";
+          const adres = selectedIncident?.straatnaam && selectedIncident?.huisnummer 
+            ? `${selectedIncident.straatnaam.toUpperCase()} ${selectedIncident.huisnummer}${selectedIncident.toevoeging ? selectedIncident.toevoeging : ''}`
+            : formData.straatnaam && formData.huisnummer
+            ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+            : (selectedIncident?.locatie || "").toUpperCase();
+          const plaatsnaam = (selectedIncident?.plaatsnaam || formData.plaatsnaam || "").toUpperCase();
+          const roepnummers = selectedIncident?.assignedUnits?.length ? selectedIncident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
+          
+          const parts = [
+            `P${prio}`,
+            finalValue.toUpperCase(),
+            mc ? mc : "",
+            adres,
+            plaatsnaam,
+            roepnummers
+          ].filter(part => part && part.trim() !== "");
+          
+          const formattedText = parts.join(" ");
+          setPagerText(formattedText);
+          addSystemLoggingEntry(`📝 PROC tekst automatisch gegenereerd met gespreksgroep "${finalValue}": "${formattedText}"`);
+        }
+
         return updated;
       });
     } else {
@@ -1840,6 +3837,154 @@ export default function GMS2() {
 
       console.log(`📝 Added new karakteristiek:`, newKarakteristiek);
       setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
+      
+      // Special case: Heterdaad karakteristiek sets priority to 1
+      if (foundKarakteristiek.ktCode === 'htd' && foundKarakteristiek.ktNaam === 'Heterdaad' && finalValue === 'Ja') {
+        setPriorityValue(1);
+        addSystemLoggingEntry('🚨 Heterdaad karakteristiek geselecteerd - prioriteit automatisch ingesteld op 1');
+        
+        // Update incident if one is selected
+        if (selectedIncident) {
+          const updatedIncident = {
+            ...selectedIncident,
+            prio: 1
+          };
+          setSelectedIncident(updatedIncident);
+        }
+      }
+
+      // Special case: OVD-OC karakteristiek triggers popup notification
+      if (foundKarakteristiek.ktNaam === "Inzet Pol algemeen" && finalValue === "OVD-OC") {
+        console.log("🚨 OVD-OC detected in new karakteristiek!");
+        addSystemLoggingEntry('🚨 OVD-OC karakteristiek geactiveerd - Operationeel Centrum geïnformeerd');
+        
+        // Trigger OVD-OC popup notification
+        if (onOvdOcActivation) {
+          console.log('🚨 Calling onOvdOcActivation callback');
+          onOvdOcActivation();
+        } else {
+          console.log('❌ onOvdOcActivation callback not available');
+        }
+      }
+
+      // Special case: Persalarm karakteristiek triggers automatic PROC
+      if (code.toLowerCase() === 'persalarm' && finalValue.toLowerCase() === 'ja') {
+        console.log('🚨 Persalarm detected - triggering automatic PROC!');
+        addSystemLoggingEntry('🚨 Persalarm karakteristiek geactiveerd - automatische PROC uitgevoerd');
+        
+        // Generate automatic PROC text
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        
+        // Create PROC text based on current incident data
+        const priority = selectedIncident?.prio || priorityValue;
+        const classification = selectedMC3 || selectedMC2 || selectedMC1 || selectedIncident?.mc || "ALARM";
+        const adres = selectedIncident?.straatnaam && selectedIncident?.huisnummer 
+          ? `${selectedIncident.straatnaam.toUpperCase()} ${selectedIncident.huisnummer}${selectedIncident.toevoeging ? selectedIncident.toevoeging : ''}`
+          : formData.straatnaam && formData.huisnummer 
+            ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+            : (selectedIncident?.locatie || "").toUpperCase();
+        const plaatsnaam = (selectedIncident?.plaatsnaam || formData.plaatsnaam || "").toUpperCase();
+        const roepnummers = selectedIncident?.assignedUnits?.length ? selectedIncident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
+        
+        // Check for gespreksgroep karakteristiek (code "gg")
+        const gespreksgroepKarakteristiek = [...selectedKarakteristieken, ...(selectedIncident?.karakteristieken || [])].find(
+          k => k.ktCode === 'gg' || k.ktCode === 'GG'
+        );
+        
+        // Use gespreksgroep waarde if available, otherwise use default "1"
+        const kanaalOfGroep = gespreksgroepKarakteristiek?.waarde 
+          ? gespreksgroepKarakteristiek.waarde.toUpperCase()
+          : "1";
+        
+        const parts = [
+          `P${priority}`,
+          kanaalOfGroep,
+          classification,
+          adres,
+          plaatsnaam,
+          roepnummers
+        ].filter(part => part && part.trim() !== "");
+        
+        const autoProcText = parts.join(" ");
+        
+        // Set the PROC text
+        setPagerText(autoProcText);
+        
+        // Dispatch P2000 alarm event to lightboard
+        const alarmEvent = new CustomEvent('p2000-alarm', {
+          detail: {
+            id: incidentNr.toString(),
+            type: classification,
+            location: location,
+            pagerText: autoProcText
+          }
+        });
+        window.dispatchEvent(alarmEvent);
+        
+        // Add to logging
+        addLoggingEntry(`🚨 AUTOMATISCHE PROC VERZONDEN: "${autoProcText}" om ${timeStr}`);
+        
+        console.log(`✅ Automatic PROC sent: "${autoProcText}"`);
+      }
+
+      // Debug: Log all karakteristiek names to see what's available
+      console.log('🔍 Found karakteristiek:', foundKarakteristiek.ktNaam, 'Code:', foundKarakteristiek.ktCode);
+      
+      // Special case: Inzet Pol recherche FO triggers automatic FO piket Rotterdam selection
+      // Try multiple variations of the name
+      const isInzetPolRechercheFO = foundKarakteristiek.ktNaam === 'Inzet Pol recherche FO' ||
+                                   foundKarakteristiek.ktNaam === 'Inzet Pol Recherche FO' ||
+                                   foundKarakteristiek.ktNaam === 'inzet pol recherche fo' ||
+                                   foundKarakteristiek.ktNaam === 'Inzet Pol recherche' ||
+                                   foundKarakteristiek.ktNaam?.toLowerCase().includes('inzet pol recherche') ||
+                                   foundKarakteristiek.ktCode === 'ipr' ||
+                                   foundKarakteristiek.ktCode === 'IPR';
+      
+      if (isInzetPolRechercheFO) {
+        console.log('🕵️ Inzet Pol recherche FO detected - triggering automatic FO piket Rotterdam selection!');
+        console.log('🕵️ Matched on:', foundKarakteristiek.ktNaam, 'Code:', foundKarakteristiek.ktCode);
+        addSystemLoggingEntry('🕵️ Inzet Pol recherche FO karakteristiek geactiveerd - FO piket Rotterdam automatisch geselecteerd');
+        
+        // Directly add capcode to pager text and check the checkbox
+        setPagerText(prev => {
+          const newText = prev + " 1430100";
+          console.log('📝 Adding capcode 1430100 to pager text:', newText);
+          return newText;
+        });
+        setFoPiketChecked(true);
+        addSystemLoggingEntry("🕵️ FO piket Rotterdam (capcode: 1430100) toegevoegd");
+        
+        console.log('✅ FO piket Rotterdam capcode added and checkbox checked');
+      }
+
+      // Check for gespreksgroep karakteristiek - automatically generate PROC text
+      if ((foundKarakteristiek.ktCode === 'gg' || foundKarakteristiek.ktCode === 'GG') && finalValue) {
+        console.log('📞 Gespreksgroep karakteristiek detected - automatically generating PROC text');
+        // Generate PROC text with the new gespreksgroep value
+        const prio = selectedIncident?.prio || priorityValue;
+        const mc = selectedIncident?.mc3 || selectedMC3 || selectedIncident?.mc2 || selectedMC2 || selectedIncident?.mc1 || selectedMC1 || "";
+        const adres = selectedIncident?.straatnaam && selectedIncident?.huisnummer 
+          ? `${selectedIncident.straatnaam.toUpperCase()} ${selectedIncident.huisnummer}${selectedIncident.toevoeging ? selectedIncident.toevoeging : ''}`
+          : formData.straatnaam && formData.huisnummer
+          ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+          : (selectedIncident?.locatie || "").toUpperCase();
+        const plaatsnaam = (selectedIncident?.plaatsnaam || formData.plaatsnaam || "").toUpperCase();
+        const roepnummers = selectedIncident?.assignedUnits?.length ? selectedIncident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
+        
+        const parts = [
+          `P${prio}`,
+          finalValue.toUpperCase(),
+          mc ? mc : "",
+          adres,
+          plaatsnaam,
+          roepnummers
+        ].filter(part => part && part.trim() !== "");
+        
+        const formattedText = parts.join(" ");
+        setPagerText(formattedText);
+        addSystemLoggingEntry(`📝 PROC tekst automatisch gegenereerd met gespreksgroep "${finalValue}": "${formattedText}"`);
+      }
     }
 
     return true;
@@ -1866,10 +4011,11 @@ export default function GMS2() {
         setActiveLoggingTab('locatietreffers');
 
         // Search for highway information
-        const results = await searchRWSHighways(highway);
+        const fullQuery = additional ? `${highway} ${additional}` : highway;
+        const results = await searchRWSHighways(fullQuery);
         if (results.length > 0) {
           setBagSearchResults(results);
-          addLoggingEntry(`🛣️ Snelweg ${highway} gevonden via RWS Wegenbestand`);
+          addSystemLoggingEntry(`🛣️ Snelweg ${highway} gevonden via RWS Wegenbestand`);
           
           // Auto-fill if only one result and no additional info
           if (results.length === 1 && !additional) {
@@ -1886,12 +4032,12 @@ export default function GMS2() {
               setSelectedIncident({ ...selectedIncident, ...addressData });
             }
 
-            addLoggingEntry(`🛣️ Snelweglocatie automatisch ingevuld: ${result.volledigAdres}`);
+            addSystemLoggingEntry(`🛣️ Snelweglocatie automatisch ingevuld: ${result.volledigAdres}`);
             setBagSearchQuery("");
             setBagSearchResults([]);
           }
         } else {
-          addLoggingEntry(`❌ Snelweg ${highway} niet gevonden in RWS Wegenbestand`);
+          addSystemLoggingEntry(`❌ Snelweg ${highway} niet gevonden in RWS Wegenbestand`);
         }
 
         return true;
@@ -1951,49 +4097,375 @@ export default function GMS2() {
       }
     }
 
-    // Object shortcode: o/[object/gebouw]
+    // Object shortcode: o/[object/gebouw] - Search OSM for public objects
     if (lastLine.startsWith('o/')) {
       const objectMatch = lastLine.match(/^o\/(.+)$/i);
       if (objectMatch) {
-        const [, objectGebouw] = objectMatch;
+        const [, objectQuery] = objectMatch;
 
-        console.log(`🏢 Object shortcode detected: ${objectGebouw}`);
+        console.log(`🏢 Object shortcode detected: ${objectQuery}`);
 
-        // ALWAYS update form data regardless of incident selection
-        const newObjectData = {
-          functie: objectGebouw.trim()
-        };
+        // Switch to Locatietreffers tab immediately
+        setActiveLoggingTab('locatietreffers');
 
-        setFormData(prev => {
-          const updated = {
-            ...prev,
-            ...newObjectData
+        // Search OSM for public objects
+        const results = await searchOSMObjects(objectQuery);
+        if (results.length > 0) {
+          setBagSearchResults(results);
+          addSystemLoggingEntry(`🏢 ${results.length} openbare objecten gevonden voor "${objectQuery}"`);
+          
+          // Auto-fill if only one result
+          if (results.length === 1) {
+            const result = results[0];
+            // Use object name (naam) for object field, and translated function for functie field
+            const objectNaam = result.naam || result.weergavenaam || '';
+            const buildingFunctie = result.functie || '';
+            const addressData = {
+              straatnaam: result.straatnaam,
+              huisnummer: result.huisnummer,
+              plaatsnaam: result.plaatsnaam,
+              gemeente: result.gemeente,
+              postcode: result.postcode,
+              coordinates: result.coordinates,
+              object: objectNaam,
+              functie: buildingFunctie
+            };
+
+            setFormData(prev => ({ ...prev, ...addressData }));
+            if (selectedIncident) {
+              setSelectedIncident({ ...selectedIncident, ...addressData });
+            }
+
+            addSystemLoggingEntry(`🏢 Object automatisch ingevuld: ${result.weergavenaam}`);
+            setBagSearchQuery("");
+            setBagSearchResults([]);
+          }
+        } else {
+          addSystemLoggingEntry(`❌ Geen openbare objecten gevonden voor "${objectQuery}"`);
+          
+          // Fallback: just set the function field
+          const newObjectData = {
+            functie: objectQuery.trim()
           };
-          console.log(`🏢 Object field updated for ${incidentContext}:`, updated);
-          return updated;
-        });
 
-        // Only update selected incident if one exists (editing mode)
-        if (selectedIncident) {
-          const updatedIncident = {
-            ...selectedIncident,
-            ...newObjectData
-          };
-          setSelectedIncident(updatedIncident);
-          console.log(`🏢 Existing incident updated: ${selectedIncident.nr}`);
+          setFormData(prev => {
+            const updated = { ...prev, ...newObjectData };
+            console.log(`🏢 Object field updated for ${incidentContext}:`, updated);
+            return updated;
+          });
+
+          if (selectedIncident) {
+            const updatedIncident = { ...selectedIncident, ...newObjectData };
+            setSelectedIncident(updatedIncident);
+            console.log(`🏢 Existing incident updated: ${selectedIncident.nr}`);
+          }
         }
 
         return true;
       }
+
+    // Hydrografie shortcode: l/  → twee modi
+    // 1) l/<meters>  → zoek nabij huidige coördinaten met straal
+    // 2) l/<vrije tekst>  → geocodeer tekst naar coördinaten en zoek nabij
+    if (lastLine.startsWith('l/')) {
+      setActiveLoggingTab('locatietreffers');
+
+      const arg = lastLine.substring(2).trim();
+      const radiusOnly = arg.match(/^(\d{3,5})$/);
+      const radius = radiusOnly ? parseInt(radiusOnly[1], 10) : 1500;
+
+      let targetCoords: [number, number] | null = null;
+
+      if (radiusOnly) {
+        // Gebruik bestaande coördinaten
+        const coords = selectedIncident?.coordinates || formData.coordinates;
+        if (!coords) {
+          addSystemLoggingEntry('❌ Geen coördinaten beschikbaar voor Hydrografie-zoekopdracht. Vul eerst een locatie in.');
+          return true;
+        }
+        targetCoords = coords as [number, number];
+      } else if (arg.length > 0) {
+        // Vrije tekst: probeer BAG en OSM
+        addSystemLoggingEntry(`🔎 Zoeken naar locatie: "${arg}"`);
+        try {
+          const [bag, osm] = await Promise.all([
+            searchBAGAddress(arg),
+            searchOSMObjects(arg)
+          ]);
+          const combined = [...bag, ...osm];
+          const withCoords = combined.find((r: any) => Array.isArray(r.coordinates) && r.coordinates.length === 2);
+          if (withCoords) {
+            targetCoords = withCoords.coordinates as [number, number];
+            addSystemLoggingEntry(`📍 Locatie gevonden: ${withCoords.weergavenaam || withCoords.naam}`);
+          } else {
+            addSystemLoggingEntry('❌ Geen coördinaten gevonden voor deze zoekopdracht');
+            return true;
+          }
+        } catch (e) {
+          console.error('Hydrografie free-text geocoding error:', e);
+          addSystemLoggingEntry('❌ Fout bij geocoderen van zoekopdracht');
+          return true;
+        }
+      } else {
+        // Alleen 'l/' zonder argument: gebruik standaard coördinaten indien aanwezig
+        const coords = selectedIncident?.coordinates || formData.coordinates;
+        if (!coords) {
+          addSystemLoggingEntry('❌ Geen coördinaten beschikbaar voor Hydrografie-zoekopdracht. Voeg argument toe of vul eerst een locatie in.');
+          return true;
+        }
+        targetCoords = coords as [number, number];
+      }
+
+      if (targetCoords) {
+        const [lng, lat] = targetCoords;
+        addSystemLoggingEntry(`🌊 Hydrografie zoeken binnen ~${radius}m...`);
+        const results = await searchHydrografieNear(lat, lng, radius);
+        if (results.length > 0) {
+          setBagSearchResults(results);
+          addSystemLoggingEntry(`🌊 ${results.length} waternetwerk-segmenten gevonden`);
+        } else {
+          setBagSearchResults([]);
+          addSystemLoggingEntry('❌ Geen hydrografie gevonden');
+        }
+      }
+
+      return true;
+    }
+
+    // NWB Wegen shortcode: nwb / nwb <meters>
+    if (lastLine.startsWith('=nwb')) {
+      setActiveLoggingTab('locatietreffers');
+
+      // Parse optional radius: "=nwb 2000"
+      const arg = lastLine.substring(4).trim();
+      const radiusOnly = arg.match(/^(\d{3,5})$/);
+      const radius = radiusOnly ? parseInt(radiusOnly[1], 10) : 1500;
+
+      const coords = selectedIncident?.coordinates || formData.coordinates;
+      if (!coords) {
+        addSystemLoggingEntry('❌ Geen coördinaten beschikbaar voor NWB-zoekopdracht. Vul eerst een locatie in.');
+        return true;
+      }
+
+      const [lng, lat] = coords as [number, number];
+      addSystemLoggingEntry(`🛣️ NWB Wegen zoeken binnen ~${radius}m...`);
+      const results = await searchNwbWegenNear(lat, lng, radius);
+      if (results.length > 0) {
+        setBagSearchResults(results);
+        addSystemLoggingEntry(`🛣️ ${results.length} wegsegmenten gevonden (PDOK NWB WFS)`);
+      } else {
+        setBagSearchResults([]);
+        addSystemLoggingEntry('❌ Geen NWB-wegsegmenten gevonden');
+      }
+
+      return true;
+    }
+
+    // Snelweg (NWB-only) shortcode: s/<opties>
+    // Voorbeelden:
+    //  - s/            → gebruik huidige coördinaten, radius 1500m
+    //  - s/2000        → gebruik huidige coördinaten, radius 2000m
+    //  - s/A20         → filter op wegnummer A20 binnen 1500m bbox
+    //  - s/A20 2000    → filter op A20 binnen 2000m bbox
+    if (lastLine.toLowerCase().startsWith('s/')) {
+      setActiveLoggingTab('locatietreffers');
+
+      const arg = lastLine.substring(2).trim();
+      // Support:
+      // s/A20 Maasland
+      // s/A20 17,1 Maasland
+      // s/A20
+      const roadPlaceMatch = arg.match(/^(A\d+|N\d+)(?:\s+(\d+(?:[\.,]\d+)?))?(?:\s+(.+))?$/i);
+
+      let results: any[] = [];
+      if (roadPlaceMatch) {
+        const road = (roadPlaceMatch[1] || '').toUpperCase();
+        const hectoRaw = roadPlaceMatch[2];
+        const place = (roadPlaceMatch[3] || '').trim();
+
+        if (hectoRaw) {
+          // Direct hectometer punt
+          const hecto = hectoRaw.replace(',', '.');
+          const tol = 0.5;
+          const clauses = [
+            `WEGNUMMER ILIKE '%${road}%'`,
+            `(AFSTAND >= ${parseFloat(hecto) - tol} AND AFSTAND <= ${parseFloat(hecto) + tol})`
+          ];
+          if (place) clauses.push(`(GEMEENTE ILIKE '%${place}%' OR PLAATS ILIKE '%${place}%' OR NAAM ILIKE '%${place}%')`);
+          const cql = clauses.join(' AND ');
+          addSystemLoggingEntry(`🛣️ NWB hectometer zoeken: ${road} ${hecto}${place ? ' ' + place : ''}`);
+          const hectoTypes = ['nwb:Hectometerpunten', 'nwb:hectometerpunten', 'hectometerpunten'];
+          for (const tn of hectoTypes) {
+            const resp = await fetch(`/api/pdok/nwb-wegen/features?typeNames=${encodeURIComponent(tn)}&srsName=EPSG:4326&count=200&cql_filter=${encodeURIComponent(cql)}`);
+            if (!resp.ok) continue;
+            const json = await resp.json();
+            const feats = (json.features || []);
+            if (!feats.length && place) {
+              // Fallback: try without place filter
+              const cqlNoPlace = [`WEGNUMMER ILIKE '%${road}%'`, `(AFSTAND >= ${parseFloat(hecto) - tol} AND AFSTAND <= ${parseFloat(hecto) + tol})`].join(' AND ');
+              const resp2 = await fetch(`/api/pdok/nwb-wegen/features?typeNames=${encodeURIComponent(tn)}&srsName=EPSG:4326&count=200&cql_filter=${encodeURIComponent(cqlNoPlace)}`);
+              if (!resp2.ok) continue;
+              const json2 = await resp2.json();
+              feats.push(...(json2.features || []));
+            }
+            if (!feats.length) continue;
+            results = feats.map((feature: any, index: number) => {
+              const geom = feature.geometry;
+              let coord: [number, number] | null = null;
+              if (geom?.type === 'Point' && Array.isArray(geom.coordinates)) {
+                coord = [geom.coordinates[0], geom.coordinates[1]];
+              }
+              const p = feature.properties || {};
+              return {
+                id: feature.id || `${Date.now()}-${index}`,
+                weergavenaam: `${road} hectometer ${hecto}${place ? ' ' + place : ''}`,
+                naam: `${road} hectometer ${hecto}`,
+                coordinates: coord,
+                wegType: 'hectometer',
+                source: `PDOK NWB – Hectometerpunten (${tn})`,
+                volledigAdres: `${road} hectometer ${hecto}`,
+                straatnaam: road,
+                huisnummer: hecto,
+                plaatsnaam: place || 'Nederland',
+                gemeente: place || 'Rijkswegen',
+                postcode: ''
+              };
+            });
+            break;
+          }
+          // As last resort: use infrastructure endpoint to find hectometer by numeric distance
+          if (results.length === 0) {
+            try {
+              const infraResp = await fetch(`/api/rws/infrastructure?roadName=${encodeURIComponent(road)}&includeHectometers=true&limit=1000`);
+              if (infraResp.ok) {
+                const infra = await infraResp.json();
+                const targetVal = parseFloat(hecto);
+                const feats = (infra.hectometers?.features || []).filter((f: any) => {
+                  const v = f.properties?.AFSTAND || f.properties?.KM_AFSTAND || f.properties?.afstand || f.properties?.km_afstand;
+                  const num = v ? parseFloat(String(v).replace(',', '.')) : NaN;
+                  return !Number.isNaN(num) && Math.abs(num - targetVal) < 0.5;
+                });
+                results = feats.map((f: any, idx: number) => ({
+                  id: f.properties?.id || `${Date.now()}-${idx}`,
+                  weergavenaam: `${road} hectometer ${hecto}${place ? ' ' + place : ''}`,
+                  naam: `${road} hectometer ${hecto}`,
+                  coordinates: f.geometry?.coordinates || null,
+                  wegType: 'hectometer',
+                  source: 'RWS NWB OGC (fallback)',
+                  volledigAdres: `${road} hectometer ${hecto}`,
+                  straatnaam: road,
+                  huisnummer: hecto,
+                  plaatsnaam: place || 'Nederland',
+                  gemeente: place || 'Rijkswegen',
+                  postcode: ''
+                }));
+              }
+            } catch (e) {
+              console.warn('Hectometer OGC fallback failed', e);
+            }
+          }
+        } else if (road) {
+          // Wegvakken voor wegnummer, optioneel plaats filter
+          const clauses = [`WEGNUMMER ILIKE '%${road}%'`];
+          if (place) clauses.push(`(GEMEENTE ILIKE '%${place}%' OR PLAATS ILIKE '%${place}%' OR NAAM ILIKE '%${place}%')`);
+          const cql = clauses.join(' AND ');
+          addSystemLoggingEntry(`🛣️ NWB wegvakken zoeken: ${road}${place ? ' ' + place : ''}`);
+          const typeCandidates = ['nwb:Wegvakken', 'nwb:wegvakken', 'wegvakken'];
+          for (const tn of typeCandidates) {
+            const resp = await fetch(`/api/pdok/nwb-wegen/features?typeNames=${encodeURIComponent(tn)}&srsName=EPSG:4326&count=1000&cql_filter=${encodeURIComponent(cql)}`);
+            if (!resp.ok) continue;
+            const json = await resp.json();
+            let feats = (json.features || []);
+            if (!feats.length && place) {
+              // Fallback: try without place clause
+              const cqlNoPlace = [`WEGNUMMER ILIKE '%${road}%'`].join(' AND ');
+              const resp2 = await fetch(`/api/pdok/nwb-wegen/features?typeNames=${encodeURIComponent(tn)}&srsName=EPSG:4326&count=1000&cql_filter=${encodeURIComponent(cqlNoPlace)}`);
+              if (resp2.ok) {
+                const json2 = await resp2.json();
+                feats = (json2.features || []);
+              }
+            }
+            if (!feats.length) continue;
+            results = feats.slice(0, 100).map((feature: any, index: number) => {
+              const geom = feature.geometry;
+              let reprCoords: [number, number] | null = null;
+              if (geom?.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 0) {
+                const mid = geom.coordinates[Math.floor(geom.coordinates.length / 2)];
+                reprCoords = [mid[0], mid[1]];
+              } else if (geom?.type === 'MultiLineString' && Array.isArray(geom.coordinates) && geom.coordinates[0]?.length > 0) {
+                const first = geom.coordinates[0];
+                const mid = first[Math.floor(first.length / 2)] || first[0];
+                reprCoords = [mid[0], mid[1]];
+              }
+              const p = feature.properties || {};
+              const wegNummer = p.WEGNUMMER || p.wegNummer || p.wegnummer || p.WGK_NAAM || p.naam || road;
+              return {
+                id: feature.id || `${Date.now()}-${index}`,
+                weergavenaam: `${wegNummer}`,
+                naam: `${wegNummer}`,
+                coordinates: reprCoords,
+                wegType: 'highway',
+                source: `PDOK NWB – Wegvakken (${tn})`,
+                volledigAdres: `${wegNummer}`,
+                straatnaam: wegNummer,
+                huisnummer: '',
+                plaatsnaam: place || 'Nederland',
+                gemeente: place || 'Rijkswegen',
+                postcode: ''
+              };
+            });
+            break;
+          }
+          // Fallback to OGC API features if still empty
+          if (results.length === 0) {
+            try {
+              const ogc = await fetch(`/api/rws/highways?limit=200`);
+              if (ogc.ok) {
+                const data = await ogc.json();
+                const filtered = (data.features || []).filter((f: any) => (f.properties?.wegNummer || '').toUpperCase().includes(road));
+                results = filtered.slice(0, 50).map((feature: any) => ({
+                  id: feature.properties?.id || '',
+                  weergavenaam: `${feature.properties?.wegNummer || road}`,
+                  naam: `${feature.properties?.wegNummer || road}`,
+                  coordinates: feature.geometry?.coordinates?.[0] || null,
+                  wegType: 'highway',
+                  source: 'RWS NWB OGC',
+                  volledigAdres: `${feature.properties?.wegNummer || road}`,
+                  straatnaam: feature.properties?.wegNummer || road,
+                  huisnummer: '',
+                  plaatsnaam: place || 'Nederland',
+                  gemeente: place || 'Rijkswegen',
+                  postcode: ''
+                }));
+              }
+            } catch (e) {
+              console.warn('OGC fallback failed', e);
+            }
+          }
+        }
+      }
+
+      if (results.length > 0) {
+        setBagSearchResults(results);
+        addSystemLoggingEntry(`🛣️ ${results.length} resultaten (PDOK NWB WFS)`);
+      } else {
+        setBagSearchResults([]);
+        addSystemLoggingEntry('❌ Geen NWB-resultaten gevonden');
+      }
+
+      return true;
+    }
     }
 
     // Classification shortcode: -[code]
+    // Alleen verwerken als het een exacte match is (geen keyword matching)
+    // Dit voorkomt dat "-persoon te water" wordt veranderd naar "persoon in drijfzand"
     if (lastLine.startsWith('-')) {
-      const inputCode = lastLine.split(' ')[0].toLowerCase(); // Normalize to lowercase
+      const inputCode = lastLine.split(' ')[0].toLowerCase(); // Alleen eerste woord (code), normalize to lowercase
 
       console.log(`Zoeken naar classificatie shortcode: ${inputCode} voor ${incidentContext}`);
 
-      // Direct shortcode match (case-insensitive)
+      // Direct shortcode match (case-insensitive) - alleen exacte matches
       let matchedMapping = null;
       for (const [code, mapping] of Object.entries(shortcodeMappings)) {
         if (code.toLowerCase() === inputCode) {
@@ -2008,7 +4480,7 @@ export default function GMS2() {
         return true;
       }
 
-      // Try to find by LMC code directly
+      // Try to find by LMC code directly - alleen exacte code matches
       const directCodeMatch = lmcClassifications.find(c => 
         c.Code.toLowerCase() === inputCode.substring(1) // Remove the '-' prefix
       );
@@ -2019,17 +4491,46 @@ export default function GMS2() {
         return true;
       }
 
-      // Fallback: keyword combination detection
-      const keywords = lastLine.substring(1).split(' ').filter(word => word.length > 2);
-      const possibleMatch = findClassificationByKeywords(keywords);
-      if (possibleMatch) {
-        console.log(`Keyword match gevonden voor ${incidentContext}:`, possibleMatch);
-        applyClassification(possibleMatch.MC1, possibleMatch.MC2, possibleMatch.MC3, lastLine);
-        return true;
+      // Keyword matching voor volledige tekst (bijv. "-persoon te water")
+      // Alleen gebruiken als de volledige tekst wordt gebruikt, niet alleen het eerste woord
+      if (lastLine.split(' ').length > 1) {
+        const fullText = lastLine.substring(1).toLowerCase().trim(); // Verwijder '-' en normalize
+        const keywords = fullText.split(/\s+/).filter(word => word.length > 2);
+        
+        // Zoek naar classificaties die alle belangrijke woorden bevatten
+        const possibleMatches = lmcClassifications.filter(c => {
+          const classificationText = `${c.MC1} ${c.MC2} ${c.MC3} ${c.DEFINITIE}`.toLowerCase();
+          
+          // Alle belangrijke keywords moeten voorkomen in de classificatie tekst
+          const allKeywordsMatch = keywords.every(keyword => 
+            classificationText.includes(keyword)
+          );
+          
+          return allKeywordsMatch;
+        });
+
+        if (possibleMatches.length > 0) {
+          // Sorteer op beste match (meeste overeenkomende woorden)
+          possibleMatches.sort((a, b) => {
+            const aText = `${a.MC1} ${a.MC2} ${a.MC3}`.toLowerCase();
+            const bText = `${b.MC1} ${b.MC2} ${b.MC3}`.toLowerCase();
+            
+            // Tel hoeveel keywords exact voorkomen in MC1/MC2/MC3 (niet alleen in DEFINITIE)
+            const aScore = keywords.filter(kw => aText.includes(kw)).length;
+            const bScore = keywords.filter(kw => bText.includes(kw)).length;
+            
+            return bScore - aScore;
+          });
+
+          const bestMatch = possibleMatches[0];
+          console.log(`Keyword match gevonden voor ${incidentContext}:`, bestMatch);
+          applyClassification(bestMatch.MC1, bestMatch.MC2, bestMatch.MC3, lastLine);
+          return true;
+        }
       }
 
-      // No match found
-      console.warn(`Geen match gevonden voor: ${inputCode} in ${incidentContext}`);
+      // Geen match gevonden
+      console.log(`Geen classificatie match gevonden voor: ${inputCode} - laat karakteristieken verwerking toe`);
       return false;
     }
 
@@ -2069,6 +4570,7 @@ export default function GMS2() {
     }
 
     console.log(`Applying classification: ${mc1} > ${mc2} > ${mc3} (code: ${detectedCode})`);
+    console.log(`Debug: detectedCode = "${detectedCode}", checking for htd...`);
 
     // Step 1: Validate and find exact match in classifications
     const exactMatch = lmcClassifications.find(c => 
@@ -2151,7 +4653,16 @@ export default function GMS2() {
     );
 
     if (finalClassification) {
-      setPriorityValue(finalClassification.PRIO);
+      // Special case: -htd (heterdaad) always gets priority 1
+      let finalPriority = finalClassification.PRIO;
+      if (detectedCode.toLowerCase() === '-htd' || detectedCode.toLowerCase() === 'htd') {
+        finalPriority = 1;
+        console.log('🚨 Heterdaad shortcode detected - setting priority to 1');
+        addSystemLoggingEntry('🚨 Heterdaad shortcode gebruikt - prioriteit automatisch ingesteld op 1');
+      }
+
+      setPriorityValue(finalPriority);
+      console.log(`🎯 Priority set to: ${finalPriority} (original: ${finalClassification.PRIO})`);
 
       // Update incident if one is selected
       if (selectedIncident) {
@@ -2161,7 +4672,7 @@ export default function GMS2() {
           mc1: mc1,
           mc2: mc2 || '',
           mc3: mc3 || '',
-          prio: finalClassification.PRIO
+          prio: finalPriority
         };
         setSelectedIncident(updatedIncident);
       }
@@ -2200,11 +4711,16 @@ export default function GMS2() {
 
 
 
-        // First try to process karakteristieken
-        const karakteristiekProcessed = processKarakteristieken(message);
-
-        // Then try to detect and apply other shortcodes (caller info or classification)
+        // Eerst proberen classificatie shortcode (alleen exacte matches)
+        // Als dat niet werkt, dan karakteristieken verwerken
         const shortcodeDetected = await detectAndApplyShortcodes(message);
+        
+        // Alleen karakteristieken verwerken als er geen classificatie shortcode werd gedetecteerd
+        // Dit voorkomt dat karakteristieken worden aangemaakt wanneer een classificatie wordt getypt
+        let karakteristiekProcessed = false;
+        if (!shortcodeDetected) {
+          karakteristiekProcessed = processKarakteristieken(message);
+        }
 
         // Always add user input to log, regardless of processing
         addLoggingEntry(message);
@@ -2234,10 +4750,18 @@ export default function GMS2() {
     }
   };
 
+  // Debounce timer for search requests
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+
   // Handle kladblok text changes for real-time BAG API integration
   const handleKladblokChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
     setKladblokText(newText);
+
+    // Clear existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
 
     // Check if user is typing an address query (starts with =)
     if (newText.startsWith('=')) {
@@ -2265,8 +4789,82 @@ export default function GMS2() {
         // Clear results if query is too short
         setBagSearchResults([]);
       }
+    } else if (newText.startsWith('o/')) {
+      // Check if user is typing an object query (starts with o/)
+      setActiveLoggingTab('locatietreffers');
+
+      // Extract the search query (remove the o/ prefix)
+      const searchQuery = newText.substring(2);
+
+      // Only search if query is long enough and user has stopped typing
+      if (searchQuery.length >= 4) {
+        // Debounce the search request
+        const timeout = setTimeout(async () => {
+          console.log(`Real-time OSM search for: "${searchQuery}"`);
+
+          // Update the search input and trigger search
+          setBagSearchQuery(searchQuery);
+
+          try {
+            const results = await searchOSMObjects(searchQuery);
+            setBagSearchResults(results);
+            console.log(`🏢 Found ${results.length} objects for "${searchQuery}"`);
+          } catch (error) {
+            console.error('Error during real-time OSM search:', error);
+            setBagSearchResults([]);
+          }
+        }, 500); // Wait 500ms after user stops typing
+
+        setSearchTimeout(timeout);
+      } else {
+        // Clear results if query is too short
+        setBagSearchResults([]);
+      }
+    } else if (newText.startsWith('l/')) {
+      // Real-time hydrografie zoeken
+      setActiveLoggingTab('locatietreffers');
+
+      const arg = newText.substring(2).trim();
+      const radiusOnly = arg.match(/^(\d{3,5})$/);
+      const radius = radiusOnly ? parseInt(radiusOnly[1], 10) : 1500;
+
+      try {
+        let targetCoords: [number, number] | null = null;
+        if (radiusOnly) {
+          const coords = selectedIncident?.coordinates || formData.coordinates;
+          if (coords && Array.isArray(coords) && coords.length === 2) {
+            targetCoords = coords as [number, number];
+          }
+        } else if (arg.length > 0) {
+          const [bag, osm] = await Promise.all([
+            searchBAGAddress(arg),
+            searchOSMObjects(arg)
+          ]);
+          const combined = [...bag, ...osm];
+          const withCoords = combined.find((r: any) => Array.isArray(r.coordinates) && r.coordinates.length === 2);
+          if (withCoords) {
+            targetCoords = withCoords.coordinates as [number, number];
+          }
+        } else {
+          const coords = selectedIncident?.coordinates || formData.coordinates;
+          if (coords && Array.isArray(coords) && coords.length === 2) {
+            targetCoords = coords as [number, number];
+          }
+        }
+
+        if (targetCoords) {
+          const [lng, lat] = targetCoords;
+          const results = await searchHydrografieNear(lat, lng, radius);
+          setBagSearchResults(results);
+        } else {
+          setBagSearchResults([]);
+        }
+      } catch (error) {
+        console.error('Error during hydrografie real-time search:', error);
+        setBagSearchResults([]);
+      }
     } else {
-      // If not an address query, clear BAG search results
+      // If not an address or object query, clear search results
       if (bagSearchResults.length > 0) {
         setBagSearchResults([]);
       }
@@ -2448,39 +5046,49 @@ export default function GMS2() {
     }
   };
 
-  //Karakteristieken database
+  //Karakteristieken database (duplicate - uses same data as karakteristiekenDatabase)
   const [karakteristiekenDb, setKarakteristiekenDb] = useState<any[]>([]);
   useEffect(() => {
     const loadKarakteristieken = async () => {
       try {
-        console.log('Loading karakteristieken...');
-        const response = await fetch('/api/karakteristieken');
+        console.log('Loading karakteristieken from JSON...');
+        const response = await fetch('/karakteristieken.json');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(`Loaded ${data.length} karakteristieken`);
+        
+        // Transform field names from snake_case to camelCase
+        const transformedData = data.map((k: any) => ({
+          ktNaam: k.kt_naam || '',
+          ktType: k.kt_type || '',
+          ktWaarde: k.kt_waarde || null,
+          ktCode: k.kt_code || null,
+          ktParser: k.kt_parser || null
+        }));
+        
+        console.log(`✅ Loaded ${transformedData.length} karakteristieken from JSON`);
 
         // Test: show sample data
-        if (data.length > 0) {
+        if (transformedData.length > 0) {
           console.log('Sample karakteristiek:', {
-            naam: data[0].ktNaam,
-            type: data[0].ktType,
-            waarde: data[0].ktWaarde,
-            parser: data[0].ktParser
+            naam: transformedData[0].ktNaam,
+            type: transformedData[0].ktType,
+            waarde: transformedData[0].ktWaarde,
+            parser: transformedData[0].ktParser
           });
 
           // Test: look for common patterns
-          const inzetPatterns = data.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('inzet'));
+          const inzetPatterns = transformedData.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('inzet'));
           console.log(`Found ${inzetPatterns.length} 'inzet' patterns`);
 
-          const polPatterns = data.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('pol'));
+          const polPatterns = transformedData.filter(k => k.ktParser && k.ktParser.toLowerCase().includes('pol'));
           console.log(`Found ${polPatterns.length} 'pol' patterns`);
         }
 
-        setKarakteristiekenDb(data);
+        setKarakteristiekenDb(transformedData);
       } catch (error) {
-        console.error('Error loading karakteristieken:', error);
+        console.error('❌ Error loading karakteristieken from JSON:', error);
       }
     };
 
@@ -2583,9 +5191,24 @@ export default function GMS2() {
       };
 
       setSelectedKarakteristieken(prev => [...prev, newKarakteristiek]);
-      addLoggingEntry(`📋 Karakteristiek toegevoegd: ${karakteristiek.ktNaam}`);
+      addSystemLoggingEntry(`📋 Karakteristiek toegevoegd: ${karakteristiek.ktNaam}`);
+      
+      // Special case: Heterdaad karakteristiek sets priority to 1
+      if (karakteristiek.ktCode === 'htd' && karakteristiek.ktNaam === 'Heterdaad' && karakteristiek.ktWaarde === 'Ja') {
+        setPriorityValue(1);
+        addSystemLoggingEntry('🚨 Heterdaad karakteristiek geselecteerd - prioriteit automatisch ingesteld op 1');
+        
+        // Update incident if one is selected
+        if (selectedIncident) {
+          const updatedIncident = {
+            ...selectedIncident,
+            prio: 1
+          };
+          setSelectedIncident(updatedIncident);
+        }
+      }
     } else {
-      addLoggingEntry(`⚠️ Karakteristiek "${karakteristiek.ktNaam}" is al toegevoegd`);
+      addSystemLoggingEntry(`⚠️ Karakteristiek "${karakteristiek.ktNaam}" is al toegevoegd`);
     }
 
     // Close dialog
@@ -2594,15 +5217,1014 @@ export default function GMS2() {
     setFilteredKarakteristieken([]);
   };
 
+  /**
+   * Centrale check of een voertuig beschikbaar is voor nieuw incident
+   * Een voertuig is beschikbaar als:
+   * - Status is KZ, IR of BS
+   * - activeIncidentId is null (niet gekoppeld aan een incident)
+   */
+  const isAvailable = (roepnummer: string, status?: string): boolean => {
+    // Haal unit positie op uit globalUnitMovement service
+    const unitPosition = getUnitPosition(roepnummer);
+    
+    // Check activeIncidentId - moet null zijn
+    if (unitPosition && unitPosition.activeIncidentId != null) {
+      return false;
+    }
+    
+    // Gebruik status uit unitPosition als beschikbaar, anders gebruik parameter
+    const actualStatus = unitPosition?.statusCode || status || '';
+    const statusLower = actualStatus.toLowerCase();
+    
+    // Alleen KZ, IR of BS zijn beschikbaar
+    if (statusLower === 'kz' || statusLower === 'ir' || statusLower === 'bs') {
+      return true;
+    }
+    
+    // OV, UT, TP zijn altijd niet beschikbaar
+    if (statusLower === 'ov' || statusLower === 'ut' || statusLower === 'tp') {
+      return false;
+    }
+    
+    // Fallback: gebruik status definitie als beschikbaar
+    const statusDef = getStatusDef(actualStatus);
+    if (statusDef) {
+      return statusDef.beschikbaar_voor_nieuw_incident === true;
+    }
+    
+    return false;
+  };
+
+  // Helper: Check of een status beschikbaar is voor inzet (gebruikt brw-statussen.json)
+  // DEPRECATED: Gebruik isAvailable() in plaats daarvan voor volledige check inclusief activeIncidentId
+  const isUnitAvailable = (status: string, roepnummer?: string): boolean => {
+    // Als roepnummer beschikbaar is, gebruik centrale isAvailable functie
+    if (roepnummer) {
+      return isAvailable(roepnummer, status);
+    }
+    
+    // Fallback voor oude code zonder roepnummer
+    const statusDef = getStatusDef(status);
+    
+    // Als status definitie gevonden, gebruik beschikbaar_voor_nieuw_incident
+    if (statusDef) {
+      return statusDef.beschikbaar_voor_nieuw_incident === true;
+    }
+    
+    // Fallback voor oude status strings (backwards compatibility)
+    const statusLower = (status || '').toLowerCase();
+    
+    // Directe status code matches
+    if (statusLower === 'bs' || statusLower === 'kz' || statusLower === 'ir') {
+      return true;
+    }
+    
+    // Status string matches (zoals "1 - Beschikbaar/vrij")
+    if (statusLower.includes('beschikbaar') || statusLower.includes('vrij')) {
+      return true;
+    }
+    if (statusLower.includes('kazerne')) {
+      return true;
+    }
+    
+    // Niet beschikbaar: ov, ut, tp, fd, GA, afmelden
+    if (statusLower === 'ov' || statusLower === 'ut' || statusLower === 'ar' || statusLower === 'tp' || 
+        statusLower === 'fd' || statusLower === 'ga' ||
+        statusLower.includes('afmelden') || statusLower.includes('aanrijdend') ||
+        statusLower.includes('ter plaatse')) {
+      return false;
+    }
+    
+    // Default: niet beschikbaar als onbekend
+    return false;
+  };
+
+  // Helper: Haal coördinaten op van een eenheid via Leaflet marker
+  // BELANGRIJK: Maakt GEEN nieuwe markers aan - gebruikt alleen bestaande markers uit voertuigMarkers Map
+  const getUnitCoordinates = async (roepnummer: string, post?: string): Promise<{ lat: number; lng: number } | null> => {
+    // Normaliseer roepnummer voor consistente matching
+    const normalizedRoepnummer = normalizeRoepnummer(roepnummer);
+    
+    // Probeer eerst Leaflet marker positie (LIVE positie op kaart)
+    // Gebruikt ALLEEN bestaande markers - maakt GEEN nieuwe markers aan
+    const markers = getVoertuigMarkers();
+    const marker = markers.get(normalizedRoepnummer);
+    
+    // Check of marker bestaat en een getLatLng methode heeft
+    if (marker && typeof marker.getLatLng === 'function') {
+      const pos = marker.getLatLng();
+      if (pos && typeof pos.lat === 'number' && typeof pos.lng === 'number') {
+        return { lat: pos.lat, lng: pos.lng };
+      }
+    }
+    
+    // Fallback: probeer uit a1Units (actieve eenheden)
+    const a1Unit = a1Units.find(u => {
+      const a1Normalized = normalizeRoepnummer(u.roepnummer);
+      return a1Normalized === normalizedRoepnummer;
+    });
+    
+    if (a1Unit?.coordinates && Array.isArray(a1Unit.coordinates) && a1Unit.coordinates.length === 2) {
+      // a1Units gebruiken [lng, lat] formaat
+      return { lat: a1Unit.coordinates[1], lng: a1Unit.coordinates[0] };
+    }
+    
+    // Fallback: probeer kazerne coördinaten op basis van post
+    if (post) {
+      try {
+        const kazerneResponse = await fetch('/attached_assets/63_kazernes_complete.json');
+        if (kazerneResponse.ok) {
+          const kazernes: any[] = await kazerneResponse.json();
+          const normalizedPost = post.toLowerCase().trim();
+          
+          // Zoek kazerne op basis van post naam
+          for (const kazerne of kazernes) {
+            const kazernePlaats = (kazerne.plaats || '').toLowerCase().trim();
+            const kazerneNaam = (kazerne.naam || '').toLowerCase().trim();
+            
+            if (kazernePlaats.includes(normalizedPost) || 
+                normalizedPost.includes(kazernePlaats) ||
+                kazerneNaam.includes(normalizedPost) ||
+                normalizedPost.includes(kazerneNaam)) {
+              const lat = typeof kazerne.latitude === 'string' 
+                ? parseFloat(kazerne.latitude) 
+                : kazerne.latitude;
+              const lng = typeof kazerne.longitude === 'string' 
+                ? parseFloat(kazerne.longitude) 
+                : kazerne.longitude;
+              
+              if (Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0) {
+                console.log(`📍 Kazerne coördinaten gevonden voor ${roepnummer} (post: ${post}): ${lat}, ${lng}`);
+                return { lat, lng };
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.warn(`⚠️ Fout bij ophalen kazerne coördinaten voor ${roepnummer}:`, error);
+      }
+    }
+    
+    // Geen coördinaten gevonden
+    console.warn(`⚠️ Geen coördinaten gevonden voor eenheid ${roepnummer}${post ? ` (post: ${post})` : ''}`);
+    return null;
+  };
+
+  // Helper: Bereken ETA van een eenheid naar een incident (gebruikt Leaflet marker positie)
+  const calculateETAForUnit = async (
+    unitRoepnummer: string, 
+    incidentCoordinates: [number, number] | { lat: number; lng: number },
+    unitPost?: string
+  ): Promise<number | null> => {
+    try {
+      const unitCoords = await getUnitCoordinates(unitRoepnummer, unitPost);
+      if (!unitCoords) {
+        console.warn(`⚠️ Geen coördinaten gevonden voor eenheid ${unitRoepnummer}`);
+        return null;
+      }
+      
+      // Converteer incident coördinaten naar { lat, lng } formaat
+      const incidentCoords = Array.isArray(incidentCoordinates)
+        ? { lat: incidentCoordinates[1], lng: incidentCoordinates[0] } // [lng, lat] -> { lat, lng }
+        : incidentCoordinates;
+      
+      // Gebruik de vaste calculateETA functie uit routingService
+      const eta = await calculateETAService(unitCoords, incidentCoords);
+      
+      if (eta !== null) {
+        console.log(`✅ ETA berekend voor ${unitRoepnummer}: ${formatETAService(eta)} (${eta}s)`);
+      }
+      
+      return eta;
+    } catch (error) {
+      console.error(`❌ Fout bij ETA berekening voor ${unitRoepnummer}:`, error);
+      return null;
+    }
+  };
+
+  // Alias voor backward compatibility
+  const formatETA = formatETAService;
+
+  // Function to generate inzetvoorstel (IV) based on MAR standard
+  const generateInzetvoorstel = async (extended: boolean = false) => {
+    if (!selectedIncident && !selectedMC1 && !selectedMC2 && !selectedMC3) {
+      addSystemLoggingEntry("⚠️ Selecteer eerst een classificatie of incident voor inzetvoorstel");
+      return;
+    }
+
+    const mc1 = selectedIncident?.mc1 || selectedMC1 || '';
+    const mc2 = selectedIncident?.mc2 || selectedMC2 || '';
+    const mc3 = selectedIncident?.mc3 || selectedMC3 || '';
+    const functie = selectedIncident?.functie || formData.functie || '';
+    // Gebruik altijd selectedKarakteristieken (de huidige state) in plaats van incident.karakteristieken
+    // Dit voorkomt dat oude karakteristieken blijven hangen bij nieuwe meldingen
+    const karakteristieken = selectedKarakteristieken || [];
+    
+    console.log(`🔍 Gebruikte karakteristieken voor IV:`, karakteristieken.map((k: any) => ({ 
+      naam: k.ktNaam, 
+      code: k.ktCode, 
+      waarde: k.ktWaarde,
+      parser: k.ktParser 
+    })));
+
+    console.log(`🚒 Generating inzetvoorstel: MC1="${mc1}", MC2="${mc2}", MC3="${mc3}", Extended=${extended}`);
+
+    // Haal voertuigen op uit Inzetvoorstellen RT basis.json
+    const rtVoertuigen = await getVoertuigenFromInzetvoorstellenRT(
+      mc1,
+      mc2 || undefined,
+      mc3 || undefined,
+      karakteristieken
+    );
+    
+    // Gebruik de mapping functie om inzetvoorstel te genereren
+    const result = generateInzetvoorstelFromMapping(
+      mc1,
+      mc2 || undefined,
+      mc3 || undefined,
+      karakteristieken,
+      functie || undefined,
+      extended
+    );
+    
+    // Voeg voertuigen uit RT basis.json toe aan het resultaat
+    if (rtVoertuigen.length > 0) {
+      // Parse voertuigen (verwijder eventuele [D] markers en extract alleen type)
+      const parsedRtVoertuigen = rtVoertuigen.map(v => {
+        // Bijv. "1 TS[D]" -> "1 TS" of "1 DV-AGS[4]" -> "1 DV-AGS"
+        // Maar nu zijn markers al verwijderd, dus alleen aantal verwijderen als nodig
+        return v.replace(/^\d+\s*/, '').trim();
+      });
+      
+      // Combineer met bestaande voertuigen, maar RT basis heeft prioriteit
+      const alleVoertuigen = new Set([...parsedRtVoertuigen, ...result.totaal]);
+      result.totaal = Array.from(alleVoertuigen);
+      result.base = Array.from(new Set([...parsedRtVoertuigen, ...result.base]));
+      console.log(`✅ ${rtVoertuigen.length} voertuigen toegevoegd uit RT basis.json:`, parsedRtVoertuigen);
+    }
+
+    // Koppel BRW-eenheden op basis van rollen uit brw-eenheden dataset (bijv. TS-6)
+    // 1) helper om BRW data te laden
+    type RawBrwEntry = {
+      "GMS-naam": string;
+      "nummering op eenheid": string;
+      "inzetrollen GMS": string[];
+      post: string;
+      "alternatief benaming": string[];
+    };
+    type BrwDataset = { [roepnummer: string]: RawBrwEntry };
+    type BrwUnit = {
+      roepnummer: string;
+      gmsNaam: string;
+      nummeringOpEenheid: string;
+      post: string;
+      rollen: string[];
+      alternatieven: string[];
+      status: string;
+    };
+
+    const normalize = (s: string) => (s || '').toLowerCase().trim();
+    const compact = (s: string) => normalize(s).replace(/[^a-z0-9+]/g, '');
+
+    const findUnitsForRole = (all: BrwUnit[], role: string): BrwUnit[] => {
+      // Strip eventuele aantallen voor het type, bv. "1 TS-6" -> "TS-6"
+      const r = role.replace(/^\d+\s*/, '').trim();
+      if (!r) return [];
+      const rNorm = normalize(r);
+      
+      const matched = all.filter(u => {
+        const pools = [
+          ...(Array.isArray(u.rollen) ? u.rollen : []),
+          ...(Array.isArray(u.alternatieven) ? u.alternatieven : []),
+        ];
+        
+        const matches = pools.some(rr => {
+          const rn = normalize(rr);
+          
+          // 1. Exact match (case-insensitive) - highest priority
+          if (rn === rNorm) return true;
+          
+          // 2. For simple codes without hyphens (WO, TS, DA, etc.)
+          if (!r.includes('-') && !rr.includes('-')) {
+            // Exact match only to avoid false positives (WO should NOT match WOV)
+            return rn === rNorm;
+          }
+          
+          // 3. For compound codes (DA-OD, TS-4, etc.) - exact prefix match
+          if (r.includes('-')) {
+            // Exact match: "DA-OD" matches "DA-OD" but NOT "DA-ODH"
+            if (rn === rNorm) return true;
+            // Prefix match with word boundary: "DA-OD" matches "DA-OD" prefix
+            // but we already handled exact match above
+            return false;
+          }
+          
+          // 4. Base code matching compound (TS matches TS-4, TS-AED, etc.)
+          if (!r.includes('-') && rr.includes('-')) {
+            const rrBase = rr.split('-')[0].toLowerCase();
+            return rrBase === rNorm;
+          }
+          
+          return false;
+        });
+        
+        return matches;
+      });
+      
+      return matched;
+    };
+
+    const loadBrwUnits = async (): Promise<BrwUnit[]> => {
+      try {
+        // Load the updated BRW eenheden file (TSV-like content, not real JSON)
+        const res = await fetch('/data/BRW%20eenheden.json');
+        if (!res.ok) return [];
+        const rawText = await res.text();
+
+        // Parse the TSV-like content into the expected dataset shape
+        const lines = rawText
+          .split(/\r?\n/)
+          .map((l) => l.trimEnd())
+          .filter((l) => l.length > 0);
+
+        const ds: BrwDataset = {};
+
+        for (const line of lines) {
+          // Columns appear to be separated by tabs
+          const cols = line.split(/\t+/);
+          if (cols.length === 0) continue;
+
+          // Correct structure:
+          // [0] = GMS-naam (e.g. 171111) of SK-nummer (e.g. SK03) of leeg
+          // [1] = roepnummer (e.g. 17-1111) of leeg
+          // [2] = eerste rol (e.g. MP, TS, DAT) - dit is vaak het voertuigtype
+          // [3..n-2] = rollen (e.g. TS-AED, TS-4, TS-6, DA-OD)
+          // [n-1] = post (e.g. Rotterdam)
+
+          const gmsNaam = (cols[0] || "").trim();
+          let roepnummer = (cols[1] || "").trim();
+
+          // If roepnummer is empty but GMS-naam exists, use GMS-naam as roepnummer
+          if (!roepnummer && gmsNaam) {
+            roepnummer = gmsNaam;
+          }
+
+          // Als beide leeg zijn, probeer te kijken of er een identifier in kolom 2 staat
+          // (bijvoorbeeld voor SK-nummers of andere speciale eenheden)
+          if (!gmsNaam && !roepnummer) {
+            // Check of er een identifier in kolom 2 staat (zoals SK03, CO-C/PLI, etc.)
+            const potentialId = (cols[2] || "").trim();
+            if (potentialId && potentialId.length > 0) {
+              // Gebruik deze als roepnummer
+              roepnummer = potentialId;
+            } else {
+              // Geen identifier gevonden, skip deze regel
+              continue;
+            }
+          }
+          
+          // Kolom 2 bevat vaak het voertuigtype (MP, TS, DAT, etc.) - dit is ook een rol!
+          // Bijvoorbeeld: "170121	17-0121	MP		DA-WVD" - MP is een rol
+
+          // Find last non-empty column as post
+          let post = "";
+          for (let i = cols.length - 1; i >= 0; i--) {
+            const v = (cols[i] || "").trim();
+            if (v) { post = v; break; }
+          }
+
+          // Collect roles from columns 2 onwards (until last non-empty which is post)
+          const roles: string[] = [];
+          const roleStartIndex = 2;
+          let roleEndIndex = cols.length;
+          
+          // Find where roles end (where post starts)
+          for (let i = cols.length - 1; i >= roleStartIndex; i--) {
+            const v = (cols[i] || "").trim();
+            if (v === post) {
+              roleEndIndex = i;
+              break;
+            }
+          }
+
+          // Als roepnummer uit kolom 2 komt (bijv. SK03), start rollen vanaf kolom 3
+          // Anders start rollen vanaf kolom 2 (die bevat vaak het voertuigtype als eerste rol)
+          const actualRoleStartIndex = (!gmsNaam && !cols[1]?.trim() && roepnummer === (cols[2] || "").trim()) ? 3 : roleStartIndex;
+          
+          // Kolom 2 bevat vaak het voertuigtype (MP, TS, DAT, etc.) - voeg dit toe als rol
+          // Alleen als roepnummer NIET uit kolom 2 komt
+          if (actualRoleStartIndex === roleStartIndex && cols[2]) {
+            const voertuigType = (cols[2] || "").trim();
+            if (voertuigType && voertuigType !== post && voertuigType !== roepnummer) {
+              // Split op " / " voor meerdere types
+              const types = voertuigType.split(/\s*\/\s*/);
+              types.forEach(t => {
+                const trimmed = t.trim();
+                if (trimmed) roles.push(trimmed);
+              });
+            }
+          }
+
+          // Start vanaf actualRoleStartIndex (kolom 3 als roepnummer in kolom 2 staat, anders kolom 2)
+          // Als we al kolom 2 hebben toegevoegd, start vanaf kolom 3
+          const startIndex = (actualRoleStartIndex === roleStartIndex && roles.length > 0) ? 3 : actualRoleStartIndex;
+          
+          for (let i = startIndex; i < roleEndIndex; i++) {
+            const cell = (cols[i] || "").trim();
+            if (!cell) continue;
+            
+            // Skip als dit de post is
+            if (cell === post) continue;
+            
+            // Skip als dit het roepnummer zelf is
+            if (cell === roepnummer) continue;
+            
+            // Handle cells that may contain multiple roles separated by " / " or just a single role
+            const parts = cell.split(/\s*\/\s*/);
+            for (const part of parts) {
+              const trimmed = part.trim();
+              if (trimmed && trimmed !== post && trimmed !== roepnummer) {
+                // Voorkom duplicaten
+                if (!roles.includes(trimmed)) {
+                  roles.push(trimmed);
+                }
+              }
+            }
+          }
+          
+          // Als er geen rollen zijn gevonden maar er wel een roepnummer is, 
+          // probeer de eerste niet-lege kolom na roepnummer als rol te gebruiken
+          if (roles.length === 0 && roepnummer) {
+            for (let i = actualRoleStartIndex; i < cols.length; i++) {
+              const cell = (cols[i] || "").trim();
+              if (cell && cell !== post && cell !== roepnummer) {
+                roles.push(cell);
+                break;
+              }
+            }
+          }
+
+          const entry: RawBrwEntry = {
+            "GMS-naam": gmsNaam || roepnummer, // Gebruik roepnummer als fallback voor GMS-naam
+            "nummering op eenheid": roepnummer,
+            "inzetrollen GMS": roles,
+            post,
+            "alternatief benaming": [],
+          };
+
+          // Debug: log eenheden met rollen
+          if (roles.length > 0) {
+            console.log(`✅ Eenheid ${roepnummer} (${post}): rollen =`, roles);
+          }
+
+          // Gebruik roepnummer als key, maar voorkom duplicaten
+          // Als roepnummer al bestaat, voeg een suffix toe (zou niet moeten voorkomen)
+          let key = roepnummer;
+          if (ds[key] && ds[key]["GMS-naam"] !== gmsNaam) {
+            // Duplicaat gevonden, voeg post toe aan key om uniek te maken
+            key = `${roepnummer}_${post}`;
+          }
+          ds[key] = entry;
+        }
+
+        // status overrides uit localStorage meenemen
+        let overrides: Record<string, string> = {};
+        try {
+          const raw = localStorage.getItem('brwStatusOverrides');
+          if (raw) overrides = JSON.parse(raw);
+        } catch {}
+        
+        // Haal status op uit brwUnitsMap als die beschikbaar is, anders gebruik default 'kz' (op kazerne)
+        const defaultStatus = getDefaultStatus();
+        return Object.entries(ds).map(([roepnummer, v]) => {
+          // Prioriteit: 1) override uit localStorage, 2) status uit brwUnitsMap, 3) default 'kz' (op kazerne)
+          let status = defaultStatus.afkorting; // Default naar "kz" (op kazerne)
+          if (overrides[roepnummer]) {
+            status = overrides[roepnummer];
+          } else if (brwUnitsMap[roepnummer]?.status) {
+            status = brwUnitsMap[roepnummer].status;
+          }
+          
+          return {
+            roepnummer,
+            gmsNaam: v["GMS-naam"] || '',
+            nummeringOpEenheid: v["nummering op eenheid"] || '',
+            post: v.post || '',
+            rollen: Array.isArray(v["inzetrollen GMS"]) ? v["inzetrollen GMS"] : [],
+            alternatieven: Array.isArray(v["alternatief benaming"]) ? v["alternatief benaming"] : [],
+            status
+          };
+        });
+      } catch (e) {
+        console.error('Error loading BRW units:', e);
+        return [];
+      }
+    };
+
+    // 2) build mapping role -> beschikbare eenheden (gesorteerd op ETA)
+    const buildRoleMatches = async () => {
+      const allUnits = await loadBrwUnits();
+      console.log(`📊 Totaal aantal BRW eenheden geladen: ${allUnits.length}`);
+      console.log(`📋 Voorbeeld eenheid:`, allUnits[0] ? {
+        roepnummer: allUnits[0].roepnummer,
+        rollen: allUnits[0].rollen,
+        status: allUnits[0].status
+      } : 'geen eenheden');
+      
+      const roleList = Array.from(new Set((result.totaal || []).filter(Boolean)));
+      console.log(`🎯 Rollen uit inzetvoorstel:`, roleList);
+      
+      const matches: Record<string, { beschikbaar: Array<{ roepnummer: string; eta: number | null }>; alle: string[] }> = {};
+      
+      // Haal incident coördinaten op
+      const incidentCoords = selectedIncident?.coordinates || formData.coordinates;
+      console.log(`📍 Incident coördinaten:`, incidentCoords);
+      
+      if (!incidentCoords || !Array.isArray(incidentCoords) || incidentCoords.length !== 2) {
+        console.warn('⚠️ Geen incident coördinaten beschikbaar voor ETA berekening - gebruik fallback zonder ETA');
+        // Fallback naar oude logica zonder ETA
+        for (const role of roleList) {
+          const units = findUnitsForRole(allUnits, role);
+          console.log(`🔍 Rol "${role}": ${units.length} eenheden gevonden`, units.map(u => u.roepnummer));
+          const sorted = units.sort((a, b) => a.roepnummer.localeCompare(b.roepnummer));
+          const beschikbaar = sorted.filter(u => isAvailable(u.roepnummer, u.status)).map(u => ({ roepnummer: u.roepnummer, eta: null }));
+          console.log(`✅ Rol "${role}": ${beschikbaar.length} beschikbare eenheden`, beschikbaar.map(u => u.roepnummer));
+          const alle = sorted.map(u => u.roepnummer);
+          matches[role] = { beschikbaar, alle };
+        }
+        const brwAll = allUnits
+          .sort((a, b) => a.roepnummer.localeCompare(b.roepnummer))
+          .map(u => u.roepnummer);
+        return { matches, brwAll };
+      }
+      
+      // Bereken ETA's voor alle beschikbare eenheden per rol
+      for (const role of roleList) {
+        const units = findUnitsForRole(allUnits, role);
+        console.log(`🔍 Rol "${role}": ${units.length} eenheden gevonden`, units.map(u => ({ roepnummer: u.roepnummer, rollen: u.rollen, status: u.status })));
+        
+        // Filter op beschikbare eenheden (gebruik centrale isAvailable functie)
+        const beschikbareUnits = units.filter(u => {
+          const available = isAvailable(u.roepnummer, u.status);
+          if (!available) {
+            const unitPosition = getUnitPosition(u.roepnummer);
+            console.log(`❌ Eenheid ${u.roepnummer} niet beschikbaar (status: ${u.status}, activeIncidentId: ${unitPosition?.activeIncidentId || 'null'})`);
+          }
+          return available;
+        });
+        console.log(`✅ Rol "${role}": ${beschikbareUnits.length} beschikbare eenheden`, beschikbareUnits.map(u => u.roepnummer));
+        
+        // Bereken ETA voor elke beschikbare eenheid (gebruikt Leaflet marker positie)
+        const unitsWithETA = await Promise.all(
+          beschikbareUnits.map(async (unit) => {
+            const eta = await calculateETAForUnit(unit.roepnummer, incidentCoords as [number, number], unit.post);
+            console.log(`⏱️ ETA voor ${unit.roepnummer}: ${eta !== null ? formatETA(eta) : 'N/A'}`);
+            return { roepnummer: unit.roepnummer, eta };
+          })
+        );
+        
+        // Sorteer op ETA (kortste eerst), null ETA's naar achteren
+        unitsWithETA.sort((a, b) => {
+          if (a.eta === null && b.eta === null) return 0;
+          if (a.eta === null) return 1;
+          if (b.eta === null) return -1;
+          return a.eta - b.eta;
+        });
+        
+        console.log(`📊 Rol "${role}" gesorteerd:`, unitsWithETA.map(u => `${u.roepnummer} (${u.eta !== null ? formatETA(u.eta) : 'N/A'})`));
+        
+        // Alle eenheden (voor volledige lijst)
+        const alle = units
+          .sort((a, b) => a.roepnummer.localeCompare(b.roepnummer))
+          .map(u => u.roepnummer);
+        
+        matches[role] = { beschikbaar: unitsWithETA, alle };
+      }
+      
+      // Voeg volledige lijst van BRW-eenheden toe (alle roepnummers)
+      const brwAll = allUnits
+        .sort((a, b) => a.roepnummer.localeCompare(b.roepnummer))
+        .map(u => u.roepnummer);
+      
+      return { matches, brwAll } as { matches: Record<string, { beschikbaar: Array<{ roepnummer: string; eta: number | null }>; alle: string[] }>; brwAll: string[] };
+    };
+
+    // 3) afronden en UI/state bijwerken
+    return (async () => {
+      const { matches: roleMatches, brwAll } = await buildRoleMatches();
+
+      // Sla ETA's op in state voor gebruik in UI
+      const etaMap: Record<string, number> = {};
+      Object.values(roleMatches).forEach((match) => {
+        match.beschikbaar.forEach((unit) => {
+          if (unit.eta !== null && unit.eta !== undefined) {
+            etaMap[unit.roepnummer] = unit.eta;
+            console.log(`💾 ETA opgeslagen in state voor ${unit.roepnummer}: ${unit.eta} seconden (${formatETA(unit.eta)})`);
+          }
+        });
+      });
+      console.log(`📦 Totaal ${Object.keys(etaMap).length} ETA's opgeslagen in state:`, etaMap);
+      setUnitETAs(etaMap);
+
+      const voorstel = {
+        base: result.base,
+        extra: result.extra,
+        totaal: result.totaal,
+        toelichting: result.toelichting,
+        mc1,
+        mc2,
+        mc3,
+        functie,
+        extended,
+        timestamp: new Date().toLocaleString('nl-NL'),
+        brwMatches: roleMatches,
+        brwAll
+      } as any;
+
+      console.log('📦 Inzetvoorstel data:', {
+        brwMatches: roleMatches,
+        unitETAs: etaMap,
+        totalRoles: Object.keys(roleMatches).length,
+        sampleMatch: Object.keys(roleMatches).length > 0 ? roleMatches[Object.keys(roleMatches)[0]] : null
+      });
+
+      setInzetvoorstel(voorstel);
+      
+      // Laad alle BRW units voor de volledige tabel
+      const incidentCoordsForETA = selectedIncident?.coordinates || formData.coordinates;
+      const allBrwUnitsData = await loadBrwUnits();
+      const allBrwUnitsWithETA = await Promise.all(
+        allBrwUnitsData.map(async (unit) => {
+          let eta: number | null = null;
+          if (incidentCoordsForETA && Array.isArray(incidentCoordsForETA) && incidentCoordsForETA.length === 2) {
+            eta = await calculateETAForUnit(unit.roepnummer, incidentCoordsForETA as [number, number], unit.post);
+          }
+          return {
+            ...unit,
+            eta,
+            type: unit.rollen[0] || ''
+          };
+        })
+      );
+      setIvAllBrwUnits(allBrwUnitsWithETA);
+      
+      // Auto-select beste eenheden voor elke rol (op basis van ETA)
+      const autoSelected = new Set<string>();
+      Object.values(roleMatches).forEach((match) => {
+        const beschikbaar = Array.isArray(match?.beschikbaar) ? match.beschikbaar : [];
+        if (beschikbaar.length > 0) {
+          const bestUnit = beschikbaar[0]; // Eerste eenheid heeft laagste ETA
+          const roepnummer = typeof bestUnit === 'string' ? bestUnit : bestUnit.roepnummer;
+          autoSelected.add(roepnummer);
+        }
+      });
+      setIvSelectedUnits(autoSelected);
+      
+      // Force re-render door state update
+      console.log('🔄 Inzetvoorstel state bijgewerkt, verwacht re-render met ETA data');
+      setShowInzetvoorstel(true);
+      setActiveLoggingTab('hist-meldblok');
+      
+      // Start live ETA updates (elke 30 seconden)
+      if (etaUpdateIntervalRef.current) {
+        clearInterval(etaUpdateIntervalRef.current);
+      }
+      etaUpdateIntervalRef.current = setInterval(async () => {
+        if (selectedIncident?.coordinates) {
+          const newEtaMap: Record<string, number> = {};
+          // Gebruik Promise.all voor parallelle updates
+          const updatePromises: Promise<void>[] = [];
+          Object.values(roleMatches).forEach((match) => {
+            match.beschikbaar.forEach((unit) => {
+              const roepnummer = typeof unit === 'string' ? unit : unit.roepnummer;
+              // Vind post voor deze eenheid uit allBrwUnitsData
+              const unitData = allBrwUnitsData.find(u => u.roepnummer === roepnummer);
+              const unitPost = unitData?.post;
+              updatePromises.push(
+                calculateETAForUnit(roepnummer, selectedIncident.coordinates as [number, number], unitPost).then((eta) => {
+                  if (eta !== null) {
+                    newEtaMap[roepnummer] = eta;
+                  }
+                })
+              );
+            });
+          });
+          await Promise.all(updatePromises);
+          setUnitETAs(prev => ({ ...prev, ...newEtaMap }));
+        }
+      }, 30000); // Update elke 30 seconden
+
+      const tijdStr = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
+      addSystemLoggingEntry(`🚒 ${extended ? 'Uitgebreid ' : ''}Inzetvoorstel gegenereerd: ${voorstel.totaal.join(', ')}`);
+
+      // Logging per rol met gevonden roepnummers (voorkeur beschikbaar)
+      Object.entries(roleMatches).forEach(([role, lists]) => {
+        const beschikbaar = Array.isArray(lists.beschikbaar) ? lists.beschikbaar : [];
+        if (beschikbaar.length > 0) {
+          const eenhedenMetETA = beschikbaar.map((unit: any) => {
+            const roepnummer = typeof unit === 'string' ? unit : unit.roepnummer;
+            const eta = typeof unit === 'object' && unit.eta !== null ? formatETA(unit.eta) : '';
+            return eta ? `${roepnummer} (${eta})` : roepnummer;
+          }).join(', ');
+          addSystemLoggingEntry(`🔥 ${role}: ${eenhedenMetETA}`);
+        } else {
+          addSystemLoggingEntry(`🔥 ${role}: geen beschikbare BRW-eenheden gevonden`);
+        }
+      });
+
+      console.log('✅ Inzetvoorstel + BRW matches:', voorstel);
+    })();
+
+    // return direct een minimale structuur; volledige wordt async gezet
+    return {
+      base: result.base,
+      extra: result.extra,
+      totaal: result.totaal,
+      toelichting: result.toelichting,
+      mc1,
+      mc2,
+      mc3,
+      functie,
+      extended,
+      timestamp: new Date().toLocaleString('nl-NL')
+    };
+  };
+
+  // Toggle selectie van eenheid in IV-scherm (zonder koppelen)
+  const toggleIvUnitSelection = async (roepnummer: string) => {
+    setIvSelectedUnits(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(roepnummer)) {
+        // Deselecteren: verwijder ook inzetrol
+        newSet.delete(roepnummer);
+        setIvUnitRoles(prevRoles => {
+          const newRoles = new Map(prevRoles);
+          newRoles.delete(roepnummer);
+          return newRoles;
+        });
+      } else {
+        // Selecteren: bepaal en wijs inzetrol toe
+        newSet.add(roepnummer);
+        
+        // Bepaal inzetrol op basis van incident en voertuigtype
+        void (async () => {
+          if (!selectedIncident) return;
+          
+          // Haal voertuigtype op uit brwUnitsMap of ivAllBrwUnits
+          const unit = brwUnitsMap[roepnummer] || ivAllBrwUnits.find(u => u.roepnummer === roepnummer);
+          if (!unit) {
+            console.warn(`⚠️ Eenheid ${roepnummer} niet gevonden voor inzetrol bepaling`);
+            return;
+          }
+          
+          // Bepaal voertuigtype (eerste rol of type)
+          const voertuigtype = unit.type || unit.rollen[0] || 'Onbekend';
+          
+          // Haal MC1 en MC2 op uit incident
+          const mc1 = selectedIncident.mc1 || selectedMC1 || '';
+          const mc2 = selectedIncident.mc2 || selectedMC2 || '';
+          
+          // Haal karakteristieken op
+          const karakteristieken = selectedKarakteristieken || [];
+          
+          try {
+            // Bepaal inzetrol
+            const inzetrol = await getInzetrolForIncidentAndVehicle(
+              mc1,
+              mc2,
+              karakteristieken,
+              voertuigtype
+            );
+            
+            if (inzetrol) {
+              // Sla inzetrol op
+              setIvUnitRoles(prevRoles => {
+                const newRoles = new Map(prevRoles);
+                newRoles.set(roepnummer, inzetrol);
+                return newRoles;
+              });
+              
+              console.log(`✅ Inzetrol "${inzetrol}" toegewezen aan ${roepnummer} voor MC1="${mc1}", MC2="${mc2}", voertuigtype="${voertuigtype}"`);
+            } else {
+              console.warn(`⚠️ Geen inzetrol gevonden voor ${roepnummer}`);
+            }
+          } catch (error) {
+            console.error(`❌ Fout bij bepalen inzetrol voor ${roepnummer}:`, error);
+          }
+        })();
+      }
+      return newSet;
+    });
+  };
+
+  // Herbereken inzetrollen voor alle geselecteerde eenheden
+  const recalculateInzetrollen = async () => {
+    if (!selectedIncident || ivSelectedUnits.size === 0) {
+      return;
+    }
+
+    const mc1 = selectedIncident.mc1 || selectedMC1 || '';
+    const mc2 = selectedIncident.mc2 || selectedMC2 || '';
+    const karakteristieken = selectedKarakteristieken || [];
+
+    const newRoles = new Map<string, string>();
+
+    // Herbereken voor alle geselecteerde eenheden
+    for (const roepnummer of ivSelectedUnits) {
+      const unit = brwUnitsMap[roepnummer] || ivAllBrwUnits.find(u => u.roepnummer === roepnummer);
+      if (!unit) continue;
+
+      const voertuigtype = unit.type || unit.rollen[0] || 'Onbekend';
+
+      try {
+        const inzetrol = await getInzetrolForIncidentAndVehicle(
+          mc1,
+          mc2,
+          karakteristieken,
+          voertuigtype
+        );
+
+        if (inzetrol) {
+          newRoles.set(roepnummer, inzetrol);
+          console.log(`✅ Inzetrol herberekend voor ${roepnummer}: "${inzetrol}"`);
+        }
+      } catch (error) {
+        console.error(`❌ Fout bij herberekenen inzetrol voor ${roepnummer}:`, error);
+      }
+    }
+
+    // Update state
+    setIvUnitRoles(newRoles);
+    console.log(`🔄 Inzetrollen herberekend voor ${newRoles.size} eenheden`);
+  };
+
+  // Auto-select beste eenheid (laagste ETA) voor key roles in IV-scherm
+  const autoSelectKeyBrwUnits = () => {
+    if (!inzetvoorstel || !inzetvoorstel.brwMatches) return;
+
+    const normalizeRole = (s: string) => (s || '').replace(/^\d+\s*/, '').trim().toUpperCase();
+    const desiredRoles = ['TS-6', 'RV', 'WO', 'DA-OD'];
+
+    const newSelected = new Set(ivSelectedUnits);
+
+    for (const desired of desiredRoles) {
+      // Find the matching role key in brwMatches (keys may include counts like "1 TS-6")
+      const roleKey = Object.keys(inzetvoorstel.brwMatches).find(k => normalizeRole(k) === desired);
+      if (!roleKey) continue;
+      const m = inzetvoorstel.brwMatches[roleKey];
+      
+      // m.beschikbaar is nu een array van { roepnummer, eta } objecten, gesorteerd op ETA
+      const beschikbaar = Array.isArray(m?.beschikbaar) ? m.beschikbaar : [];
+      
+      // Zoek de eerste beschikbare eenheid met de laagste ETA die nog niet is geselecteerd
+      const candidate = beschikbaar.find((unit: any) => {
+        const roepnummer = typeof unit === 'string' ? unit : unit.roepnummer;
+        return !newSelected.has(roepnummer);
+      });
+      
+      if (candidate) {
+        const roepnummer = typeof candidate === 'string' ? candidate : candidate.roepnummer;
+        newSelected.add(roepnummer);
+      }
+    }
+    
+    setIvSelectedUnits(newSelected);
+  };
+
+  // Accepteer IV: koppel alle geselecteerde eenheden en start movement
+  const handleAcceptIV = async () => {
+    if (!selectedIncident) {
+      addSystemLoggingEntry('❌ Geen incident geselecteerd');
+      return;
+    }
+
+    if (ivSelectedUnits.size === 0) {
+      addSystemLoggingEntry('⚠️ Geen eenheden geselecteerd om te koppelen');
+      return;
+    }
+
+    // Verzamel eerst alle units die gekoppeld moeten worden
+    const unitsToAdd: AssignedUnit[] = [];
+    const now = new Date().toTimeString().slice(0, 5);
+    const existingRoepnummers = new Set((selectedIncident.assignedUnits || []).map(u => u.roepnummer));
+
+    // Koppel alle geselecteerde eenheden
+    for (const roepnummer of ivSelectedUnits) {
+      // Skip als al gekoppeld
+      if (existingRoepnummers.has(roepnummer)) {
+        addSystemLoggingEntry(`⚠️ Eenheid ${roepnummer} is al gekoppeld aan incident #${selectedIncident.nr}`);
+        continue;
+      }
+
+      const unit = brwUnitsMap[roepnummer] || ivAllBrwUnits.find(u => u.roepnummer === roepnummer);
+      const soort_voertuig = unit?.gmsNaam || (unit?.rollen?.[0] || 'BRW-eenheid');
+      
+      // Haal inzetrol op uit ivUnitRoles
+      const inzetrol = ivUnitRoles.get(roepnummer);
+
+      const newUnit: AssignedUnit = { 
+        roepnummer, 
+        soort_voertuig,
+        inzetrol: inzetrol || undefined, // Voeg inzetrol toe als beschikbaar
+        huidige_status: 'ov', // Opdracht verstrekt
+        ov_tijd: now 
+      };
+      
+      // Gebruik centrale statusmodule
+      setUnitStatusCentral(newUnit, 'ov', {
+        incidentId: selectedIncident.id
+      });
+
+      unitsToAdd.push(newUnit);
+      addSystemLoggingEntry(`🧩 Eenheid ${roepnummer} gekoppeld aan incident #${selectedIncident.nr} - Status: OV`);
+    }
+
+    // Voeg alle units in één keer toe aan het incident
+    if (unitsToAdd.length > 0) {
+      const updatedAssigned = Array.isArray(selectedIncident.assignedUnits) 
+        ? [...selectedIncident.assignedUnits, ...unitsToAdd]
+        : unitsToAdd;
+      
+      const updatedIncident = { ...selectedIncident, assignedUnits: updatedAssigned } as any;
+      setSelectedIncident(updatedIncident);
+      setIncidents(prev => prev.map(inc => inc.id === updatedIncident.id ? updatedIncident : inc));
+      
+      // Update database
+      await updateSelectedIncident(updatedIncident);
+
+      // Start movement engine voor alle gekoppelde units als coördinaten beschikbaar zijn
+      if (selectedIncident.coordinates && Array.isArray(selectedIncident.coordinates) && selectedIncident.coordinates.length === 2) {
+        const [lng, lat] = selectedIncident.coordinates;
+        
+        for (const unit of unitsToAdd) {
+          // Dispatch event om movement te starten (wordt opgepikt door globalUnitMovement)
+          window.dispatchEvent(new CustomEvent('unitMovementStarted', {
+            detail: { 
+              roepnummer: unit.roepnummer, 
+              targetLat: lat, 
+              targetLng: lng, 
+              targetType: 'incident', 
+              targetId: selectedIncident.id 
+            }
+          }));
+        }
+      }
+    }
+
+    addSystemLoggingEntry(`✅ IV geaccepteerd: ${unitsToAdd.length} eenhe${unitsToAdd.length === 1 ? 'id' : 'den'} gekoppeld`);
+    
+    // Sluit IV-scherm en reset selectie
+    setShowInzetvoorstel(false);
+    setInzetvoorstel(null);
+    setIvSelectedUnits(new Set());
+  };
+
+  // Auto-assign beste eenheid (laagste ETA) voor key roles (oude functie, behouden voor backwards compatibility)
+  const autoAssignKeyBrwUnits = () => {
+    if (!inzetvoorstel || !inzetvoorstel.brwMatches) return;
+    if (!selectedIncident) return;
+
+    const normalizeRole = (s: string) => (s || '').replace(/^\d+\s*/, '').trim().toUpperCase();
+    const desiredRoles = ['TS-6', 'RV', 'WO', 'DA-OD'];
+
+    const alreadyPicked = new Set<string>();
+
+    for (const desired of desiredRoles) {
+      // Find the matching role key in brwMatches (keys may include counts like "1 TS-6")
+      const roleKey = Object.keys(inzetvoorstel.brwMatches).find(k => normalizeRole(k) === desired);
+      if (!roleKey) continue;
+      const m = inzetvoorstel.brwMatches[roleKey];
+      
+      // m.beschikbaar is nu een array van { roepnummer, eta } objecten, gesorteerd op ETA
+      const beschikbaar = Array.isArray(m?.beschikbaar) ? m.beschikbaar : [];
+      
+      // Zoek de eerste beschikbare eenheid met de laagste ETA die nog niet is toegewezen
+      const candidate = beschikbaar.find((unit: any) => {
+        const roepnummer = typeof unit === 'string' ? unit : unit.roepnummer;
+        return !isBrwUnitAssigned(roepnummer) && !alreadyPicked.has(roepnummer);
+      });
+      
+      if (candidate) {
+        const roepnummer = typeof candidate === 'string' ? candidate : candidate.roepnummer;
+        const eta = typeof candidate === 'object' && candidate.eta !== null ? formatETA(candidate.eta) : '';
+        toggleAssignBrwUnit(roepnummer);
+        alreadyPicked.add(roepnummer);
+        addSystemLoggingEntry(`🔗 Automatisch gekoppeld (${desired}): ${roepnummer}${eta ? ` - Aanrijdtijd: ${eta}` : ''}`);
+      } else {
+        addSystemLoggingEntry(`⚠️ Geen geschikte eenheid gevonden voor ${desired}`);
+      }
+    }
+  };
+
   // Function to merge incidents (DUB functionality)
   const handleDubMerge = (targetIncident: GmsIncident) => {
     if (!selectedIncident) {
-      addLoggingEntry("❌ Geen hoofdincident geselecteerd voor samenvoegen");
+      addSystemLoggingEntry("❌ Geen hoofdincident geselecteerd voor samenvoegen");
       return;
     }
 
     if (selectedIncident.id === targetIncident.id) {
-      addLoggingEntry("❌ Kan incident niet met zichzelf samenvoegen");
+      addSystemLoggingEntry("❌ Kan incident niet met zichzelf samenvoegen");
       return;
     }
 
@@ -2725,9 +6347,43 @@ export default function GMS2() {
     setActiveLoggingTab('hist-meldblok');
 
     // Show success message
-    addLoggingEntry(`✅ DUB voltooid: Incident ${targetIncident.nr} samengevoegd met ${selectedIncident.nr}`);
+    addSystemLoggingEntry(`✅ DUB voltooid: Incident ${targetIncident.nr} samengevoegd met ${selectedIncident.nr}`);
 
     console.log(`✅ DUB: Incident ${targetIncident.nr} successfully merged into ${selectedIncident.nr}`);
+  };
+
+  // Generate P2000 format: P[urgentiecijfer] [GESPREKSGROEP] [MC3] [ADRES] [PLAATSNAAM] [ROEPNUMMERS]
+  const generateP2000Format = () => {
+    const prio = selectedIncident?.prio || priorityValue;
+    const mc = selectedIncident?.mc3 || selectedMC3 || selectedIncident?.mc2 || selectedMC2 || selectedIncident?.mc1 || selectedMC1 || "";
+    const adres = selectedIncident?.straatnaam && selectedIncident?.huisnummer 
+      ? `${selectedIncident.straatnaam.toUpperCase()} ${selectedIncident.huisnummer}${selectedIncident.toevoeging ? selectedIncident.toevoeging : ''}`
+      : formData.straatnaam && formData.huisnummer
+      ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}`
+      : (selectedIncident?.locatie || "").toUpperCase();
+    const plaatsnaam = (selectedIncident?.plaatsnaam || formData.plaatsnaam || "").toUpperCase();
+    const roepnummers = selectedIncident?.assignedUnits?.length ? selectedIncident.assignedUnits.map(u => u.roepnummer).join(" ") : "";
+
+    // Check for gespreksgroep karakteristiek (code "gg")
+    const gespreksgroepKarakteristiek = [...selectedKarakteristieken, ...(selectedIncident?.karakteristieken || [])].find(
+      k => k.ktCode === 'gg' || k.ktCode === 'GG'
+    );
+    
+    // Use gespreksgroep waarde if available, otherwise use default "1"
+    const kanaalOfGroep = gespreksgroepKarakteristiek?.waarde 
+      ? gespreksgroepKarakteristiek.waarde.toUpperCase()
+      : "1";
+
+    const parts = [
+      `P${prio}`,
+      kanaalOfGroep,
+      mc ? mc : "",
+      adres,
+      plaatsnaam,
+      roepnummers
+    ].filter(part => part && part.trim() !== "");
+
+    return parts.join(" ");
   };
 
   return (
@@ -2760,7 +6416,8 @@ export default function GMS2() {
               <div className="gms2-p2000-current-incident">
                 <div className="gms2-p2000-section-header">
                   Pagertext Editor
-                  <button 
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button 
                     className="gms2-btn"
                     onClick={() => {
                       const now = new Date();
@@ -2768,6 +6425,19 @@ export default function GMS2() {
                       
                       // Add to logging
                       addLoggingEntry(`🚨 ALARMERING VERZONDEN: "${pagerText}" om ${timeStr}`);
+                      
+                      // Dispatch P2000 alarm event to lightboard
+                      const alarmEvent = new CustomEvent('p2000-alarm', {
+                        detail: {
+                          id: selectedIncident?.nr?.toString() || getNextIncidentNumber().toString(),
+                          type: selectedMC3 || selectedMC2 || selectedMC1 || "ALARM",
+                          location: formData.straatnaam && formData.huisnummer 
+                            ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}, ${formData.plaatsnaam?.toUpperCase() || 'ONBEKEND'}`
+                            : "LOCATIE ONBEKEND",
+                          pagerText: pagerText
+                        }
+                      });
+                      window.dispatchEvent(alarmEvent);
                       
                       // Create new P2000 entry for current incident/melding
                       const currentIncident = selectedIncident || {
@@ -2806,6 +6476,7 @@ export default function GMS2() {
                           postcode: formData.postcode,
                           plaatsnaam: formData.plaatsnaam,
                           gemeente: formData.gemeente,
+                          coordinates: formData.coordinates,
                           functie: formData.functie,
                           mc1: selectedMC1,
                           mc2: selectedMC2,
@@ -2820,6 +6491,22 @@ export default function GMS2() {
                         
                         setIncidents(prev => [newIncident, ...prev]);
                         setSelectedIncident(newIncident);
+                        
+                        // Dispatch custom event voor real-time map updates
+                        window.dispatchEvent(new CustomEvent('gms2IncidentsUpdated'));
+                        
+                        // Dispatch P2000 alarm event to lightboard
+                        const alarmEvent = new CustomEvent('p2000-alarm', {
+                          detail: {
+                            id: newIncident.nr.toString(),
+                            type: selectedMC3 || selectedMC2 || selectedMC1 || "ALARM",
+                            location: formData.straatnaam && formData.huisnummer 
+                              ? `${formData.straatnaam.toUpperCase()} ${formData.huisnummer}${formData.toevoeging ? formData.toevoeging : ''}, ${formData.plaatsnaam?.toUpperCase() || 'ONBEKEND'}`
+                              : "LOCATIE ONBEKEND",
+                            pagerText: pagerText || `${selectedMC3 || selectedMC2 || selectedMC1 || "ALARM"} - ${formData.straatnaam || "ONBEKEND"}`
+                          }
+                        });
+                        window.dispatchEvent(alarmEvent);
                       } else {
                         // Update existing incident status
                         const updatedIncident = {
@@ -2830,19 +6517,33 @@ export default function GMS2() {
                           inc.id === selectedIncident.id ? updatedIncident : inc
                         ));
                         setSelectedIncident(updatedIncident);
+                        
+                        // Dispatch P2000 alarm event to lightboard for existing incident
+                        const alarmEvent = new CustomEvent('p2000-alarm', {
+                          detail: {
+                            id: selectedIncident.nr.toString(),
+                            type: selectedMC3 || selectedMC2 || selectedMC1 || selectedIncident.mc || "ALARM",
+                            location: selectedIncident.straatnaam && selectedIncident.huisnummer 
+                              ? `${selectedIncident.straatnaam.toUpperCase()} ${selectedIncident.huisnummer}${selectedIncident.toevoeging ? selectedIncident.toevoeging : ''}, ${selectedIncident.plaatsnaam?.toUpperCase() || 'ONBEKEND'}`
+                              : selectedIncident.locatie || "LOCATIE ONBEKEND",
+                            pagerText: pagerText || `${selectedMC3 || selectedMC2 || selectedMC1 || selectedIncident.mc || "ALARM"} - ${selectedIncident.locatie || "ONBEKEND"}`
+                          }
+                        });
+                        window.dispatchEvent(alarmEvent);
                       }
                     }}
                     style={{ marginLeft: '10px', background: '#ff4444', color: 'white' }}
                   >
                     🚨 ALARMEER
                   </button>
+                  </div>
                 </div>
                 <textarea 
                   className="gms2-p2000-pager-edit"
                   value={pagerText}
                   onChange={(e) => setPagerText(e.target.value)}
                   rows={2}
-                  placeholder="Prio [nummer] [classificatie] [adres] [plaats] ICNUM [incidentnummer]"
+                  placeholder="P[prio] [gespreksgroep] [classificatie] [adres] [plaats] [roepnummers]"
                   style={{ 
                     width: '100%', 
                     background: '#000080', 
@@ -2911,10 +6612,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430020");
-                            addLoggingEntry("📢 Persalarm (capcode: 1430020) toegevoegd");
+                            addSystemLoggingEntry("📢 Persalarm (capcode: 1430020) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430020", ""));
-                            addLoggingEntry("📢 Persalarm (capcode: 1430020) verwijderd");
+                            addSystemLoggingEntry("📢 Persalarm (capcode: 1430020) verwijderd");
                           }
                         }}
                       />
@@ -2931,10 +6632,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430050");
-                            addLoggingEntry("🔍 TEV piket (capcode: 1430050) toegevoegd");
+                            addSystemLoggingEntry("🔍 TEV piket (capcode: 1430050) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430050", ""));
-                            addLoggingEntry("🔍 TEV piket (capcode: 1430050) verwijderd");
+                            addSystemLoggingEntry("🔍 TEV piket (capcode: 1430050) verwijderd");
                           }
                         }}
                       />
@@ -2951,10 +6652,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430030");
-                            addLoggingEntry("👮 Officier van Dienst (capcode: 1430030) toegevoegd");
+                            addSystemLoggingEntry("👮 Officier van Dienst (capcode: 1430030) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430030", ""));
-                            addLoggingEntry("👮 Officier van Dienst (capcode: 1430030) verwijderd");
+                            addSystemLoggingEntry("👮 Officier van Dienst (capcode: 1430030) verwijderd");
                           }
                         }}
                       />
@@ -2971,10 +6672,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430060");
-                            addLoggingEntry("🕵️ BVT (capcode: 1430060) toegevoegd");
+                            addSystemLoggingEntry("🕵️ BVT (capcode: 1430060) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430060", ""));
-                            addLoggingEntry("🕵️ BVT (capcode: 1430060) verwijderd");
+                            addSystemLoggingEntry("🕵️ BVT (capcode: 1430060) verwijderd");
                           }
                         }}
                       />
@@ -2991,10 +6692,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430040");
-                            addLoggingEntry("⚖️ HOVJ (capcode: 1430040) toegevoegd");
+                            addSystemLoggingEntry("⚖️ HOVJ (capcode: 1430040) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430040", ""));
-                            addLoggingEntry("⚖️ HOVJ (capcode: 1430040) verwijderd");
+                            addSystemLoggingEntry("⚖️ HOVJ (capcode: 1430040) verwijderd");
                           }
                         }}
                       />
@@ -3011,10 +6712,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430070");
-                            addLoggingEntry("🚗 VOA (capcode: 1430070) toegevoegd");
+                            addSystemLoggingEntry("🚗 VOA (capcode: 1430070) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430070", ""));
-                            addLoggingEntry("🚗 VOA (capcode: 1430070) verwijderd");
+                            addSystemLoggingEntry("🚗 VOA (capcode: 1430070) verwijderd");
                           }
                         }}
                       />
@@ -3031,10 +6732,10 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430080");
-                            addLoggingEntry("📞 Coördinatie Centrum (capcode: 1430080) toegevoegd");
+                            addSystemLoggingEntry("📞 Coördinatie Centrum (capcode: 1430080) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430080", ""));
-                            addLoggingEntry("📞 Coördinatie Centrum (capcode: 1430080) verwijderd");
+                            addSystemLoggingEntry("📞 Coördinatie Centrum (capcode: 1430080) verwijderd");
                           }
                         }}
                       />
@@ -3051,16 +6752,38 @@ export default function GMS2() {
                         onChange={(e) => {
                           if (e.target.checked) {
                             setPagerText(prev => prev + " 1430090");
-                            addLoggingEntry("🔬 Forensische Opsporing (capcode: 1430090) toegevoegd");
+                            addSystemLoggingEntry("🔬 Forensische Opsporing (capcode: 1430090) toegevoegd");
                           } else {
                             setPagerText(prev => prev.replace(" 1430090", ""));
-                            addLoggingEntry("🔬 Forensische Opsporing (capcode: 1430090) verwijderd");
+                            addSystemLoggingEntry("🔬 Forensische Opsporing (capcode: 1430090) verwijderd");
                           }
                         }}
                       />
                       <label htmlFor="forensische-opsporing" className="gms2-functionaris-label">
                         <span className="functionaris-name">Forensische Opsporing</span>
                         <span className="functionaris-capcode">(capcode: 1430090)</span>
+                      </label>
+                    </div>
+
+                    <div className="gms2-functionaris-item">
+                      <input 
+                        type="checkbox" 
+                        id="fo-piket-rotterdam"
+                        checked={foPiketChecked}
+                        onChange={(e) => {
+                          setFoPiketChecked(e.target.checked);
+                          if (e.target.checked) {
+                            setPagerText(prev => prev + " 1430100");
+                            addSystemLoggingEntry("🕵️ FO piket Rotterdam (capcode: 1430100) toegevoegd");
+                          } else {
+                            setPagerText(prev => prev.replace(" 1430100", ""));
+                            addSystemLoggingEntry("🕵️ FO piket Rotterdam (capcode: 1430100) verwijderd");
+                          }
+                        }}
+                      />
+                      <label htmlFor="fo-piket-rotterdam" className="gms2-functionaris-label">
+                        <span className="functionaris-name">FO piket Rotterdam</span>
+                        <span className="functionaris-capcode">(capcode: 1430100)</span>
                       </label>
                     </div>
                   </div>
@@ -3079,6 +6802,565 @@ export default function GMS2() {
           </div>
         </div>
       )}
+
+      {/* Inzetvoorstel Modal Popup - GMS Style */}
+      {showInzetvoorstel && inzetvoorstel && (() => {
+        // Bereken gefilterde en gesorteerde eenheden voor de tabel
+        const filteredUnits = ivAllBrwUnits
+          .filter(unit => {
+            // Filter op zichtbaarheid en status
+            if (unit.visible === false) return false;
+            
+            // Filter op status (buiten dienst units niet tonen)
+            const statusDef = getStatusDef(unit.status);
+            if (statusDef?.afkorting === 'fd' || unit.status === '4 - Niet inzetbaar') {
+              return false;
+            }
+            
+            // Alleen filteren als filtersEnabled = true
+            if (ivFiltersEnabled) {
+              // Filter op type
+              if (ivFilterType && !unit.rollen.some(r => r.includes(ivFilterType))) {
+                return false;
+              }
+              // Filter op status
+              if (ivFilterStatus) {
+                const statusLower = (unit.status || '').toLowerCase();
+                if (ivFilterStatus === 'BS' && !statusLower.includes('beschikbaar') && !statusLower.includes('vrij')) return false;
+                if (ivFilterStatus === 'KZ' && !statusLower.includes('kazerne')) return false;
+                if (ivFilterStatus === 'NB' && !statusLower.includes('niet beschikbaar') && !statusLower.includes('inzetbaar')) return false;
+              }
+              // Filter op beschikbaarheid
+              if (ivShowOnlyAvailable && !isAvailable(unit.roepnummer, unit.status)) {
+                return false;
+              }
+              // Filter op max ETA
+              if (unit.eta !== null && unit.eta !== undefined && unit.eta > ivFilterMaxETA) {
+                return false;
+              }
+            }
+            return true;
+          })
+          .map(unit => ({
+            ...unit,
+            eta: unit.eta ?? unitETAs[unit.roepnummer] ?? null
+          }))
+          .sort((a, b) => {
+            // Sorteer op ETA (kortste eerst) - GEEN OVD-preferentie
+            if (a.eta === null && b.eta === null) return 0;
+            if (a.eta === null) return 1;
+            if (b.eta === null) return -1;
+            return a.eta - b.eta;
+          });
+
+        // Haal eenheden uit inzetvoorstel op met ETA's
+        const inzetvoorstelUnits: Array<{ role: string; count: number; bestUnit?: { roepnummer: string; eta: number | null } }> = [];
+        const roleCounts: Record<string, number> = {};
+        (inzetvoorstel.totaal || []).forEach((u: string) => {
+          const key = (u || '').trim();
+          if (!key) return;
+          roleCounts[key] = (roleCounts[key] || 0) + 1;
+        });
+
+        Object.entries(roleCounts).forEach(([role, count]) => {
+          const match = inzetvoorstel.brwMatches?.[role];
+          const bestUnit = match?.beschikbaar?.[0];
+          inzetvoorstelUnits.push({
+            role,
+            count,
+            bestUnit: bestUnit ? {
+              roepnummer: typeof bestUnit === 'string' ? bestUnit : bestUnit.roepnummer,
+              eta: typeof bestUnit === 'object' && bestUnit !== null ? bestUnit.eta : null
+            } : undefined
+          });
+        });
+
+        // Bereken snelste ETA
+        const fastestETA = inzetvoorstelUnits
+          .map(u => u.bestUnit?.eta)
+          .filter((eta): eta is number => eta !== null && eta !== undefined)
+          .sort((a, b) => a - b)[0];
+
+        return (
+          <div 
+            className="gms2-p2000-overlay"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowInzetvoorstel(false);
+                setInzetvoorstel(null);
+              }
+            }}
+          >
+            <div 
+              className="gms2-p2000-window" 
+              style={{ 
+                maxWidth: '1000px', 
+                maxHeight: '90vh',
+                width: '95%',
+                overflow: 'auto',
+                background: '#ffffff',
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '11px'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* GMS Blauwe Header */}
+              <div style={{ 
+                background: '#0066CC', 
+                color: '#ffffff', 
+                padding: '4px 8px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    onClick={handleAcceptIV}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '10px',
+                      background: '#ffffff',
+                      color: '#0066CC',
+                      border: '1px solid #ffffff',
+                      cursor: 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                    title="Accepteer inzetvoorstel en koppel geselecteerde eenheden"
+                  >
+                    IV accepteren
+                  </button>
+                  <span>Inzetvoorstel (MAR)</span>
+                </div>
+                <button 
+                  onClick={() => {
+                    setShowInzetvoorstel(false);
+                    setInzetvoorstel(null);
+                    setIvSelectedUnits(new Set());
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    padding: '0 4px'
+                  }}
+                  title="Sluiten (ESC)"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div style={{ padding: '12px', background: '#ffffff' }}>
+                {/* SECTIE 0: VOORGESTELDE INZET (AUTOMATISCH OP BASIS VAN ETA) */}
+                <div style={{ 
+                  marginBottom: '16px', 
+                  border: '1px solid #d0d0d0', 
+                  background: '#f0f0f0', 
+                  padding: '10px'
+                }}>
+                  <div style={{ 
+                    fontSize: '11px', 
+                    fontWeight: 'bold', 
+                    marginBottom: '8px',
+                    color: '#333'
+                  }}>
+                    VOORGESTELDE INZET (AUTOMATISCH OP BASIS VAN ETA)
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap', 
+                    gap: '6px',
+                    fontSize: '10px'
+                  }}>
+                    {inzetvoorstelUnits.map((item, idx) => {
+                      if (!item.bestUnit) return null;
+                      const unit = ivAllBrwUnits.find(u => u.roepnummer === item.bestUnit!.roepnummer);
+                      const type = unit?.type || unit?.rollen[0] || 'Onbekend';
+                      const role = item.role;
+                      return (
+                        <div 
+                          key={idx}
+                          style={{
+                            border: '1px solid #ccc',
+                            background: '#ffffff',
+                            padding: '4px 8px',
+                            fontSize: '9px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          <span style={{ fontWeight: 'bold' }}>{item.bestUnit.roepnummer}</span>
+                          <span>|</span>
+                          <span>{type} — {role}</span>
+                          {item.bestUnit.eta !== null && (
+                            <>
+                              <span>|</span>
+                              <span style={{ 
+                                color: '#0066CC', 
+                                fontFamily: 'monospace',
+                                fontSize: '9px'
+                              }}>
+                                ETA: {formatETA(item.bestUnit.eta)}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {inzetvoorstelUnits.filter(item => item.bestUnit).length === 0 && (
+                      <div style={{ fontSize: '9px', color: '#999', fontStyle: 'italic' }}>
+                        Geen eenheden beschikbaar
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* SECTIE 1: INZETVOORSTEL */}
+                <div style={{ 
+                  marginBottom: '16px', 
+                  border: '1px solid #d0d0d0', 
+                  background: '#f5f5f5', 
+                  padding: '10px'
+                }}>
+                  <div style={{ 
+                    fontSize: '11px', 
+                    fontWeight: 'bold', 
+                    marginBottom: '8px',
+                    color: '#333'
+                  }}>
+                    INZETVOORSTEL
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexWrap: 'wrap', 
+                    gap: '8px',
+                    marginBottom: '8px'
+                  }}>
+                    {inzetvoorstelUnits.map((item, idx) => (
+                      <div 
+                        key={idx}
+                        style={{
+                          border: '1px solid #ccc',
+                          background: '#ffffff',
+                          padding: '6px 10px',
+                          fontSize: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <span style={{ fontWeight: 'bold' }}>{item.count}× {item.role}</span>
+                        {item.bestUnit && item.bestUnit.eta !== null && (
+                          <span style={{ 
+                            color: '#0066CC', 
+                            fontFamily: 'monospace',
+                            fontSize: '10px'
+                          }}>
+                            ETA: {formatETA(item.bestUnit.eta)}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {fastestETA !== undefined && (
+                    <div style={{ 
+                      fontSize: '10px', 
+                      color: '#666',
+                      marginTop: '4px'
+                    }}>
+                      Snelste aanrijdtijd: <strong>{formatETA(fastestETA)}</strong>
+                    </div>
+                  )}
+                  <div style={{ marginTop: '8px' }}>
+                    <button
+                      onClick={autoSelectKeyBrwUnits}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '10px',
+                        background: '#0066CC',
+                        color: '#ffffff',
+                        border: '1px solid #0052A3',
+                        cursor: 'pointer'
+                      }}
+                      title="Selecteer automatisch TS-6, RV, WO en DA-OD"
+                    >
+                      Automatisch selecteren
+                    </button>
+                  </div>
+                </div>
+
+                {/* SECTIE 2: FILTERS */}
+                <div style={{ 
+                  marginBottom: '16px', 
+                  border: '1px solid #d0d0d0', 
+                  background: ivFiltersEnabled ? '#f5f5f5' : '#e8e8e8', 
+                  padding: '10px',
+                  opacity: ivFiltersEnabled ? 1 : 0.7
+                }}>
+                  <div style={{ 
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '11px', 
+                      fontWeight: 'bold', 
+                      color: '#333'
+                    }}>
+                      FILTERS
+                    </div>
+                    <button
+                      onClick={() => setIvFiltersEnabled(!ivFiltersEnabled)}
+                      style={{
+                        padding: '3px 8px',
+                        fontSize: '9px',
+                        background: ivFiltersEnabled ? '#0066CC' : '#999',
+                        color: '#ffffff',
+                        border: '1px solid #ccc',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {ivFiltersEnabled ? 'Filters verbergen' : 'Filters tonen'}
+                    </button>
+                  </div>
+                  {ivFiltersEnabled && (
+                    <>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                    {/* Type filters */}
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {['TS-6', 'RV', 'HV', 'WO', 'DA-OD', 'SI', 'OvD'].map(type => (
+                        <button
+                          key={type}
+                          onClick={() => setIvFilterType(ivFilterType === type ? '' : type)}
+                          style={{
+                            padding: '3px 8px',
+                            fontSize: '9px',
+                            background: ivFilterType === type ? '#0066CC' : '#e0e0e0',
+                            color: ivFilterType === type ? '#ffffff' : '#333',
+                            border: '1px solid #ccc',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Status filters */}
+                    <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
+                      {['BS', 'KZ', 'NB'].map(status => (
+                        <button
+                          key={status}
+                          onClick={() => setIvFilterStatus(ivFilterStatus === status ? '' : status)}
+                          style={{
+                            padding: '3px 8px',
+                            fontSize: '9px',
+                            background: ivFilterStatus === status ? '#0066CC' : '#e0e0e0',
+                            color: ivFilterStatus === status ? '#ffffff' : '#333',
+                            border: '1px solid #ccc',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Max ETA filter */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '8px' }}>
+                      <span style={{ fontSize: '9px' }}>ETA ≤</span>
+                      <input
+                        type="number"
+                        value={ivFilterMaxETA === 999999 ? '' : Math.floor(ivFilterMaxETA / 60)}
+                        onChange={(e) => {
+                          const minutes = parseInt(e.target.value) || 0;
+                          setIvFilterMaxETA(minutes > 0 ? minutes * 60 : 999999);
+                        }}
+                        placeholder="min"
+                        style={{
+                          width: '50px',
+                          padding: '2px 4px',
+                          fontSize: '9px',
+                          border: '1px solid #ccc'
+                        }}
+                      />
+                      <span style={{ fontSize: '9px' }}>min</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', fontSize: '9px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={ivShowAllUnits}
+                        onChange={(e) => setIvShowAllUnits(e.target.checked)}
+                      />
+                      Alle eenheden tonen
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={ivShowOnlyAvailable}
+                        onChange={(e) => setIvShowOnlyAvailable(e.target.checked)}
+                      />
+                      Alleen inzetbare eenheden
+                    </label>
+                  </div>
+                    </>
+                  )}
+                  {!ivFiltersEnabled && (
+                    <div style={{ fontSize: '9px', color: '#666', fontStyle: 'italic' }}>
+                      Filters zijn uitgeschakeld. Klik op "Filters tonen" om filters te activeren.
+                    </div>
+                  )}
+                </div>
+
+                {/* SECTIE 3: ALLE BESCHIKBARE EENHEDEN (GMS-STYLE TABEL) */}
+                <div style={{ 
+                  marginBottom: '16px'
+                }}>
+                  <div style={{ 
+                    fontSize: '11px', 
+                    fontWeight: 'bold', 
+                    marginBottom: '8px',
+                    color: '#333'
+                  }}>
+                    ALLE BESCHIKBARE EENHEDEN (GESORTEERD OP ETA)
+                  </div>
+                  <div style={{ 
+                    border: '1px solid #d0d0d0',
+                    background: '#ffffff',
+                    fontSize: '10px'
+                  }}>
+                    <table style={{ 
+                      width: '100%', 
+                      borderCollapse: 'collapse',
+                      fontSize: '10px',
+                      fontFamily: 'Arial, sans-serif'
+                    }}>
+                      <thead>
+                        <tr style={{ background: '#f0f0f0', borderBottom: '1px solid #d0d0d0' }}>
+                          <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #d0d0d0', width: '30px' }}></th>
+                          <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #d0d0d0' }}>Roepnummer</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #d0d0d0' }}>Type — Rol</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #d0d0d0' }}>Post</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #d0d0d0' }}>Status</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'right' }}>ETA</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredUnits.map((unit, idx) => {
+                          const isSelected = ivSelectedUnits.has(unit.roepnummer);
+                          const type = unit.type || unit.rollen[0] || 'Onbekend';
+                          
+                          // Haal inzetrol op uit ivUnitRoles (als toegewezen)
+                          let inzetrol = ivUnitRoles.get(unit.roepnummer);
+                          
+                          // Als geen inzetrol is toegewezen, gebruik fallback logica
+                          if (!inzetrol) {
+                            // Zoek de rol die deze eenheid heeft in het inzetvoorstel
+                            let role = 'Onbekend';
+                            if (inzetvoorstel?.brwMatches) {
+                              for (const [roleKey, match] of Object.entries(inzetvoorstel.brwMatches)) {
+                                const beschikbaar = Array.isArray(match?.beschikbaar) ? match.beschikbaar : [];
+                                const found = beschikbaar.find((u: any) => {
+                                  const roepnummer = typeof u === 'string' ? u : u.roepnummer;
+                                  return roepnummer === unit.roepnummer;
+                                });
+                                if (found) {
+                                  // Strip eventuele aantallen voor het type, bv. "1 TS-6" -> "TS-6"
+                                  role = roleKey.replace(/^\d+\s*/, '').trim();
+                                  break;
+                                }
+                              }
+                            }
+                            // Fallback naar eerste rol als niet gevonden in inzetvoorstel
+                            if (role === 'Onbekend') {
+                              role = unit.rollen.find(r => r !== type) || unit.rollen[0] || 'Onbekend';
+                            }
+                            inzetrol = role;
+                          }
+                          return (
+                            <tr
+                              key={idx}
+                              onClick={() => toggleIvUnitSelection(unit.roepnummer)}
+                              style={{
+                                background: isSelected ? '#e3f2fd' : idx % 2 === 0 ? '#ffffff' : '#f9f9f9',
+                                borderBottom: '1px solid #e0e0e0',
+                                cursor: 'pointer'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = isSelected ? '#c5e1f5' : '#f0f0f0';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = isSelected ? '#e3f2fd' : idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                              }}
+                            >
+                              <td style={{ padding: '4px 6px', borderRight: '1px solid #e0e0e0', textAlign: 'center' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleIvUnitSelection(unit.roepnummer)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </td>
+                              <td style={{ padding: '4px 6px', borderRight: '1px solid #e0e0e0', fontWeight: isSelected ? 'bold' : 'normal' }}>
+                                {unit.roepnummer}
+                              </td>
+                              <td style={{ padding: '4px 6px', borderRight: '1px solid #e0e0e0' }}>
+                                {type} — <strong style={{ color: isSelected ? '#0066cc' : '#333' }}>{inzetrol}</strong>
+                              </td>
+                              <td style={{ padding: '4px 6px', borderRight: '1px solid #e0e0e0' }}>
+                                {unit.post || '-'}
+                              </td>
+                              <td style={{ padding: '4px 6px', borderRight: '1px solid #e0e0e0' }}>
+                                {unit.status || '-'}
+                              </td>
+                              <td style={{ padding: '4px 6px', textAlign: 'right', fontFamily: 'monospace', color: unit.eta !== null ? '#0066CC' : '#999' }}>
+                                {unit.eta !== null ? formatETA(unit.eta) : '-'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {filteredUnits.length === 0 && (
+                          <tr>
+                            <td colSpan={6} style={{ padding: '12px', textAlign: 'center', color: '#999' }}>
+                              Geen eenheden gevonden met de huidige filters
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* SECTIE 4: EXTRA EENHEDEN TOEVOEGEN */}
+                <div style={{ 
+                  marginBottom: '16px',
+                  fontSize: '10px',
+                  color: '#666'
+                }}>
+                  Selecteer extra BRW-eenheden per rol om aan de melding toe te voegen (gesorteerd op aanrijdtijd).
+                </div>
+
+                {/* Footer */}
+                <div style={{ 
+                  fontSize: '9px', 
+                  color: '#999', 
+                  textAlign: 'center', 
+                  paddingTop: '12px', 
+                  borderTop: '1px solid #d0d0d0',
+                  marginTop: '16px'
+                }}>
+                  Gegenereerd: {inzetvoorstel.timestamp} | MAR Standaard Brandweer Nederland
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Top Menu Bar */}
       <div className="gms2-menu-bar">
@@ -3224,9 +7506,40 @@ export default function GMS2() {
             </div>
           </div>
 
-          {/* Actieve Eenheden Display - positioned under Openstaande incidenten */}
-          <div className="gms2-section">
-            <ActiveUnitsDisplay />
+          {/* Map Component - synchroon met map.tsx */}
+          <div className="gms2-section" style={{ height: '400px', minHeight: '400px' }}>
+            <div className="gms2-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Kaart Overzicht</span>
+              <button 
+                className="gms2-btn small"
+                onClick={() => setShowVoertuigen(!showVoertuigen)}
+                style={{ 
+                  marginLeft: '8px',
+                  padding: '2px 8px',
+                  fontSize: '10px',
+                  backgroundColor: showVoertuigen ? '#0066CC' : '#f0f0f0',
+                  color: showVoertuigen ? '#fff' : '#333',
+                  border: '1px solid #ccc',
+                  cursor: 'pointer'
+                }}
+              >
+                {showVoertuigen ? "Verberg Voertuigen" : "Toon Voertuigen"}
+              </button>
+            </div>
+            <div style={{ height: 'calc(100% - 30px)', width: '100%', position: 'relative' }}>
+              <MapComponent
+                eenheden={[]}
+                eenhedenPosities={{}}
+                incidenten={mapIncidenten}
+                kazernes={kazernes}
+                showVoertuigen={showVoertuigen}
+                center={[52.1, 5.3]}
+                zoom={8}
+                onMapReady={(map) => {
+                  mapInstanceRef.current = map;
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -3268,6 +7581,7 @@ export default function GMS2() {
                     className="gms2-input wide" 
                     value={formData.melderNaam}
                     onChange={(e) => handleFormChange('melderNaam', e.target.value)}
+                    style={{ textTransform: 'uppercase' }}
                   />
                   <span className="gms2-field-label">Tel:</span>
                   <input 
@@ -3276,7 +7590,17 @@ export default function GMS2() {
                     value={formData.telefoonnummer}
                     onChange={(e) => handleFormChange('telefoonnummer', e.target.value)}
                   />
-                  <button className="gms2-btn small">Anoniem</button>
+                  <button 
+                    className="gms2-btn small"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        melderNaam: "ANONIEM"
+                      }));
+                    }}
+                  >
+                    Anoniem
+                  </button>
                 </div>
 
                 {/* Melder Adres Row */}
@@ -3287,6 +7611,7 @@ export default function GMS2() {
                     className="gms2-input wide" 
                     value={formData.melderAdres}
                     onChange={(e) => handleFormChange('melderAdres', e.target.value)}
+                    style={{ width: '100px' }}
                   />
                   <span className="gms2-field-label">Gem:</span>
                   <input 
@@ -3294,6 +7619,7 @@ export default function GMS2() {
                     className="gms2-input small" 
                     value={formData.gemeente}
                     onChange={(e) => handleFormChange('gemeente', e.target.value)}
+                    style={{ width: '90px' }}
                   />
                 </div>
 
@@ -3305,15 +7631,16 @@ export default function GMS2() {
                   <span className="gms2-section-title">Incidentlocatie</span>
                 </div>
 
-                {/* Adres Row - Straat, Nr, PC, Pts, Gem */}
+                {/* Row 1 - Straat, Nr and Object */}
                 <div className="gms2-form-row">
-                  <span className="gms2-field-label">Straat:</span>
+                  <button className="gms2-btn small" style={{ minWidth: '30px', padding: '2px 4px' }}>1 S</button>
                   <input 
                     type="text" 
-                    className="gms2-input wide" 
+                    className="gms2-input" 
                     value={formData.straatnaam}
                     onChange={(e) => handleFormChange('straatnaam', e.target.value)}
                     placeholder="Straatnaam"
+                    style={{ textTransform: 'uppercase', width: '50%', maxWidth: '200px' }}
                   />
                   <span className="gms2-field-label compact">Nr:</span>
                   <input 
@@ -3322,40 +7649,66 @@ export default function GMS2() {
                     value={formData.huisnummer}
                     onChange={(e) => handleFormChange('huisnummer', e.target.value)}
                   />
-                  <span className="gms2-field-label compact">PC:</span>
+                  <span className="gms2-field-label compact">Obj:</span>
+                  <input 
+                    type="text" 
+                    className="gms2-input" 
+                    value={formData.object}
+                    onChange={(e) => handleFormChange('object', e.target.value)}
+                    placeholder="Object"
+                    style={{ textTransform: 'uppercase', width: '60%', maxWidth: '300px' }}
+                  />
+                </div>
+
+                {/* Row 2 - PC, Plts, Gem, Func */}
+                <div className="gms2-form-row">
                   <input 
                     type="text" 
                     className="gms2-input postal" 
                     value={formData.postcode}
                     onChange={(e) => handleFormChange('postcode', e.target.value)}
                     placeholder="1234AB"
+                    style={{ textTransform: 'uppercase' }}
                   />
-                  <span className="gms2-field-label compact">Pts:</span>
+                  <span className="gms2-field-label compact">Plts:</span>
                   <input 
                     type="text" 
                     className="gms2-input place-wide" 
                     value={formData.plaatsnaam}
                     onChange={(e) => handleFormChange('plaatsnaam', e.target.value)}
                     placeholder="Plaats"
+                    style={{ textTransform: 'uppercase', width: '140px' }}
                   />
                   <span className="gms2-field-label compact">Gem:</span>
                   <input 
                     type="text" 
-                    className="gms2-input extra-small" 
+                    className="gms2-input place-wide" 
                     value={formData.gemeente}
                     onChange={(e) => handleFormChange('gemeente', e.target.value)}
+                    placeholder="Gemeente"
+                    style={{ textTransform: 'uppercase', width: '180px' }}
                   />
-                </div>
-
-                {/* Object Row */}
-                <div className="gms2-form-row">
-                  <span className="gms2-field-label">Object:</span>
+                  <span className="gms2-field-label compact">Func:</span>
                   <input 
                     type="text" 
                     className="gms2-input wide" 
                     value={formData.functie}
                     onChange={(e) => handleFormChange('functie', e.target.value)}
-                    placeholder="Object/gebouw"
+                    placeholder="Functie"
+                    style={{ width: '50px' }}
+                  />
+                </div>
+
+                {/* Row 3 - Empty entry line */}
+                <div className="gms2-form-row">
+                  <button className="gms2-btn small" style={{ minWidth: '30px', padding: '2px 4px' }}>2</button>
+                  <input 
+                    type="text" 
+                    className="gms2-input wide" 
+                    placeholder=""
+                    value={formData.extra}
+                    onChange={(e) => handleFormChange('extra', e.target.value)}
+                    style={{ textTransform: 'uppercase' }}
                   />
                 </div>
 
@@ -3378,15 +7731,48 @@ export default function GMS2() {
                   <button className="gms2-btn small">AOL</button>
                   <button className="gms2-btn small">OGS</button>
                   <button className="gms2-btn small">OBJ</button>
-                  <button className="gms2-btn small">LOC</button>
+                  <button 
+                    className="gms2-btn small"
+                    onClick={async () => {
+                      if (selectedIncident?.coordinates) {
+                        setShowLocationDetails(true);
+                        addSystemLoggingEntry("📍 Locatiegegevens worden opgehaald...");
+                        
+                        const details = await getDetailedLocationInfo(selectedIncident.coordinates);
+                        if (details) {
+                          setLocationDetails(details);
+                          addSystemLoggingEntry("📍 Locatiegegevens opgehaald uit BAG en OSM");
+                        } else {
+                          addSystemLoggingEntry("❌ Geen locatiegegevens beschikbaar");
+                        }
+                      } else {
+                        addSystemLoggingEntry("❌ Geen locatie geselecteerd");
+                      }
+                    }}
+                    disabled={!selectedIncident?.coordinates}
+                  >
+                    LOC
+                  </button>
                   <button 
                     className="gms2-btn small"
                     onClick={() => setShowP2000Screen(true)}
                   >
                     PROC
                   </button>
-                  <button className="gms2-btn small">IV</button>
-                  <button className="gms2-btn small">IV+</button>
+                  <button 
+                    className="gms2-btn small"
+                    onClick={() => void generateInzetvoorstel(false)}
+                    title="Inzetvoorstel genereren (MAR standaard)"
+                  >
+                    IV
+                  </button>
+                  <button 
+                    className="gms2-btn small"
+                    onClick={() => void generateInzetvoorstel(true)}
+                    title="Uitgebreid inzetvoorstel met opschalingsniveaus"
+                  >
+                    IV+
+                  </button>
                   <button className="gms2-btn small">TK</button>
                   <button className="gms2-btn small">OMS</button>
                   <button className="gms2-btn small">RND</button>
@@ -3398,7 +7784,7 @@ export default function GMS2() {
                     className={`gms2-btn tab-btn ${activeLoggingTab === 'hist-meldblok' ? 'active' : ''}`}
                     onClick={() => setActiveLoggingTab('hist-meldblok')}
                   >
-                    Hist. Meldblok
+                    Kladblok
                   </button>
                   <button 
                     className={`gms2-btn tab-btn ${activeLoggingTab === 'locatietreffers' ? 'active' : ''}`}
@@ -3417,6 +7803,12 @@ export default function GMS2() {
                     onClick={() => setActiveLoggingTab('overige-inzet')}
                   >
                     Overige inzet
+                  </button>
+                  <button 
+                    className={`gms2-btn tab-btn ${activeLoggingTab === 'logging' ? 'active' : ''}`}
+                    onClick={() => setActiveLoggingTab('logging')}
+                  >
+                    Logging
                   </button>
                 </div>
 
@@ -3497,7 +7889,7 @@ export default function GMS2() {
                                   onClick={() => {
                                     setShowDubContent(false);
                                     handleNieuw();
-                                    addLoggingEntry("🆕 Nieuwe melding aangemaakt voor mogelijke DUB samenvoeg");
+                                    addSystemLoggingEntry("🆕 Nieuwe melding aangemaakt voor mogelijke DUB samenvoeg");
                                   }}
                                   style={{ 
                                     marginTop: '10px', 
@@ -3532,6 +7924,7 @@ export default function GMS2() {
                     <>
                       {activeLoggingTab === 'hist-meldblok' && (
                         <div className="gms2-history-scrollbox" id="gms2-logging-display">
+                          {/* Show logging entries */}
                           {loggingEntries.map((entry) => (
                             <div key={entry.id} className="gms2-history-entry">
                               {entry.timestamp} {entry.message}
@@ -3572,7 +7965,8 @@ export default function GMS2() {
                                       huisnummer: fullHuisnummer,
                                       postcode: result.postcode,
                                       plaatsnaam: result.plaatsnaam,
-                                      gemeente: result.gemeente
+                                      gemeente: result.gemeente,
+                                      coordinates: result.coordinates
                                     };
 
                                     setFormData(prev => ({ ...prev, ...addressData }));
@@ -3580,7 +7974,14 @@ export default function GMS2() {
                                       setSelectedIncident({ ...selectedIncident, ...addressData });
                                     }
 
-                                    addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
+                                    // Log coordinates if available
+                                    if (result.coordinates) {
+                                      console.log(`📍 Coördinaten opgeslagen: [${result.coordinates[0]}, ${result.coordinates[1]}]`);
+                                      addSystemLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres} (${result.coordinates[0].toFixed(4)}, ${result.coordinates[1].toFixed(4)})`);
+                                    } else {
+                                      addSystemLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
+                                    }
+                                    
                                     setBagSearchQuery("");
                                     setBagSearchResults([]);
                                   } else if (bagSearchResults.length === 0) {
@@ -3589,9 +7990,9 @@ export default function GMS2() {
                                     if (fallbackResults.length > 0) {
                                       const result = fallbackResults[0];
                                       setFormData(prev => ({ ...prev, postcode: result.postcode }));
-                                      addLoggingEntry(`Postcode automatisch ingevuld: ${result.postcode}`);
+                                      addSystemLoggingEntry(`Postcode automatisch ingevuld: ${result.postcode}`);
                                     } else {
-                                      addLoggingEntry(`Geen adres gevonden voor: "${bagSearchQuery}"`);
+                                      addSystemLoggingEntry(`Geen adres gevonden voor: "${bagSearchQuery}"`);
                                     }
                                   }
                                 }
@@ -3600,7 +8001,9 @@ export default function GMS2() {
                           </div>
 
                           <div className="gms2-search-help">
-                            💡 Tip: Begin te typen met = in het kladblok voor automatisch zoeken
+                            💡 Tips: 
+                            <br/>• Type <strong>=</strong> in het kladblok voor adres zoeken
+                            <br/>• Type <strong>o/</strong> in het kladblok voor openbare objecten
                           </div>
 
                           <div className="gms2-search-results">
@@ -3610,21 +8013,74 @@ export default function GMS2() {
                                 <div
                                   key={index}
                                   className="gms2-address-result"
-                                  onClick={() => {
+                                  onClick={async () => {
+                                    console.log(`🖱️ Adres geselecteerd:`, result);
+                                    console.log(`🖱️ Result coordinates type:`, typeof result.coordinates);
+                                    console.log(`🖱️ Result coordinates value:`, result.coordinates);
+                                    console.log(`🖱️ Result coordinates isArray:`, Array.isArray(result.coordinates));
+                                    
+                                    // Get building function - first try from result, then from coordinates
+                                    let buildingFunctie = result.functie || '';
+                                    
+                                    // If no function in result but coordinates available, fetch it
+                                    if (!buildingFunctie && result.coordinates && Array.isArray(result.coordinates) && result.coordinates.length === 2) {
+                                      console.log(`🏢 Ophalen gebouwfunctie van coördinaten...`);
+                                      buildingFunctie = await getBuildingFunctionFromCoordinates(result.coordinates as [number, number]);
+                                      if (buildingFunctie) {
+                                        console.log(`✅ Gebouwfunctie opgehaald: ${buildingFunctie}`);
+                                        addSystemLoggingEntry(`🏢 Gebouwfunctie automatisch gedetecteerd: ${buildingFunctie}`);
+                                      }
+                                    }
+                                    
+                                    // Get object name - prioritize naam (OSM), then weergavenaam
+                                    const objectNaam = result.wegType === 'object' 
+                                      ? (result.naam || result.weergavenaam || '')
+                                      : '';
+                                    
                                     const addressData = {
                                       straatnaam: result.straatnaam,
                                       huisnummer: fullHuisnummer,
                                       postcode: result.postcode,
                                       plaatsnaam: result.plaatsnaam,
-                                      gemeente: result.gemeente
+                                      gemeente: result.gemeente,
+                                      coordinates: result.coordinates,
+                                      object: objectNaam || formData.object || '',
+                                      functie: buildingFunctie || formData.functie || ''
                                     };
 
-                                    setFormData(prev => ({ ...prev, ...addressData }));
+                                    console.log(`💾 AddressData being saved:`, addressData);
+                                    console.log(`💾 Coordinates in addressData:`, addressData.coordinates);
+                                    console.log(`💾 Gebouwfunctie:`, addressData.functie);
+
+                                    setFormData(prev => {
+                                      const updated = { ...prev, ...addressData };
+                                      console.log(`💾 FormData updated:`, updated);
+                                      console.log(`💾 FormData.coordinates:`, updated.coordinates);
+                                      console.log(`💾 FormData.functie:`, updated.functie);
+                                      return updated;
+                                    });
+                                    
                                     if (selectedIncident) {
-                                      setSelectedIncident({ ...selectedIncident, ...addressData });
+                                      const updatedIncident = { ...selectedIncident, ...addressData };
+                                      console.log(`💾 Incident updated:`, updatedIncident);
+                                      console.log(`💾 Incident.coordinates:`, updatedIncident.coordinates);
+                                      console.log(`💾 Incident.functie:`, updatedIncident.functie);
+                                      setSelectedIncident(updatedIncident);
                                     }
 
-                                    addLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres}`);
+                                    // Log coordinates if available
+                                    if (result.coordinates) {
+                                      console.log(`✅ Coördinaten opgeslagen: [${result.coordinates[0]}, ${result.coordinates[1]}]`);
+                                      if (buildingFunctie) {
+                                        addSystemLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres} (${result.coordinates[0].toFixed(4)}, ${result.coordinates[1].toFixed(4)}) - ${buildingFunctie}`);
+                                      } else {
+                                        addSystemLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres} (${result.coordinates[0].toFixed(4)}, ${result.coordinates[1].toFixed(4)})`);
+                                      }
+                                    } else {
+                                      console.warn(`⚠️ GEEN COÖRDINATEN in result!`);
+                                      addSystemLoggingEntry(`📍 Adres geselecteerd: ${result.volledigAdres} (GEEN COÖRDINATEN)`);
+                                    }
+                                    
                                     setBagSearchQuery("");
                                     setBagSearchResults([]);
 
@@ -3634,9 +8090,37 @@ export default function GMS2() {
                                     }
                                   }}
                                 >
-                                  <div className="gms2-address-main">{result.volledigAdres}</div>
+                                  <div className="gms2-address-main">
+                                    {result.wegType === 'object' ? (
+                                      <>
+                                        🏢 {result.naam || result.amenity || 'Object'}
+                                        {result.amenity && result.amenity !== result.naam && (
+                                          <span style={{ fontSize: '10px', color: '#666' }}> ({result.amenity})</span>
+                                        )}
+                                      </>
+                                    ) : result.wegType === 'hydro' ? (
+                                      <>
+                                        🌊 {result.naam || result.weergavenaam || result.volledigAdres}
+                                      </>
+                                    ) : (
+                                      result.volledigAdres
+                                    )}
+                                  </div>
                                   <div className="gms2-address-details">
-                                    {result.gemeente} | {result.postcode}
+                                    {result.wegType === 'object' ? (
+                                      <>
+                                        {result.straatnaam && `${result.straatnaam} ${result.huisnummer || ''}`.trim()}
+                                        {result.plaatsnaam && ` | ${result.plaatsnaam}`}
+                                        {result.gemeente && ` | ${result.gemeente}`}
+                                      </>
+                                    ) : result.wegType === 'hydro' ? (
+                                      <>
+                                        {result.source || 'PDOK Hydrografie – Netwerk'}
+                                        {result.coordinates && ` | ${result.coordinates[1]?.toFixed(4)}, ${result.coordinates[0]?.toFixed(4)}`}
+                                      </>
+                                    ) : (
+                                      `${result.gemeente} | ${result.postcode}`
+                                    )}
                                   </div>
                                 </div>
                               );
@@ -3655,8 +8139,12 @@ export default function GMS2() {
                               <div className="gms2-search-instructions">
                                 <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Hoe te gebruiken:</div>
                                 <div style={{ fontSize: '10px', lineHeight: '1.4' }}>
+                                  <strong>Adressen zoeken:</strong><br/>
                                   • Type in het kladblok: <strong>=Rotterdam/Kleiweg 12</strong><br/>
-                                  • Of zoek direct hier: <strong>Rotterdam Kleiweg</strong><br/>
+                                  • Of zoek direct hier: <strong>Rotterdam Kleiweg</strong><br/><br/>
+                                  <strong>Openbare objecten zoeken:</strong><br/>
+                                  • Type in het kladblok: <strong>o/ziekenhuis</strong><br/>
+                                  • Of zoek direct hier: <strong>ziekenhuis</strong><br/><br/>
                                   • Klik op een resultaat om automatisch in te vullen
                                 </div>
                               </div>
@@ -3682,42 +8170,124 @@ export default function GMS2() {
                               {/* Header row */}
                               <thead>
                                 <tr style={{ backgroundColor: '#f0f0f0' }}>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '25px' }}>D<br/>P</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: 'auto', minWidth: '100px' }}>Roepnaam</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '70px' }}>Soort voe</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ov</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>ar</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>tp</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>nb</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>am</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>vr</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>fd</th>
-                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '40px' }}>GA</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '20px', fontSize: '9px' }}>D<br/>P</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'left', width: 'auto', minWidth: '100px', fontSize: '9px' }}>Roepnaam</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '70px', fontSize: '9px' }}>Soort voe</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>ov</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>ar</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>tp</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>nb</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>ir</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>bs</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>kz</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>vr</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>fd</th>
+                                  <th style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', width: '35px', fontSize: '9px' }}>GA</th>
                                 </tr>
                               </thead>
 
                               <tbody>
                                 {/* Dynamic rows for assigned units from selected incident */}
                                 {selectedIncident && selectedIncident.assignedUnits && selectedIncident.assignedUnits.length > 0 ? (
-                                  selectedIncident.assignedUnits.map((unit, index) => (
-                                    <tr key={`${unit.roepnummer}-${index}`}>
-                                      <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', fontSize: '9px' }}>P</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'left', fontSize: '9px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.roepnummer}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px' }}>{unit.soort_voertuig || 'SurvBus'}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ov_tijd ? '#ffff99' : 'transparent' }}>{unit.ov_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ar_tijd ? '#ffff99' : 'transparent' }}>{unit.ar_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.tp_tijd ? '#ffff99' : 'transparent' }}>{unit.tp_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.nb_tijd ? '#ffff99' : 'transparent' }}>{unit.nb_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.am_tijd ? '#ffff99' : 'transparent' }}>{unit.am_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.vr_tijd ? '#ffff99' : 'transparent' }}>{unit.vr_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.fd_tijd ? '#ffff99' : 'transparent' }}>{unit.fd_tijd || ''}</td>
-                                      <td style={{ border: '1px solid #ccc', padding: '1px 2px', textAlign: 'center', fontSize: '8px', backgroundColor: unit.ga_tijd ? '#ffff99' : 'transparent' }}>{unit.ga_tijd || ''}</td>
-                                    </tr>
-                                  ))
+                                  selectedIncident.assignedUnits.map((unit, index) => {
+                                    // Helper functie om te bepalen of een status actief is
+                                    // Rekening houdend met kolommapping (ar kolom toont ut status)
+                                    const isStatusActive = (columnCode: string) => {
+                                      const internalCode = STATUS_COLUMN_MAPPING[columnCode] || columnCode;
+                                      return unit.huidige_status === internalCode;
+                                    };
+
+                                    // Helper functie om statusblokje te renderen
+                                    const renderStatusCell = (columnCode: string) => {
+                                      const isActive = isStatusActive(columnCode);
+                                      // Voor tijdvelden: ar kolom gebruikt ar_tijd maar toont ut status
+                                      const timeField = {
+                                        'ov': unit.ov_tijd,
+                                        'ar': unit.ar_tijd, // AR kolom toont UT status maar gebruikt ar_tijd
+                                        'tp': unit.tp_tijd,
+                                        'nb': unit.nb_tijd,
+                                        'ir': unit.ir_tijd,
+                                        'bs': unit.bs_tijd,
+                                        'kz': unit.kz_tijd,
+                                        'vr': unit.vr_tijd,
+                                        'fd': unit.fd_tijd,
+                                        'GA': unit.ga_tijd
+                                      }[columnCode];
+
+                                      return (
+                                        <td 
+                                          key={columnCode}
+                                          style={{ 
+                                            border: '1px solid #ccc', 
+                                            padding: '2px', 
+                                            textAlign: 'center', 
+                                            fontSize: '8px',
+                                            backgroundColor: isActive ? '#0066cc' : 'transparent',
+                                            color: isActive ? 'white' : 'black',
+                                            minWidth: '35px',
+                                            height: '20px',
+                                            position: 'relative'
+                                          }}
+                                          title={isActive ? `${columnCode.toUpperCase()} - ${timeField || 'Actief'}` : ''}
+                                        >
+                                          {isActive && timeField ? (
+                                            <div style={{
+                                              width: '100%',
+                                              height: '100%',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              backgroundColor: '#0066cc',
+                                              color: 'white',
+                                              fontWeight: 'bold',
+                                              fontSize: '8px',
+                                              whiteSpace: 'nowrap'
+                                            }}>
+                                              {timeField}
+                                            </div>
+                                          ) : isActive ? (
+                                            <div style={{
+                                              width: '100%',
+                                              height: '100%',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              backgroundColor: '#0066cc',
+                                              color: 'white',
+                                              fontWeight: 'bold',
+                                              fontSize: '9px'
+                                            }}>
+                                              {columnCode === 'GA' ? 'GA' : columnCode.toUpperCase()}
+                                            </div>
+                                          ) : (
+                                            ''
+                                          )}
+                                        </td>
+                                      );
+                                    };
+
+                                    return (
+                                      <tr key={`${unit.roepnummer}-${index}`} style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f8f8f8' }}>
+                                        <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', fontSize: '9px' }}>P</td>
+                                        <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'left', fontSize: '9px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{unit.roepnummer}</td>
+                                        <td style={{ border: '1px solid #ccc', padding: '2px 4px', textAlign: 'center', fontSize: '8px' }}>{unit.soort_voertuig || '-'}</td>
+                                        {renderStatusCell('ov')}
+                                        {renderStatusCell('ar')}
+                                        {renderStatusCell('tp')}
+                                        {renderStatusCell('nb')}
+                                        {renderStatusCell('ir')}
+                                        {renderStatusCell('bs')}
+                                        {renderStatusCell('kz')}
+                                        {renderStatusCell('vr')}
+                                        {renderStatusCell('fd')}
+                                        {renderStatusCell('GA')}
+                                      </tr>
+                                    );
+                                  })
                                 ) : (
                                   selectedIncident && (
                                     <tr>
-                                      <td colSpan={11} style={{ 
+                                      <td colSpan={13} style={{ 
                                         border: '1px solid #ccc', 
                                         padding: '10px', 
                                         textAlign: 'center', 
@@ -3740,6 +8310,69 @@ export default function GMS2() {
                         <div className="gms2-tab-content">
                           <div className="gms2-content-placeholder">
                             Overige inzet - Inhoud volgt later
+                          </div>
+                        </div>
+                      )}
+
+                      {activeLoggingTab === 'logging' && (
+                        <div className="gms2-tab-content">
+                          <div className="gms2-logging-section">
+                            <div className="gms2-logging-header">
+                              <h3>📝 Logging Overzicht</h3>
+                              <div className="gms2-logging-stats">
+                                <span>📊 Totaal entries: {loggingTabEntries.length}</span>
+                                <span>🕒 Laatste update: {new Date().toLocaleTimeString('nl-NL')}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="gms2-logging-content">
+                              <div className="gms2-logging-filters">
+                                <input
+                                  type="text"
+                                  placeholder="🔍 Zoek in logging..."
+                                  className="gms2-logging-search"
+                                  onChange={(e) => {
+                                    const query = e.target.value.toLowerCase();
+                                    // Filter logging entries based on search query
+                                    const filtered = loggingTabEntries.filter(entry => 
+                                      entry.message.toLowerCase().includes(query)
+                                    );
+                                    // You could implement filtering logic here
+                                  }}
+                                />
+                                <button 
+                                  className="gms2-btn"
+                                  onClick={() => {
+                                    // Clear logging entries
+                                    setLoggingTabEntries([]);
+                                    addLoggingEntry('🗑️ Logging gewist');
+                                  }}
+                                >
+                                  🗑️ Wissen
+                                </button>
+                              </div>
+                              
+                              <div className="gms2-logging-entries">
+                                {loggingTabEntries.map((entry, index) => (
+                                  <div 
+                                    key={entry.id} 
+                                    className={`gms2-logging-entry ${
+                                      entry.message.includes('🚨') ? 'priority-high' : 
+                                      entry.message.includes('📋') ? 'karakteristiek' :
+                                      entry.message.includes('📍') ? 'location' :
+                                      entry.message.includes('🏢') ? 'object' :
+                                      entry.message.includes('🛣️') ? 'highway' :
+                                      'normal'
+                                    }`}
+                                  >
+                                    <span className="gms2-logging-time">
+                                      {entry.timestamp}
+                                    </span>
+                                    <span className="gms2-logging-text">{entry.message}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -3831,69 +8464,71 @@ export default function GMS2() {
 
                 {/* Bottom action section */}
                 <div className="gms2-bottom-actions">
-                  <div className="gms2-priority-buttons">
-                    <span>P:</span>
-                    <select 
-                      className="gms2-priority-dropdown" 
-                      value={priorityValue}
-                      onChange={(e) => setPriorityValue(parseInt(e.target.value))}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </select>
-                  </div>
-
-                  <div className="gms2-service-options">
-                    <div className="gms2-service-col">
-                      <input type="checkbox" />
-                      <span>P</span>
-                      <input type="checkbox" />
+                  <div className="gms2-action-buttons" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <div className="gms2-service-options" style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="gms2-service-col">
+                          <input type="checkbox" checked readOnly />
+                          <span>P</span>
+                        </div>
+                        <div className="gms2-service-col">
+                          <input 
+                            type="checkbox" 
+                            id="share-brandweer"
+                            onChange={(e) => {
+                              const action = e.target.checked ? "gedeeld met" : "delen beëindigd met";
+                              addLoggingEntry(`🚒 Melding ${action} Brandweer`);
+                            }}
+                          />
+                          <span>B</span>
+                        </div>
+                        <div className="gms2-service-col">
+                          <input 
+                            type="checkbox" 
+                            id="share-ambulance"
+                            onChange={(e) => {
+                              const action = e.target.checked ? "gedeeld met" : "delen beëindigd met";
+                              addLoggingEntry(`🚑 Melding ${action} Ambulance`);
+                            }}
+                          />
+                          <span>A</span>
+                        </div>
+                      </div>
+                      <div className="gms2-priority-buttons">
+                        <span>P:</span>
+                        <select 
+                          className="gms2-priority-dropdown" 
+                          value={priorityValue}
+                          onChange={(e) => setPriorityValue(parseInt(e.target.value))}
+                        >
+                          <option value={0}>0</option>
+                          <option value={1}>1</option>
+                          <option value={2}>2</option>
+                          <option value={3}>3</option>
+                          <option value={4}>4</option>
+                          <option value={5}>5</option>
+                        </select>
+                      </div>
+                      {selectedIncident ? (
+                        <button className="gms2-btn" onClick={handleUpdate} style={{ minWidth: '60px' }}>Update</button>
+                      ) : (
+                        <button className="gms2-btn" onClick={handleUitgifte} style={{ minWidth: '60px', backgroundColor: '#ffaa44', color: '#000' }}>Uitgifte</button>
+                      )}
+                      <button className="gms2-btn" onClick={handleArchiveer} style={{ minWidth: '70px' }}>Archiveer</button>
+                      <button className="gms2-btn" onClick={handleNieuw} style={{ minWidth: '50px' }}>Nieuw</button>
                     </div>
-                    <div className="gms2-service-col">
-                      <input 
-                        type="checkbox" 
-                        id="share-brandweer"
-                        onChange={(e) => {
-                          const action = e.target.checked ? "gedeeld met" : "delen beëindigd met";
-                          addLoggingEntry(`🚒 Melding ${action} Brandweer`);
-                        }}
-                      />
-                      <span>B</span>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <select className="gms2-dropdown" style={{ minWidth: '150px' }} defaultValue="7">
+                        <option value="1">1 Autom. afgeh. MK</option>
+                        <option value="2">2 Info bericht</option>
+                        <option value="3">3 Test/oefening</option>
+                        <option value="4">4 Vals/misbruik</option>
+                        <option value="5">5 Overig afgeh. MK</option>
+                        <option value="6">6 Afgebroken inzet</option>
+                        <option value="7">7 Inzet</option>
+                        <option value="8">8 Samengevoegd incident</option>
+                      </select>
                     </div>
-                    <div className="gms2-service-col">
-                      <input 
-                        type="checkbox" 
-                        id="share-ambulance"
-                        onChange={(e) => {
-                          const action = e.target.checked ? "gedeeld met" : "delen beëindigd met";
-                          addLoggingEntry(`🚑 Melding ${action} Ambulance`);
-                        }}
-                      />
-                      <span>A</span>
-                    </div>
-                  </div>
-
-                  <div className="gms2-action-buttons" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <select className="gms2-dropdown" style={{ minWidth: '150px' }} defaultValue="7">
-                      <option value="1">1 Autom. afgeh. MK</option>
-                      <option value="2">2 Info bericht</option>
-                      <option value="3">3 Test/oefening</option>
-                      <option value="4">4 Vals/misbruik</option>
-                      <option value="5">5 Overig afgeh. MK</option>
-                      <option value="6">6 Afgebroken inzet</option>
-                      <option value="7">7 Inzet</option>
-                      <option value="8">8 Samengevoegd incident</option>
-                    </select>
-                    {selectedIncident ? (
-                      <button className="gms2-btn" onClick={handleUpdate} style={{ minWidth: '60px' }}>Update</button>
-                    ) : (
-                      <button className="gms2-btn" onClick={handleUitgifte} style={{ minWidth: '60px' }}>Uitgifte</button>
-                    )}
-                    <button className="gms2-btn" onClick={handleArchiveer} style={{ minWidth: '70px' }}>Archiveer</button>
-                    <button className="gms2-btn" onClick={handleNieuw} style={{ minWidth: '50px' }}>Nieuw</button>
                   </div>
                 </div>
               </div>
@@ -4021,6 +8656,152 @@ export default function GMS2() {
                   Sluiten
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Location Details Popup */}
+      {showLocationDetails && (
+        <div className="gms2-p2000-overlay">
+          <div className="gms2-p2000-window" style={{ maxWidth: '900px', maxHeight: '85vh' }}>
+            <div className="gms2-p2000-header">
+              <span className="gms2-p2000-title">📍 Locatiegegevens</span>
+              <button 
+                className="gms2-p2000-close"
+                onClick={() => {
+                  setShowLocationDetails(false);
+                  setLocationDetails(null);
+                }}
+                title="Sluiten"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="gms2-p2000-content">
+              {locationDetails ? (
+                <div className="location-details-content">
+                  {/* Coordinates */}
+                  <div className="location-section">
+                    <h3>📍 Coördinaten</h3>
+                    <p><strong>Latitude:</strong> {locationDetails.coordinates.lat.toFixed(6)}</p>
+                    <p><strong>Longitude:</strong> {locationDetails.coordinates.lng.toFixed(6)}</p>
+                  </div>
+
+                  {/* BAG Information */}
+                  {locationDetails.bag && (
+                    <div className="location-section">
+                      <h3>🏢 BAG Gegevens</h3>
+                      <div className="location-details-grid">
+                        {locationDetails.bag.weergavenaam && (
+                          <div><strong>Adres:</strong> {locationDetails.bag.weergavenaam}</div>
+                        )}
+                        {locationDetails.bag.huisnummer && (
+                          <div><strong>Huisnummer:</strong> {locationDetails.bag.huisnummer}</div>
+                        )}
+                        {locationDetails.bag.huisletter && (
+                          <div><strong>Huisletter:</strong> {locationDetails.bag.huisletter}</div>
+                        )}
+                        {locationDetails.bag.huisnummertoevoeging && (
+                          <div><strong>Toevoeging:</strong> {locationDetails.bag.huisnummertoevoeging}</div>
+                        )}
+                        {locationDetails.bag.postcode && (
+                          <div><strong>Postcode:</strong> {locationDetails.bag.postcode}</div>
+                        )}
+                        {locationDetails.bag.woonplaats && (
+                          <div><strong>Woonplaats:</strong> {locationDetails.bag.woonplaats}</div>
+                        )}
+                        {locationDetails.bag.gemeente && (
+                          <div><strong>Gemeente:</strong> {locationDetails.bag.gemeente}</div>
+                        )}
+                        {locationDetails.bag.provincie && (
+                          <div><strong>Provincie:</strong> {locationDetails.bag.provincie}</div>
+                        )}
+                        {locationDetails.bag.status && (
+                          <div><strong>Status:</strong> {locationDetails.bag.status}</div>
+                        )}
+                        {locationDetails.bag.gebruiksdoel && (
+                          <div><strong>Gebruiksdoel:</strong> {locationDetails.bag.gebruiksdoel}</div>
+                        )}
+                        {locationDetails.bag.oppervlakte && (
+                          <div><strong>Oppervlakte:</strong> {locationDetails.bag.oppervlakte} m²</div>
+                        )}
+                        {locationDetails.bag.bouwjaar && (
+                          <div><strong>Bouwjaar:</strong> {locationDetails.bag.bouwjaar}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* OSM Information */}
+                  {locationDetails.osm && (
+                    <div className="location-section">
+                      <h3>🗺️ OpenStreetMap Gegevens</h3>
+                      <div className="location-details-grid">
+                        {locationDetails.osm.display_name && (
+                          <div><strong>Volledige naam:</strong> {locationDetails.osm.display_name}</div>
+                        )}
+                        {locationDetails.osm.address && (
+                          <>
+                            {locationDetails.osm.address.house_number && (
+                              <div><strong>Huisnummer:</strong> {locationDetails.osm.address.house_number}</div>
+                            )}
+                            {locationDetails.osm.address.road && (
+                              <div><strong>Straat:</strong> {locationDetails.osm.address.road}</div>
+                            )}
+                            {locationDetails.osm.address.postcode && (
+                              <div><strong>Postcode:</strong> {locationDetails.osm.address.postcode}</div>
+                            )}
+                            {locationDetails.osm.address.city && (
+                              <div><strong>Stad:</strong> {locationDetails.osm.address.city}</div>
+                            )}
+                            {locationDetails.osm.address.town && (
+                              <div><strong>Plaats:</strong> {locationDetails.osm.address.town}</div>
+                            )}
+                            {locationDetails.osm.address.municipality && (
+                              <div><strong>Gemeente:</strong> {locationDetails.osm.address.municipality}</div>
+                            )}
+                            {locationDetails.osm.address.state && (
+                              <div><strong>Provincie:</strong> {locationDetails.osm.address.state}</div>
+                            )}
+                            {locationDetails.osm.address.country && (
+                              <div><strong>Land:</strong> {locationDetails.osm.address.country}</div>
+                            )}
+                          </>
+                        )}
+                        {locationDetails.osm.type && (
+                          <div><strong>Type:</strong> {locationDetails.osm.type}</div>
+                        )}
+                        {locationDetails.osm.class && (
+                          <div><strong>Class:</strong> {locationDetails.osm.class}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Timestamp */}
+                  <div className="location-section">
+                    <p><em>Gegevens opgehaald op: {new Date(locationDetails.timestamp).toLocaleString('nl-NL')}</em></p>
+                  </div>
+                </div>
+              ) : (
+                <div className="location-loading">
+                  <p>📍 Locatiegegevens worden opgehaald...</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="gms2-p2000-footer">
+              <button 
+                className="gms2-btn"
+                onClick={() => {
+                  setShowLocationDetails(false);
+                  setLocationDetails(null);
+                }}
+              >
+                Sluiten
+              </button>
             </div>
           </div>
         </div>

@@ -1,1411 +1,568 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useQuery } from '@tanstack/react-query';
+import { MapContainer, TileLayer, Marker, Popup, MarkerClusterGroup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Basisteam } from '../../../shared/basisteam-schema';
-
-// Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { useState, useEffect, useRef } from 'react';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useKazerneGeocoding } from '../hooks/use-kazerne-geocoding';
+import { getKazernesWithVoertuigen } from '../lib/mock-kazernes-api';
+import VoertuigenOpKaart from '../components/VoertuigenOpKaart';
+import { resetAllUnitsToKazerne } from '../services/globalUnitMovement';
 
-// Import React Leaflet components directly
-import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
-
-// Fix for default markers in React Leaflet
-try {
-  const DefaultIcon = L.Icon.Default as any;
-  if (DefaultIcon.prototype._getIconUrl) {
-    delete DefaultIcon.prototype._getIconUrl;
-  }
-
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  });
-
-  console.log('✅ Leaflet icons configured successfully');
-} catch (error) {
-  console.error('❌ Error configuring Leaflet icons:', error);
-}
-
-// Create numbered incident markers with different colors based on incident type
-const createIncidentIcon = (incidentNumber: number, incidentType: string, priority: number) => {
-  // Color mapping based on MC1 classification
-  const getColorForIncident = (type: string) => {
-    const lowerType = type.toLowerCase();
-    if (lowerType.includes('brand')) return '#ff4444'; // Red for fire
-    if (lowerType.includes('geweld') || lowerType.includes('diefstal')) return '#4444ff'; // Blue for police
-    if (lowerType.includes('medisch') || lowerType.includes('ambulance')) return '#44ff44'; // Green for medical
-    if (lowerType.includes('verkeer') || lowerType.includes('ongeval')) return '#ff8800'; // Orange for traffic
-    if (lowerType.includes('overlast')) return '#88ff44'; // Light green for public nuisance
-    return '#888888'; // Gray for unknown
-  };
-
-  // Priority affects the border
-  const borderColor = priority === 1 ? '#ff0000' : priority === 2 ? '#ffaa00' : '#888888';
-  const borderWidth = priority === 1 ? 4 : priority === 2 ? 3 : 2;
-
-  const color = getColorForIncident(incidentType);
-
-  return L.divIcon({
-    className: 'incident-marker',
-    html: `
-      <div style="
-        background-color: ${color}; 
-        width: 35px; 
-        height: 35px; 
-        border-radius: 50%; 
-        border: ${borderWidth}px solid ${borderColor}; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 14px; 
-        color: white; 
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        transition: all 0.3s ease;
-      ">${incidentNumber}</div>
-    `,
-    iconSize: [35, 35],
-    iconAnchor: [17, 17],
-  });
-};
-
-// Create police unit markers with different colors based on status
-const createUnitIcon = (unit: PoliceUnit) => {
-  const getColorForStatus = (status: string) => {
-    // Extract status number from status string
-    const statusMatch = status.match(/^(\d+)/);
-    const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-
-    // Check for noodoproep
-    if (status.toLowerCase().includes('n') || status.toLowerCase().includes('nood')) {
-      return '#dc143c'; // Crimson red for emergency
-    }
-
-    switch (statusNum) {
-      case 1: return '#00ff00'; // Available - Green
-      case 2: return '#ffff00'; // On patrol - Yellow  
-      case 3: return '#ff6600'; // Responding - Orange
-      case 4: return '#ff0000'; // At scene - Red
-      case 6: return '#9900ff'; // En route back - Purple
-      case 7: return '#00ffff'; // Available at station - Cyan
-      case 8: return '#ff00ff'; // Out of service - Magenta
-      case 9: return '#888888'; // Off duty - Gray
-      default: return '#000000'; // Unknown - Black
-    }
-  };
-
-  // Animation for moving units
-  const animation = unit.isMoving ? 'animation: pulse 1.5s infinite;' : '';
-
-  const color = getColorForStatus(unit.status);
-  const roepnummer = unit.roepnummer.replace('RT ', '');
-
-  return L.divIcon({
-    className: 'unit-marker',
-    html: `
-      <div style="
-        background-color: ${color}; 
-        width: 30px; 
-        height: 30px; 
-        border-radius: 4px; 
-        border: 2px solid #000; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 10px; 
-        color: black; 
-        font-weight: bold;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        ${animation}
-      ">${roepnummer}</div>
-      <style>
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-      </style>
-    `,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-  });
-};
-
+// GMS2 Incident interface
 interface GmsIncident {
   id: number;
-  melderNaam: string;
-  melderAdres: string;
-  telefoonnummer: string;
-  straatnaam: string;
-  huisnummer: string;
-  toevoeging: string;
-  postcode: string;
-  plaatsnaam: string;
-  gemeente: string;
-  mc1: string;
-  mc2: string;
-  mc3: string;
-  tijdstip: string;
-  prioriteit: number;
-  status: string;
-  meldingslogging: string;
-  notities: string;
-  aangemaaktOp: string;
-  afgesloten: string | null;
-  assignedUnits: string | null;
+  nr: number;
+  prio: number;
+  tijd: string;
+  mc: string;
+  locatie: string;
+  plaats: string;
+  straatnaam?: string;
+  huisnummer?: string;
+  postcode?: string;
+  plaatsnaam?: string;
+  coordinates?: [number, number] | null;
+  mc1?: string;
+  mc2?: string;
+  mc3?: string;
+  status?: string;
+  melderNaam?: string;
+  assignedUnits?: any[];
 }
 
-interface ProcessedIncident {
-  id: number;
-  number: number;
-  type: string;
-  classification: string;
-  address: string;
-  coordinates: [number, number];
-  priority: number;
-  status: string;
-  timestamp: string;
-  units: string[];
-  notes: string;
-  isNew?: boolean;
-}
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
-interface PoliceUnit {
-  id: number;
-  roepnummer: string;
-  aantal_mensen: number;
-  rollen: string[];
-  soort_auto: string;
-  team: string;
-  basisteam_id: string;
-  status: string;
-  locatie: string | null;
-  incident: string | null;
-  currentPosition: [number, number];
-  targetPosition?: [number, number];
-  movementSpeed: number; // km/h
-  lastUpdateTime: number;
-  isMoving: boolean;
-}
+L.Marker.prototype.options.icon = DefaultIcon;
 
-interface MovementPattern {
-  type: 'idle' | 'responding' | 'patrol';
-  target?: [number, number];
-  waypoints?: [number, number][];
-  speed: number;
-}
+// Kazerne iconen
+const createKazerneIcon = (type: string | null) => {
+  const colors: Record<string, string> = {
+    'Beroeps': '#dc2626',
+    'Vrijwilligers': '#f59e0b',
+    'Vrijwillig': '#f59e0b',
+    'Vrijwillig/Beroeps': '#ea580c',
+  };
+  
+  const color = colors[type || ''] || '#6b7280';
+  const svgIcon = `<svg width="30" height="45" xmlns="http://www.w3.org/2000/svg"><path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 15 30 15 30s15-21.716 15-30C30 6.716 23.284 0 15 0z" fill="${color}" stroke="#fff" stroke-width="2"/><circle cx="15" cy="15" r="6" fill="#fff"/></svg>`;
 
-const KaartPage: React.FC = () => {
-  const [incidents, setIncidents] = useState<ProcessedIncident[]>([]);
-  const [basisteams, setBasisteams] = useState<Basisteam[]>([]);
-  const [policeUnits, setPoliceUnits] = useState<PoliceUnit[]>([]);
-  const [showBasisteams, setShowBasisteams] = useState(true);
-  const [showUnits, setShowUnits] = useState(true);
-  const [selectedFilter, setSelectedFilter] = useState('alle');
-  const [priorityFilter, setPriorityFilter] = useState('alle');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [newIncidentIds, setNewIncidentIds] = useState<Set<number>>(new Set());
-  const [showAdministrativeBoundaries, setShowAdministrativeBoundaries] = useState(false);
-  const [pdokCapabilities, setPdokCapabilities] = useState<any>(null);
-  const [isSavingPositions, setIsSavingPositions] = useState(false);
-  const [lastPositionSave, setLastPositionSave] = useState<Date | null>(null);
-  const [positionSaveStatus, setPositionSaveStatus] = useState<string>('');
-  const mapRef = useRef<L.Map | null>(null);
-  const lastFetchTime = useRef<Date>(new Date());
-  const movementIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  return L.divIcon({
+    html: svgIcon,
+    className: 'kazerne-marker',
+    iconSize: [30, 45],
+    iconAnchor: [15, 45],
+    popupAnchor: [0, -45]
+  });
+};
 
-  // Load PDOK WMS capabilities
-  const loadPdokCapabilities = useCallback(async () => {
-    try {
-      console.log('🌍 Loading PDOK WMS capabilities...');
-      const response = await fetch('/api/pdok/capabilities');
+// Voertuig iconen
+const createVoertuigIcon = (type: string, functie: string, gekoppeld: boolean) => {
+  const typeColors: Record<string, string> = {
+    'TS': '#ef4444',      // Tankautospuit - rood
+    'HTS': '#dc2626',     // Hoogwerker - donkerrood
+    'RV': '#f59e0b',      // Reddingsvoertuig - oranje
+    'MP': '#10b981',      // Materieel/Personeel - groen
+    'DB': '#3b82f6',      // Dienstbus - blauw
+    'VBK': '#8b5cf6',     // Vakbekwaamheid - paars
+    'OV': '#f97316',      // Overig - oranje
+  };
+  
+  const color = typeColors[type] || '#6b7280';
+  const opacity = gekoppeld ? '1' : '0.5';
+  
+  const svgIcon = `
+    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" opacity="${opacity}">
+      <rect x="2" y="8" width="20" height="12" rx="2" fill="${color}" stroke="#fff" stroke-width="2"/>
+      <circle cx="7" cy="18" r="2" fill="#fff"/>
+      <circle cx="17" cy="18" r="2" fill="#fff"/>
+      <rect x="4" y="4" width="16" height="6" rx="1" fill="${color}" stroke="#fff" stroke-width="1"/>
+      <text x="12" y="7" text-anchor="middle" fill="#fff" font-size="8" font-weight="bold">${type}</text>
+    </svg>
+  `;
 
-      if (response.ok) {
-        const xmlText = await response.text();
-        console.log('✅ PDOK WMS capabilities loaded');
-        setPdokCapabilities(xmlText);
-      } else {
-        console.warn('⚠️ Could not load PDOK capabilities');
-      }
-    } catch (error) {
-      console.error('❌ Error loading PDOK capabilities:', error);
-    }
-  }, []);
+  return L.divIcon({
+    html: svgIcon,
+    className: 'voertuig-marker',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12]
+  });
+};
 
-  // Load PDOK capabilities on mount
+// Incident iconen (GMS2 meldingen)
+const createIncidentIcon = (prio: number, hasUnits: boolean) => {
+  const prioColors: Record<number, string> = {
+    1: '#dc2626',      // Prio 1 - Donkerrood (urgent)
+    2: '#f59e0b',      // Prio 2 - Oranje
+    3: '#eab308',      // Prio 3 - Geel
+    4: '#3b82f6',      // Prio 4 - Blauw
+    5: '#6b7280',      // Prio 5 - Grijs
+  };
+  
+  const color = prioColors[prio] || '#6b7280';
+  const pulseAnimation = prio <= 2 ? 'animate-pulse' : '';
+  const statusColor = hasUnits ? '#10b981' : '#ef4444'; // Groen als eenheden, rood als geen eenheden
+  
+  const svgIcon = `
+    <svg width="35" height="50" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dx="0" dy="2" result="offsetblur"/>
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.3"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <path d="M17.5 0C10.5 0 5 5.5 5 12.5c0 9.5 12.5 32.5 12.5 32.5s12.5-23 12.5-32.5C30 5.5 24.5 0 17.5 0z" 
+            fill="${color}" stroke="#fff" stroke-width="2.5" filter="url(#shadow)"/>
+      <circle cx="17.5" cy="12.5" r="8" fill="#fff"/>
+      <text x="17.5" y="17" text-anchor="middle" fill="${color}" font-size="12" font-weight="bold">P${prio}</text>
+      <circle cx="28" cy="8" r="4" fill="${statusColor}" stroke="#fff" stroke-width="1.5"/>
+    </svg>
+  `;
+
+  return L.divIcon({
+    html: svgIcon,
+    className: `incident-marker ${pulseAnimation}`,
+    iconSize: [35, 50],
+    iconAnchor: [17.5, 50],
+    popupAnchor: [0, -50]
+  });
+};
+
+/**
+ * Component die map state persistent maakt
+ */
+function MapStatePersister() {
+  const map = useMap();
+
   useEffect(() => {
-    setMapLoaded(true);
-    loadPdokCapabilities();
-  }, [loadPdokCapabilities]);
-
-  // Generate coordinates for Rotterdam area based on incident data
-  const generateCoordinatesForIncident = (incident: GmsIncident): [number, number] => {
-    // Base coordinates for Rotterdam center
-    const baseCoords: [number, number] = [51.9225, 4.4792];
-
-    // If we have address data, create variation based on it
-    if (incident.straatnaam || incident.huisnummer) {
-      const streetHash = (incident.straatnaam || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-      const houseNumber = parseInt(incident.huisnummer) || incident.id;
-
-      // Create reasonable spread across Rotterdam metropolitan area
-      const latOffset = ((streetHash % 200) - 100) * 0.002; // ±0.2 degrees
-      const lonOffset = ((houseNumber % 200) - 100) * 0.002;
-
-      return [
-        Math.max(51.85, Math.min(52.0, baseCoords[0] + latOffset)),
-        Math.max(4.3, Math.min(4.6, baseCoords[1] + lonOffset))
-      ];
-    }
-
-    // Fallback: spread incidents around Rotterdam area based on ID
-    const idOffset = incident.id * 137; // Prime number for better distribution
-    const latOffset = ((idOffset % 100) - 50) * 0.003;
-    const lonOffset = (((idOffset * 7) % 100) - 50) * 0.003;
-
-    return [
-      baseCoords[0] + latOffset,
-      baseCoords[1] + lonOffset
-    ];
-  };
-
-  // Calculate distance between two coordinates in kilometers
-  const calculateDistance = (pos1: [number, number], pos2: [number, number]): number => {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = (pos2[0] - pos1[0]) * Math.PI / 180;
-    const dLon = (pos2[1] - pos1[1]) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(pos1[0] * Math.PI / 180) * Math.cos(pos2[0] * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
-
-  // Generate random position within a municipality boundary with better distribution
-  const generateRandomPositionInMunicipality = (basisteam: Basisteam, unitId: number): [number, number] => {
-    const polygon = basisteam.polygon as [number, number][];
-    if (!polygon || polygon.length === 0) {
-      // Spread units across larger Rotterdam metropolitan area
-      const baseCoords: [number, number] = [51.9225, 4.4792];
-      const idOffset = unitId * 137; // Prime number for better distribution
-      const latOffset = ((idOffset % 300) - 150) * 0.001; // Larger spread
-      const lonOffset = (((idOffset * 7) % 300) - 150) * 0.001;
-
-      return [
-        Math.max(51.85, Math.min(52.05, baseCoords[0] + latOffset)),
-        Math.max(4.25, Math.min(4.65, baseCoords[1] + lonOffset))
-      ];
-    }
-
-    // Find bounding box
-    const lats = polygon.map(p => p[0]);
-    const lngs = polygon.map(p => p[1]);
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs);
-    const maxLng = Math.max(...lngs);
-
-    // Use unit ID for deterministic but well-distributed positioning
-    const seedX = (unitId * 17) % 1000 / 1000; // 0-1
-    const seedY = (unitId * 31) % 1000 / 1000; // 0-1
-
-    // Apply seeds to bounding box with some padding to avoid clustering at edges
-    const padding = 0.1; // 10% padding
-    const latRange = (maxLat - minLat) * (1 - 2 * padding);
-    const lngRange = (maxLng - minLng) * (1 - 2 * padding);
-
-    const randomLat = minLat + padding * (maxLat - minLat) + seedY * latRange;
-    const randomLng = minLng + padding * (maxLng - minLng) + seedX * lngRange;
-
-    return [randomLat, randomLng];
-  };
-
-  // Get movement speed based on unit status and type
-  const getMovementSpeed = (unit: PoliceUnit, isEmergency: boolean = false): number => {
-    const statusNum = parseInt(unit.status.split(' ')[0]);
-
-    // Base speeds (km/h)
-    const baseSpeed = unit.soort_auto.includes('Motor') ? 60 : 50;
-
-    if (isEmergency || statusNum === 3 || statusNum === 4) {
-      return baseSpeed * 1.5; // Emergency response speed
-    } else if (statusNum === 2) {
-      return baseSpeed * 1.2; // Patrol speed
-    } else {
-      return baseSpeed * 0.8; // Normal movement
-    }
-  };
-
-  // Generate initial position for a unit based on its basisteam
-  const generateInitialUnitPosition = (unit: PoliceUnit): [number, number] => {
-    const basisteam = basisteams.find(bt => bt.id === unit.basisteam_id);
-    if (basisteam) {
-      return generateRandomPositionInMunicipality(basisteam, unit.id);
-    }
-    // Fallback with unit-specific distribution across Rotterdam area
-    const baseCoords: [number, number] = [51.9225, 4.4792];
-    const idOffset = unit.id * 137;
-    const latOffset = ((idOffset % 400) - 200) * 0.001;
-    const lonOffset = (((idOffset * 7) % 400) - 200) * 0.001;
-
-    return [
-      Math.max(51.85, Math.min(52.05, baseCoords[0] + latOffset)),
-      Math.max(4.25, Math.min(4.65, baseCoords[1] + lonOffset))
-    ];
-  };
-
-  // Process raw GMS incidents into map-ready format
-  const processIncidents = (rawIncidents: GmsIncident[]): ProcessedIncident[] => {
-    return rawIncidents.map((incident) => {
-      const address = incident.straatnaam && incident.huisnummer 
-        ? `${incident.straatnaam} ${incident.huisnummer}${incident.toevoeging ? incident.toevoeging : ''}, ${incident.plaatsnaam || 'Rotterdam'}`
-        : incident.melderAdres || `Incident ${incident.id}`;
-
-      const units = incident.assignedUnits 
-        ? JSON.parse(incident.assignedUnits).map((u: any) => u.roepnummer || u.id) 
-        : [];
-
-      return {
-        id: incident.id,
-        number: incident.id,
-        type: incident.mc1,
-        classification: `${incident.mc1} - ${incident.mc2}`,
-        address,
-        coordinates: generateCoordinatesForIncident(incident),
-        priority: incident.prioriteit,
-        status: incident.status,
-        timestamp: incident.tijdstip,
-        units,
-        notes: incident.notities || `${incident.mc3} ${incident.mc2}`.trim()
+    const handleMoveEnd = () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      const state = {
+        center: [center.lat, center.lng] as [number, number],
+        zoom: zoom
       };
-    });
-  };
-
-  // Simulate realistic status distribution for active units
-  const assignRealisticStatus = (unit: any, index: number): string => {
-    // If unit has status 5 (afmelden), keep it as is
-    if (unit.status.includes('5 - Afmelden')) {
-      return unit.status;
-    }
-
-    // For active units (status 1), distribute realistic statuses
-    const random = (index * 7 + unit.id * 13) % 100; // Deterministic but varied
-
-    if (random < 60) return '1 - Beschikbaar/vrij';        // 60% available
-    if (random < 75) return '2 - Surveilleren';            // 15% patrolling  
-    if (random < 85) return '3 - Onderweg naar incident';  // 10% responding
-    if (random < 90) return '4 - Ter plaatse';             // 5% at scene
-    if (random < 94) return '6 - Terug naar post';         // 4% returning
-    if (random < 97) return '7 - Beschikbaar op post';     // 3% at station
-    if (random < 99) return '8 - Uitruk';                  // 2% emergency response
-    return '9 - Dienst uit';                               // 1% off duty
-  };
-
-  // Load police units from database with real status synchronization
-  const loadPoliceUnits = useCallback(async () => {
-    try {
-      console.log('🚔 Loading police units for map synchronization...');
-
-      const response = await fetch('/api/police-units');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const rawUnits = await response.json();
-      console.log('✅ Fetched police units from GMS-units sheet:', rawUnits.length);
-
-      // Convert raw units to map-ready format using EXACT status from database
-      const processedUnits: PoliceUnit[] = rawUnits.map((unit: any) => {
-        const currentPosition = unit.locatie 
-          ? JSON.parse(unit.locatie) 
-          : generateInitialUnitPosition(unit);
-
-        return {
-          ...unit,
-          status: unit.status, // Use EXACT status from GMS-units sheet
-          currentPosition,
-          movementSpeed: getMovementSpeed(unit),
-          lastUpdateTime: Date.now(),
-          isMoving: false
-        };
-      });
-
-      // Log status distribution from real data
-      const statusCounts = processedUnits.reduce((acc: any, unit) => {
-        const statusMatch = unit.status.match(/^(\d+)/);
-        const statusNum = statusMatch ? statusMatch[1] : 'unknown';
-        acc[statusNum] = (acc[statusNum] || 0) + 1;
-        return acc;
-      }, {});
-
-      console.log('📊 Real unit status distribution from GMS-units sheet:', statusCounts);
-
-      // Filter for visible units based on display rules
-      const visibleUnits = processedUnits.filter(u => {
-        const statusMatch = u.status.match(/^(\d+)/);
-        const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-        const isNoodoproep = u.status.toLowerCase().includes('n') || u.status.toLowerCase().includes('nood');
-
-        // Show noodoproep units regardless of status number
-        if (isNoodoproep) {
-          return true;
-        }
-
-        // Hide only status 5 (afmelden) - show all others
-        if (statusNum === 5) {
-          return false;
-        }
-
-        // Show all other statuses
-        return true;
-      });
-
-      console.log('📊 Units visible on map (alle behalve status 5):', visibleUnits.length);
-      console.log('📊 Hidden units (alleen status 5 - afmelden):', processedUnits.length - visibleUnits.length);
-
-      setPoliceUnits(processedUnits); // Store all units for status tracking
-
-    } catch (error) {
-      console.error('❌ Error loading police units:', error);
-    }
-  }, [basisteams]);
-
-  // Centralized unit visibility logic
-  const isUnitVisible = (unit: PoliceUnit): boolean => {
-    const statusMatch = unit.status.match(/^(\d+)/);
-    const statusNum = statusMatch ? parseInt(statusMatch[1]) : null;
-    const isNoodoproep = unit.status.toLowerCase().includes('n') || unit.status.toLowerCase().includes('nood');
-
-    // Show noodoproep units regardless of status number
-    if (isNoodoproep) {
-      return true;
-    }
-
-    // Hide only status 5 (afmelden) - show all others
-    if (statusNum === 5) {
-      return false;
-    }
-
-    // Show all other statuses (1,2,3,4,6,7,8,9, etc.)
-    return true;
-  };
-
-  // Helper function to generate realistic patrol bearing
-  const generatePatrolBearing = (unit: PoliceUnit, polygon: [number, number][]): number => {
-    if (!polygon || polygon.length === 0) {
-      return Math.random() * 2 * Math.PI; // Random fallback
-    }
-
-    // Create patrol patterns based on unit ID for consistent routes
-    const unitSeed = unit.id * 17 + Date.now() / (1000 * 60 * 5); // Change every 5 minutes
-    const patternIndex = Math.floor(unitSeed) % 4;
-
-    switch (patternIndex) {
-      case 0: return 0; // North
-      case 1: return Math.PI / 2; // East
-      case 2: return Math.PI; // South
-      case 3: return 3 * Math.PI / 2; // West
-      default: return Math.random() * 2 * Math.PI;
-    }
-  };
-
-  // Helper function to calculate lat/lng movement from bearing and distance
-  const calculateMovement = (bearing: number, moveDistance: number, currentPos: [number, number]) => {
-    const latMove = Math.cos(bearing) * moveDistance / 111; // Rough km to degrees
-    const lonMove = Math.sin(bearing) * moveDistance / (111 * Math.cos(currentPos[0] * Math.PI / 180));
-    return { latMove, lonMove };
-  };
-
-  // Advanced waypoint system for realistic patrol routes
-  const generateWaypoints = (unit: PoliceUnit, basisteam: Basisteam): [number, number][] => {
-    const polygon = basisteam.polygon as [number, number][];
-    if (!polygon || polygon.length === 0) return [];
-
-    // Generate 3-5 waypoints for patrol route
-    const waypointCount = 3 + (Math.floor(unit.id) % 3); // 3-5 waypoints based on unit ID
-    const waypoints: [number, number][] = [];
-
-    // Calculate municipality bounds
-    const lats = polygon.map(p => p[0]);
-    const lngs = polygon.map(p => p[1]);
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs);
-    const maxLng = Math.max(...lngs);
-
-    // Create systematic patrol pattern
-    for (let i = 0; i < waypointCount; i++) {
-      const angle = (2 * Math.PI * i) / waypointCount + (unit.id * 0.1); // Offset by unit ID
-      const radius = 0.8; // Stay within 80% of bounds
-      
-      const centerLat = (minLat + maxLat) / 2;
-      const centerLng = (minLng + maxLng) / 2;
-      const latRadius = (maxLat - minLat) * radius / 2;
-      const lngRadius = (maxLng - minLng) * radius / 2;
-
-      const waypointLat = centerLat + Math.cos(angle) * latRadius;
-      const waypointLng = centerLng + Math.sin(angle) * lngRadius;
-
-      waypoints.push([waypointLat, waypointLng]);
-    }
-
-    return waypoints;
-  };
-
-  // Traffic-aware routing that considers street patterns
-  const generateTrafficAwareRoute = (
-    currentPos: [number, number], 
-    targetPos: [number, number],
-    unit: PoliceUnit
-  ): number => {
-    // Calculate direct bearing
-    const directBearing = Math.atan2(
-      targetPos[1] - currentPos[1],
-      targetPos[0] - currentPos[0]
-    );
-
-    // Add street-following behavior (simulate following road network)
-    // Dutch cities have mixed grid/radial patterns
-    const streetOffset = Math.sin(unit.id * 17 + Date.now() / (1000 * 60)) * 0.3; // ±0.3 radians
-    
-    // Traffic considerations: avoid direct routes, follow probable streets
-    let adjustedBearing = directBearing + streetOffset;
-
-    // Emergency units get more direct routes
-    const statusNum = parseInt(unit.status);
-    if (statusNum === 3) { // Emergency response
-      adjustedBearing = directBearing + streetOffset * 0.3; // Less deviation for emergencies
-    }
-
-    return adjustedBearing;
-  };
-
-  // Helper function to generate patrol routes with waypoints
-  const generatePatrolRoute = (unit: PoliceUnit, basisteam: Basisteam): number => {
-    const polygon = basisteam.polygon as [number, number][];
-    if (!polygon || polygon.length === 0) {
-      return Math.random() * 2 * Math.PI; // Random fallback
-    }
-
-    // Get or generate waypoints for this unit
-    if (!unit.waypoints || unit.waypoints.length === 0) {
-      // Generate new waypoints (this should be stored on the unit)
-      const waypoints = generateWaypoints(unit, basisteam);
-      // For now, use current waypoint logic with calculated center
-      const centerLat = polygon.reduce((sum, p) => sum + p[0], 0) / polygon.length;
-      const centerLng = polygon.reduce((sum, p) => sum + p[1], 0) / polygon.length;
-      
-      return generateTrafficAwareRoute(unit.currentPosition, [centerLat, centerLng], unit);
-    }
-
-    // Use waypoint system (simplified for now)
-    const currentPos = unit.currentPosition;
-    const waypoints = generateWaypoints(unit, basisteam);
-    
-    // Find closest waypoint
-    let closestWaypoint = waypoints[0];
-    let minDistance = calculateDistance(currentPos, waypoints[0]);
-    
-    for (const waypoint of waypoints) {
-      const distance = calculateDistance(currentPos, waypoint);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestWaypoint = waypoint;
-      }
-    }
-
-    // Move toward closest waypoint with traffic-aware routing
-    return generateTrafficAwareRoute(currentPos, closestWaypoint, unit);
-  };
-
-  // Helper function to constrain unit position within municipality bounds
-  const constrainToMunicipality = (
-    position: [number, number], 
-    basisteam: Basisteam, 
-    tolerance: number = 0
-  ): [number, number] => {
-    const polygon = basisteam.polygon as [number, number][];
-    if (!polygon || polygon.length === 0) {
-      // Fallback to Rotterdam area bounds with tolerance
-      return [
-        Math.max(51.8 - tolerance, Math.min(52.1 + tolerance, position[0])),
-        Math.max(4.2 - tolerance, Math.min(4.7 + tolerance, position[1]))
-      ];
-    }
-
-    // Find bounding box with tolerance
-    const lats = polygon.map(p => p[0]);
-    const lngs = polygon.map(p => p[1]);
-    const minLat = Math.min(...lats) - tolerance;
-    const maxLat = Math.max(...lats) + tolerance;
-    const minLng = Math.min(...lngs) - tolerance;
-    const maxLng = Math.max(...lngs) + tolerance;
-
-    // Constrain position to bounds
-    return [
-      Math.max(minLat, Math.min(maxLat, position[0])),
-      Math.max(minLng, Math.min(maxLng, position[1]))
-    ];
-  };
-
-  // Update unit positions based on movement simulation
-  const updateUnitPositions = useCallback(() => {
-    setPoliceUnits(prevUnits => {
-      return prevUnits.map(unit => {
-        const now = Date.now();
-        const deltaTime = (now - unit.lastUpdateTime) / 1000; // seconds
-
-        // Only move units that are visible (not status 5)
-        const statusNum = parseInt(unit.status.split(' ')[0]);
-        const shouldMove = statusNum !== 5 || unit.status.includes('N');
-
-        if (!shouldMove) {
-          return { ...unit, lastUpdateTime: now };
-        }
-
-        let newPosition = [...unit.currentPosition] as [number, number];
-        let isMoving = false;
-
-        // Determine movement target based on incident assignment
-        const assignedIncident = incidents.find(inc => 
-          inc.units.includes(unit.roepnummer)
-        );
-
-        if (assignedIncident && statusNum === 3) {
-          // Unit is responding to incident - enhanced emergency routing
-          const target = assignedIncident.coordinates;
-          const distance = calculateDistance(unit.currentPosition, target);
-
-          if (distance > 0.1) { // Still more than 100m away
-            const speed = getMovementSpeed(unit, true); // Emergency response
-            const distancePerSecond = (speed * 1000) / 3600; // m/s
-            const moveDistance = distancePerSecond * deltaTime / 1000; // km
-
-            // Use traffic-aware routing for emergency response
-            const bearing = generateTrafficAwareRoute(unit.currentPosition, target, unit);
-
-            // Collision avoidance with other units
-            const nearbyUnits = policeUnits.filter(otherUnit => 
-              otherUnit.id !== unit.id && 
-              otherUnit.currentPosition &&
-              calculateDistance(unit.currentPosition, otherUnit.currentPosition) < 0.5 // Within 500m
-            );
-
-            let avoidanceBearing = bearing;
-            if (nearbyUnits.length > 0) {
-              // Calculate avoidance vector
-              let avoidanceX = 0, avoidanceY = 0;
-              for (const otherUnit of nearbyUnits) {
-                const distToOther = calculateDistance(unit.currentPosition, otherUnit.currentPosition);
-                if (distToOther < 0.2) { // Too close (200m)
-                  const repelBearing = Math.atan2(
-                    unit.currentPosition[1] - otherUnit.currentPosition[1],
-                    unit.currentPosition[0] - otherUnit.currentPosition[0]
-                  );
-                  const repelStrength = 0.2 / distToOther; // Stronger repel when closer
-                  avoidanceX += Math.cos(repelBearing) * repelStrength;
-                  avoidanceY += Math.sin(repelBearing) * repelStrength;
-                }
-              }
-              
-              if (avoidanceX !== 0 || avoidanceY !== 0) {
-                const avoidanceDir = Math.atan2(avoidanceY, avoidanceX);
-                avoidanceBearing = bearing + avoidanceDir * 0.3; // 30% avoidance influence
-              }
-            }
-
-            // Calculate movement with avoidance
-            const { latMove, lonMove } = calculateMovement(avoidanceBearing, moveDistance, unit.currentPosition);
-
-            newPosition = [
-              unit.currentPosition[0] + latMove,
-              unit.currentPosition[1] + lonMove
-            ];
-            isMoving = true;
-          }
-        } else if (statusNum === 1 || statusNum === 2) {
-          // Unit is available or on patrol - realistic patrol patterns
-          const basisteam = basisteams.find(bt => bt.id === unit.basisteam_id);
-          
-          // Different movement patterns based on status
-          if (statusNum === 1 && Math.random() < 0.1) {
-            // Available units move slowly and less frequently (10% chance)
-            const speed = getMovementSpeed(unit) * 0.5; // Half speed for available units
-            const moveDistance = (speed * 1000 / 3600) * deltaTime / 1000;
-            
-            // Prefer staying within known areas (lower random movement)
-            if (basisteam && unit.currentPosition) {
-              const bearing = generatePatrolBearing(unit, basisteam.polygon);
-              const { latMove, lonMove } = calculateMovement(bearing, moveDistance, unit.currentPosition);
-              
-              newPosition = [
-                unit.currentPosition[0] + latMove,
-                unit.currentPosition[1] + lonMove
-              ];
-              
-              // Keep within municipality bounds
-              newPosition = constrainToMunicipality(newPosition, basisteam);
-              isMoving = true;
-            }
-          } else if (statusNum === 2 && Math.random() < 0.5) {
-            // Patrol units move more actively (50% chance)
-            const speed = getMovementSpeed(unit);
-            const moveDistance = (speed * 1000 / 3600) * deltaTime / 1000;
-            
-            if (basisteam && unit.currentPosition) {
-              // Follow patrol routes along municipality perimeter or through center
-              let bearing = generatePatrolRoute(unit, basisteam);
-              
-              // Add collision avoidance for patrol units
-              const nearbyUnits = policeUnits.filter(otherUnit => 
-                otherUnit.id !== unit.id && 
-                otherUnit.currentPosition &&
-                calculateDistance(unit.currentPosition, otherUnit.currentPosition) < 0.3 // Within 300m
-              );
-
-              if (nearbyUnits.length > 0) {
-                // Light collision avoidance for patrol units
-                let avoidanceX = 0, avoidanceY = 0;
-                for (const otherUnit of nearbyUnits) {
-                  const distToOther = calculateDistance(unit.currentPosition, otherUnit.currentPosition);
-                  if (distToOther < 0.15) { // Too close (150m)
-                    const repelBearing = Math.atan2(
-                      unit.currentPosition[1] - otherUnit.currentPosition[1],
-                      unit.currentPosition[0] - otherUnit.currentPosition[0]
-                    );
-                    const repelStrength = 0.1 / distToOther; // Gentler repel for patrols
-                    avoidanceX += Math.cos(repelBearing) * repelStrength;
-                    avoidanceY += Math.sin(repelBearing) * repelStrength;
-                  }
-                }
-                
-                if (avoidanceX !== 0 || avoidanceY !== 0) {
-                  const avoidanceDir = Math.atan2(avoidanceY, avoidanceX);
-                  bearing = bearing + avoidanceDir * 0.2; // 20% avoidance influence
-                }
-              }
-
-              const { latMove, lonMove } = calculateMovement(bearing, moveDistance, unit.currentPosition);
-              
-              newPosition = [
-                unit.currentPosition[0] + latMove,
-                unit.currentPosition[1] + lonMove
-              ];
-              
-              // Keep within municipality bounds with some edge tolerance for patrol routes
-              newPosition = constrainToMunicipality(newPosition, basisteam, 0.002); // 200m tolerance
-              isMoving = true;
-            }
-          }
-        }
-
-        return {
-          ...unit,
-          currentPosition: newPosition,
-          lastUpdateTime: now,
-          isMoving
-        };
-      });
-    });
-  }, [incidents, basisteams]);
-
-  // Load incidents with real-time polling
-  const loadIncidents = useCallback(async () => {
-    try {
-      console.log('🗺️ Loading GMS incidents for map...');
-
-      const response = await fetch('/api/gms-incidents');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const rawIncidents: GmsIncident[] = await response.json();
-      console.log('✅ Fetched GMS incidents for map:', rawIncidents.length);
-
-      const processedIncidents = processIncidents(rawIncidents);
-
-      // Detect new incidents
-      setIncidents(prevIncidents => {
-        const prevIds = new Set(prevIncidents.map(i => i.id));
-        const newIds = processedIncidents
-          .filter(incident => !prevIds.has(incident.id))
-          .map(incident => incident.id);
-
-        if (newIds.length > 0) {
-          console.log('🚨 New incidents detected:', newIds);
-          setNewIncidentIds(prev => new Set([...Array.from(prev), ...newIds]));
-
-          // Clear new incident highlighting after 10 seconds
-          setTimeout(() => {
-            setNewIncidentIds(prev => {
-              const updated = new Set(prev);
-              newIds.forEach(id => updated.delete(id));
-              return updated;
-            });
-          }, 10000);
-        }
-
-        return processedIncidents;
-      });
-
-      lastFetchTime.current = new Date();
-      setIsLoading(false);
-
-    } catch (error) {
-      console.error('❌ Error loading GMS incidents:', error);
-      setError('Fout bij laden van GMS meldingen');
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Initial load and setup polling
+      localStorage.setItem('mapState', JSON.stringify(state));
+    };
+
+    map.on('moveend', handleMoveEnd);
+    map.on('zoomend', handleMoveEnd);
+
+    return () => {
+      map.off('moveend', handleMoveEnd);
+      map.off('zoomend', handleMoveEnd);
+    };
+  }, [map]);
+
+  return null;
+}
+
+export default function KaartPage() {
+  const { data: kazernes, isLoading } = useQuery<any[]>({
+    queryKey: ['/api/kazernes-with-voertuigen'],
+  });
+
+  const [showVoertuigen, setShowVoertuigen] = useState(false); // Standaard uit
+  const [showIncidents, setShowIncidents] = useState(true); // Standaard aan
+  const [incidents, setIncidents] = useState<GmsIncident[]>([]);
+  
+  // PDOK geocoding hook
+  const { geocodingResults, isGeocoding, geocodeKazernes, clearResults } = useKazerneGeocoding();
+
+  // Track incidents zonder coördinaten
+  const [incidentsZonderCoordinaten, setIncidentsZonderCoordinaten] = useState(0);
+
+  // Laad GMS2 incidents uit localStorage
   useEffect(() => {
-    loadIncidents();
-
-    // Poll for updates every 5 seconds
-    const interval = setInterval(loadIncidents, 5000);
-
-    return () => clearInterval(interval);
-  }, [loadIncidents]);
-
-  // Load police units when basisteams are loaded
-  useEffect(() => {
-    if (basisteams.length > 0) {
-      loadPoliceUnits();
-    }
-  }, [basisteams, loadPoliceUnits]);
-
-  // Force reload police units on component mount to ensure status assignment
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (basisteams.length > 0) {
-        console.log('🔄 Force reloading police units with new status assignment...');
-        loadPoliceUnits();
-      }
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Save unit positions to database with enhanced feedback
-  const saveUnitPositions = useCallback(async (unitsToSave: PoliceUnit[]) => {
-    try {
-      setIsSavingPositions(true);
-      setPositionSaveStatus('Saving positions...');
-
-      // Only save database units (with numeric IDs) that have moved
-      const databaseUnits = unitsToSave.filter(unit => 
-        typeof unit.id === 'number' && unit.currentPosition
-      );
-
-      if (databaseUnits.length === 0) {
-        setPositionSaveStatus('No positions to save');
-        setIsSavingPositions(false);
-        return;
-      }
-
-      const positionUpdates = databaseUnits.map(unit => ({
-        id: unit.id as number,
-        locatie: JSON.stringify(unit.currentPosition),
-        status: unit.status
-      }));
-
-      const response = await fetch('/api/police-units/positions', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ positions: positionUpdates })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(`💾 Saved positions for ${positionUpdates.length} units to database`);
-        setPositionSaveStatus(`✅ Saved ${result.updated} positions`);
-        setLastPositionSave(new Date());
-      } else {
-        const errorText = await response.text();
-        console.warn('⚠️ Failed to save unit positions to database:', errorText);
-        setPositionSaveStatus(`❌ Save failed: ${response.status}`);
-      }
-
-    } catch (error) {
-      console.error('❌ Error saving unit positions:', error);
-      setPositionSaveStatus(`❌ Error: ${error.message}`);
-    } finally {
-      setIsSavingPositions(false);
-
-      // Clear status after 3 seconds
-      setTimeout(() => {
-        setPositionSaveStatus('');
-      }, 3000);
-    }
-  }, []);
-
-  // Start movement simulation
-  useEffect(() => {
-    if (policeUnits.length > 0) {
-      // Update unit positions every 2 seconds
-      movementIntervalRef.current = setInterval(updateUnitPositions, 2000);
-
-      return () => {
-        if (movementIntervalRef.current) {
-          clearInterval(movementIntervalRef.current);
-        }
-      };
-    }
-  }, [policeUnits.length, updateUnitPositions]);
-
-  // Save positions to database every 20 seconds for more frequent updates
-  useEffect(() => {
-    const saveInterval = setInterval(() => {
-      if (policeUnits.length > 0) {
-        // Only save if there are database units with actual positions
-        const databaseUnits = policeUnits.filter(unit => 
-          typeof unit.id === 'number' && unit.currentPosition && unit.isMoving
-        );
-        
-        if (databaseUnits.length > 0) {
-          console.log(`🕐 Periodic save: ${databaseUnits.length} moving units`);
-          saveUnitPositions(policeUnits);
-        }
-      }
-    }, 20000); // Save every 20 seconds
-
-    return () => clearInterval(saveInterval);
-  }, [policeUnits, saveUnitPositions]);
-
-  // Also save positions when units change status or start/stop moving
-  useEffect(() => {
-    const hasMovingUnits = policeUnits.some(unit => 
-      typeof unit.id === 'number' && unit.isMoving
-    );
-    
-    if (hasMovingUnits && policeUnits.length > 0) {
-      // Debounced save when movement status changes
-      const timer = setTimeout(() => {
-        console.log('📍 Status change triggered position save');
-        saveUnitPositions(policeUnits);
-      }, 2000); // Wait 2 seconds after movement change
-
-      return () => clearTimeout(timer);
-    }
-  }, [policeUnits.map(u => u.isMoving).join(','), saveUnitPositions]);
-
-  // Load basisteams data
-  useEffect(() => {
-    const loadBasisteams = async () => {
+    const loadIncidents = () => {
       try {
-        const response = await fetch('/api/basisteams');
-        if (response.ok) {
-          const basisteamsData = await response.json();
-          setBasisteams(basisteamsData);
+        const storedIncidents = localStorage.getItem('gms2Incidents');
+        if (storedIncidents) {
+          const parsedIncidents: GmsIncident[] = JSON.parse(storedIncidents);
+          // Filter alleen incidents met coördinaten
+          const incidentsMetCoordinaten = parsedIncidents.filter(
+            inc => inc.coordinates && Array.isArray(inc.coordinates) && inc.coordinates.length === 2
+          );
+          const incidentsZonder = parsedIncidents.length - incidentsMetCoordinaten.length;
+          
+          setIncidents(incidentsMetCoordinaten);
+          setIncidentsZonderCoordinaten(incidentsZonder);
+          
+          console.log(`📍 ${incidentsMetCoordinaten.length} incidents geladen met coördinaten uit ${parsedIncidents.length} totaal`);
+          
+          if (incidentsZonder > 0) {
+            console.warn(`⚠️ ${incidentsZonder} incident(en) hebben geen coördinaten en worden niet getoond op de kaart!`);
+            console.warn(`💡 Tip: Voeg een adres toe in GMS2 met "=Rotterdam/Kleiweg 12" om coördinaten toe te voegen`);
+          }
         }
       } catch (error) {
-        console.error('Error loading basisteams:', error);
+        console.error('Error loading incidents from localStorage:', error);
       }
     };
 
-    loadBasisteams();
+    // Laad initial
+    loadIncidents();
+
+    // Listen voor storage changes (wanneer GMS2 updates)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'gms2Incidents') {
+        loadIncidents();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Poll elke 2 seconden voor updates (fallback als storage event niet werkt)
+    const interval = setInterval(loadIncidents, 2000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
-  // Filter incidents based on user selection
-  const filteredIncidents = incidents.filter(incident => {
-    if (selectedFilter !== 'alle' && !incident.type.toLowerCase().includes(selectedFilter.toLowerCase())) {
-      return false;
-    }
-    if (priorityFilter !== 'alle' && incident.priority.toString() !== priorityFilter) {
-      return false;
-    }
-    return true;
-  });
+  // Geocode kazernes wanneer ze geladen zijn
+  useEffect(() => {
+    if (!kazernes || kazernes.length === 0) return;
+    
+    // Start geocoding voor kazernes zonder geldige coördinaten
+    geocodeKazernes(kazernes);
+  }, [kazernes, geocodeKazernes]);
 
-  if (!mapLoaded || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-lg">Kaart wordt geladen...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="text-lg">Kaart laden...</div>
         </div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center text-red-600">
-          <p className="text-lg mb-4">Er is een fout opgetreden:</p>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
+  // Combineer kazernes met geocoding resultaten
+  const kazernesMetCoordinaten = (kazernes || []).map((k: any) => {
+    const geocodingResult = geocodingResults.find(r => r.kazerneId === k.id);
+    
+    if (geocodingResult?.success && geocodingResult.coordinates) {
+      return {
+        ...k,
+        latitude: geocodingResult.coordinates[0].toString(),
+        longitude: geocodingResult.coordinates[1].toString(),
+        geocoded: true
+      };
+    }
+    
+    // Fallback naar bestaande coördinaten
+    if (k.latitude && k.longitude && 
+        k.latitude !== 'NULL' && k.longitude !== 'NULL' &&
+        !isNaN(parseFloat(k.latitude)) && !isNaN(parseFloat(k.longitude))) {
+      return {
+        ...k,
+        geocoded: false
+      };
+    }
+    
+    return null;
+  }).filter(Boolean);
 
-  return (
-    <div className="relative h-screen w-full">
-      {/* Map Container */}
-      <div className="h-full w-full">
-        <MapContainer
-          center={[51.9225, 4.4792]}
-          zoom={11}
-          className="h-full w-full"
-          ref={(map: any) => {
-            if (map) mapRef.current = map;
-          }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+  // Tel voertuigen
+  const totaalVoertuigen = kazernes?.reduce((acc: number, k: any) => acc + (k.voertuigen?.length || 0), 0) || 0;
 
-          {/* PDOK Administrative Boundaries WMS Layer */}
-          {showAdministrativeBoundaries && (
-            <TileLayer
-              attribution='&copy; <a href="https://www.pdok.nl/">PDOK</a> - Kadaster'
-              url="/api/pdok/bestuurlijke-gebieden?service=WMS&version=1.3.0&request=GetMap&layers=bestuurlijkegebieden:gemeenten&styles=&crs=EPSG:3857&bbox={bbox-epsg-3857}&width=256&height=256&format=image/png&transparent=true"
-              opacity={0.6}
-            />
-          )}
+  // Laad opgeslagen map state of gebruik default
+  const [mapState] = useState<{ center: [number, number]; zoom: number }>(() => {
+    try {
+      const saved = localStorage.getItem('mapState');
+      if (saved) {
+        const state = JSON.parse(saved);
+        if (state.center && Array.isArray(state.center) && state.center.length === 2 && state.zoom) {
+          return { center: state.center, zoom: state.zoom };
+        }
+      }
+    } catch (error) {
+      console.warn('Fout bij laden map state:', error);
+    }
+    return { center: [52.1326, 5.2913], zoom: 7 };
+  });
 
-          {/* Incident Markers */}
-          {filteredIncidents.map((incident) => {
-            const isNew = newIncidentIds.has(incident.id);
-
-            return (
-              <Marker
-                key={`incident-${incident.id}`}
-                position={incident.coordinates}
-                icon={createIncidentIcon(incident.number, incident.type, incident.priority)}
-              >
-                <Popup>
-                  <div className={`p-3 min-w-[250px] ${isNew ? 'bg-yellow-50 border-yellow-300 border-2' : ''}`}>
-                    {isNew && (
-                      <div className="bg-red-500 text-white text-xs px-2 py-1 rounded mb-2 animate-pulse">
-                        🚨 NIEUWE MELDING
-                      </div>
-                    )}
-                    <h3 className="font-bold text-base mb-2 text-gray-800">
-                      Incident #{incident.number}
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <p><strong>Type:</strong> {incident.classification}</p>
-                      <p><strong>Adres:</strong> {incident.address}</p>
-                      <p><strong>Prioriteit:</strong> 
-                        <span className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
-                          incident.priority === 1 ? 'bg-red-500 text-white' :
-                          incident.priority === 2 ? 'bg-orange-500 text-white' :
-                          incident.priority === 3 ? 'bg-yellow-500 text-black' :
-                          'bg-gray-500 text-white'
-                        }`}>
-                          P{incident.priority}
-                        </span>
-                      </p>
-                      <p><strong>Status:</strong> {incident.status}</p>
-                      <p><strong>Tijd:</strong> {new Date(incident.timestamp).toLocaleString('nl-NL')}</p>
-                      {incident.units.length > 0 && (
-                        <p><strong>Eenheden:</strong> {incident.units.join(', ')}</p>
-                      )}
-                      {incident.notes && (
-                        <div className="mt-2 p-2 bg-gray-100 rounded">
-                          <strong>Details:</strong> {incident.notes}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-
-          {/* Police Unit Markers - Synchronized with GMS-units sheet */}
-          {showUnits && policeUnits
-            .filter(isUnitVisible) // Use centralized visibility logic
-            .filter((unit, index) => {
-              // Show only every 3rd unit to reduce density (can be made configurable)
-              return index % 3 === 0;
-            })
-            .map((unit) => {
+  // Centrum op Nederland of opgeslagen state
+  const center: [number, number] = mapState.center;
+  const zoom: number = mapState.zoom;
 
             return (
-              <Marker
-                key={`unit-${unit.id}`}
-                position={unit.currentPosition}
-                icon={createUnitIcon(unit)}
-              >
-                <Popup>
-                  <div className="p-3 min-w-[200px]">
-                    <h3 className="font-bold text-base mb-2 text-gray-800">
-                      {unit.roepnummer}
-                    </h3>
-                    <div className="space-y-1 text-sm">
-                      <p><strong>Status:</strong> {unit.status}</p>
-                      <p><strong>Team:</strong> {unit.team}</p>
-                      <p><strong>Voertuig:</strong> {unit.soort_auto}</p>
-                      <p><strong>Bezetting:</strong> {unit.aantal_mensen} personen</p>
-                      <p><strong>Snelheid:</strong> {unit.movementSpeed} km/h</p>
-                      {unit.incident && (
-                        <p><strong>Incident:</strong> {unit.incident}</p>
-                      )}
-                      {unit.isMoving && (
-                        <div className="mt-2 p-1 bg-orange-100 rounded text-xs">
-                          🚗 In beweging
+    <div className="h-screen w-full">
+      <div className="bg-white shadow-sm border-b p-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Meldkamer Kaart</h1>
+            <p className="text-gray-600 mt-1">
+              {kazernesMetCoordinaten.length} kazernes • {totaalVoertuigen} voertuigen • {incidents.length} incidenten
+              {isGeocoding && <span className="ml-2 text-blue-600">• Geocoding bezig...</span>}
+            </p>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-
-          {/* Basisteam Polygons */}
-          {showBasisteams && basisteams.map((basisteam) => {
-            // If team has multiple polygons per gemeente, show them separately
-            if (basisteam.polygons && Object.keys(basisteam.polygons).length > 0) {
-              return Object.entries(basisteam.polygons).map(([gemeente, polygonCoords]) => {
-                if (polygonCoords && polygonCoords.length > 0) {
-                  return (
-                    <Polygon
-                      key={`basisteam-${basisteam.id}-${gemeente}`}
-                      positions={polygonCoords}
-                      pathOptions={{
-                        fillColor: basisteam.actief ? '#3388ff' : '#888888',
-                        fillOpacity: 0.1,
-                        color: basisteam.actief ? '#3388ff' : '#888888',
-                        weight: 2,
-                        opacity: 0.6,
-                      }}
-                    >
-                      <Popup>
-                        <div className="p-2">
-                          <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
-                          <p className="text-xs mb-1"><strong>Gemeente:</strong> {gemeente}</p>
-                          <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
-                          <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
-                        </div>
-                      </Popup>
-                    </Polygon>
-                  );
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                checked={showIncidents} 
+                onChange={(e) => setShowIncidents(e.target.checked)}
+                className="rounded"
+              />
+              <span className="text-sm font-semibold text-orange-600">Toon incidenten ({incidents.length})</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                checked={showVoertuigen} 
+                onChange={(e) => setShowVoertuigen(e.target.checked)}
+                className="rounded"
+              />
+              <span className="text-sm">Toon voertuigen</span>
+            </label>
+            <Button
+              onClick={async () => {
+                if (confirm('Weet je zeker dat je alle eenheden terug wilt zetten naar hun kazerne?')) {
+                  await resetAllUnitsToKazerne();
                 }
-                return null;
-              });
-            } else {
-              // Fallback to single polygon
-              if (basisteam.polygon && basisteam.polygon.length > 0) {
-                return (
-                  <Polygon
-                    key={`basisteam-${basisteam.id}`}
-                    positions={basisteam.polygon}
-                    pathOptions={{
-                      fillColor: basisteam.actief ? '#3388ff' : '#888888',
-                      fillOpacity: 0.1,
-                      color: basisteam.actief ? '#3388ff' : '#888888',
-                      weight: 2,
-                      opacity: 0.6,
-                    }}
-                  >
-                    <Popup>
-                      <div className="p-2">
-                        <h3 className="font-bold text-sm mb-2">{basisteam.naam}</h3>
-                        <p className="text-xs mb-1"><strong>ID:</strong> {basisteam.id}</p>
-                        <p className="text-xs mb-1"><strong>Status:</strong> {basisteam.actief ? 'Actief' : 'Inactief'}</p>
-                        {basisteam.gemeentes && basisteam.gemeentes.length > 0 && (
-                          <p className="text-xs"><strong>Gemeentes:</strong> {basisteam.gemeentes.join(', ')}</p>
-                        )}
-                      </div>
-                    </Popup>
-                  </Polygon>
-                );
-              }
-              return null;
-            }
-          }).flat()}
-        </MapContainer>
+              }}
+              variant="outline"
+              className="ml-2"
+            >
+              Reset alle eenheden naar kazerne
+            </Button>
+                    </div>
+                  </div>
       </div>
-
-      {/* Control Panel */}
-      <div className="absolute top-4 left-4 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-xs">
-        <h3 className="font-bold text-sm mb-3">GMS Incidents Kaart</h3>
-
-        {/* Real-time Position Status */}
-        <div className="mb-3 p-2 bg-gray-50 rounded text-xs">
-          <div className="flex items-center gap-2 mb-1">
-            <div className={`w-2 h-2 rounded-full ${isSavingPositions ? 'bg-orange-400 animate-pulse' : 'bg-green-400'}`}></div>
-            <span className="font-medium">Positie Updates</span>
-          </div>
-          {positionSaveStatus && (
-            <div className="text-gray-600 mb-1">{positionSaveStatus}</div>
-          )}
-          {lastPositionSave && (
-            <div className="text-gray-500">
-              Laatste save: {lastPositionSave.toLocaleTimeString('nl-NL')}
-            </div>
-          )}
-          <div className="text-gray-500">
-            {policeUnits.filter(u => typeof u.id === 'number').length} eenheden getrackt
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium mb-1">Filter Type:</label>
-            <select 
-              value={selectedFilter} 
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="w-full text-xs border rounded px-2 py-1"
-            >
-              <option value="alle">Alle Types</option>
-              <option value="brand">Brand</option>
-              <option value="geweld">Geweld</option>
-              <option value="medisch">Medisch</option>
-              <option value="verkeer">Verkeer</option>
-              <option value="overlast">Overlast</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium mb-1">Prioriteit:</label>
-            <select 
-              value={priorityFilter} 
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="w-full text-xs border rounded px-2 py-1"
-            >
-              <option value="alle">Alle Prioriteiten</option>
-              <option value="1">P1 - Zeer Hoog</option>
-              <option value="2">P2 - Hoog</option>
-              <option value="3">P3 - Normaal</option>
-              <option value="4">P4 - Laag</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="showBasisteams"
-                checked={showBasisteams}
-                onChange={(e) => setShowBasisteams(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="showBasisteams" className="text-xs">Toon Basisteam Gebieden</label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="showUnits"
-                checked={showUnits}
-                onChange={(e) => setShowUnits(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="showUnits" className="text-xs">Toon Politie-eenheden ({policeUnits.filter(unit => isUnitVisible(unit)).filter((unit, index) => index % 3 === 0).length})</label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="showAdministrativeBoundaries"
-                checked={showAdministrativeBoundaries}
-                onChange={(e) => setShowAdministrativeBoundaries(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="showAdministrativeBoundaries" className="text-xs">Toon Bestuurlijke Grenzen (PDOK)</label>
+      
+      <div className="h-[calc(100vh-120px)] w-full relative">
+        {/* Warning banner voor incidents zonder coördinaten */}
+        {incidentsZonderCoordinaten > 0 && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] max-w-2xl">
+            <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded shadow-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium">
+                    {incidentsZonderCoordinaten} incident(en) hebben geen coördinaten en worden niet getoond
+                  </p>
+                  <p className="text-xs mt-1">
+                    💡 Voeg een adres toe in GMS2 met: <code className="bg-orange-200 px-1 rounded">=Rotterdam/Kleiweg 12</code>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="mt-4 pt-3 border-t">
-          <div className="text-xs text-gray-600 space-y-1">
-            <p><strong>Live Statistieken:</strong></p>
-            <p>Incidents: {incidents.length} ({filteredIncidents.length} zichtbaar)</p>
-            <p>Eenheden: {policeUnits.filter(unit => isUnitVisible(unit)).filter((unit, index) => index % 3 === 0).length}</p>
-            <p>In beweging: {policeUnits.filter(u => isUnitVisible(u) && u.isMoving).filter((unit, index) => policeUnits.findIndex(pu => pu.id === unit.id) % 3 === 0).length}</p>
-            <p>Laatste Update: {lastFetchTime.current.toLocaleTimeString('nl-NL')}</p>
-            {newIncidentIds.size > 0 && (
-              <p className="text-red-600 font-bold">🚨 {Array.from(newIncidentIds).length} nieuwe melding(en)</p>
+        <MapContainer 
+          center={center} 
+          zoom={zoom} 
+          style={{ height: '100%', width: '100%' }} 
+          scrollWheelZoom={true}
+        >
+          <MapStatePersister />
+          <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          
+          {/* Voertuigen markers (via renderEenhedenOpKaart - Leaflet markers die kunnen bewegen) */}
+          {showVoertuigen && <VoertuigenOpKaart enabled={true} autoRijden={true} />}
+          
+
+          {/* Incident markers (GMS2 meldingen) */}
+          {showIncidents && incidents.map((incident) => {
+            if (!incident.coordinates) return null;
+            const [lng, lat] = incident.coordinates; // GeoJSON standard: [longitude, latitude]
+            const hasUnits = incident.assignedUnits && incident.assignedUnits.length > 0;
+            const classificatie = incident.mc3 || incident.mc2 || incident.mc1 || incident.mc || 'Onbekend';
+
+            return (
+              <Marker 
+                key={`incident-${incident.id}`} 
+                position={[lat, lng]} 
+                icon={createIncidentIcon(incident.prio, hasUnits)}
+              >
+                <Popup>
+                  <div className="p-2 min-w-[280px]">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-bold text-lg">Incident #{incident.nr}</h3>
+                      <span className={`px-2 py-1 rounded text-xs font-bold ${
+                        incident.prio === 1 ? 'bg-red-600 text-white' :
+                        incident.prio === 2 ? 'bg-orange-500 text-white' :
+                        incident.prio === 3 ? 'bg-yellow-500 text-black' :
+                        'bg-blue-500 text-white'
+                      }`}>
+                        P{incident.prio}
+                      </span>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <div><span className="font-semibold">Classificatie:</span> {classificatie}</div>
+                      <div><span className="font-semibold">Locatie:</span> {incident.locatie}</div>
+                      {incident.plaatsnaam && <div><span className="font-semibold">Plaats:</span> {incident.plaatsnaam}</div>}
+                      <div><span className="font-semibold">Tijd:</span> {incident.tijd}</div>
+                      <div>
+                        <span className="font-semibold">Status:</span>{' '}
+                        <span className={hasUnits ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                          {hasUnits ? `${incident.assignedUnits.length} eenheid(en) ingezet` : 'Geen eenheden'}
+                        </span>
+                      </div>
+                      {incident.assignedUnits && incident.assignedUnits.length > 0 && (
+                        <div className="mt-2 pt-2 border-t">
+                          <span className="font-semibold">Eenheden:</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {incident.assignedUnits.map((unit, idx) => (
+                              <span key={idx} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-mono">
+                                {unit.roepnummer}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {incident.melderNaam && (
+                        <div className="mt-2 pt-2 border-t">
+                          <span className="font-semibold">Melder:</span> {incident.melderNaam}
+                        </div>
+                      )}
+                      <div className="text-xs text-gray-500 mt-2">
+                        <span className="font-semibold">Coördinaten:</span> [{lng.toFixed(6)}, {lat.toFixed(6)}] (lon, lat)
+                      </div>
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+
+          {/* Kazerne markers */}
+          {kazernesMetCoordinaten.map((k: any) => {
+            const lat = parseFloat(k.latitude);
+            const lng = parseFloat(k.longitude);
+
+            return (
+              <Marker key={k.id} position={[lat, lng]} icon={createKazerneIcon(k.type)}>
+                <Popup>
+                  <div className="p-2 min-w-[250px]">
+                    <h3 className="font-bold text-lg mb-2">{k.naam}</h3>
+                    <div className="space-y-1 text-sm">
+                      {k.type && <div><span className="font-semibold">Type:</span> <span className="px-2 py-0.5 rounded text-xs bg-gray-100">{k.type}</span></div>}
+                      {k.adres && k.adres !== '-' && <div><span className="font-semibold">Adres:</span><br/>{k.adres}<br/>{k.postcode} {k.plaats}</div>}
+                      {k.telefoonnummer && <div><span className="font-semibold">Telefoon:</span> {k.telefoonnummer}</div>}
+                      {k.voertuigen && k.voertuigen.length > 0 && <div><span className="font-semibold">Voertuigen:</span> {k.voertuigen.length}</div>}
+                      <div><span className="font-semibold">Status:</span> <span className={k.actief ? 'text-green-600' : 'text-red-600'}>{k.actief ? 'Actief' : 'Inactief'}</span></div>
+                      {k.geocoded && <div><span className="font-semibold">Locatie:</span> <span className="text-green-600">PDOK gegeocodeerd</span></div>}
+                      <div className="text-xs text-gray-500">
+                        <span className="font-semibold">Coördinaten:</span> {lat.toFixed(6)}, {lng.toFixed(6)}
+                      </div>
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
+        
+        <div className="absolute bottom-6 right-6 bg-white shadow-lg rounded-lg p-4 z-[1000] max-w-xs">
+          <h3 className="font-bold mb-2">Legenda</h3>
+          <div className="space-y-2 text-sm">
+            <div>
+              <h4 className="font-semibold mb-1">Incidenten (GMS2):</h4>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold">1</div>
+                  <span>Prio 1 (Spoed)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">2</div>
+                  <span>Prio 2</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs font-bold">3</div>
+                  <span>Prio 3</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span className="text-xs">Eenheden ingezet</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span className="text-xs">Geen eenheden</span>
+                </div>
+              </div>
+            </div>
+            <div className="pt-2 border-t">
+              <h4 className="font-semibold mb-1">Kazernes:</h4>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-full bg-red-600"></div><span>Beroeps</span></div>
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-full bg-amber-500"></div><span>Vrijwilligers</span></div>
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-full bg-orange-600"></div><span>Gemengd</span></div>
+            </div>
+            </div>
+          <div className="pt-2 border-t">
+              <h4 className="font-semibold mb-1">Voertuigen:</h4>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-red-500"></div><span>TS/HTS</span></div>
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-orange-500"></div><span>RV</span></div>
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-green-500"></div><span>MP</span></div>
+                <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-blue-500"></div><span>DB</span></div>
+            </div>
+            </div>
+            </div>
+            </div>
+
+        {/* Debug panel */}
+        <div className="absolute top-6 right-6 bg-white shadow-lg rounded-lg p-4 z-[1000] max-w-xs">
+          <h3 className="font-bold mb-2">Debug Info</h3>
+          <div className="space-y-1 text-xs">
+            <div className="font-semibold text-orange-600">
+              Incidenten op kaart: {incidents.length}
+              {incidentsZonderCoordinaten > 0 && (
+                <span className="text-red-600"> (⚠️ {incidentsZonderCoordinaten} zonder coords)</span>
+              )}
+            </div>
+            <div>Kazernes met coördinaten: {kazernesMetCoordinaten.length}</div>
+            <div>Voertuigen: {totaalVoertuigen}</div>
+            <div>Geocoding status: {isGeocoding ? 'Bezig...' : 'Voltooid'}</div>
+            <div>Geocoding resultaten: {geocodingResults.length}</div>
+            <div>Succesvol gegeocodeerd: {geocodingResults.filter(r => r.success).length}</div>
+            <div>Kaart centrum: {center[0].toFixed(4)}, {center[1].toFixed(4)}</div>
+            {incidents.length > 0 && (
+              <div className="mt-2 pt-2 border-t">
+                <strong>Eerste incident:</strong><br/>
+                #{incidents[0].nr} - P{incidents[0].prio}<br/>
+                <strong>Locatie:</strong> {incidents[0].locatie}<br/>
+                <strong>Coördinaten:</strong><br/>
+                {incidents[0].coordinates ? `[${incidents[0].coordinates[0].toFixed(6)}, ${incidents[0].coordinates[1].toFixed(6)}] (lon, lat)` : 'Geen'}
+              </div>
+            )}
+            {incidentsZonderCoordinaten > 0 && (
+              <div className="mt-2 pt-2 border-t text-red-600">
+                <strong>⚠️ {incidentsZonderCoordinaten} incident(en) zonder coördinaten</strong><br/>
+                <span className="text-gray-600 text-xs">Open debug-incidents.html om te debuggen</span>
+              </div>
             )}
           </div>
         </div>
       </div>
-
-      {/* Unit Status Legend - Only show when units are visible */}
-      {showUnits && (
-        <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000] max-w-xs">
-          <h4 className="font-bold text-xs mb-2">Eenheid Status Legenda</h4>
-          <div className="grid grid-cols-2 gap-1 text-xs">
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-green-500 rounded-sm border border-black"></div>
-              <span>1-Beschikbaar</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-yellow-500 rounded-sm border border-black"></div>
-              <span>2-Surveilleren</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-orange-600 rounded-sm border border-black"></div>
-              <span>3-Onderweg</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-red-500 rounded-sm border border-black"></div>
-              <span>4-Ter plaatse</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-purple-600 rounded-sm border border-black"></div>
-              <span>6-Terug</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-cyan-500 rounded-sm border border-black"></div>
-              <span>7-Post</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-pink-500 rounded-sm border border-black"></div>
-              <span>8-Uitruk</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-gray-500 rounded-sm border border-black"></div>
-              <span>9-Dienst uit</span>
-            </div>
-          </div>
-          <div className="text-xs text-gray-600 mt-2">
-            Bewegende eenheden: pulserende animatie
-          </div>
-        </div>
-      )}
-
-      {/* Incident Legend - Only show when units are hidden */}
-      {!showUnits && (
-        <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000]">
-          <h4 className="font-bold text-xs mb-2">Incident Legenda</h4>
-          <div className="space-y-1 text-xs">
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold mr-2">1</div>
-              <span>Brand (Rood)</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold mr-2">2</div>
-              <span>Politie (Blauw)</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold mr-2">3</div>
-              <span>Medisch (Groen)</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold mr-2">4</div>
-              <span>Verkeer (Oranje)</span>
-            </div>
-            <div className="text-xs text-gray-600 mt-2">
-              Randkleur: Rood=P1, Oranje=P2, Grijs=P3+
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Auto-refresh indicator */}
-      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-[1000]">
-        🔄 LIVE
-      </div>
     </div>
   );
-};
-
-export default KaartPage;
+}

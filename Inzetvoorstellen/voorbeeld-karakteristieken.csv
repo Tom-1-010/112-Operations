@@ -1,0 +1,8 @@
+ktCode,ktNaam,ktWaarde,ktParser,baseInzet,extraInzet,toelichting,prioriteit
+ibfunc,Inzet Brw functie,Off. van Dienst,-inzet brw off van dienst,1 DA-OD,,Inzet BRW off van dienst: 1 DA-OD,10
+ibfunc,Inzet Brw functie,Adv. Gev.stof,-inzet brw adv gevstof,1 AGS,,Inzet BRW Adviseur Gevaarlijke Stoffen: 1 AGS,10
+ibhveh,Inzet Brw HV EH,HV,-inzet brw hv,1 HV,,Inzet BRW HV EH HV: 1 HV,10
+brgb,Brand/gebouw,,,-brand gebouw,"1 TS-6;1 RV",,Brand/gebouw: 1 TS-6 + 1 RV,5
+
+
+

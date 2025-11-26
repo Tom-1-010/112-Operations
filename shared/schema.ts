@@ -255,6 +255,41 @@ export const insertKarakteristiekSchema = createInsertSchema(karakteristieken).o
   updatedAt: true,
 });
 
+// Kazernes table - fire stations, police stations, ambulance posts
+export const kazernes = pgTable("kazernes", {
+  id: text("id").primaryKey(),
+  naam: text("naam").notNull(),
+  adres: text("adres").notNull(),
+  postcode: text("postcode").notNull(),
+  plaats: text("plaats").notNull(),
+  type: text("type").notNull(), // 'Brandweer', 'Politie', 'Ambulance'
+  telefoonnummer: text("telefoonnummer"),
+  email: text("email"),
+  capaciteit: integer("capaciteit").notNull().default(20),
+  actief: boolean("actief").notNull().default(true),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
+  regio: text("regio"),
+  basisteam_id: text("basisteam_id"),
+  opmerkingen: text("opmerkingen"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertKazerneSchema = createInsertSchema(kazernes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateKazerneSchema = createInsertSchema(kazernes).partial().omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const selectKazerneSchema = createSelectSchema(kazernes);
+
 // Basisteams schema's
 export const insertBasisteamSchema = createInsertSchema(basisteams);
 export const updateBasisteamSchema = createInsertSchema(basisteams).partial().omit({
@@ -290,3 +325,24 @@ export type InsertEmergencyCall = z.infer<typeof insertEmergencyCallSchema>;
 export type EmergencyCall = typeof emergencyCalls.$inferSelect;
 export type InsertEmergencyTemplate = z.infer<typeof insertEmergencyTemplateSchema>;
 export type EmergencyTemplate = typeof emergencyTemplates.$inferSelect;
+export type InsertKazerne = z.infer<typeof insertKazerneSchema>;
+export type Kazerne = typeof kazernes.$inferSelect;
+export type UpdateKazerne = z.infer<typeof updateKazerneSchema>;
+
+// Voertuigen table
+export const voertuigen = pgTable("voertuigen", {
+  roepnummer: text("roepnummer").primaryKey(),
+  kazerne_id: text("kazerne_id").references(() => kazernes.id),
+  roepnummer_interregionaal: text("roepnummer_interregionaal"),
+  type: text("type"),
+  functie: text("functie"),
+  bemanning: integer("bemanning"),
+  typenummer_lrnp: integer("typenummer_lrnp"),
+  gms_omschrijving: text("gms_omschrijving"),
+  criteria: text("criteria"),
+  opmerking: text("opmerking"),
+});
+
+export const insertVoertuigSchema = createInsertSchema(voertuigen);
+export const selectVoertuigSchema = createSelectSchema(voertuigen);
+export type Voertuig = typeof voertuigen.$inferSelect;

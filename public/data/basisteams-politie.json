@@ -1,0 +1,65 @@
+{
+  "database_name": "Basisteams politie",
+  "created_at": "2025-01-27",
+  "description": "Test database voor Basisteams politie incidenten",
+  "bureaus": [
+    {
+      "organisatie": "Basisteam Waterweg",
+      "locatie": {
+        "bezoekadres": {
+          "straat": "Delftseveerweg",
+          "nummer": "40",
+          "postcode": "3134 JJ",
+          "plaats": "Vlaardingen",
+          "provincie": "Zuid-Holland",
+          "land": "Nederland"
+        },
+        "postadres": {
+          "straat": null,
+          "nummer": null,
+          "postcode": null,
+          "plaats": "Rotterdam",
+          "provincie": "Zuid-Holland",
+          "land": "Nederland",
+          "postbus": "70023",
+          "postcode_postbus": "3000 LD"
+        }
+      },
+      "contactgegevens": {
+        "telefoon_algemeen": "0900-8844",
+        "telefoon_spoed": "112"
+      },
+      "werkgebied": [
+        "Vlaardingen",
+        "Maassluis",
+        "Hoek van Holland"
+      ],
+      "organisatieonderdeel": {
+        "eenheid": "Eenheid Rotterdam",
+        "type": "Basisteam Politie"
+      },
+      "openingstijden_bezoekadres": {
+        "maandag": "09:00-17:00",
+        "dinsdag": "09:00-17:00",
+        "woensdag": "09:00-17:00",
+        "donderdag": "09:00-17:00",
+        "vrijdag": "09:00-17:00",
+        "zaterdag": "Gesloten",
+        "zondag": "Gesloten",
+        "feestdagen": "Gesloten"
+      },
+      "coördinaten": {
+        "latitude": 51.91498,
+        "longitude": 4.32400
+      }
+    }
+  ],
+  "incidents": [],
+  "statistics": {
+    "total_incidents": 0,
+    "total_bureaus": 1,
+    "by_priority": {},
+    "by_type": {},
+    "by_status": {}
+  }
+}

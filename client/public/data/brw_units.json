@@ -1,0 +1,39 @@
+[
+  {
+    "id": "1",
+    "roepnummer": "TS 1234",
+    "type": "TS",
+    "rol": "Tankautospuit",
+    "kazerne": "Rotterdam Centrum",
+    "opKaart": true,
+    "locatie": {
+      "lat": 51.9225,
+      "lng": 4.4772
+    }
+  },
+  {
+    "id": "2",
+    "roepnummer": "RV 5678",
+    "type": "RV",
+    "rol": "Redvoertuig",
+    "kazerne": "Rotterdam Zuid",
+    "opKaart": true,
+    "locatie": {
+      "lat": 51.9000,
+      "lng": 4.5000
+    }
+  },
+  {
+    "id": "3",
+    "roepnummer": "HV 9012",
+    "type": "HV",
+    "rol": "Hulpverlening",
+    "kazerne": "Rotterdam Noord",
+    "opKaart": false,
+    "locatie": {
+      "lat": null,
+      "lng": null
+    }
+  }
+]
+

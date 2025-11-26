@@ -1,24 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/sidebar";
-import StatsGrid from "../components/stats-grid";
 import IncidentTable from "../components/incident-table";
-import UnitsPanel from "../components/units-panel";
 import GMS2 from "./gms2";
 import GMSEenheden from "./gms-eenheden";
 import BasisteamsPage from "./basisteams";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import KaartPage from "./kaart";
+import MapPage from "./map";
 import TelefoniePage from "./telefonie";
+import KazernesPage from "./kazernes";
+import InzetrollenPage from "./inzetrollen";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { Incident, Unit, Stats } from "../types";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
-// Dynamic import for React Leaflet components
-let MapContainer: any;
-let TileLayer: any;  
-let Marker: any;
-let Popup: any;
-let Polyline: any;
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 
 // Fix for default markers in React Leaflet
 try {
@@ -89,33 +85,10 @@ function KaartSection() {
   const [disciplineFilter, setDisciplineFilter] = useState('alle');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
-
-  // Load React Leaflet components dynamically
-  useEffect(() => {
-    const loadMapComponents = async () => {
-      try {
-        const reactLeaflet = await import('react-leaflet');
-        MapContainer = reactLeaflet.MapContainer;
-        TileLayer = reactLeaflet.TileLayer;
-        Marker = reactLeaflet.Marker;
-        Popup = reactLeaflet.Popup;
-        Polyline = reactLeaflet.Polyline;
-        setMapLoaded(true);
-      } catch (error) {
-        console.error('Failed to load map components:', error);
-        setError('Failed to load map components');
-      }
-    };
-
-    loadMapComponents();
-  }, []);
 
   // Load mock data
   useEffect(() => {
-    if (!mapLoaded) return;
-
     const loadData = () => {
       try {
         setIsLoading(true);
@@ -214,7 +187,7 @@ function KaartSection() {
     };
 
     loadData();
-  }, [mapLoaded]);
+  }, []);
 
   // Filter incidents and units
   const filteredMeldingen = meldingen.filter(melding => {
@@ -278,14 +251,6 @@ function KaartSection() {
     
     return lines;
   };
-
-  if (!mapLoaded) {
-    return (
-      <div className="kaart-loading">
-        <div>Kaart wordt geladen...</div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -406,6 +371,7 @@ export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [notification, setNotification] = useState("");
   const [showNotification, setShowNotification] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   
 
   const [incidents, setIncidents] = useLocalStorage<Incident[]>(
@@ -414,24 +380,22 @@ export default function Dashboard() {
   );
 
   // GMS Incidents database for complete incident lifecycle
-  const [gmsIncidents, setGmsIncidents] = useState<any[]>([]);
-  
-  // Load GMS incidents from database on component mount
-  useEffect(() => {
-    const loadGmsIncidents = async () => {
-      try {
-        const response = await fetch('/api/gms-incidents');
-        if (response.ok) {
-          const incidents = await response.json();
-          setGmsIncidents(incidents);
-        }
-      } catch (error) {
-        console.error('Failed to load GMS incidents:', error);
-      }
-    };
-    
-    loadGmsIncidents();
-  }, []);
+  const queryClient = useQueryClient();
+  const { data: gmsIncidents = [], isLoading: gmsIncidentsLoading } = useQuery<any[]>({
+    queryKey: ['/api/gms-incidents'],
+    queryFn: async () => {
+      const response = await fetch('/api/gms-incidents');
+      if (!response.ok) throw new Error('Failed to fetch GMS incidents');
+      return response.json();
+    }
+  });
+
+  // Helper function to update GMS incidents in the query cache
+  const setGmsIncidents = (updater: (prev: any[]) => any[]) => {
+    queryClient.setQueryData(['/api/gms-incidents'], (oldData: any[] = []) => {
+      return updater(oldData);
+    });
+  };
 
   // Current active incident in GMS
   const [currentGmsIncident, setCurrentGmsIncident] = useState<any>(null);
@@ -7719,6 +7683,11 @@ export default function Dashboard() {
       <Sidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
+        notificationCount={notificationCount}
+        onNotificationBadgeClick={() => {
+          setNotificationCount(0);
+          setShowNotification(false);
+        }}
       />
 
       <main className={`main-content ${activeSection === "gms" ? "gms-active" : ""}`}>
@@ -7726,24 +7695,146 @@ export default function Dashboard() {
 
         {activeSection === "dashboard" && (
           <div className="content-section active">
-            <StatsGrid stats={calculateStats()} />
-            <div className="content-grid">
-              <div className="section">
+            <div className="dashboard-container">
+              {/* Meldingen Statistieken */}
+              <div className="dashboard-section">
                 <div className="section-header">
-                  <h3 className="section-title">Dashboard Overzicht</h3>
+                  <h3 className="section-title">
+                    <i className="bi bi-clipboard-data"></i>
+                    Meldingen Overzicht
+                  </h3>
                 </div>
-                <div
-                  style={{
-                    padding: "40px",
-                    textAlign: "center",
-                    color: "#666",
-                  }}
-                >
-                  <p>Welkom bij het Meldkamer Dashboard</p>
-                  <p>Gebruik de navigatie om naar specifieke secties te gaan</p>
+                <div className="meldingen-stats-grid">
+                  <div className="stat-card active">
+                    <div className="stat-icon">
+                      <i className="bi bi-exclamation-circle-fill"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{incidents.filter(i => i.status === 'actief').length}</div>
+                      <div className="stat-label">Actieve Meldingen</div>
+                    </div>
+                  </div>
+                  <div className="stat-card processed">
+                    <div className="stat-icon">
+                      <i className="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{incidents.filter(i => i.status === 'afgesloten').length}</div>
+                      <div className="stat-label">Verwerkte Meldingen</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <UnitsPanel units={units} />
+
+              {/* OVD-OC Dashboard */}
+              <div className="dashboard-section">
+                <div className="section-header">
+                  <h3 className="section-title">
+                    <i className="bi bi-shield-check"></i>
+                    OVD-OC Dashboard
+                  </h3>
+                </div>
+                <div className="ovd-oc-container">
+                  <div className="ovd-summary">
+                    <div className="ovd-stat-card">
+                      <div className="ovd-icon">
+                        <i className="bi bi-shield-exclamation"></i>
+                      </div>
+                      <div className="ovd-content">
+                        <div className="ovd-number">{gmsIncidents.filter(i => 
+                          i.meldingslogging?.toLowerCase().includes('ovd-oc') || 
+                          i.karakteristieken?.some((k: any) => k.includes('OVD-OC')) ||
+                          i.classificatie1?.includes('OVD-OC') ||
+                          i.mc1?.includes('OVD-OC')
+                        ).length}</div>
+                        <div className="ovd-label">OVD-OC Meldingen</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="ovd-meldingen-container">
+                    <div className="ovd-header">
+                      <h4>
+                        <i className="bi bi-list-ul"></i>
+                        Recente OVD-OC Meldingen
+                      </h4>
+                    </div>
+                    <div className="meldingen-tabel-container">
+                      {gmsIncidents.filter(i => 
+                        i.meldingslogging?.toLowerCase().includes('ovd-oc') || 
+                        i.karakteristieken?.some((k: any) => k.includes('OVD-OC')) ||
+                        i.classificatie1?.includes('OVD-OC') ||
+                        i.mc1?.includes('OVD-OC')
+                      ).length === 0 ? (
+                        <div className="geen-meldingen">
+                          <i className="bi bi-info-circle"></i>
+                          <p>Geen OVD-OC meldingen gevonden</p>
+                        </div>
+                      ) : (
+                        <div className="meldingen-tabel">
+                          <div className="tabel-header">
+                            <div className="header-cell">Prioriteit</div>
+                            <div className="header-cell">Adres</div>
+                            <div className="header-cell">Plaatsnaam</div>
+                            <div className="header-cell">MC</div>
+                            <div className="header-cell">Karakteristieken</div>
+                            <div className="header-cell">Eenheid</div>
+                          </div>
+                          {gmsIncidents
+                            .filter(i => 
+                              i.meldingslogging?.toLowerCase().includes('ovd-oc') || 
+                              i.karakteristieken?.some((k: any) => k.includes('OVD-OC')) ||
+                              i.classificatie1?.includes('OVD-OC') ||
+                              i.mc1?.includes('OVD-OC')
+                            )
+                            .slice(0, 5)
+                            .map((incident, index) => (
+                              <div 
+                                key={incident.id || index} 
+                                className="melding-row clickable-row"
+                                onClick={() => {
+                                  // Navigate to GMS and load this incident
+                                  setActiveSection("gms2");
+                                  setCurrentGmsIncident(incident);
+                                  showNotificationMessage(`Incident ${incident.id} geladen in GMS`);
+                                }}
+                                title="Klik om incident te laden in GMS"
+                              >
+                                <div className={`melding-prioriteit prioriteit-${incident.prioriteit || '3'}`}>
+                                  <i className="bi bi-flag"></i>
+                                  {incident.prioriteit || '3'}
+                                </div>
+                                <div className="melding-adres">
+                                  <i className="bi bi-geo-alt"></i>
+                                  {incident.straatnaam && incident.huisnummer 
+                                    ? `${incident.straatnaam} ${incident.huisnummer}${incident.toevoeging ? incident.toevoeging : ''}`
+                                    : 'Onbekend adres'
+                                  }
+                                </div>
+                                <div className="melding-plaats">
+                                  <i className="bi bi-building"></i>
+                                  {incident.plaatsnaam || incident.gemeente || 'Onbekend'}
+                                </div>
+                                <div className="melding-mc">
+                                  <i className="bi bi-tag"></i>
+                                  {incident.classificatie1 || incident.mc1 || 'Onbekend'}
+                                </div>
+                                <div className="melding-karakteristieken">
+                                  <i className="bi bi-list-check"></i>
+                                  {incident.karakteristieken?.filter((k: any) => k.includes('OVD-OC')).join(', ') || 'OVD-OC'}
+                                </div>
+                                <div className="melding-eenheid">
+                                  <i className="bi bi-person-badge"></i>
+                                  {incident.toegewezenEenheid || incident.assignedUnit || 'Geen'}
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -8589,7 +8680,18 @@ export default function Dashboard() {
         )}
         {activeSection === "gms2" && (
           <div className="content-section active">
-            <GMS2 />
+            <GMS2 onOvdOcActivation={() => {
+              console.log('🚨 Dashboard: OVD-OC activation callback received!');
+              // OVD-OC activation handler
+              setNotificationCount(prev => prev + 1);
+              showNotificationMessage("🚨 OVD-OC karakteristiek geactiveerd!");
+              
+              // Refresh GMS incidents to show the updated incident
+              setTimeout(() => {
+                queryClient.invalidateQueries({ queryKey: ['/api/gms-incidents'] });
+                console.log('🚨 Dashboard: GMS incidents refreshed after OVD-OC activation');
+              }, 1000);
+            }} />
           </div>
         )}
 
@@ -8934,6 +9036,11 @@ export default function Dashboard() {
             <KaartPage />
           </div>
         )}
+        {activeSection === "map" && (
+          <div className="content-section active">
+            <MapPage />
+          </div>
+        )}
         {activeSection === "telefonie" && (
           <div className="content-section active">
             <TelefoniePage />
@@ -8979,6 +9086,14 @@ export default function Dashboard() {
         )}
         {activeSection === "basisteams" && (
           <BasisteamsPage />
+        )}
+        {activeSection === "kazernes" && (
+          <KazernesPage />
+        )}
+        {activeSection === "inzetrollen" && (
+          <div className="content-section active">
+            <InzetrollenPage />
+          </div>
         )}
         {activeSection === "settings" && (
           <div className="content-section active">

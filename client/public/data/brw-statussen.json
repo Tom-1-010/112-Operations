@@ -1,0 +1,107 @@
+{
+  "brandweer_statussen": [
+    {
+      "id": 0,
+      "naam": "Opdracht verstrekt",
+      "afkorting": "ov",
+      "c2000_toets": null,
+      "gms_int_code": 15,
+      "gms_ext_code": 10,
+      "beschikbaar_voor_nieuw_incident": false,
+      "omschrijving": "Het meldkamersysteem koppelt dit voertuig aan het geselecteerde incident."
+    },
+    {
+      "id": 1,
+      "naam": "Uitgerukt",
+      "afkorting": "ut",
+      "c2000_toets": 1,
+      "gms_int_code": 4,
+      "gms_ext_code": 1,
+      "beschikbaar_voor_nieuw_incident": false,
+      "omschrijving": "Eenheid is compleet en uitgerukt naar de incidentlocatie."
+    },
+    {
+      "id": 2,
+      "naam": "Ter plaatse",
+      "afkorting": "tp",
+      "c2000_toets": 2,
+      "gms_int_code": 5,
+      "gms_ext_code": 2,
+      "beschikbaar_voor_nieuw_incident": false,
+      "omschrijving": "De eenheid is aangekomen op de locatie en staat zo dicht mogelijk bij het incident."
+    },
+    {
+      "id": 3,
+      "naam": "Ingerukt",
+      "afkorting": "ir",
+      "c2000_toets": 3,
+      "gms_int_code": 7,
+      "gms_ext_code": 3,
+      "beschikbaar_voor_nieuw_incident": false,
+      "omschrijving": "Eenheid vertrekt van de incidentlocatie en is nog niet beschikbaar voor nieuwe meldingen."
+    },
+    {
+      "id": 4,
+      "naam": "Beschikbaar",
+      "afkorting": "bs",
+      "c2000_toets": 4,
+      "gms_int_code": 8,
+      "gms_ext_code": 4,
+      "beschikbaar_voor_nieuw_incident": true,
+      "opmerking": "JA* – Na Ter Plaatse of Ingerukt moet opnieuw deze status gegeven worden om weer beschikbaar te zijn.",
+      "omschrijving": "Eenheid is gereed om een nieuwe alarmering te ontvangen."
+    },
+    {
+      "id": 5,
+      "naam": "Op kazerne",
+      "afkorting": "kz",
+      "c2000_toets": 5,
+      "gms_int_code": 9,
+      "gms_ext_code": 5,
+      "beschikbaar_voor_nieuw_incident": true,
+      "opmerking": "JA** – Alleen geven als de eenheid daadwerkelijk weer inzetbaar is.",
+      "omschrijving": "Eenheid staat beschikbaar op de kazerne."
+    },
+    {
+      "id": 6,
+      "naam": "Buiten dienst",
+      "afkorting": "bd",
+      "c2000_toets": 6,
+      "gms_int_code": 11,
+      "gms_ext_code": 6,
+      "beschikbaar_voor_nieuw_incident": false,
+      "omschrijving": "Eenheid is tijdelijk niet beschikbaar voor alarmeringen of opdrachten."
+    },
+    {
+      "id": 7,
+      "naam": "Spraakaanvraag",
+      "afkorting": "A",
+      "c2000_toets": 7,
+      "gms_int_code": 2,
+      "gms_ext_code": 7,
+      "beschikbaar_voor_nieuw_incident": null,
+      "omschrijving": "Spraakaanvraag via C2000 (niet inzetgerelateerd)."
+    },
+    {
+      "id": 8,
+      "naam": "Onbekende status",
+      "afkorting": null,
+      "c2000_toets": 8,
+      "gms_int_code": null,
+      "gms_ext_code": 8,
+      "beschikbaar_voor_nieuw_incident": null,
+      "omschrijving": "GMS-ondersteuningscode zonder vaste betekenis."
+    },
+    {
+      "id": 9,
+      "naam": "Spraakaanvraag urgent",
+      "afkorting": "U",
+      "c2000_toets": 9,
+      "gms_int_code": 14,
+      "gms_ext_code": 9,
+      "beschikbaar_voor_nieuw_incident": null,
+      "omschrijving": "Urgente spraakaanvraag via C2000 (niet inzetgerelateerd)."
+    }
+  ]
+}
+

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Eenheden naar Kazerne</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        .error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Reset Eenheden naar Kazerne</h1>
+        <div id="status" class="status">
+            Klik op de knop hieronder om alle eenheden terug te zetten naar hun kazerne.
+        </div>
+        <button id="resetBtn" onclick="resetUnits()">Reset Alle Eenheden</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function resetUnits() {
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            resetBtn.disabled = true;
+            statusDiv.textContent = '🔄 Reset wordt uitgevoerd...';
+            statusDiv.className = 'status';
+            resultDiv.innerHTML = '';
+            
+            try {
+                // Check of we op de juiste pagina zijn (localhost:5000)
+                if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                    throw new Error('Dit script moet worden uitgevoerd op localhost:5000 waar de simulator draait');
+                }
+                
+                // Laad de reset functie uit localStorage of probeer via window object
+                // Eerst proberen via window object (als de app geladen is)
+                if (typeof window.resetAllUnitsToKazerne === 'function') {
+                    await window.resetAllUnitsToKazerne();
+                    statusDiv.textContent = '✅ Reset succesvol uitgevoerd!';
+                    statusDiv.className = 'status success';
+                    resultDiv.innerHTML = '<p>Alle eenheden zijn teruggezet naar hun kazerne.</p>';
+                } else {
+                    // Probeer via localStorage te werken
+                    const stored = localStorage.getItem('global_unit_positions');
+                    if (!stored) {
+                        throw new Error('Geen eenheden posities gevonden in localStorage');
+                    }
+                    
+                    const positions = JSON.parse(stored);
+                    const unitCount = Object.keys(positions).length;
+                    
+                    if (unitCount === 0) {
+                        throw new Error('Geen eenheden gevonden om te resetten');
+                    }
+                    
+                    // We kunnen niet direct de kazerne coördinaten ophalen zonder de app code
+                    // Maar we kunnen wel een signaal geven
+                    statusDiv.textContent = `⚠️ ${unitCount} eenheden gevonden, maar reset functie niet beschikbaar.`;
+                    statusDiv.className = 'status error';
+                    resultDiv.innerHTML = `
+                        <p>Open de browser console (F12) op de kaart pagina en voer uit:</p>
+                        <code style="background: #f5f5f5; padding: 10px; display: block; margin-top: 10px;">
+                            resetAllUnitsToKazerne()
+                        </code>
+                        <p style="margin-top: 10px;">Of ga naar de kaart pagina en klik op de "Reset alle eenheden naar kazerne" knop.</p>
+                    `;
+                }
+            } catch (error) {
+                statusDiv.textContent = `❌ Fout: ${error.message}`;
+                statusDiv.className = 'status error';
+                resultDiv.innerHTML = `
+                    <p>Probeer het volgende:</p>
+                    <ol>
+                        <li>Ga naar <a href="http://localhost:5000/#/kaart" target="_blank">http://localhost:5000/#/kaart</a></li>
+                        <li>Open de browser console (F12)</li>
+                        <li>Voer uit: <code>resetAllUnitsToKazerne()</code></li>
+                    </ol>
+                    <p>Of klik op de "Reset alle eenheden naar kazerne" knop op de kaart pagina.</p>
+                `;
+            } finally {
+                resetBtn.disabled = false;
+            }
+        }
+        
+        // Auto-execute als parameter aanwezig is
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('auto') === 'true') {
+            window.addEventListener('load', () => {
+                setTimeout(resetUnits, 1000);
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+

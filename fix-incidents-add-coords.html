@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Incidents - Add Coordinates</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            margin: 10px; 
+            cursor: pointer; 
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .success { background: #28a745; padding: 15px; margin: 10px 0; color: white; border-radius: 5px; }
+        .error { background: #dc3545; padding: 15px; margin: 10px 0; color: white; border-radius: 5px; }
+        .info { background: #17a2b8; padding: 15px; margin: 10px 0; color: white; border-radius: 5px; }
+        pre { background: white; padding: 10px; border: 1px solid #ccc; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Fix Incidents - Voeg Coördinaten Toe</h1>
+    
+    <button onclick="addCoordinatesToAll()">📍 Voeg Coördinaten toe aan ALLE incidenten</button>
+    <button onclick="showIncidents()">👁️ Bekijk Incidenten</button>
+    <button onclick="location.reload()">🔄 Refresh</button>
+    
+    <div id="output"></div>
+
+    <script>
+        // Test adressen met bekende coördinaten
+        const testLocations = [
+            { name: 'Rotterdam Coolsingel 40', coords: [4.4777, 51.9244] },
+            { name: 'Amsterdam Dam 1', coords: [4.8952, 52.3730] },
+            { name: 'Den Haag Binnenhof 1', coords: [4.3127, 52.0799] },
+            { name: 'Utrecht Domplein 1', coords: [5.1214, 52.0907] },
+        ];
+
+        function addCoordinatesToAll() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<div class="info">⏳ Bezig met toevoegen van coördinaten...</div>';
+            
+            try {
+                const incidentsStr = localStorage.getItem('gms2Incidents');
+                
+                if (!incidentsStr) {
+                    output.innerHTML = '<div class="error">❌ Geen incidenten gevonden!</div>';
+                    return;
+                }
+
+                const incidents = JSON.parse(incidentsStr);
+                
+                if (incidents.length === 0) {
+                    output.innerHTML = '<div class="error">❌ Geen incidenten in lijst!</div>';
+                    return;
+                }
+
+                let updated = 0;
+                let html = '<div class="info">📝 Updating incidents...</div>';
+
+                incidents.forEach((inc, index) => {
+                    if (!inc.coordinates || !Array.isArray(inc.coordinates) || inc.coordinates.length !== 2) {
+                        // Gebruik test locatie gebaseerd op index
+                        const testLoc = testLocations[index % testLocations.length];
+                        inc.coordinates = testLoc.coords;
+                        
+                        // Update ook adres velden als ze leeg zijn
+                        if (!inc.straatnaam) {
+                            const parts = testLoc.name.split(' ');
+                            inc.plaatsnaam = parts[0];
+                            inc.straatnaam = parts.slice(1, -1).join(' ');
+                            inc.huisnummer = parts[parts.length - 1];
+                        }
+                        
+                        updated++;
+                        html += `<div>✅ Incident #${inc.nr}: coords toegevoegd ${testLoc.name} [${testLoc.coords[0]}, ${testLoc.coords[1]}]</div>`;
+                    } else {
+                        html += `<div>✓ Incident #${inc.nr}: had al coords [${inc.coordinates[0]}, ${inc.coordinates[1]}]</div>`;
+                    }
+                });
+
+                // Save terug naar localStorage
+                localStorage.setItem('gms2Incidents', JSON.stringify(incidents));
+                
+                html += `<div class="success">✅ Klaar! ${updated} incident(en) bijgewerkt</div>`;
+                html += `<div class="info">🗺️ Ga nu naar de Kaart om de incidenten te zien!</div>`;
+                html += `<pre>${JSON.stringify(incidents.map(i => ({
+                    nr: i.nr,
+                    locatie: i.locatie,
+                    plaats: i.plaatsnaam,
+                    coordinates: i.coordinates
+                })), null, 2)}</pre>`;
+                
+                output.innerHTML = html;
+
+                // Trigger storage event voor andere tabs
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'gms2Incidents',
+                    newValue: JSON.stringify(incidents)
+                }));
+
+            } catch (error) {
+                output.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function showIncidents() {
+            const output = document.getElementById('output');
+            
+            try {
+                const incidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
+                
+                if (incidents.length === 0) {
+                    output.innerHTML = '<div class="error">❌ Geen incidenten!</div>';
+                    return;
+                }
+
+                const withCoords = incidents.filter(i => i.coordinates && Array.isArray(i.coordinates) && i.coordinates.length === 2);
+                
+                let html = `
+                    <div class="info">
+                        📊 Totaal: ${incidents.length} incident(en)<br/>
+                        ✅ Met coördinaten: ${withCoords.length}<br/>
+                        ❌ Zonder coördinaten: ${incidents.length - withCoords.length}
+                    </div>
+                `;
+
+                html += '<pre>' + JSON.stringify(incidents.map(i => ({
+                    nr: i.nr,
+                    prio: i.prio,
+                    locatie: i.locatie,
+                    plaats: i.plaatsnaam,
+                    coordinates: i.coordinates,
+                    hasCoords: !!i.coordinates
+                })), null, 2) + '</pre>';
+                
+                output.innerHTML = html;
+
+            } catch (error) {
+                output.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-show on load
+        window.onload = showIncidents;
+    </script>
+</body>
+</html>
+

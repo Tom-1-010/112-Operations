@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug GMS2 Incidents</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #00ff00;
+        }
+        .incident {
+            background: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #00ff00;
+        }
+        .has-coords {
+            border-color: #00ff00;
+        }
+        .no-coords {
+            border-color: #ff0000;
+            color: #ff6b6b;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 GMS2 Incidents Debug Tool</h1>
+    
+    <button onclick="checkIncidents()">🔄 Refresh Incidents</button>
+    <button onclick="checkSpecificIncident()">🔍 Check Incident #20250101</button>
+    <button onclick="addTestCoordinates()">📍 Add Test Coordinates to First Incident</button>
+    <button onclick="createTestDatabase()">🏢 Create Test Database (Doelwater 5, Rotterdam)</button>
+    <button onclick="createBureauTest()">🏢 Create Bureau Test (Doelwater 5, RT-test)</button>
+    <button onclick="createBasisteamsPolitie()">👮 Create Basisteams Politie Database</button>
+    <button onclick="clearIncidents()">🗑️ Clear All Incidents</button>
+    
+    <div id="output"></div>
+
+    <script>
+        function checkIncidents() {
+            const incidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
+            const output = document.getElementById('output');
+            
+            if (incidents.length === 0) {
+                output.innerHTML = '<p>❌ No incidents found in localStorage</p>';
+                return;
+            }
+
+            let html = `<h2>📋 Found ${incidents.length} incident(s)</h2>`;
+            
+            const withCoords = incidents.filter(inc => inc.coordinates && inc.coordinates.length === 2);
+            const withoutCoords = incidents.filter(inc => !inc.coordinates || inc.coordinates.length !== 2);
+            
+            html += `<p>✅ With coordinates: <strong>${withCoords.length}</strong></p>`;
+            html += `<p>❌ Without coordinates: <strong>${withoutCoords.length}</strong></p>`;
+            
+            incidents.forEach((inc, idx) => {
+                const hasCoords = inc.coordinates && inc.coordinates.length === 2;
+                const cssClass = hasCoords ? 'has-coords' : 'no-coords';
+                
+                html += `
+                    <div class="incident ${cssClass}">
+                        <strong>Incident #${inc.nr || idx}</strong> (P${inc.prio}) - ${inc.locatie || 'Geen locatie'}<br/>
+                        <strong>Plaats:</strong> ${inc.plaatsnaam || 'Onbekend'}<br/>
+                        <strong>Tijd:</strong> ${inc.tijd || 'Onbekend'}<br/>
+                        <strong>Classificatie:</strong> ${inc.mc3 || inc.mc2 || inc.mc1 || inc.mc || 'Geen'}<br/>
+                        <strong>Coördinaten:</strong> ${hasCoords ? `✅ [${inc.coordinates[0]}, ${inc.coordinates[1]}]` : '❌ GEEN COORDINATEN'}<br/>
+                        ${inc.straatnaam ? `<strong>Straat:</strong> ${inc.straatnaam} ${inc.huisnummer || ''}<br/>` : ''}
+                        ${inc.assignedUnits ? `<strong>Eenheden:</strong> ${inc.assignedUnits.length}<br/>` : ''}
+                    </div>
+                `;
+            });
+            
+            output.innerHTML = html;
+        }
+
+        function checkSpecificIncident() {
+            const incidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
+            const output = document.getElementById('output');
+            
+            // Zoek naar incident #20250101
+            const targetIncident = incidents.find(incident => 
+                incident.nr === 20250101 || incident.id === 20250101
+            );
+            
+            if (targetIncident) {
+                const hasCoords = targetIncident.coordinates && targetIncident.coordinates.length === 2;
+                const coordInfo = hasCoords ? 
+                    `✅ Coördinaten: [${targetIncident.coordinates[0]}, ${targetIncident.coordinates[1]}]` : 
+                    '❌ Geen coördinaten';
+                
+                output.innerHTML = `
+                    <h2>✅ Incident #20250101 GEVONDEN!</h2>
+                    <div class="incident ${hasCoords ? 'has-coords' : 'no-coords'}">
+                        <h3>Incident #${targetIncident.nr || targetIncident.id}</h3>
+                        <p><strong>MC:</strong> ${targetIncident.mc}</p>
+                        <p><strong>Locatie:</strong> ${targetIncident.locatie}</p>
+                        <p><strong>Plaats:</strong> ${targetIncident.plaats}</p>
+                        <p><strong>Prioriteit:</strong> ${targetIncident.prio || targetIncident.prioriteit}</p>
+                        <p><strong>Tijd:</strong> ${targetIncident.tijd}</p>
+                        <p><strong>Status:</strong> ${targetIncident.status || 'Onbekend'}</p>
+                        <p><strong>Functie:</strong> ${targetIncident.functie || 'Geen'}</p>
+                        <p>${coordInfo}</p>
+                        ${targetIncident.assignedUnits && targetIncident.assignedUnits.length > 0 ? 
+                            `<p><strong>Eenheden:</strong> ${targetIncident.assignedUnits.map(u => u.roepnummer).join(', ')}</p>` : 
+                            '<p><strong>Eenheden:</strong> Geen</p>'
+                        }
+                        <pre>${JSON.stringify(targetIncident, null, 2)}</pre>
+                    </div>
+                `;
+            } else {
+                output.innerHTML = `
+                    <h2>❌ Incident #20250101 NIET GEVONDEN</h2>
+                    <div class="incident no-coords">
+                        <p>Er zijn ${incidents.length} incidenten in localStorage, maar incident #20250101 is niet gevonden.</p>
+                        <p>Beschikbare incident nummers: ${incidents.map(i => i.nr || i.id).join(', ')}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function addTestCoordinates() {
+            const incidents = JSON.parse(localStorage.getItem('gms2Incidents') || '[]');
+            
+            if (incidents.length === 0) {
+                alert('❌ No incidents found!');
+                return;
+            }
+
+            // Rotterdam coordinates as test
+            incidents[0].coordinates = [4.4777, 51.9244];
+            incidents[0].straatnaam = 'Coolsingel';
+            incidents[0].huisnummer = '40';
+            incidents[0].plaatsnaam = 'Rotterdam';
+            incidents[0].postcode = '3011 AD';
+            
+            localStorage.setItem('gms2Incidents', JSON.stringify(incidents));
+            
+            alert(`✅ Added test coordinates to incident #${incidents[0].nr}:\n[4.4777, 51.9244] (Rotterdam Coolsingel 40)`);
+            checkIncidents();
+        }
+
+        function createTestDatabase() {
+            // Doelwater 5, Rotterdam coordinates
+            const doelwaterCoords = [4.4777, 51.9244]; // [longitude, latitude]
+            
+            const testIncidents = [
+                {
+                    id: 1,
+                    nr: 20250001,
+                    prio: 1,
+                    tijd: new Date().toLocaleTimeString('nl-NL'),
+                    mc: "Brand",
+                    locatie: "Doelwater 5",
+                    plaats: "Rotterdam",
+                    roepnr: "P2000-001",
+                    positie: "Doelwater 5, Rotterdam",
+                    straatnaam: "Doelwater",
+                    huisnummer: "5",
+                    postcode: "3011 AA",
+                    plaatsnaam: "Rotterdam",
+                    gemeente: "Rotterdam",
+                    coordinates: doelwaterCoords,
+                    mc1: "Brand",
+                    mc2: "Binnenbrand",
+                    mc3: "Woningbrand",
+                    notities: "Test incident - Doelwater 5, Rotterdam",
+                    status: "Gealarmeerd",
+                    functie: "bureau",
+                    meldingslogging: `${new Date().toLocaleTimeString('nl-NL')} Test incident aangemaakt`,
+                    tijdstip: new Date().toISOString(),
+                    prioriteit: 1,
+                    assignedUnits: []
+                },
+                {
+                    id: 2,
+                    nr: 20250002,
+                    prio: 2,
+                    tijd: new Date(Date.now() - 300000).toLocaleTimeString('nl-NL'), // 5 minuten geleden
+                    mc: "Verkeer",
+                    locatie: "Doelwater 3",
+                    plaats: "Rotterdam",
+                    roepnr: "P2000-002",
+                    positie: "Doelwater 3, Rotterdam",
+                    straatnaam: "Doelwater",
+                    huisnummer: "3",
+                    postcode: "3011 AA",
+                    plaatsnaam: "Rotterdam",
+                    gemeente: "Rotterdam",
+                    coordinates: [4.4775, 51.9242], // Iets verderop
+                    mc1: "Verkeer",
+                    mc2: "Verkeersongeval",
+                    mc3: "Aanrijding",
+                    notities: "Test incident - Doelwater 3, Rotterdam",
+                    status: "Gealarmeerd",
+                    functie: "bureau",
+                    meldingslogging: `${new Date(Date.now() - 300000).toLocaleTimeString('nl-NL')} Test incident aangemaakt`,
+                    tijdstip: new Date(Date.now() - 300000).toISOString(),
+                    prioriteit: 2,
+                    assignedUnits: []
+                },
+                {
+                    id: 3,
+                    nr: 20250003,
+                    prio: 0,
+                    tijd: new Date(Date.now() - 600000).toLocaleTimeString('nl-NL'), // 10 minuten geleden
+                    mc: "Ambulance",
+                    locatie: "Doelwater 7",
+                    plaats: "Rotterdam",
+                    roepnr: "P2000-003",
+                    positie: "Doelwater 7, Rotterdam",
+                    straatnaam: "Doelwater",
+                    huisnummer: "7",
+                    postcode: "3011 AA",
+                    plaatsnaam: "Rotterdam",
+                    gemeente: "Rotterdam",
+                    coordinates: [4.4779, 51.9246], // Iets verderop
+                    mc1: "Ambulance",
+                    mc2: "Medisch",
+                    mc3: "Hartstilstand",
+                    notities: "Test incident - Doelwater 7, Rotterdam (Prio 0)",
+                    status: "Gealarmeerd",
+                    functie: "bureau",
+                    meldingslogging: `${new Date(Date.now() - 600000).toLocaleTimeString('nl-NL')} Test incident aangemaakt`,
+                    tijdstip: new Date(Date.now() - 600000).toISOString(),
+                    prioriteit: 0,
+                    assignedUnits: []
+                }
+            ];
+            
+            // Set last incident number
+            localStorage.setItem('lastIncidentNumber', '20250003');
+            
+            // Store test incidents
+            localStorage.setItem('gms2Incidents', JSON.stringify(testIncidents));
+            
+            alert(`✅ Test database created with ${testIncidents.length} incidents on Doelwater, Rotterdam!\n\nIncidents:\n- #${testIncidents[0].nr}: ${testIncidents[0].mc} (Prio ${testIncidents[0].prio})\n- #${testIncidents[1].nr}: ${testIncidents[1].mc} (Prio ${testIncidents[1].prio})\n- #${testIncidents[2].nr}: ${testIncidents[2].mc} (Prio ${testIncidents[2].prio})`);
+            checkIncidents();
+        }
+
+        function createBureauTest() {
+            // Doelwater 5, Rotterdam coordinates
+            const doelwaterCoords = [4.4777, 51.9244]; // [longitude, latitude]
+            
+            const bureauIncident = {
+                id: 1,
+                nr: 20250001,
+                prio: 1,
+                tijd: new Date().toLocaleTimeString('nl-NL'),
+                mc: "Brand",
+                locatie: "Doelwater 5",
+                plaats: "Rotterdam",
+                roepnr: "P2000-001",
+                positie: "Doelwater 5, Rotterdam",
+                straatnaam: "Doelwater",
+                huisnummer: "5",
+                postcode: "3011 AA",
+                plaatsnaam: "Rotterdam",
+                gemeente: "Rotterdam",
+                coordinates: doelwaterCoords,
+                mc1: "Brand",
+                mc2: "Binnenbrand",
+                mc3: "Woningbrand",
+                notities: "Test bureau incident - Doelwater 5, Rotterdam met RT-test eenheid",
+                status: "Gealarmeerd",
+                functie: "bureau",
+                meldingslogging: `${new Date().toLocaleTimeString('nl-NL')} Bureau test incident aangemaakt met RT-test eenheid`,
+                tijdstip: new Date().toISOString(),
+                prioriteit: 1,
+                assignedUnits: [
+                    {
+                        roepnummer: "RT-test",
+                        soort_voertuig: "Brandweer",
+                        ov_tijd: new Date().toLocaleTimeString('nl-NL'),
+                        ar_tijd: null,
+                        tp_tijd: null,
+                        nb_tijd: null,
+                        am_tijd: null,
+                        vr_tijd: null,
+                        fd_tijd: null,
+                        ga_tijd: null
+                    }
+                ]
+            };
+            
+            // Set last incident number
+            localStorage.setItem('lastIncidentNumber', '20250001');
+            
+            // Store bureau test incident
+            localStorage.setItem('gms2Incidents', JSON.stringify([bureauIncident]));
+            
+            alert(`✅ Bureau test incident created!\n\nIncident #${bureauIncident.nr}: ${bureauIncident.mc} (Prio ${bureauIncident.prio})\nLocatie: ${bureauIncident.locatie}, ${bureauIncident.plaats}\nEenheid: ${bureauIncident.assignedUnits[0].roepnummer}\nFunctie: ${bureauIncident.functie}`);
+            checkIncidents();
+        }
+
+        function createBasisteamsPolitie() {
+            const basisteamsIncidents = [
+                {
+                    id: 1,
+                    nr: 20250001,
+                    prio: 1,
+                    tijd: new Date().toLocaleTimeString('nl-NL'),
+                    mc: "Politie",
+                    locatie: "Coolsingel 40",
+                    plaats: "Rotterdam",
+                    roepnr: "P2000-001",
+                    positie: "Coolsingel 40, Rotterdam",
+                    straatnaam: "Coolsingel",
+                    huisnummer: "40",
+                    postcode: "3011 AD",
+                    plaatsnaam: "Rotterdam",
+                    gemeente: "Rotterdam",
+                    coordinates: [4.4777, 51.9244],
+                    mc1: "Politie",
+                    mc2: "Openbare orde",
+                    mc3: "Overlast",
+                    notities: "Basisteams politie - Overlast melding Coolsingel",
+                    status: "Gealarmeerd",
+                    functie: "Basisteams politie",
+                    meldingslogging: `${new Date().toLocaleTimeString('nl-NL')} Basisteams politie incident aangemaakt`,
+                    tijdstip: new Date().toISOString(),
+                    prioriteit: 1,
+                    assignedUnits: [
+                        {
+                            roepnummer: "P-001",
+                            soort_voertuig: "Politie",
+                            ov_tijd: new Date().toLocaleTimeString('nl-NL'),
+                            ar_tijd: null,
+                            tp_tijd: null,
+                            nb_tijd: null,
+                            am_tijd: null,
+                            vr_tijd: null,
+                            fd_tijd: null,
+                            ga_tijd: null
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    nr: 20250002,
+                    prio: 2,
+                    tijd: new Date(Date.now() - 300000).toLocaleTimeString('nl-NL'),
+                    mc: "Politie",
+                    locatie: "Blaak 10",
+                    plaats: "Rotterdam",
+                    roepnr: "P2000-002",
+                    positie: "Blaak 10, Rotterdam",
+                    straatnaam: "Blaak",
+                    huisnummer: "10",
+                    postcode: "3011 TA",
+                    plaatsnaam: "Rotterdam",
+                    gemeente: "Rotterdam",
+                    coordinates: [4.4850, 51.9200],
+                    mc1: "Politie",
+                    mc2: "Verkeer",
+                    mc3: "Verkeersongeval",
+                    notities: "Basisteams politie - Verkeersongeval Blaak",
+                    status: "Gealarmeerd",
+                    functie: "Basisteams politie",
+                    meldingslogging: `${new Date(Date.now() - 300000).toLocaleTimeString('nl-NL')} Basisteams politie incident aangemaakt`,
+                    tijdstip: new Date(Date.now() - 300000).toISOString(),
+                    prioriteit: 2,
+                    assignedUnits: [
+                        {
+                            roepnummer: "P-002",
+                            soort_voertuig: "Politie",
+                            ov_tijd: new Date(Date.now() - 300000).toLocaleTimeString('nl-NL'),
+                            ar_tijd: null,
+                            tp_tijd: null,
+                            nb_tijd: null,
+                            am_tijd: null,
+                            vr_tijd: null,
+                            fd_tijd: null,
+                            ga_tijd: null
+                        }
+                    ]
+                },
+                {
+                    id: 3,
+                    nr: 20250003,
+                    prio: 0,
+                    tijd: new Date(Date.now() - 600000).toLocaleTimeString('nl-NL'),
+                    mc: "Politie",
+                    locatie: "Kruiskade 15",
+                    plaats: "Rotterdam",
+                    roepnr: "P2000-003",
+                    positie: "Kruiskade 15, Rotterdam",
+                    straatnaam: "Kruiskade",
+                    huisnummer: "15",
+                    postcode: "3012 EH",
+                    plaatsnaam: "Rotterdam",
+                    gemeente: "Rotterdam",
+                    coordinates: [4.4700, 51.9300],
+                    mc1: "Politie",
+                    mc2: "Criminaliteit",
+                    mc3: "Inbraak",
+                    notities: "Basisteams politie - Inbraak Kruiskade (Prio 0)",
+                    status: "Gealarmeerd",
+                    functie: "Basisteams politie",
+                    meldingslogging: `${new Date(Date.now() - 600000).toLocaleTimeString('nl-NL')} Basisteams politie incident aangemaakt`,
+                    tijdstip: new Date(Date.now() - 600000).toISOString(),
+                    prioriteit: 0,
+                    assignedUnits: [
+                        {
+                            roepnummer: "P-003",
+                            soort_voertuig: "Politie",
+                            ov_tijd: new Date(Date.now() - 600000).toLocaleTimeString('nl-NL'),
+                            ar_tijd: null,
+                            tp_tijd: null,
+                            nb_tijd: null,
+                            am_tijd: null,
+                            vr_tijd: null,
+                            fd_tijd: null,
+                            ga_tijd: null
+                        }
+                    ]
+                }
+            ];
+            
+            // Set last incident number
+            localStorage.setItem('lastIncidentNumber', '20250003');
+            
+            // Store basisteams politie incidents
+            localStorage.setItem('gms2Incidents', JSON.stringify(basisteamsIncidents));
+            
+            alert(`✅ Basisteams politie database created with ${basisteamsIncidents.length} incidents!\n\nIncidents:\n- #${basisteamsIncidents[0].nr}: ${basisteamsIncidents[0].mc} - ${basisteamsIncidents[0].locatie} (Prio ${basisteamsIncidents[0].prio})\n- #${basisteamsIncidents[1].nr}: ${basisteamsIncidents[1].mc} - ${basisteamsIncidents[1].locatie} (Prio ${basisteamsIncidents[1].prio})\n- #${basisteamsIncidents[2].nr}: ${basisteamsIncidents[2].mc} - ${basisteamsIncidents[2].locatie} (Prio ${basisteamsIncidents[2].prio})`);
+            checkIncidents();
+        }
+
+        function clearIncidents() {
+            if (confirm('Are you sure you want to clear all incidents?')) {
+                localStorage.removeItem('gms2Incidents');
+                alert('✅ All incidents cleared');
+                checkIncidents();
+            }
+        }
+
+        // Auto-load on page load
+        window.onload = checkIncidents;
+    </script>
+</body>
+</html>
+

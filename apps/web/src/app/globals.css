@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
+/* Custom scrollbar styles for dark theme */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(71 85 105) rgb(30 41 59);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(30 41 59);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(71 85 105);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(100 116 139);
+  }
+}
+
+/* Global styles */
+@layer base {
+  html {
+    font-family: system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-dark-900 text-gray-100;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  
+  /* Leaflet map container adjustments */
+  .leaflet-container {
+    @apply bg-dark-800;
+  }
+  
+  .leaflet-tile {
+    filter: brightness(0.8) contrast(1.2);
+  }
+  
+  /* Custom control room styling */
+  .dispatch-card {
+    @apply bg-dark-800 border border-dark-700 rounded-lg shadow-lg;
+  }
+  
+  .dispatch-panel {
+    @apply bg-dark-800 border border-dark-700 rounded-lg shadow-xl;
+  }
+  
+  .dispatch-button {
+    @apply bg-dark-700 hover:bg-dark-600 border border-dark-600 hover:border-dark-500 text-gray-200 hover:text-white transition-colors duration-200;
+  }
+  
+  .dispatch-button-primary {
+    @apply bg-primary-600 hover:bg-primary-700 border border-primary-500 hover:border-primary-400 text-white transition-colors duration-200;
+  }
+  
+  /* Slider styles */
+  .slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    background: #0284c7;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .slider-track {
+    appearance: none;
+    height: 8px;
+    border-radius: 8px;
+    background: #334155;
+  }
+}

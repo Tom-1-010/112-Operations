@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brandweervoertuigen op kaart</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    #map { 
+      height: 100vh; 
+      width: 100%; 
+    }
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .info-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      max-width: 300px;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    .info-panel h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .stat {
+      margin: 5px 0;
+    }
+    .stat strong {
+      color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="info-panel">
+    <h3>📊 Statistieken</h3>
+    <div class="stat"><strong id="totaal-voertuigen">0</strong> totaal voertuigen</div>
+    <div class="stat"><strong id="gekoppeld">0</strong> gekoppeld aan kazernes</div>
+    <div class="stat"><strong id="niet-gekoppeld">0</strong> niet gekoppeld</div>
+    <div class="stat"><strong id="op-kaart">0</strong> voertuigen op kaart</div>
+  </div>
+
+  <script>
+    // Globale variabelen
+    let map;
+    let voertuigen = [];
+    let kazernes = [];
+    let voertuigMarkers = {}; // Object om markers bij te houden: {voertuigId: marker}
+
+    /**
+     * Parse tab-gescheiden BRW eenheden bestand
+     */
+    function parseBRWEenheden(text) {
+      const lines = text.split(/\r?\n/);
+      const result = [];
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        
+        const cols = trimmed.split('\t');
+        if (cols.length < 2) continue;
+        
+        const roepnummer_interregionaal = cols[0]?.trim();
+        const roepnummer = cols[1]?.trim();
+        const post = cols[cols.length - 1]?.trim(); // Laatste kolom is postnaam
+        
+        if (!roepnummer && !roepnummer_interregionaal) continue;
+        if (!post) continue;
+        
+        const type = cols[2]?.trim() || '';
+        const functie = cols[3]?.trim() || '';
+        
+        result.push({
+          id: roepnummer || roepnummer_interregionaal,
+          roepnummer: roepnummer || roepnummer_interregionaal,
+          roepnummer_interregionaal: roepnummer_interregionaal || roepnummer,
+          type: type,
+          functie: functie,
+          post: post
+        });
+      }
+      
+      return result;
+    }
+
+    /**
+     * Normaliseer plaatsnamen voor matching
+     */
+    function normalizePlaatsnaam(naam) {
+      return naam
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]/g, '')
+        .replace(/^kazerne\s*/i, '')
+        .replace(/^gezamenlijke\s*brandweer\s*-\s*/i, '')
+        .replace(/\s+/g, '');
+    }
+
+    /**
+     * Koppel voertuig aan kazerne op basis van postnaam
+     */
+    function koppelVoertuigMetKazerne(voertuig) {
+      const postGenormaliseerd = normalizePlaatsnaam(voertuig.post);
+      
+      // Zoek kazerne die matcht met postnaam
+      const match = kazernes.find(k => {
+        const kazerneNaamGenormaliseerd = normalizePlaatsnaam(k.naam);
+        const kazernePlaatsGenormaliseerd = normalizePlaatsnaam(k.plaats);
+        
+        return kazerneNaamGenormaliseerd.includes(postGenormaliseerd) ||
+               kazernePlaatsGenormaliseerd.includes(postGenormaliseerd) ||
+               postGenormaliseerd.includes(kazerneNaamGenormaliseerd) ||
+               postGenormaliseerd.includes(kazernePlaatsGenormaliseerd);
+      });
+      
+      if (match && match.latitude && match.longitude) {
+        const lat = parseFloat(match.latitude);
+        const lon = parseFloat(match.longitude);
+        
+        if (!isNaN(lat) && !isNaN(lon)) {
+          voertuig.lat = lat;
+          voertuig.lon = lon;
+          voertuig.kazerneId = match.id;
+          voertuig.kazerneNaam = match.naam;
+          
+          console.log(`✅ Gekoppeld: ${voertuig.roepnummer} (${voertuig.post}) -> ${match.naam} (${match.id})`);
+          return voertuig;
+        }
+      }
+      
+      console.warn(`⚠️ Geen match gevonden voor: ${voertuig.roepnummer} (post: ${voertuig.post})`);
+      return null;
+    }
+
+    /**
+     * Maak custom voertuig icoon op basis van type
+     */
+    function createVoertuigIcon(type) {
+      const typeColors = {
+        'TS': '#dc2626',      // Tankautospuit - Rood
+        'MP': '#3b82f6',      // Materieel/Personeel - Blauw
+        'HW': '#f59e0b',      // Hoogwerker - Oranje
+        'RV': '#10b981',      // Reddingsvoertuig - Groen
+        'DAT': '#8b5cf6',     // Dienstauto Terreinvaardig - Paars
+        'DA': '#6b7280',      // Dienstauto - Grijs
+        'WOV': '#06b6d4',     // Waterongevallenvoertuig - Cyan
+        'WO': '#06b6d4',      // Waterongevallen - Cyan
+        'AL': '#ec4899',      // Ademlucht - Roze
+        'HV': '#84cc16',      // Hulpverleningsvoertuig - Limoengroen
+        'SI': '#f97316',      // Slangwagen - Oranje
+        'BM': '#14b8a6',      // Blusmaterieel - Teal
+        'HA': '#a855f7',      // Haakarmbak - Paars
+        'AS': '#ef4444',      // Autospuit - Rood
+        'SB': '#f59e0b',      // Schuimblusvoertuig - Oranje
+        'VP': '#9ca3af',      // Vaste Post - Grijs
+        'BV': '#f97316',      // Blusvoertuig - Oranje
+        'CDT': '#6366f1',     // Clustercommandant - Indigo
+        'COP-DCU': '#8b5cf6', // Decentrale uitgifte - Paars
+      };
+      
+      const color = typeColors[type] || '#6b7280';
+      
+      // Maak SVG icoon als data URL
+      const svgIcon = `<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="${color}" stroke="#fff" stroke-width="2"/><text x="16" y="20" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">${type || '?'}</text></svg>`;
+      const svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgIcon)));
+      
+      return L.icon({
+        iconUrl: svgDataUrl,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      });
+    }
+
+    /**
+     * Voeg voertuig toe aan kaart
+     */
+    function addVoertuigToMap(voertuig) {
+      if (!voertuig.lat || !voertuig.lon) return;
+      
+      const icon = createVoertuigIcon(voertuig.type);
+      
+      // Offset voertuigen rondom kazerne (kleine random offset)
+      const offset = 0.0001; // Ongeveer 10 meter
+      const randomOffset = (Math.random() - 0.5) * offset;
+      const lat = voertuig.lat + randomOffset;
+      const lon = voertuig.lon + randomOffset;
+      
+      const marker = L.marker([lat, lon], { icon: icon })
+        .addTo(map)
+        .bindPopup(`
+          <div style="min-width: 200px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 16px; font-weight: bold;">${voertuig.roepnummer}</h3>
+            <div style="font-size: 12px; line-height: 1.6;">
+              ${voertuig.type ? `<div><strong>Type:</strong> ${voertuig.type}</div>` : ''}
+              ${voertuig.functie ? `<div><strong>Functie:</strong> ${voertuig.functie}</div>` : ''}
+              <div><strong>Post:</strong> ${voertuig.post}</div>
+              <div><strong>Kazerne:</strong> ${voertuig.kazerneNaam || voertuig.kazerneId}</div>
+              <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 10px; color: #666;">
+                <strong>Coördinaten:</strong><br>
+                Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}
+              </div>
+            </div>
+          </div>
+        `);
+      
+      voertuigMarkers[voertuig.id] = marker;
+      return marker;
+    }
+
+    /**
+     * Verplaats voertuig op kaart
+     */
+    function moveVehicle(voertuigId, newLat, newLon) {
+      const marker = voertuigMarkers[voertuigId];
+      if (marker) {
+        marker.setLatLng([newLat, newLon]);
+        console.log(`🚗 Voertuig ${voertuigId} verplaatst naar [${newLat}, ${newLon}]`);
+        
+        // Update voertuig object
+        const voertuig = voertuigen.find(v => v.id === voertuigId);
+        if (voertuig) {
+          voertuig.lat = newLat;
+          voertuig.lon = newLon;
+        }
+      } else {
+        console.warn(`⚠️ Voertuig ${voertuigId} niet gevonden op kaart`);
+      }
+    }
+
+    /**
+     * Update statistieken
+     */
+    function updateStats() {
+      const totaal = voertuigen.length;
+      const gekoppeld = voertuigen.filter(v => v.kazerneId).length;
+      const nietGekoppeld = totaal - gekoppeld;
+      const opKaart = Object.keys(voertuigMarkers).length;
+      
+      document.getElementById('totaal-voertuigen').textContent = totaal;
+      document.getElementById('gekoppeld').textContent = gekoppeld;
+      document.getElementById('niet-gekoppeld').textContent = nietGekoppeld;
+      document.getElementById('op-kaart').textContent = opKaart;
+    }
+
+    /**
+     * Initialiseer kaart
+     */
+    function initMap() {
+      map = L.map('map').setView([51.9225, 4.4792], 9); // Centrum op Rotterdam/Zuid-Holland
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(map);
+    }
+
+    /**
+     * Hoofdfunctie
+     */
+    async function main() {
+      console.log('🚀 Start laden voertuigen en kazernes...');
+      
+      // Initialiseer kaart
+      initMap();
+      
+      try {
+        // Laad kazernes
+        console.log('📖 Laden kazernes...');
+        const kazernesResponse = await fetch('./attached_assets/63_kazernes_complete.json');
+        if (!kazernesResponse.ok) {
+          throw new Error(`Kan kazernes niet laden: ${kazernesResponse.status}`);
+        }
+        kazernes = await kazernesResponse.json();
+        console.log(`✅ ${kazernes.length} kazernes geladen`);
+        
+        // Laad BRW eenheden (tab-gescheiden)
+        console.log('📖 Laden BRW eenheden...');
+        const brwResponse = await fetch('./client/public/data/BRW eenheden.json');
+        if (!brwResponse.ok) {
+          throw new Error(`Kan BRW eenheden niet laden: ${brwResponse.status}`);
+        }
+        const brwText = await brwResponse.text();
+        voertuigen = parseBRWEenheden(brwText);
+        console.log(`✅ ${voertuigen.length} voertuigen geladen`);
+        
+        // Koppel voertuigen aan kazernes
+        console.log('\n🔗 Koppelen voertuigen aan kazernes...');
+        const gekoppeldeVoertuigen = voertuigen
+          .map(koppelVoertuigMetKazerne)
+          .filter(v => v !== null);
+        
+        console.log(`\n📊 Resultaten:`);
+        console.log(`   ✅ Gekoppeld: ${gekoppeldeVoertuigen.length}`);
+        console.log(`   ❌ Niet gekoppeld: ${voertuigen.length - gekoppeldeVoertuigen.length}`);
+        
+        // Voeg voertuigen toe aan kaart
+        console.log('\n🗺️ Voeg voertuigen toe aan kaart...');
+        gekoppeldeVoertuigen.forEach(voertuig => {
+          addVoertuigToMap(voertuig);
+        });
+        
+        console.log(`✅ ${Object.keys(voertuigMarkers).length} voertuigen toegevoegd aan kaart`);
+        
+        // Update statistieken
+        updateStats();
+        
+        // Log alle gekoppelde voertuigen
+        console.log('\n📋 Gekoppelde voertuigen:', gekoppeldeVoertuigen);
+        
+        // Maak moveVehicle functie globaal beschikbaar
+        window.moveVehicle = moveVehicle;
+        console.log('\n✅ Kaart geladen! Gebruik moveVehicle(voertuigId, lat, lon) om voertuigen te verplaatsen.');
+        
+      } catch (error) {
+        console.error('❌ Fout bij laden data:', error);
+        alert('Fout bij laden data. Zorg dat beide JSON-bestanden beschikbaar zijn.');
+      }
+    }
+
+    // Start applicatie
+    main();
+  </script>
+</body>
+</html>
+

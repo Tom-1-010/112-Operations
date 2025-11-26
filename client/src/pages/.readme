@@ -1,0 +1,120 @@
+📘 README — Inzetrollen Brandweer (Cursor AI)
+
+🔥 Doel van dit bestand
+
+Deze README beschrijft de inzetrollen binnen het brandweersysteem zoals vastgelegd in de landelijke materieelstandaard. De informatie is bedoeld om te gebruiken in Cursor AI, bijvoorbeeld voor simulatie van meldingen, selectie van voertuigen of koppeling met een meldkamerinterface.
+
+De inzetrollen bepalen welke taken een voertuig, team of functie-eenheid kan uitvoeren, en vormen samen met de materieelsoort de basis voor de alarmering, inzetselectie en weergave in het systeem.
+
+🧩 Wat is een inzetrol?
+
+Een inzetrol beschrijft de operationele taak of het gebruiksscenario waarvoor een voertuig of eenheid wordt ingezet. Bijvoorbeeld:
+
+- Een TS (Tankautospuit) kan meerdere rollen hebben: Brandbestrijding, Waterwinning, Redden.
+- Een HV (Hulpverleningsvoertuig) heeft rollen als Technische hulpverlening en Bevrijding bij verkeersongevallen.
+- Een OVD-B (Officier van Dienst Brandweer) heeft een commando-/coördinatierol.
+
+Inzetrollen zorgen ervoor dat het systeem weet welke eenheden geschikt zijn voor welke melding en welke alternatieven er zijn bij beperkte beschikbaarheid.
+
+⚙️ Typen inzetrollen
+
+Binnen de standaard worden drie hoofdcategorieën van inzetrollen gehanteerd:
+
+- Primaire inzetrol
+  - Dit is de hoofdtaak van het voertuig of team.
+  - Voorbeeld: Een TST (Terreinvaardige Tankautospuit) heeft als primaire rol Brandbestrijding.
+
+- Alternatieve inzetrol
+  - Wordt toegevoegd wanneer een voertuig ook voor andere taken inzetbaar is, maar niet primair.
+  - Voorbeeld: Een TS kan als alternatief Waterongevallenondersteuning uitvoeren (rol WO-).
+
+- Ondersteunende inzetrol (ON-)
+  - Wordt gebruikt voor voertuigen die ondersteuning leveren aan specialistische teams of operaties. Ze vervoeren bijvoorbeeld mensen of middelen voor een andere eenheid.
+  - Voorbeeld: ON-GO: Ondersteuning voor ontsmettingsteam. ON-GW: Ondersteuning grootschalige watervoorziening.
+
+🧱 Opbouw van inzetrollen
+
+De inzetrol is altijd gekoppeld aan een materieelsoort. Bijvoorbeeld:
+
+- TS-BO → Tankautospuit voor ontsmetting (BO = Bestrijding Ontsmetting).
+- PM-NB → Pelotonmotorwagen voor natuurbrandbestrijding.
+- DB-OVD → Dienstbus voor Officier van Dienst.
+
+De regels uit de landelijke standaard bepalen hoe deze afkortingen worden opgebouwd:
+
+- Geen bedrijfs- of merknamen in afkortingen.
+- Gebruik van duidelijke Nederlandse termen.
+- Maximaal 7–9 tekens in de afkorting.
+- Geen gebruik van overbodige toevoegingen zoals team (T), unit (U) of eenheid (E) in de basisafkorting.
+
+🧭 Relatie met Cursor AI
+
+Binnen Cursor AI kun je inzetrollen gebruiken om:
+
+- Automatisch de juiste voertuigen te selecteren bij incidenttypes.
+- AI-gestuurde meldingen te genereren op basis van het juiste type inzet.
+- Realistische koppelingen te maken tussen meldingen, materieel en functies.
+
+Voorbeeldstructuur in JSON:
+
+```json
+{
+  "voertuig": "TS",
+  "inzetrollen": ["Brandbestrijding", "Redden", "Watervoorziening"],
+  "alternatieven": ["TST", "TS-NB", "TS-BO"],
+  "functies": ["Bevelvoerder", "Chauffeur", "Manschap 1", "Manschap 2"]
+}
+```
+
+🧠 Belang van standaardisatie
+
+De inzetrollen zijn landelijk vastgelegd om te zorgen dat:
+
+- Elke meldkamer dezelfde terminologie gebruikt.
+- Alarmering over regio’s heen betrouwbaar blijft.
+- Noodprocedures (NO), opleidingsinzet (OO) en noodalarmering (NA) uniform zijn.
+
+Zonder uniforme rollen zou elke regio eigen namen hanteren — dat leidt tot misverstanden en foutieve inzet bij grootschalige incidenten.
+
+📋 Veelgebruikte inzetrollen (selectie)
+
+| Code  | Omschrijving                                 | Type                          |
+|-------|----------------------------------------------|-------------------------------|
+| TS    | Tankautospuit                                | Brandbestrijding              |
+| TST   | Terreinvaardige TS                           | Brandbestrijding terrein      |
+| HV    | Hulpverleningsvoertuig                       | Technische hulpverlening      |
+| WO    | Waterongevallenbestrijding                   | Specialistisch                |
+| NB    | Natuurbrandbestrijding                       | Specialistisch                |
+| OVD-B | Officier van Dienst Brandweer                | Leiding/Coördinatie           |
+| DB    | Dienstbus                                    | Transport bemanning           |
+| PM    | Personeel/Materieelvoertuig                  | Logistiek                     |
+| ON-GW | Ondersteuning Grootschalige Watervoorziening | Ondersteunend                 |
+| ON-GO | Ondersteuning Ontsmetting                    | Ondersteunend                 |
+
+🏁 Conclusie
+
+De inzetrollen vormen het operationele hart van de brandweerlogica in Cursor AI. Ze bepalen hoe voertuigen, teams en functies in simulaties reageren en samenwerken. Door deze standaard te volgen blijft je systeem compatibel met landelijke afspraken en kun je realistische meldingen en inzetstrategieën genereren.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,116 @@
+{
+  "database_name": "Basisteams politie",
+  "created_at": "2025-01-27",
+  "description": "Test database voor Basisteams politie incidenten",
+  "bureaus": [
+    {
+      "organisatie": "Basisteam Waterweg",
+      "locatie": {
+        "bezoekadres": {
+          "straat": "Delftseveerweg",
+          "nummer": "40",
+          "postcode": "3134 JJ",
+          "plaats": "Vlaardingen",
+          "provincie": "Zuid-Holland",
+          "land": "Nederland"
+        },
+        "postadres": {
+          "straat": null,
+          "nummer": null,
+          "postcode": null,
+          "plaats": "Rotterdam",
+          "provincie": "Zuid-Holland",
+          "land": "Nederland",
+          "postbus": "70023",
+          "postcode_postbus": "3000 LD"
+        }
+      },
+      "contactgegevens": {
+        "telefoon_algemeen": "0900-8844",
+        "telefoon_spoed": "112"
+      },
+      "werkgebied": [
+        "Vlaardingen",
+        "Maassluis",
+        "Hoek van Holland"
+      ],
+      "organisatieonderdeel": {
+        "eenheid": "Eenheid Rotterdam",
+        "type": "Basisteam Politie"
+      },
+      "openingstijden_bezoekadres": {
+        "maandag": "09:00-17:00",
+        "dinsdag": "09:00-17:00",
+        "woensdag": "09:00-17:00",
+        "donderdag": "09:00-17:00",
+        "vrijdag": "09:00-17:00",
+        "zaterdag": "Gesloten",
+        "zondag": "Gesloten",
+        "feestdagen": "Gesloten"
+      },
+      "coördinaten": {
+        "latitude": 51.91387332,
+        "longitude": 4.34367832
+      }
+    }
+  ],
+  "units": [
+    {
+      "roepnummer": "RT 11.01",
+      "type": "BPV - bus",
+      "status": "1 - Beschikbaar/vrij",
+      "locatie": "Basisteam Waterweg",
+      "team": "Basisteam Waterweg (A1)",
+      "contact": "0900-8844",
+      "coordinates": [4.34367832, 51.91387332],
+      "aantal_mensen": 2,
+      "rollen": ["Noodhulp"],
+      "primair": true
+    },
+    {
+      "roepnummer": "RT 11.02", 
+      "type": "BPV - bus",
+      "status": "1 - Beschikbaar/vrij",
+      "locatie": "Basisteam Waterweg",
+      "team": "Basisteam Waterweg (A1)",
+      "contact": "0900-8844",
+      "coordinates": [4.34367832, 51.91387332],
+      "aantal_mensen": 2,
+      "rollen": ["Noodhulp"],
+      "primair": true
+    },
+    {
+      "roepnummer": "RT 11.03",
+      "type": "BPV - bus", 
+      "status": "1 - Beschikbaar/vrij",
+      "locatie": "Basisteam Waterweg",
+      "team": "Basisteam Waterweg (A1)",
+      "contact": "0900-8844",
+      "coordinates": [4.34367832, 51.91387332],
+      "aantal_mensen": 2,
+      "rollen": ["Noodhulp"],
+      "primair": true
+    },
+    {
+      "roepnummer": "RT 11.09",
+      "type": "BPV-auto",
+      "status": "1 - Beschikbaar/vrij", 
+      "locatie": "Basisteam Waterweg",
+      "team": "Basisteam Waterweg (A1)",
+      "contact": "0900-8844",
+      "coordinates": [4.34367832, 51.91387332],
+      "aantal_mensen": 1,
+      "rollen": ["Senior", "ACO"],
+      "primair": true
+    }
+  ],
+  "incidents": [],
+  "statistics": {
+    "total_incidents": 0,
+    "total_bureaus": 1,
+    "total_units": 4,
+    "by_priority": {},
+    "by_type": {},
+    "by_status": {}
+  }
+}

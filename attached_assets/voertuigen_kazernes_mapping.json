@@ -1,0 +1,5479 @@
+{
+  "metadata": {
+    "totaal_voertuigen": 472,
+    "gekoppeld": 289,
+    "niet_gekoppeld": 183,
+    "datum": "2025-11-10T13:45:32.231Z"
+  },
+  "mapping": [
+    {
+      "voertuig": {
+        "roepnummer": "17-0121",
+        "roepnummer_interregionaal": "170121",
+        "post": "Hoek van Holland",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-001",
+      "kazerne_naam": "Kazerne Hoek van Holland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0131",
+        "roepnummer_interregionaal": "170131",
+        "post": "Hoek van Holland",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-001",
+      "kazerne_naam": "Kazerne Hoek van Holland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0141",
+        "roepnummer_interregionaal": "170141",
+        "post": "Hoek van Holland",
+        "type": "TS",
+        "functie": "TS-AED / TS-NB / TST"
+      },
+      "kazerne_id": "kazerne-001",
+      "kazerne_naam": "Kazerne Hoek van Holland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0181",
+        "roepnummer_interregionaal": "170181",
+        "post": "Hoek van Holland",
+        "type": "DAT",
+        "functie": "DA-RB / DA-AED"
+      },
+      "kazerne_id": "kazerne-001",
+      "kazerne_naam": "Kazerne Hoek van Holland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0182",
+        "roepnummer_interregionaal": "170182",
+        "post": "Hoek van Holland",
+        "type": "DAT",
+        "functie": "DA-RB / RB-SW / DA-AED"
+      },
+      "kazerne_id": "kazerne-001",
+      "kazerne_naam": "Kazerne Hoek van Holland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0191",
+        "roepnummer_interregionaal": "170191",
+        "post": "Hoek van Holland",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-001",
+      "kazerne_naam": "Kazerne Hoek van Holland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0221",
+        "roepnummer_interregionaal": "170221",
+        "post": "Maassluis",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-002",
+      "kazerne_naam": "Kazerne Maassluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0231",
+        "roepnummer_interregionaal": "170231",
+        "post": "Maassluis",
+        "type": "TS",
+        "functie": "TS-AED / TS-OR"
+      },
+      "kazerne_id": "kazerne-002",
+      "kazerne_naam": "Kazerne Maassluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0232",
+        "roepnummer_interregionaal": "170232",
+        "post": "Maassluis",
+        "type": "TS",
+        "functie": "TS-AED / TS-OR"
+      },
+      "kazerne_id": "kazerne-002",
+      "kazerne_naam": "Kazerne Maassluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0251",
+        "roepnummer_interregionaal": "170251",
+        "post": "Maassluis",
+        "type": "HW",
+        "functie": "RV"
+      },
+      "kazerne_id": "kazerne-002",
+      "kazerne_naam": "Kazerne Maassluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0291",
+        "roepnummer_interregionaal": "170291",
+        "post": "Maassluis",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-002",
+      "kazerne_naam": "Kazerne Maassluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0311",
+        "roepnummer_interregionaal": "170311",
+        "post": "Vlaardingen",
+        "type": "BV"
+      },
+      "kazerne_id": "kazerne-003",
+      "kazerne_naam": "Kazerne Vlaardingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0331",
+        "roepnummer_interregionaal": "170331",
+        "post": "Vlaardingen",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-003",
+      "kazerne_naam": "Kazerne Vlaardingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0332",
+        "roepnummer_interregionaal": "170332",
+        "post": "Vlaardingen",
+        "type": "TS",
+        "functie": "TS-AED / TS-PL"
+      },
+      "kazerne_id": "kazerne-003",
+      "kazerne_naam": "Kazerne Vlaardingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0371",
+        "roepnummer_interregionaal": "170371",
+        "post": "Vlaardingen",
+        "type": "HV",
+        "functie": "VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-003",
+      "kazerne_naam": "Kazerne Vlaardingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK03",
+        "roepnummer_interregionaal": "SK03",
+        "post": "Vlaardingen"
+      },
+      "kazerne_id": "kazerne-003",
+      "kazerne_naam": "Kazerne Vlaardingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0390",
+        "roepnummer_interregionaal": "170390",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0391",
+        "roepnummer_interregionaal": "170391",
+        "post": "Vlaardingen",
+        "type": "COP-DCU",
+        "functie": "Decentrale uitgifte DCU 10"
+      },
+      "kazerne_id": "kazerne-003",
+      "kazerne_naam": "Kazerne Vlaardingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0411",
+        "roepnummer_interregionaal": "170411",
+        "post": "Schiedam",
+        "type": "WO"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0412",
+        "roepnummer_interregionaal": "170412",
+        "post": "Schiedam Boothuis",
+        "type": "WOV"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0421",
+        "roepnummer_interregionaal": "170421",
+        "post": "Schiedam",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0431",
+        "roepnummer_interregionaal": "170431",
+        "post": "Schiedam",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0432",
+        "roepnummer_interregionaal": "170432",
+        "post": "Schiedam",
+        "type": "TS",
+        "functie": "TS-AED / TS-PL"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0451",
+        "roepnummer_interregionaal": "170451",
+        "post": "Schiedam",
+        "type": "HW",
+        "functie": "RV / RV-HW"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK04",
+        "roepnummer_interregionaal": "SK04",
+        "post": "Schiedam"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0491",
+        "roepnummer_interregionaal": "170491",
+        "post": "Schiedam",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-004",
+      "kazerne_naam": "Kazerne Schiedam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0501",
+        "roepnummer_interregionaal": "170501",
+        "post": "Frobenstraat",
+        "type": "DA"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0521",
+        "roepnummer_interregionaal": "170521",
+        "post": "Frobenstraat",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0531",
+        "roepnummer_interregionaal": "170531",
+        "post": "Frobenstraat",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS / TS-VOR"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0532",
+        "roepnummer_interregionaal": "170532",
+        "post": "Frobenstraat",
+        "type": "TS",
+        "functie": "TS-AED / TS-PL / TS-VOR"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0551",
+        "roepnummer_interregionaal": "170551",
+        "post": "Frobenstraat",
+        "type": "AL",
+        "functie": "RV / RV-AL"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK05",
+        "roepnummer_interregionaal": "SK05",
+        "post": "Frobenstraat"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0590",
+        "roepnummer_interregionaal": "170590",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0591",
+        "roepnummer_interregionaal": "170591",
+        "post": "Frobenstraat",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-005",
+      "kazerne_naam": "Kazerne Rotterdam Frobenstraat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "170592",
+        "roepnummer_interregionaal": "170592",
+        "post": "Assistent vrijwillige Posten",
+        "type": "AVP",
+        "functie": "Assistent vrijwillige Posten"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0631",
+        "roepnummer_interregionaal": "170631",
+        "post": "Baan",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-006",
+      "kazerne_naam": "Kazerne Rotterdam Baan",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0691",
+        "roepnummer_interregionaal": "170691",
+        "post": "Baan",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-006",
+      "kazerne_naam": "Kazerne Rotterdam Baan",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0689",
+        "roepnummer_interregionaal": "170689",
+        "post": "Reservering",
+        "type": "Drone",
+        "functie": "Reservering"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0731",
+        "roepnummer_interregionaal": "170731",
+        "post": "Berkel en Rodenrijs",
+        "type": "TS",
+        "functie": "TS-AED / TS-VOR"
+      },
+      "kazerne_id": "kazerne-007",
+      "kazerne_naam": "Kazerne Berkel en Rodenrijs",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0732",
+        "roepnummer_interregionaal": "170732",
+        "post": "Berkel en Rodenrijs",
+        "type": "TS",
+        "functie": "TS-AED / TS-PL / TS-VOR"
+      },
+      "kazerne_id": "kazerne-007",
+      "kazerne_naam": "Kazerne Berkel en Rodenrijs",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0761",
+        "roepnummer_interregionaal": "170761",
+        "post": "Berkel en Rodenrijs",
+        "type": "SI",
+        "functie": "TS2 / TS-AED"
+      },
+      "kazerne_id": "kazerne-007",
+      "kazerne_naam": "Kazerne Berkel en Rodenrijs",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK07",
+        "roepnummer_interregionaal": "SK07",
+        "post": "Berkel en Rodenrijs"
+      },
+      "kazerne_id": "kazerne-007",
+      "kazerne_naam": "Kazerne Berkel en Rodenrijs",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0791",
+        "roepnummer_interregionaal": "170791",
+        "post": "Berkel en Rodenrijs",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-007",
+      "kazerne_naam": "Kazerne Berkel en Rodenrijs",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0831",
+        "roepnummer_interregionaal": "170831",
+        "post": "Bleiswijk",
+        "type": "TS",
+        "functie": "TS-AED / TS-OR"
+      },
+      "kazerne_id": "kazerne-008",
+      "kazerne_naam": "Kazerne Bleiswijk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0891",
+        "roepnummer_interregionaal": "170891",
+        "post": "Bleiswijk",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-008",
+      "kazerne_naam": "Kazerne Bleiswijk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0931",
+        "roepnummer_interregionaal": "170931",
+        "post": "Bosland",
+        "type": "TS",
+        "functie": "TS-AED / TS-SBB"
+      },
+      "kazerne_id": "kazerne-009",
+      "kazerne_naam": "Kazerne Rotterdam Bosland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0951",
+        "roepnummer_interregionaal": "170951",
+        "post": "Bosland",
+        "type": "AL",
+        "functie": "RV / RV-AL"
+      },
+      "kazerne_id": "kazerne-009",
+      "kazerne_naam": "Kazerne Rotterdam Bosland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-0991",
+        "roepnummer_interregionaal": "170991",
+        "post": "Bosland",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-009",
+      "kazerne_naam": "Kazerne Rotterdam Bosland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3790",
+        "roepnummer_interregionaal": "173790",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1031",
+        "roepnummer_interregionaal": "171031",
+        "post": "Metaalhof",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-010",
+      "kazerne_naam": "Kazerne Rotterdam Metaalhof",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1061",
+        "roepnummer_interregionaal": "171061",
+        "post": "Metaalhof",
+        "type": "SB",
+        "functie": "AS"
+      },
+      "kazerne_id": "kazerne-010",
+      "kazerne_naam": "Kazerne Rotterdam Metaalhof",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1081",
+        "roepnummer_interregionaal": "171081",
+        "post": "SW",
+        "type": "SW"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1082",
+        "roepnummer_interregionaal": "171082",
+        "post": "RB",
+        "type": "RB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1091",
+        "roepnummer_interregionaal": "171091",
+        "post": "Metaalhof",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-010",
+      "kazerne_naam": "Kazerne Rotterdam Metaalhof",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1111",
+        "roepnummer_interregionaal": "171111",
+        "post": "Capelle a/d IJssel",
+        "type": "WO"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1112",
+        "roepnummer_interregionaal": "171112",
+        "post": "Capelle a/d IJssel",
+        "type": "WOV"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1113",
+        "roepnummer_interregionaal": "171113",
+        "post": "Capelle a/d IJssel",
+        "type": "VW"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1121",
+        "roepnummer_interregionaal": "171121",
+        "post": "Capelle a/d IJssel",
+        "type": "MP"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1131",
+        "roepnummer_interregionaal": "171131",
+        "post": "Capelle a/d IJssel",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1132",
+        "roepnummer_interregionaal": "171132",
+        "post": "Capelle a/d IJssel",
+        "type": "TS",
+        "functie": "TS-AED / TS-PL"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1151",
+        "roepnummer_interregionaal": "171151",
+        "post": "Capelle a/d IJssel",
+        "type": "HW",
+        "functie": "RV / RV-HW"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK11",
+        "roepnummer_interregionaal": "SK11",
+        "post": "Capelle a/d IJssel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1190",
+        "roepnummer_interregionaal": "171190",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1191",
+        "roepnummer_interregionaal": "171191",
+        "post": "Capelle a/d IJssel",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "171192",
+        "roepnummer_interregionaal": "171192",
+        "post": "Assistent vrijwillige Posten",
+        "type": "AVP",
+        "functie": "Assistent vrijwillige Posten"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1231",
+        "roepnummer_interregionaal": "171231",
+        "post": "Krimpen a/d IJssel",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1291",
+        "roepnummer_interregionaal": "171291",
+        "post": "Krimpen a/d IJssel",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1331",
+        "roepnummer_interregionaal": "171331",
+        "post": "GB - Maximaweg",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1361",
+        "roepnummer_interregionaal": "171361",
+        "post": "GB - Maximaweg",
+        "type": "AS-IB",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1362",
+        "roepnummer_interregionaal": "171362",
+        "post": "GB - Maximaweg",
+        "type": "SVH",
+        "functie": "Haakarmbak SchuimVormend Middel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1381",
+        "roepnummer_interregionaal": "171381",
+        "post": "GB - Maximaweg",
+        "type": "HA-Z",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1431",
+        "roepnummer_interregionaal": "171431",
+        "post": "GB - Coloradoweg",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1461",
+        "roepnummer_interregionaal": "171461",
+        "post": "GB - Coloradoweg",
+        "type": "AS-IB",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1462",
+        "roepnummer_interregionaal": "171462",
+        "post": "GB - Coloradoweg",
+        "type": "SVH",
+        "functie": "Haakarmbak SchuimVormend Middel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1481",
+        "roepnummer_interregionaal": "171481",
+        "post": "GB - Coloradoweg",
+        "type": "HA-Z",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9288",
+        "roepnummer_interregionaal": "179288",
+        "post": "GB - Coloradoweg",
+        "type": "BMH-SBB",
+        "functie": "SBB-bak (eigendom VRR)"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1489",
+        "roepnummer_interregionaal": "171489",
+        "post": "Reservering",
+        "type": "Drone",
+        "functie": "Reservering"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1531",
+        "roepnummer_interregionaal": "171531",
+        "post": "GB - Elbeweg",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1561",
+        "roepnummer_interregionaal": "171561",
+        "post": "GB - Elbeweg",
+        "type": "AS-IB",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1571",
+        "roepnummer_interregionaal": "171571",
+        "post": "GB - Elbeweg",
+        "type": "DV-RH"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1601",
+        "roepnummer_interregionaal": "171601",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1602",
+        "roepnummer_interregionaal": "171602",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1603",
+        "roepnummer_interregionaal": "171603",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA",
+        "functie": "DV-FLO / DV-OVD / DV-HOD"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1604",
+        "roepnummer_interregionaal": "171604",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1605",
+        "roepnummer_interregionaal": "171605",
+        "post": "GB - Hoofdkantoor",
+        "type": "DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1606",
+        "roepnummer_interregionaal": "171606",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1607",
+        "roepnummer_interregionaal": "171607",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1609",
+        "roepnummer_interregionaal": "171609",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1621",
+        "roepnummer_interregionaal": "171621",
+        "post": "GB - Hoofdkantoor",
+        "type": "HV",
+        "functie": "BMH-GSH"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1631",
+        "roepnummer_interregionaal": "171631",
+        "post": "GB - Hoofdkantoor",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1632",
+        "roepnummer_interregionaal": "171632",
+        "post": "GB - Hoofdkantoor",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1633",
+        "roepnummer_interregionaal": "171633",
+        "post": "GB - Hoofdkantoor",
+        "type": "TS"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1661",
+        "roepnummer_interregionaal": "171661",
+        "post": "GB - Hoofdkantoor",
+        "type": "AS-IB",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1662",
+        "roepnummer_interregionaal": "171662",
+        "post": "GB - Hoofdkantoor",
+        "type": "SVH",
+        "functie": "Haakarmbak SchuimVormend Middel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1665",
+        "roepnummer_interregionaal": "171665",
+        "post": "GB - Hoofdkantoor",
+        "type": "AS-IB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1681",
+        "roepnummer_interregionaal": "171681",
+        "post": "GB - Hoofdkantoor",
+        "type": "PM-LM"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1682",
+        "roepnummer_interregionaal": "171682",
+        "post": "GB - Hoofdkantoor",
+        "type": "VKL-DR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1683",
+        "roepnummer_interregionaal": "171683",
+        "post": "GB - Hoofdkantoor",
+        "type": "HA",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1684",
+        "roepnummer_interregionaal": "171684",
+        "post": "GB - Hoofdkantoor",
+        "type": "HA",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1685",
+        "roepnummer_interregionaal": "171685",
+        "post": "GB - Hoofdkantoor",
+        "type": "BMH"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1689",
+        "roepnummer_interregionaal": "171689",
+        "post": "GB - Hoofdkantoor",
+        "type": "MFH"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1692",
+        "roepnummer_interregionaal": "171692",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA-CUG",
+        "functie": "Was Coördinator Team Digitale Verkenning/ wordt reserve FL"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1693",
+        "roepnummer_interregionaal": "171693",
+        "post": "GB - Hoofdkantoor",
+        "type": "FL",
+        "functie": "Logistiek Piket"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1695",
+        "roepnummer_interregionaal": "171695",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA",
+        "functie": "Reservevoertuig OvD, HOvD, FLO en Gezagvoerder Drone"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1696",
+        "roepnummer_interregionaal": "171696",
+        "post": "GB - Hoofdkantoor",
+        "type": "DA",
+        "functie": "Reservevoertuig OvD, HOvD, FLO en Gezagvoerder Drone"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1731",
+        "roepnummer_interregionaal": "171731",
+        "post": "GB - Rozenburg",
+        "type": "TS",
+        "functie": "Tankautpsuit"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1762",
+        "roepnummer_interregionaal": "171762",
+        "post": "GB - Rozenburg",
+        "type": "SVH",
+        "functie": "Haakarmbak SchuimVormend Middel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1781",
+        "roepnummer_interregionaal": "171781",
+        "post": "GB - Rozenburg",
+        "type": "HA",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1782",
+        "roepnummer_interregionaal": "171782",
+        "post": "GB - Rozenburg",
+        "type": "HA",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1801",
+        "roepnummer_interregionaal": "171801",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "DA",
+        "functie": "Rayoncommandant"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1802",
+        "roepnummer_interregionaal": "171802",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "DA",
+        "functie": "Rayoncommandant"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1803",
+        "roepnummer_interregionaal": "171803",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1804",
+        "roepnummer_interregionaal": "171804",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1805",
+        "roepnummer_interregionaal": "171805",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1806",
+        "roepnummer_interregionaal": "171806",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "DA"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1821",
+        "roepnummer_interregionaal": "171821",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1822",
+        "roepnummer_interregionaal": "171822",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1823",
+        "roepnummer_interregionaal": "171823",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1824",
+        "roepnummer_interregionaal": "171824",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1825",
+        "roepnummer_interregionaal": "171825",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1826",
+        "roepnummer_interregionaal": "171826",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1827",
+        "roepnummer_interregionaal": "171827",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1828",
+        "roepnummer_interregionaal": "171828",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1829",
+        "roepnummer_interregionaal": "171829",
+        "post": "VRR - Advies Gevaarlijke Stoffen",
+        "type": "MP",
+        "functie": "Meetploeg"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1832",
+        "roepnummer_interregionaal": "171832",
+        "post": "BP Raffinaderij Rotterdam-Europoort",
+        "type": "TS-BB",
+        "functie": "TS Bedrijfsbrandweer BP Raffinaderij"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1861",
+        "roepnummer_interregionaal": "171861",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-DPH",
+        "functie": "Dompelpomphaakarmbak groot vermogen"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1862",
+        "roepnummer_interregionaal": "171862",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-DPH",
+        "functie": "Dompelpomphaakarmbak groot vermogen"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1863",
+        "roepnummer_interregionaal": "171863",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-MSH",
+        "functie": "Foambooster"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1864",
+        "roepnummer_interregionaal": "171864",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-MSH",
+        "functie": "Foambooster"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1865",
+        "roepnummer_interregionaal": "171865",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-WKH",
+        "functie": "Tankbrandmonitor"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1866",
+        "roepnummer_interregionaal": "171866",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-WKH",
+        "functie": "Tankbrandmonitor"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1881",
+        "roepnummer_interregionaal": "171881",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-SLH",
+        "functie": "Slangenbak 12\"\""
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1882",
+        "roepnummer_interregionaal": "171882",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-SLH",
+        "functie": "Slangenbak 12\"\""
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1883",
+        "roepnummer_interregionaal": "171883",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-SLH",
+        "functie": "Slangenbak 12\"\""
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1884",
+        "roepnummer_interregionaal": "171884",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-SLH",
+        "functie": "Slangenbak 12\"\""
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1885",
+        "roepnummer_interregionaal": "171885",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-GMH",
+        "functie": "Magazijnunit CBP"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1886",
+        "roepnummer_interregionaal": "171886",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-GMH",
+        "functie": "Vakbekwaamheid CBP"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1887",
+        "roepnummer_interregionaal": "171887",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-BRB",
+        "functie": "Blusrobots 2x (UGV)"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1888",
+        "roepnummer_interregionaal": "171888",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "CBP-BRB",
+        "functie": "Blusrobots 2x (UGV)"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1889",
+        "roepnummer_interregionaal": "171889",
+        "post": "GB - Moezelweg Hoofdkantoor",
+        "type": "ABH",
+        "functie": "Ademluchtbak (niet operationeel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1931",
+        "roepnummer_interregionaal": "171931",
+        "post": "GB - Merseyweg",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-1961",
+        "roepnummer_interregionaal": "171961",
+        "post": "GB - Merseyweg",
+        "type": "AS-IB",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2031",
+        "roepnummer_interregionaal": "172031",
+        "post": "GB - Botlekweg",
+        "type": "TS-IB",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2021",
+        "roepnummer_interregionaal": "172021",
+        "post": "GB - Botlekweg",
+        "type": "BMH-DOC",
+        "functie": "Decontaminatiecontainer"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2061",
+        "roepnummer_interregionaal": "172061",
+        "post": "GB - Botlekweg",
+        "type": "AS-IB",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2081",
+        "roepnummer_interregionaal": "172081",
+        "post": "GB - Botlekweg",
+        "type": "HA-Z",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2089",
+        "roepnummer_interregionaal": "172089",
+        "post": "Drone",
+        "type": "Drone"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2131",
+        "roepnummer_interregionaal": "172131",
+        "post": "GB - Butaanweg",
+        "type": "TS",
+        "functie": "Tankautospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2151",
+        "roepnummer_interregionaal": "172151",
+        "post": "GB - Butaanweg",
+        "type": "HW",
+        "functie": "Hoogwerker ALLEEN VOOR PRORAIL"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2161",
+        "roepnummer_interregionaal": "172161",
+        "post": "GB - Butaanweg",
+        "type": "AS",
+        "functie": "Autospuit Industrieel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2162",
+        "roepnummer_interregionaal": "172162",
+        "post": "GB - Butaanweg",
+        "type": "SV",
+        "functie": "Haakarmbak SchuimVormend Middel"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2165",
+        "roepnummer_interregionaal": "172165",
+        "post": "GB - Butaanweg",
+        "type": "SB",
+        "functie": "Schuimblusvoertuig"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2181",
+        "roepnummer_interregionaal": "172181",
+        "post": "GB - Butaanweg",
+        "type": "HA",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2231",
+        "roepnummer_interregionaal": "172231",
+        "post": "GB - Hoogvliet",
+        "type": "TS",
+        "functie": "Tabnkautospuit"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2281",
+        "roepnummer_interregionaal": "172281",
+        "post": "GB - Hoogvliet",
+        "type": "HA-Z",
+        "functie": "Haakarmbak chasis Zwaar"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK22",
+        "roepnummer_interregionaal": "SK22",
+        "post": "GB - Hoogvliet"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2321",
+        "roepnummer_interregionaal": "172321",
+        "post": "Rockanje",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-023",
+      "kazerne_naam": "Kazerne Rockanje",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2331",
+        "roepnummer_interregionaal": "172331",
+        "post": "Rockanje",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-023",
+      "kazerne_naam": "Kazerne Rockanje",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2340",
+        "roepnummer_interregionaal": "172340",
+        "post": "Rockanje",
+        "type": "BMA-NWS"
+      },
+      "kazerne_id": "kazerne-023",
+      "kazerne_naam": "Kazerne Rockanje",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2381",
+        "roepnummer_interregionaal": "172381",
+        "post": "Rockanje",
+        "type": "BM",
+        "functie": "BM-VK"
+      },
+      "kazerne_id": "kazerne-023",
+      "kazerne_naam": "Kazerne Rockanje",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2391",
+        "roepnummer_interregionaal": "172391",
+        "post": "Rockanje",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-023",
+      "kazerne_naam": "Kazerne Rockanje",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2431",
+        "roepnummer_interregionaal": "172431",
+        "post": "Oostvoorne",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-024",
+      "kazerne_naam": "Kazerne Oostvoorne",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2481",
+        "roepnummer_interregionaal": "172481",
+        "post": "Oostvoorne",
+        "type": "BM",
+        "functie": "BM-AED"
+      },
+      "kazerne_id": "kazerne-024",
+      "kazerne_naam": "Kazerne Oostvoorne",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2491",
+        "roepnummer_interregionaal": "172491",
+        "post": "Oostvoorne",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-024",
+      "kazerne_naam": "Kazerne Oostvoorne",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2531",
+        "roepnummer_interregionaal": "172531",
+        "post": "Hellevoetsluis",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-025",
+      "kazerne_naam": "Kazerne Hellevoetsluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2551",
+        "roepnummer_interregionaal": "172551",
+        "post": "Hellevoetsluis",
+        "type": "HW",
+        "functie": "RV"
+      },
+      "kazerne_id": "kazerne-025",
+      "kazerne_naam": "Kazerne Hellevoetsluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2561",
+        "roepnummer_interregionaal": "172561",
+        "post": "Hellevoetsluis",
+        "type": "SI",
+        "functie": "TS2 / TS-AED"
+      },
+      "kazerne_id": "kazerne-025",
+      "kazerne_naam": "Kazerne Hellevoetsluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2571",
+        "roepnummer_interregionaal": "172571",
+        "post": "Hellevoetsluis",
+        "type": "HV",
+        "functie": "HV"
+      },
+      "kazerne_id": "kazerne-025",
+      "kazerne_naam": "Kazerne Hellevoetsluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2590",
+        "roepnummer_interregionaal": "172590",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2591",
+        "roepnummer_interregionaal": "172591",
+        "post": "Hellevoetsluis",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-025",
+      "kazerne_naam": "Kazerne Hellevoetsluis",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "172592",
+        "roepnummer_interregionaal": "172592",
+        "post": "Assistent vrijwillige Posten",
+        "type": "AVP",
+        "functie": "Assistent vrijwillige Posten"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2621",
+        "roepnummer_interregionaal": "172621",
+        "post": "Brielle",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-026",
+      "kazerne_naam": "Kazerne Brielle",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2631",
+        "roepnummer_interregionaal": "172631",
+        "post": "Brielle",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-026",
+      "kazerne_naam": "Kazerne Brielle",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2691",
+        "roepnummer_interregionaal": "172691",
+        "post": "Brielle",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-026",
+      "kazerne_naam": "Kazerne Brielle",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2731",
+        "roepnummer_interregionaal": "172731",
+        "post": "Zwartewaal",
+        "type": "TS",
+        "functie": "TS-AED / TS-SK / TS-PL"
+      },
+      "kazerne_id": "kazerne-027",
+      "kazerne_naam": "Kazerne Zwartewaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK27",
+        "roepnummer_interregionaal": "SK27",
+        "post": "Zwartewaal"
+      },
+      "kazerne_id": "kazerne-027",
+      "kazerne_naam": "Kazerne Zwartewaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2791",
+        "roepnummer_interregionaal": "172791",
+        "post": "Zwartewaal",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-027",
+      "kazerne_naam": "Kazerne Zwartewaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2831",
+        "roepnummer_interregionaal": "172831",
+        "post": "Oudenhoorn",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-028",
+      "kazerne_naam": "Kazerne Oudenhoorn",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2891",
+        "roepnummer_interregionaal": "172891",
+        "post": "Oudenhoorn",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-028",
+      "kazerne_naam": "Kazerne Oudenhoorn",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2931",
+        "roepnummer_interregionaal": "172931",
+        "post": "Heenvliet",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-029",
+      "kazerne_naam": "Kazerne Heenvliet",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-2991",
+        "roepnummer_interregionaal": "172991",
+        "post": "Heenvliet",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-029",
+      "kazerne_naam": "Kazerne Heenvliet",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3031",
+        "roepnummer_interregionaal": "173031",
+        "post": "Zuidland",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-030",
+      "kazerne_naam": "Kazerne Zuidland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3091",
+        "roepnummer_interregionaal": "173091",
+        "post": "Zuidland",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-030",
+      "kazerne_naam": "Kazerne Zuidland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3111",
+        "roepnummer_interregionaal": "173111",
+        "post": "Spijkenisse",
+        "type": "WO"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3112",
+        "roepnummer_interregionaal": "173112",
+        "post": "Spijkenisse",
+        "type": "WOV"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3113",
+        "roepnummer_interregionaal": "173113",
+        "post": "Spijkenisse",
+        "type": "VW"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3121",
+        "roepnummer_interregionaal": "173121",
+        "post": "Spijkenisse",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3131",
+        "roepnummer_interregionaal": "173131",
+        "post": "Spijkenisse",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3132",
+        "roepnummer_interregionaal": "173132",
+        "post": "Spijkenisse",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3151",
+        "roepnummer_interregionaal": "173151",
+        "post": "Spijkenisse",
+        "type": "HW",
+        "functie": "RV"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3171",
+        "roepnummer_interregionaal": "173171",
+        "post": "Spijkenisse",
+        "type": "HV"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK31",
+        "roepnummer_interregionaal": "SK31",
+        "post": "Spijkenisse"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3190",
+        "roepnummer_interregionaal": "173190",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3191",
+        "roepnummer_interregionaal": "173191",
+        "post": "Spijkenisse",
+        "type": "COP-DCU",
+        "functie": "Decentrale uitgifte DCU 50 + DCU 60"
+      },
+      "kazerne_id": "kazerne-031",
+      "kazerne_naam": "Kazerne Spijkenisse",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3221",
+        "roepnummer_interregionaal": "173221",
+        "post": "Albrandswaard",
+        "type": "MP",
+        "functie": "MP"
+      },
+      "kazerne_id": "kazerne-032",
+      "kazerne_naam": "Kazerne Albrandswaard",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3231",
+        "roepnummer_interregionaal": "173231",
+        "post": "Albrandswaard",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-032",
+      "kazerne_naam": "Kazerne Albrandswaard",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3291",
+        "roepnummer_interregionaal": "173291",
+        "post": "Albrandswaard",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-032",
+      "kazerne_naam": "Kazerne Albrandswaard",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3331",
+        "roepnummer_interregionaal": "173331",
+        "post": "Keijenburg",
+        "type": "TS",
+        "functie": "TS-AED / TS-SK / TS-PL"
+      },
+      "kazerne_id": "kazerne-033",
+      "kazerne_naam": "Kazerne Rotterdam Keijenburg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3361",
+        "roepnummer_interregionaal": "173361",
+        "post": "Keijenburg",
+        "type": "TS",
+        "functie": "TS2 / TS-AED"
+      },
+      "kazerne_id": "kazerne-033",
+      "kazerne_naam": "Kazerne Rotterdam Keijenburg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK33",
+        "roepnummer_interregionaal": "SK33",
+        "post": "Keijenburg"
+      },
+      "kazerne_id": "kazerne-033",
+      "kazerne_naam": "Kazerne Rotterdam Keijenburg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3391",
+        "roepnummer_interregionaal": "173391",
+        "post": "Keijenburg",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-033",
+      "kazerne_naam": "Kazerne Rotterdam Keijenburg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3431",
+        "roepnummer_interregionaal": "173431",
+        "post": "Mijnsherenlaan",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-034",
+      "kazerne_naam": "Kazerne Rotterdam Mijnsherenlaan",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3451",
+        "roepnummer_interregionaal": "173451",
+        "post": "Mijnsherenlaan",
+        "type": "AL",
+        "functie": "RV RV-AL"
+      },
+      "kazerne_id": "kazerne-034",
+      "kazerne_naam": "Kazerne Rotterdam Mijnsherenlaan",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3491",
+        "roepnummer_interregionaal": "173491",
+        "post": "Mijnsherenlaan",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-034",
+      "kazerne_naam": "Kazerne Rotterdam Mijnsherenlaan",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3561",
+        "roepnummer_interregionaal": "173561",
+        "post": "Albert Plesmanweg",
+        "type": "SI",
+        "functie": "TS2 / TS-AED"
+      },
+      "kazerne_id": "kazerne-035",
+      "kazerne_naam": "Kazerne Rotterdam Albert Plesmanweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3591",
+        "roepnummer_interregionaal": "173591",
+        "post": "Albert Plesmanweg",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-035",
+      "kazerne_naam": "Kazerne Rotterdam Albert Plesmanweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3589",
+        "roepnummer_interregionaal": "173589",
+        "post": "Reservering",
+        "type": "Drone",
+        "functie": "Reservering"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3631",
+        "roepnummer_interregionaal": "173631",
+        "post": "Barendrecht",
+        "type": "TS",
+        "functie": "TS-AED TS-OR"
+      },
+      "kazerne_id": "kazerne-036",
+      "kazerne_naam": "Kazerne Barendrecht",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3632",
+        "roepnummer_interregionaal": "173632",
+        "post": "Barendrecht",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-036",
+      "kazerne_naam": "Kazerne Barendrecht",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3690",
+        "roepnummer_interregionaal": "173690",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3691",
+        "roepnummer_interregionaal": "173691",
+        "post": "Barendrecht",
+        "type": "COP-DCU",
+        "functie": "Decentrale uitgifte DCU 40"
+      },
+      "kazerne_id": "kazerne-036",
+      "kazerne_naam": "Kazerne Barendrecht",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3731",
+        "roepnummer_interregionaal": "173731",
+        "post": "Groene Tuin",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-037",
+      "kazerne_naam": "Kazerne Rotterdam Groene Tuin",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3751",
+        "roepnummer_interregionaal": "173751",
+        "post": "Groene Tuin",
+        "type": "AL",
+        "functie": "RV RV-AL"
+      },
+      "kazerne_id": "kazerne-037",
+      "kazerne_naam": "Kazerne Rotterdam Groene Tuin",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3791",
+        "roepnummer_interregionaal": "173791",
+        "post": "Groene Tuin",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-037",
+      "kazerne_naam": "Kazerne Rotterdam Groene Tuin",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3821",
+        "roepnummer_interregionaal": "173821",
+        "post": "Ridderkerk",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-038",
+      "kazerne_naam": "Kazerne Ridderkerk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3831",
+        "roepnummer_interregionaal": "173831",
+        "post": "Ridderkerk",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-038",
+      "kazerne_naam": "Kazerne Ridderkerk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3832",
+        "roepnummer_interregionaal": "173832",
+        "post": "Ridderkerk",
+        "type": "TS",
+        "functie": "TS-AED / TS-SK / TS-PL"
+      },
+      "kazerne_id": "kazerne-038",
+      "kazerne_naam": "Kazerne Ridderkerk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK38",
+        "roepnummer_interregionaal": "SK38",
+        "post": "Ridderkerk"
+      },
+      "kazerne_id": "kazerne-038",
+      "kazerne_naam": "Kazerne Ridderkerk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3891",
+        "roepnummer_interregionaal": "173891",
+        "post": "Ridderkerk",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-038",
+      "kazerne_naam": "Kazerne Ridderkerk",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3921",
+        "roepnummer_interregionaal": "173921",
+        "post": "Ouddorp",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-039",
+      "kazerne_naam": "Kazerne Ouddorp",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3931",
+        "roepnummer_interregionaal": "173931",
+        "post": "Ouddorp",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-039",
+      "kazerne_naam": "Kazerne Ouddorp",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3940",
+        "roepnummer_interregionaal": "173940",
+        "post": "Ouddorp",
+        "type": "BMA-NWS"
+      },
+      "kazerne_id": "kazerne-039",
+      "kazerne_naam": "Kazerne Ouddorp",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3981",
+        "roepnummer_interregionaal": "173981",
+        "post": "Ouddorp",
+        "type": "BM"
+      },
+      "kazerne_id": "kazerne-039",
+      "kazerne_naam": "Kazerne Ouddorp",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-3991",
+        "roepnummer_interregionaal": "173991",
+        "post": "Ouddorp",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-039",
+      "kazerne_naam": "Kazerne Ouddorp",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4031",
+        "roepnummer_interregionaal": "174031",
+        "post": "Goedereede",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-040",
+      "kazerne_naam": "Kazerne Goedereede",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4091",
+        "roepnummer_interregionaal": "174091",
+        "post": "Goedereede",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-040",
+      "kazerne_naam": "Kazerne Goedereede",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4131",
+        "roepnummer_interregionaal": "174131",
+        "post": "Stellendam",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-041",
+      "kazerne_naam": "Kazerne Stellendam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4191",
+        "roepnummer_interregionaal": "174191",
+        "post": "Stellendam",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-041",
+      "kazerne_naam": "Kazerne Stellendam",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4231",
+        "roepnummer_interregionaal": "174231",
+        "post": "Melissant",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-042",
+      "kazerne_naam": "Kazerne Melissant",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4291",
+        "roepnummer_interregionaal": "174291",
+        "post": "Melissant",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-042",
+      "kazerne_naam": "Kazerne Melissant",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4331",
+        "roepnummer_interregionaal": "174331",
+        "post": "Dirksland",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-043",
+      "kazerne_naam": "Kazerne Dirksland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4391",
+        "roepnummer_interregionaal": "174391",
+        "post": "Dirksland",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-043",
+      "kazerne_naam": "Kazerne Dirksland",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4431",
+        "roepnummer_interregionaal": "174431",
+        "post": "Herkingen",
+        "type": "TS",
+        "functie": "TS-AED / TS-CBRN / TS-OR"
+      },
+      "kazerne_id": "kazerne-044",
+      "kazerne_naam": "Kazerne Herkingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4491",
+        "roepnummer_interregionaal": "174491",
+        "post": "Herkingen",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-044",
+      "kazerne_naam": "Kazerne Herkingen",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4501",
+        "roepnummer_interregionaal": "174501",
+        "post": "Olympia",
+        "type": "DA",
+        "functie": "CBRNe"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4521",
+        "roepnummer_interregionaal": "174521",
+        "post": "Olympia",
+        "functie": "CBRNe"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4522",
+        "roepnummer_interregionaal": "174522",
+        "post": "Olympia",
+        "functie": "CBRNe"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4523",
+        "roepnummer_interregionaal": "174523",
+        "post": "Olympia",
+        "functie": "CBRNe"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4531",
+        "roepnummer_interregionaal": "174531",
+        "post": "Olympia",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4532",
+        "roepnummer_interregionaal": "174532",
+        "post": "Olympia",
+        "type": "TS",
+        "functie": "TS-AED / TS-SK / TS-PL / TS-CBRN"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4561",
+        "roepnummer_interregionaal": "174561",
+        "post": "Olympia",
+        "type": "TW"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4562",
+        "roepnummer_interregionaal": "174562",
+        "post": "Olympia",
+        "type": "WTH"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4581",
+        "roepnummer_interregionaal": "174581",
+        "post": "Olympia",
+        "type": "HA",
+        "functie": "CBRNe"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4582",
+        "roepnummer_interregionaal": "174582",
+        "post": "Olympia",
+        "type": "HA",
+        "functie": "CBRNe"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "SK45",
+        "roepnummer_interregionaal": "SK45",
+        "post": "Olympia"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4590",
+        "roepnummer_interregionaal": "174590",
+        "post": "Cluster",
+        "type": "CDT",
+        "functie": "Clustercommandant"
+      },
+      "kazerne_id": "kazerne-054",
+      "kazerne_naam": "Leiding en Coordinatie",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4591",
+        "roepnummer_interregionaal": "174591",
+        "post": "Olympia",
+        "type": "COP-DCU",
+        "functie": "Decentrale uitgifte DCU 70"
+      },
+      "kazerne_id": "kazerne-045",
+      "kazerne_naam": "Kazerne Olympiaweg",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "174592",
+        "roepnummer_interregionaal": "174592",
+        "post": "Assistent vrijwillige Posten",
+        "type": "AVP",
+        "functie": "Assistent vrijwillige Posten"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4621",
+        "roepnummer_interregionaal": "174621",
+        "post": "Nieuwe-Tonge",
+        "type": "MP"
+      },
+      "kazerne_id": "kazerne-046",
+      "kazerne_naam": "Kazerne Nieuwe Tonge",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4631",
+        "roepnummer_interregionaal": "174631",
+        "post": "Nieuwe-Tonge",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-046",
+      "kazerne_naam": "Kazerne Nieuwe Tonge",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4691",
+        "roepnummer_interregionaal": "174691",
+        "post": "Nieuwe-Tonge",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-046",
+      "kazerne_naam": "Kazerne Nieuwe Tonge",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4731",
+        "roepnummer_interregionaal": "174731",
+        "post": "Stad a/h Haringvliet",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4791",
+        "roepnummer_interregionaal": "174791",
+        "post": "Stad a/h Haringvliet",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4831",
+        "roepnummer_interregionaal": "174831",
+        "post": "Oude-Tonge",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-048",
+      "kazerne_naam": "Kazerne Oude Tonge",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4891",
+        "roepnummer_interregionaal": "174891",
+        "post": "Oude-Tonge",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-048",
+      "kazerne_naam": "Kazerne Oude Tonge",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4931",
+        "roepnummer_interregionaal": "174931",
+        "post": "Den Bommel",
+        "type": "TS",
+        "functie": "TS-AED / HV / VT-SS / VT-NS"
+      },
+      "kazerne_id": "kazerne-049",
+      "kazerne_naam": "Kazerne Den Bommel",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-4991",
+        "roepnummer_interregionaal": "174991",
+        "post": "Den Bommel",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-049",
+      "kazerne_naam": "Kazerne Den Bommel",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-5031",
+        "roepnummer_interregionaal": "175031",
+        "post": "Ooltgensplaat",
+        "type": "TS",
+        "functie": "TS-AED"
+      },
+      "kazerne_id": "kazerne-050",
+      "kazerne_naam": "Kazerne Ooltgensplaat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-5091",
+        "roepnummer_interregionaal": "175091",
+        "post": "Ooltgensplaat",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-050",
+      "kazerne_naam": "Kazerne Ooltgensplaat",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8701",
+        "roepnummer_interregionaal": "178701",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8702",
+        "roepnummer_interregionaal": "178702",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8703",
+        "roepnummer_interregionaal": "178703",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8704",
+        "roepnummer_interregionaal": "178704",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8721",
+        "roepnummer_interregionaal": "178721",
+        "post": "RPA / DHMR / HBR",
+        "type": "MP",
+        "functie": "RPA-MP 1"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8722",
+        "roepnummer_interregionaal": "178722",
+        "post": "RPA / DHMR / HBR",
+        "type": "MP",
+        "functie": "RPA-MP 2"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8723",
+        "roepnummer_interregionaal": "178723",
+        "post": "RPA / DHMR / HBR",
+        "type": "MP",
+        "functie": "RPA-MP 3"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8724",
+        "roepnummer_interregionaal": "178724",
+        "post": "RPA / DHMR / HBR",
+        "functie": "Gereserveerd voor HB 2-10-2025"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8760",
+        "roepnummer_interregionaal": "178760",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8761",
+        "roepnummer_interregionaal": "178761",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8762",
+        "roepnummer_interregionaal": "178762",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8763",
+        "roepnummer_interregionaal": "178763",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8764",
+        "roepnummer_interregionaal": "178764",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8765",
+        "roepnummer_interregionaal": "178765",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8766",
+        "roepnummer_interregionaal": "178766",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8780",
+        "roepnummer_interregionaal": "178780",
+        "post": "RPA / DHMR / HBR",
+        "type": "BRV-G"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8781",
+        "roepnummer_interregionaal": "178781",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8782",
+        "roepnummer_interregionaal": "178782",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8783",
+        "roepnummer_interregionaal": "178783",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8784",
+        "roepnummer_interregionaal": "178784",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8785",
+        "roepnummer_interregionaal": "178785",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8791",
+        "roepnummer_interregionaal": "178791",
+        "post": "RPA / DHMR / HBR",
+        "type": "DA-ODH",
+        "functie": "RPA-OD 1"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8792",
+        "roepnummer_interregionaal": "178792",
+        "post": "RPA / DHMR / HBR",
+        "type": "DA-ODH",
+        "functie": "RPA-OD 2"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8793",
+        "roepnummer_interregionaal": "178793",
+        "post": "RPA / DHMR / HBR",
+        "type": "DA-ODH",
+        "functie": "RPA-OD 3"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8794",
+        "roepnummer_interregionaal": "178794",
+        "post": "RPA / DHMR / HBR",
+        "type": "DA-HOH",
+        "functie": "RPA-HO 1"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8795",
+        "roepnummer_interregionaal": "178795",
+        "post": "RPA / DHMR / HBR",
+        "type": "DA-HOH",
+        "functie": "RPA-HO 2"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8796",
+        "roepnummer_interregionaal": "178796",
+        "post": "RPA / DHMR / HBR",
+        "type": "DA-CDH",
+        "functie": "RPA-CD"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8797",
+        "roepnummer_interregionaal": "178797",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8798",
+        "roepnummer_interregionaal": "178798",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8799",
+        "roepnummer_interregionaal": "178799",
+        "post": "RPA / DHMR / HBR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8890",
+        "roepnummer_interregionaal": "178890",
+        "post": "ProRail"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8891",
+        "roepnummer_interregionaal": "178891",
+        "post": "ProRail",
+        "functie": "ProRail-OVD"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8892",
+        "roepnummer_interregionaal": "178892",
+        "post": "ProRail",
+        "functie": "ProRail-OVD"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8893",
+        "roepnummer_interregionaal": "178893",
+        "post": "ProRail",
+        "functie": "ProRail-OVD"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8894",
+        "roepnummer_interregionaal": "178894",
+        "post": "ProRail",
+        "functie": "ProRail-OVD"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8895",
+        "roepnummer_interregionaal": "178895",
+        "post": "ProRail",
+        "functie": "ProRail-OVD"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8896",
+        "roepnummer_interregionaal": "178896",
+        "post": "Rijkswaterstaat",
+        "functie": "RWS-OVD"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8897",
+        "roepnummer_interregionaal": "178897",
+        "post": "Rijkswaterstaat",
+        "functie": "RWS-OVD"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8898",
+        "roepnummer_interregionaal": "178898",
+        "post": "ProRail"
+      },
+      "kazerne_id": "kazerne-052",
+      "kazerne_naam": "ProRail Incidentenbestrijding",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8931",
+        "roepnummer_interregionaal": "178931",
+        "post": "Rotterdam-The Hague Airport",
+        "type": "TS",
+        "functie": "ROL-OSC (voorheen AFO)"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8961",
+        "roepnummer_interregionaal": "178961",
+        "post": "Rotterdam-The Hague Airport",
+        "type": "CT"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8962",
+        "roepnummer_interregionaal": "178962",
+        "post": "Rotterdam-The Hague Airport",
+        "type": "CT"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8963",
+        "roepnummer_interregionaal": "178963",
+        "post": "Rotterdam-The Hague Airport",
+        "type": "CT"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8981",
+        "roepnummer_interregionaal": "178981",
+        "post": "Rotterdam-The Hague Airport",
+        "type": "?"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8991",
+        "roepnummer_interregionaal": "178991",
+        "post": "Rotterdam-The Hague Airport"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-8992",
+        "roepnummer_interregionaal": "178992",
+        "post": "Rotterdam-The Hague Airport",
+        "type": "VP",
+        "functie": "Kazerne / Vaste Post (Portofoon of mob)"
+      },
+      "kazerne_id": "kazerne-053",
+      "kazerne_naam": "Rotterdam The Hague Airport",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9001",
+        "roepnummer_interregionaal": "179001",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9002",
+        "roepnummer_interregionaal": "179002",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB",
+        "functie": "Stage Auto Preventie Piket alleen deze rollen!!"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9003",
+        "roepnummer_interregionaal": "179003",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9004",
+        "roepnummer_interregionaal": "179004",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9005",
+        "roepnummer_interregionaal": "179005",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9006",
+        "roepnummer_interregionaal": "179006",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9007",
+        "roepnummer_interregionaal": "179007",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9008",
+        "roepnummer_interregionaal": "179008",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9009",
+        "roepnummer_interregionaal": "179009",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA / DB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9021",
+        "roepnummer_interregionaal": "179021",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA-AG"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9022",
+        "roepnummer_interregionaal": "179022",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA-AG"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9023",
+        "roepnummer_interregionaal": "179023",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA-AG"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9024",
+        "roepnummer_interregionaal": "179024",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA-AG"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9071",
+        "roepnummer_interregionaal": "179071",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "HS",
+        "functie": "Vlaardingen"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9072",
+        "roepnummer_interregionaal": "179072",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "HS",
+        "functie": "Frobenstraat"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9073",
+        "roepnummer_interregionaal": "179073",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "HS",
+        "functie": "Ridderkerk"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9074",
+        "roepnummer_interregionaal": "179074",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "HS",
+        "functie": "Albrandswaard"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9075",
+        "roepnummer_interregionaal": "179075",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "HS",
+        "functie": "Oostvoorne"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9081",
+        "roepnummer_interregionaal": "179081",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DB-TBO"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9082",
+        "roepnummer_interregionaal": "179082",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA-SBB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9083",
+        "roepnummer_interregionaal": "179083",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA-SBB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9084",
+        "roepnummer_interregionaal": "179084",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "BSA",
+        "functie": "Brandstof Aanhanger"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9085",
+        "roepnummer_interregionaal": "179085",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "VZA-WC",
+        "functie": "Verzorgingsaanhanger voor personeel bij inzet. Met WC's."
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9088",
+        "roepnummer_interregionaal": "179088",
+        "post": "Rotterdam-Rijnmond Regio",
+        "functie": "Reservering DroneTeam"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9089",
+        "roepnummer_interregionaal": "179089",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA",
+        "functie": "HA tbv MIRG bak 17-9289"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9090",
+        "roepnummer_interregionaal": "179090",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "functie": "HIN-B Reservering"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9091",
+        "roepnummer_interregionaal": "179091",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "functie": "Hoofdofficier 1"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9092",
+        "roepnummer_interregionaal": "179092",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "functie": "Hoofdofficier 2"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9093",
+        "roepnummer_interregionaal": "179093",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "functie": "Hoofdofficier Stage // Reserve"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9094",
+        "roepnummer_interregionaal": "179094",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "functie": "Tactisch Officier Alarmcentrale"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9095",
+        "roepnummer_interregionaal": "179095",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9096",
+        "roepnummer_interregionaal": "179096",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9097",
+        "roepnummer_interregionaal": "179097",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "DA",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9098",
+        "roepnummer_interregionaal": "179098",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "PC-LOG"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9099",
+        "roepnummer_interregionaal": "179099",
+        "post": "Rotterdam-Rijnmond Leiding & Coördinatie",
+        "type": "TL-TDV",
+        "functie": "Coördinator Team Digitale Verkenning"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9101",
+        "roepnummer_interregionaal": "179101",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB",
+        "functie": "Preventie Piket"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9102",
+        "roepnummer_interregionaal": "179102",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9103",
+        "roepnummer_interregionaal": "179103",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9104",
+        "roepnummer_interregionaal": "179104",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9105",
+        "roepnummer_interregionaal": "179105",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9106",
+        "roepnummer_interregionaal": "179106",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9107",
+        "roepnummer_interregionaal": "179107",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9108",
+        "roepnummer_interregionaal": "179108",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9109",
+        "roepnummer_interregionaal": "179109",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA / DB"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9100",
+        "roepnummer_interregionaal": "179100",
+        "post": "Rotterdam-Rijnmond Regio",
+        "functie": "Beheerder C2000"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9160",
+        "roepnummer_interregionaal": "179160",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "SI??"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9161",
+        "roepnummer_interregionaal": "179161",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9162",
+        "roepnummer_interregionaal": "179162",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9163",
+        "roepnummer_interregionaal": "179163",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9164",
+        "roepnummer_interregionaal": "179164",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9165",
+        "roepnummer_interregionaal": "179165",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9166",
+        "roepnummer_interregionaal": "179166",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9167",
+        "roepnummer_interregionaal": "179167",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9168",
+        "roepnummer_interregionaal": "179168",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DPH"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9169",
+        "roepnummer_interregionaal": "179169",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "BM-BBM",
+        "functie": "Hoogbouwprocedure ondersteunende eenheid"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9171",
+        "roepnummer_interregionaal": "179171",
+        "post": "Rotterdam-Rijnmond Regio",
+        "functie": "Verlichting??"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9173",
+        "roepnummer_interregionaal": "179173",
+        "post": "Spoorslootoverbrugging // ROL-SOB",
+        "functie": "Spoorslootoverbrugging // ROL-SOB"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9180",
+        "roepnummer_interregionaal": "179180",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9181",
+        "roepnummer_interregionaal": "179181",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9182",
+        "roepnummer_interregionaal": "179182",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9183",
+        "roepnummer_interregionaal": "179183",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9184",
+        "roepnummer_interregionaal": "179184",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "KR"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9185",
+        "roepnummer_interregionaal": "179185",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9186",
+        "roepnummer_interregionaal": "179186",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9187",
+        "roepnummer_interregionaal": "179187",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9188",
+        "roepnummer_interregionaal": "179188",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "KR"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9189",
+        "roepnummer_interregionaal": "179189",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "HA"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9191",
+        "roepnummer_interregionaal": "179191",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9192",
+        "roepnummer_interregionaal": "179192",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9193",
+        "roepnummer_interregionaal": "179193",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9194",
+        "roepnummer_interregionaal": "179194",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9195",
+        "roepnummer_interregionaal": "179195",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9196",
+        "roepnummer_interregionaal": "179196",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9197",
+        "roepnummer_interregionaal": "179197",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9198",
+        "roepnummer_interregionaal": "179198",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9199",
+        "roepnummer_interregionaal": "179199",
+        "post": "Rotterdam-Rijnmond Regio",
+        "type": "DA-OD",
+        "functie": "evenementen OD"
+      },
+      "kazerne_id": "kazerne-055",
+      "kazerne_naam": "Regionaal",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9201",
+        "roepnummer_interregionaal": "179201",
+        "post": "Rotterdam-Rijnmond Logistiek"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9202",
+        "roepnummer_interregionaal": "179202",
+        "post": "Rotterdam-Rijnmond Logistiek"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9203",
+        "roepnummer_interregionaal": "179203",
+        "post": "Rotterdam-Rijnmond Logistiek"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9204",
+        "roepnummer_interregionaal": "179204",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "functie": "Reserve Piket"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9205",
+        "roepnummer_interregionaal": "179205",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "functie": "Reserve Piket"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9231",
+        "roepnummer_interregionaal": "179231",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "TS"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9232",
+        "roepnummer_interregionaal": "179232",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "TS"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9233",
+        "roepnummer_interregionaal": "179233",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "TS"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9234",
+        "roepnummer_interregionaal": "179234",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "TS"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9235",
+        "roepnummer_interregionaal": "179235",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "TS"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9236",
+        "roepnummer_interregionaal": "179236",
+        "post": "Rotterdam-Rijnmond Logistiek"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9237",
+        "roepnummer_interregionaal": "179237",
+        "post": "Rotterdam-Rijnmond Logistiek"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9251",
+        "roepnummer_interregionaal": "179251",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "RV"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9261",
+        "roepnummer_interregionaal": "179261",
+        "post": "Rotterdam-Rijnmond Logistiek"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9262",
+        "roepnummer_interregionaal": "179262",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "SLH"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9263",
+        "roepnummer_interregionaal": "179263",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "SLH"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9281",
+        "roepnummer_interregionaal": "179281",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "KR",
+        "functie": "HA-KR"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9282",
+        "roepnummer_interregionaal": "179282",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "KR",
+        "functie": "HA"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9283",
+        "roepnummer_interregionaal": "179283",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "HA-KR"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9284",
+        "roepnummer_interregionaal": "179284",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "ABH"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9285",
+        "roepnummer_interregionaal": "179285",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "ABH"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9286",
+        "roepnummer_interregionaal": "179286",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "VZH"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9287",
+        "roepnummer_interregionaal": "179287",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "VZH",
+        "functie": "Totall Los"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9288",
+        "roepnummer_interregionaal": "179288",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "BBH",
+        "functie": "VBK Mirg Cont"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9289",
+        "roepnummer_interregionaal": "179289",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "BBH",
+        "functie": "Reserve container MIRG"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9280",
+        "roepnummer_interregionaal": "179280",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "VWH",
+        "functie": "Aggregaat/MOR op platte bak (vast gedemonteerd)"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9291",
+        "roepnummer_interregionaal": "179291",
+        "post": "Rotterdam-Rijnmond Logistiek",
+        "type": "VP",
+        "functie": "Vaste Post (Driemansteeweg)"
+      },
+      "kazerne_id": "kazerne-056",
+      "kazerne_naam": "Logistiek",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9311",
+        "roepnummer_interregionaal": "179311",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "WO",
+        "functie": "Reserve WO"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9312",
+        "roepnummer_interregionaal": "179312",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "WOV",
+        "functie": "Reserve WOV"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9313",
+        "roepnummer_interregionaal": "179313",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "WO/duik"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9321",
+        "roepnummer_interregionaal": "179321",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "OGS,LEKKAGE TANK"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9322",
+        "roepnummer_interregionaal": "179322",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "OGS, LEIDINGSTR/2kl tank"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9331",
+        "roepnummer_interregionaal": "179331",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "TS",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9332",
+        "roepnummer_interregionaal": "179332",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "TS",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9333",
+        "roepnummer_interregionaal": "179333",
+        "post": "TS VBK",
+        "type": "TS",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9334",
+        "roepnummer_interregionaal": "179334",
+        "post": "TS VBK",
+        "type": "TS",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9335",
+        "roepnummer_interregionaal": "179335",
+        "post": "TS VBK",
+        "type": "TS",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9336",
+        "roepnummer_interregionaal": "179336",
+        "post": "TS VBK",
+        "type": "TS",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9337",
+        "roepnummer_interregionaal": "179337",
+        "post": "TS VBK Rijtraining dubbele voetbediening",
+        "type": "TS-OO",
+        "functie": "TS VBK Rijtraining dubbele voetbediening"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9338",
+        "roepnummer_interregionaal": "179338",
+        "post": "TS VBK / nog niet actief",
+        "type": "TS-OO",
+        "functie": "TS VBK / nog niet actief"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9339",
+        "roepnummer_interregionaal": "179339",
+        "post": "TS VBK",
+        "type": "TS-OO",
+        "functie": "TS VBK"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9372",
+        "roepnummer_interregionaal": "179372",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "THV"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9373",
+        "roepnummer_interregionaal": "179373",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "THV"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9374",
+        "roepnummer_interregionaal": "179374",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "platte/bak zijkleppen"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9375",
+        "roepnummer_interregionaal": "179375",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "95-1/ DICHT/leeg"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9376",
+        "roepnummer_interregionaal": "179376",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "HOOG"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9377",
+        "roepnummer_interregionaal": "179377",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "blauw/chassis/lier"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9378",
+        "roepnummer_interregionaal": "179378",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "25KV/SPOOR"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9379",
+        "roepnummer_interregionaal": "179378",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "WVS"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9380",
+        "roepnummer_interregionaal": "179380",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "container",
+        "functie": "verzorging/unit"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9381",
+        "roepnummer_interregionaal": "179381",
+        "post": "DV VBK Rijtraining VRR",
+        "type": "DA-OO",
+        "functie": "DV VBK Rijtraining VRR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9382",
+        "roepnummer_interregionaal": "179382",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "platte/bak"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9383",
+        "roepnummer_interregionaal": "179383",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "DICHT/vloer labyrint T114 (HVH)"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9384",
+        "roepnummer_interregionaal": "179384",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "BRAND"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9385",
+        "roepnummer_interregionaal": "179385",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "VBTC"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9386",
+        "roepnummer_interregionaal": "179386",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "zonnepaneel"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9387",
+        "roepnummer_interregionaal": "179387",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "container",
+        "functie": "Basis VBK"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9388",
+        "roepnummer_interregionaal": "179388",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "Container",
+        "functie": "MIRG"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9389",
+        "roepnummer_interregionaal": "179389",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DA-OO",
+        "functie": "DV VBK Rijtraining VRR"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9391",
+        "roepnummer_interregionaal": "179391",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9392",
+        "roepnummer_interregionaal": "179392",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9393",
+        "roepnummer_interregionaal": "179393",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9394",
+        "roepnummer_interregionaal": "179394",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9395",
+        "roepnummer_interregionaal": "179395",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9396",
+        "roepnummer_interregionaal": "179396",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9397",
+        "roepnummer_interregionaal": "179397",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "DV-OD",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9398",
+        "roepnummer_interregionaal": "179398",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "PC-LOG",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9399",
+        "roepnummer_interregionaal": "179399",
+        "post": "Rotterdam-Rijnmond Vakbekwaamheid",
+        "type": "PC-LOG",
+        "functie": "LET- op geen voertuig alleen Porto"
+      },
+      "kazerne_id": "kazerne-057",
+      "kazerne_naam": "Vakbekwaamheid",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "CO-C/PLI",
+        "roepnummer_interregionaal": "CO-C/PLI",
+        "post": "Reserve ZHZ / RR"
+      },
+      "kazerne_id": null,
+      "kazerne_naam": null,
+      "match_type": "geen_match"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9900",
+        "roepnummer_interregionaal": "179900",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "Reserve Dienst auto crisis beheersing"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9901",
+        "roepnummer_interregionaal": "179901",
+        "post": "Gemeenschappelijke Meldkamer",
+        "type": "DA",
+        "functie": "Piketcentralist"
+      },
+      "kazerne_id": "kazerne-059",
+      "kazerne_naam": "Gemeenschappelijke Meldkamer",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9901",
+        "roepnummer_interregionaal": "179901",
+        "post": "Gemeenschappelijke Meldkamer",
+        "type": "DA",
+        "functie": "Piketcentralist"
+      },
+      "kazerne_id": "kazerne-059",
+      "kazerne_naam": "Gemeenschappelijke Meldkamer",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9902",
+        "roepnummer_interregionaal": "179902",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "Dienst auto crisis beheersing"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9903",
+        "roepnummer_interregionaal": "179903",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "ReservePiket NS-593-Z OI"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9904",
+        "roepnummer_interregionaal": "179904",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "Reserve Piket PT-751-K OI"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9905",
+        "roepnummer_interregionaal": "179905",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "Reserve Piket GRJ-15-V"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9906",
+        "roepnummer_interregionaal": "179906",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "Reserve Piket GTL-56-X"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9909",
+        "roepnummer_interregionaal": "179909",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "DA",
+        "functie": "Reserve Dienst auto crisis beheersing"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9981",
+        "roepnummer_interregionaal": "179981",
+        "post": "Rotterdam-Rijnmond Multi"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9982",
+        "roepnummer_interregionaal": "179982",
+        "post": "Rotterdam-Rijnmond Multi"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9983",
+        "roepnummer_interregionaal": "179983",
+        "post": "Gemeenschappelijke Meldkamer"
+      },
+      "kazerne_id": "kazerne-059",
+      "kazerne_naam": "Gemeenschappelijke Meldkamer",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9984",
+        "roepnummer_interregionaal": "179984",
+        "post": "Gemeenschappelijke Meldkamer",
+        "type": "DA",
+        "functie": "MAC"
+      },
+      "kazerne_id": "kazerne-059",
+      "kazerne_naam": "Gemeenschappelijke Meldkamer",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9991",
+        "roepnummer_interregionaal": "179991",
+        "post": "Rotterdam-Rijnmond Multi",
+        "functie": "Leider Copi"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9992",
+        "roepnummer_interregionaal": "179992",
+        "post": "Rotterdam-Rijnmond Multi",
+        "functie": "Regionaal Operationeel Leider"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9993",
+        "roepnummer_interregionaal": "179993",
+        "post": "Rotterdam-Rijnmond Multi",
+        "functie": "Informatiemanager CoPI"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9994",
+        "roepnummer_interregionaal": "179994",
+        "post": "Rotterdam-Rijnmond Multi",
+        "functie": "Informatiemanager ROT"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9995",
+        "roepnummer_interregionaal": "179995",
+        "post": "Rotterdam-Rijnmond Multi",
+        "functie": "Geo Informatie Medewerker (Plotter ROT)"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9996",
+        "roepnummer_interregionaal": "179996",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "MCU"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9997",
+        "roepnummer_interregionaal": "179997",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "VC"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9998",
+        "roepnummer_interregionaal": "179998",
+        "post": "Rotterdam-Rijnmond Multi",
+        "type": "VC"
+      },
+      "kazerne_id": "kazerne-058",
+      "kazerne_naam": "Multidisciplinair",
+      "match_type": "postnaam"
+    },
+    {
+      "voertuig": {
+        "roepnummer": "17-9999",
+        "roepnummer_interregionaal": "179999",
+        "post": "Gemeenschappelijke Meldkamer",
+        "type": "CaCo"
+      },
+      "kazerne_id": "kazerne-059",
+      "kazerne_naam": "Gemeenschappelijke Meldkamer",
+      "match_type": "postnaam"
+    }
+  ],
+  "unmatched_posts": [
+    "Assistent vrijwillige Posten",
+    "Reservering",
+    "SW",
+    "RB",
+    "Capelle a/d IJssel",
+    "Krimpen a/d IJssel",
+    "GB - Maximaweg",
+    "GB - Coloradoweg",
+    "GB - Elbeweg",
+    "GB - Hoofdkantoor",
+    "GB - Rozenburg",
+    "GB - Moezelweg Hoofdkantoor",
+    "VRR - Advies Gevaarlijke Stoffen",
+    "BP Raffinaderij Rotterdam-Europoort",
+    "GB - Merseyweg",
+    "GB - Botlekweg",
+    "Drone",
+    "GB - Butaanweg",
+    "GB - Hoogvliet",
+    "Stad a/h Haringvliet",
+    "RPA / DHMR / HBR",
+    "Rijkswaterstaat",
+    "Rotterdam-Rijnmond Leiding & Coördinatie",
+    "Spoorslootoverbrugging // ROL-SOB",
+    "TS VBK",
+    "TS VBK Rijtraining dubbele voetbediening",
+    "TS VBK / nog niet actief",
+    "DV VBK Rijtraining VRR",
+    "Reserve ZHZ / RR"
+  ]
+}

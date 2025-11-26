@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { db, pool } from "./db";
+
 import { 
   incidents, 
   insertIncidentSchema, 
@@ -16,12 +17,202 @@ import {
   updateBasisteamSchema,
   emergencyCalls,
   insertEmergencyCallSchema,
-  emergencyTemplates
-} from "@shared/schema";
+  emergencyTemplates,
+  kazernes,
+  insertKazerneSchema,
+  updateKazerneSchema,
+  voertuigen
+} from "../shared/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import openaiRoutes from "./openai-routes";
+import pdokRoutes from "./routes/pdok-routes";
+
+// Mock voertuigen functie verwijderd - nu gebruiken we alleen echte BRW eenheden
 
 export async function registerRoutes(app: Express): Promise<Server> {
+
+  // Geocode alle kazernes op basis van adres en sla op
+  // MOET vroeg worden geregistreerd om te voorkomen dat andere routes deze onderscheppen
+  app.post("/api/kazernes/geocode-all", async (req, res) => {
+    console.log('📡 POST /api/kazernes/geocode-all aangeroepen');
+    
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const filePath = path.join(process.cwd(), 'attached_assets', '63_kazernes_complete.json');
+      console.log(`📂 Bestandspad: ${filePath}`);
+      
+      if (!fs.existsSync(filePath)) {
+        console.error(`❌ Bestand niet gevonden: ${filePath}`);
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Kazernes JSON bestand niet gevonden',
+          path: filePath
+        });
+      }
+
+      // Laad kazernes
+      console.log('📖 Laden kazernes uit JSON bestand...');
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const kazernes = JSON.parse(fileContent);
+      
+      console.log(`✅ ${kazernes.length} kazernes geladen`);
+      console.log(`🔄 Start geocoding van ${kazernes.length} kazernes op basis van adres...`);
+
+      // Helper functies voor geocoding
+      async function geocodeNominatim(adres: string): Promise<{ lat: number; lng: number } | null> {
+        try {
+          const query = `${adres}, Nederland`;
+          const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=nl&addressdetails=1`;
+          
+          const response = await fetch(url, {
+            headers: {
+              'User-Agent': 'MeldkamerSimulator/1.0',
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (!response.ok) return null;
+          
+          const data = await response.json();
+          if (data && data.length > 0) {
+            const result = data[0];
+            const lat = parseFloat(result.lat);
+            const lng = parseFloat(result.lon);
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+              return { lat, lng };
+            }
+          }
+          return null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      async function geocodePDOK(adres: string): Promise<{ lat: number; lng: number } | null> {
+        try {
+          const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(adres)}&rows=5`;
+          const res = await fetch(url, { headers: { Accept: 'application/json' } });
+          if (!res.ok) return null;
+          
+          const json = await res.json();
+          const docs = json?.response?.docs ?? [];
+          if (!docs.length) return null;
+
+          const doc = docs.find((d: any) => d.type === 'adres') ??
+                      docs.find((d: any) => d.type === 'verblijfsobject') ??
+                      docs[0];
+          if (!doc) return null;
+
+          if (doc.centroide_ll) {
+            const match = doc.centroide_ll.match(/POINT\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/i);
+            if (match) {
+              const lon = parseFloat(match[1]);
+              const lat = parseFloat(match[2]);
+              if (Number.isFinite(lat) && Number.isFinite(lon)) {
+                return { lat, lng: lon };
+              }
+            }
+          }
+          return null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      async function geocodeAdres(adres: string): Promise<{ lat: number; lng: number; bron: string } | null> {
+        const nominatimResult = await geocodeNominatim(adres);
+        if (nominatimResult) {
+          return { ...nominatimResult, bron: 'Nominatim' };
+        }
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const pdokResult = await geocodePDOK(adres);
+        if (pdokResult) {
+          return { ...pdokResult, bron: 'PDOK' };
+        }
+        return null;
+      }
+
+      function zijnGeldigeCoordinaten(lat: number, lng: number): boolean {
+        return (
+          Number.isFinite(lat) &&
+          Number.isFinite(lng) &&
+          lat >= 50 && lat <= 54 &&
+          lng >= 3 && lng <= 8 &&
+          lat !== 0 && lng !== 0
+        );
+      }
+
+      // Geocodeer alle kazernes
+      let successCount = 0;
+      let skipCount = 0;
+      let failCount = 0;
+      const updatedKazernes = [];
+
+      for (let i = 0; i < kazernes.length; i++) {
+        const kazerne = kazernes[i];
+        const adresString = `${kazerne.adres}, ${kazerne.postcode} ${kazerne.plaats}`;
+        
+        const result = await geocodeAdres(adresString);
+        
+        if (result && zijnGeldigeCoordinaten(result.lat, result.lng)) {
+          kazerne.latitude = result.lat.toString();
+          kazerne.longitude = result.lng.toString();
+          updatedKazernes.push(kazerne);
+          successCount++;
+        } else {
+          const existingLat = kazerne.latitude ? parseFloat(kazerne.latitude) : null;
+          const existingLng = kazerne.longitude ? parseFloat(kazerne.longitude) : null;
+          
+          if (existingLat !== null && existingLng !== null && zijnGeldigeCoordinaten(existingLat, existingLng)) {
+            updatedKazernes.push(kazerne);
+            skipCount++;
+          } else {
+            failCount++;
+          }
+        }
+        
+        // Rate limiting
+        if (i < kazernes.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // Maak backup
+      const backupPath = filePath.replace('.json', `_backup_${Date.now()}.json`);
+      fs.writeFileSync(backupPath, fileContent);
+      
+      // Sla bijgewerkte kazernes op
+      fs.writeFileSync(filePath, JSON.stringify(updatedKazernes, null, 2), 'utf8');
+      
+      console.log(`✅ Geocoding voltooid: ${successCount} succesvol, ${skipCount} behouden, ${failCount} mislukt`);
+
+      res.setHeader('Content-Type', 'application/json');
+      res.json({
+        success: true,
+        message: 'Geocoding voltooid',
+        stats: {
+          total: kazernes.length,
+          success: successCount,
+          skipped: skipCount,
+          failed: failCount,
+          updated: updatedKazernes.length
+        },
+        backupPath: backupPath
+      });
+    } catch (error: any) {
+      console.error('❌ Error geocoding kazernes:', error);
+      console.error('❌ Error stack:', error.stack);
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'Fout bij geocoding kazernes',
+        details: error.stack
+      });
+    }
+  });
 
   // Load LMC classifications from JSON file
   app.get("/api/lmc-classifications", (req, res) => {
@@ -39,6 +230,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   // OpenAI routes
   app.use('/api/openai', openaiRoutes);
+
+  // PDOK API routes
+  app.use('/api/pdok', pdokRoutes);
 
   // Health check
   app.get("/api/health", (req, res) => {
@@ -252,11 +446,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transformedData = {
         features: (data.response?.docs || []).map((doc: any) => {
           // Parse coordinates from centroide_ll if available
+          // PDOK returns: "POINT(lat lon)" string format
           let coordinates = null;
           if (doc.centroide_ll) {
-            const coords = doc.centroide_ll.split(',');
-            if (coords.length === 2) {
-              coordinates = [parseFloat(coords[1]), parseFloat(coords[0])]; // [lat, lon]
+            // Remove "POINT(" and ")" if present, then split
+            const coordString = doc.centroide_ll.replace(/POINT\(|\)/g, '');
+            const coords = coordString.split(/[\s,]+/); // Split on space or comma
+            
+            if (coords.length >= 2) {
+              // PDOK format is "lat lon" but GeoJSON standard is [lon, lat]
+              const lat = parseFloat(coords[0]);
+              const lon = parseFloat(coords[1]);
+              coordinates = [lon, lat]; // [longitude, latitude] - GeoJSON standard
+              
+              console.log(`[PDOK] Parsed coordinates for ${doc.weergavenaam}: [${lon}, ${lat}]`);
             }
           }
 
@@ -272,7 +475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               plaatsnaam: doc.woonplaatsnaam,
               gemeentenaam: doc.gemeentenaam,
               provincienaam: doc.provincienaam,
-              coordinates: coordinates,
+              coordinates: coordinates, // [lon, lat] - GeoJSON standard
               score: doc.score
             }
           };
@@ -286,8 +489,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test endpoint for PDOK Locatieserver debugging
+  // Test endpoint for PDOK Locatieserver debugging - raw response
   app.get('/api/bag/test', async (req, res) => {
+    try {
+      const testQuery = 'Rotterdam Kleiweg 12';
+      const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(testQuery)}&rows=1&fq=type:adres&fl=*`;
+      
+      console.log(`[PDOK Test] Fetching: ${url}`);
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      res.json({
+        query: testQuery,
+        raw_response: data,
+        first_doc: data.response?.docs?.[0],
+        centroide_ll: data.response?.docs?.[0]?.centroide_ll,
+        parsed_coordinates: (() => {
+          const doc = data.response?.docs?.[0];
+          if (doc?.centroide_ll) {
+            const coordString = doc.centroide_ll.replace(/POINT\(|\)/g, '');
+            const coords = coordString.split(/[\s,]+/);
+            if (coords.length >= 2) {
+              return {
+                raw: doc.centroide_ll,
+                split: coords,
+                lat: parseFloat(coords[0]),
+                lon: parseFloat(coords[1]),
+                geojson: [parseFloat(coords[1]), parseFloat(coords[0])] // [lon, lat]
+              };
+            }
+          }
+          return null;
+        })()
+      });
+    } catch (error) {
+      res.status(500).json({ error: String(error) });
+    }
+  });
+
+  // Original test endpoint
+  app.get('/api/bag/test-old', async (req, res) => {
     try {
       const testQuery = 'Rotterdam Kleiweg';
       const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(testQuery)}&rows=5&fq=type:adres&fl=id,weergavenaam,straatnaam,huisnummer,huisletter,huisnummertoevoeging,postcode,woonplaatsnaam,gemeentenaam,provincienaam,centroide_ll&sort=score desc`;
@@ -328,6 +570,213 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         status: 'fetch_error',
         error: error?.message || 'Unknown error'
+      });
+    }
+  });
+
+  // OSM Objects search endpoint
+  app.get('/api/osm/search', async (req, res) => {
+    try {
+      const query = String(req.query.q || '');
+      const limit = String(req.query.limit || '20');
+
+      if (!query) {
+        return res.status(400).json({ error: 'Query parameter q is required' });
+      }
+
+      console.log(`[OSM Search] Searching for objects: "${query}"`);
+
+      // Use Overpass API to search for public objects/amenities
+      const overpassQuery = `
+        [out:json][timeout:25];
+        (
+          node["amenity"~"${query}",i](area.searchArea);
+          way["amenity"~"${query}",i](area.searchArea);
+          relation["amenity"~"${query}",i](area.searchArea);
+          node["name"~"${query}",i]["amenity"](area.searchArea);
+          way["name"~"${query}",i]["amenity"](area.searchArea);
+          relation["name"~"${query}",i]["amenity"](area.searchArea);
+        );
+        out center;
+      `;
+
+      // Optimized single-strategy search for speed
+      const encodedQuery = encodeURIComponent(query);
+      
+      // Use the most effective single search strategy
+      const searchUrl = `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=${limit}&addressdetails=1&extratags=1&namedetails=1&countrycodes=nl&bounded=1&featuretype=amenity,shop,tourism`;
+      
+      console.log(`[OSM Search] Fast search: ${searchUrl}`);
+
+      let allResults = [];
+      
+      try {
+        const response = await fetch(searchUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'GMS2-Application/1.0',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`[OSM Search] Found ${data.length} results in ${Date.now() - Date.now()}ms`);
+          allResults = data;
+        }
+      } catch (error) {
+        console.error('[OSM Search] Search error:', error);
+      }
+
+      // If no results, try a broader search without country restriction
+      if (allResults.length === 0) {
+        console.log(`[OSM Search] Fallback to global search`);
+        
+        try {
+          const fallbackUrl = `https://nominatim.openstreetmap.org/search?q=${encodedQuery}&format=json&limit=${limit}&addressdetails=1&extratags=1&namedetails=1`;
+          const fallbackResponse = await fetch(fallbackUrl, {
+            headers: {
+              'Accept': 'application/json',
+              'User-Agent': 'GMS2-Application/1.0',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json();
+            console.log(`[OSM Search] Fallback found ${fallbackData.length} results`);
+            allResults = fallbackData;
+          }
+        } catch (error) {
+          console.error('[OSM Search] Fallback error:', error);
+        }
+      }
+
+      console.log(`[OSM Search] Total combined results: ${allResults.length}`);
+      const data = allResults;
+
+      // Transform Nominatim response to match expected format
+      const transformedData = {
+        features: data.map((item: any, index: number) => {
+          const coordinates = item.lat && item.lon ? [parseFloat(item.lon), parseFloat(item.lat)] : null;
+          
+          return {
+            id: `osm_${item.place_id || index}`,
+            weergavenaam: item.display_name || '',
+            naam: item.name || '',
+            type: item.type || '',
+            amenity: item.amenity || '',
+            category: item.category || '',
+            straatnaam: item.address?.road || '',
+            huisnummer: item.address?.house_number || '',
+            postcode: item.address?.postcode || '',
+            plaatsnaam: item.address?.city || item.address?.town || item.address?.village || '',
+            gemeente: item.address?.municipality || '',
+            provincie: item.address?.state || '',
+            coordinates: coordinates,
+            score: item.importance || 0,
+            volledigAdres: item.display_name || '',
+            wegType: 'object',
+            osm_type: item.osm_type,
+            osm_id: item.osm_id,
+            class: item.class,
+            extratags: item.extratags || {}
+          };
+        })
+      };
+
+      res.json(transformedData);
+
+    } catch (error: any) {
+      console.error('[OSM Search] Error:', error);
+      res.status(500).json({
+        error: error?.message || 'OSM search failed',
+        details: String(error)
+      });
+    }
+  });
+
+  // Routing endpoint for unit movement
+  app.get('/api/routing/route', async (req, res) => {
+    try {
+      const { start, end, profile = 'driving-car' } = req.query;
+      
+      if (!start || !end) {
+        return res.status(400).json({ error: 'Start and end coordinates are required' });
+      }
+
+      const startCoords = String(start).split(',').map(Number);
+      const endCoords = String(end).split(',').map(Number);
+
+      if (startCoords.length !== 2 || endCoords.length !== 2) {
+        return res.status(400).json({ error: 'Invalid coordinate format. Use: lat,lng' });
+      }
+
+      // Use OpenRouteService for routing (free tier available)
+      const apiKey = process.env.OPENROUTESERVICE_API_KEY || '5b3ce3597851110001cf6248b8b8b8b8b8b8b8b8';
+      const url = `https://api.openrouteservice.org/v2/directions/${profile}`;
+      
+      const requestBody = {
+        coordinates: [startCoords, endCoords],
+        format: 'geojson',
+        options: {
+          avoid_features: ['tollways'],
+          profile_params: {
+            weightings: {
+              green: 0.1,
+              quiet: 0.1
+            }
+          }
+        }
+      };
+
+      console.log(`[Routing] Getting route from ${startCoords} to ${endCoords}`);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Routing] API Error:', errorText);
+        return res.status(500).json({ 
+          error: 'Routing service failed',
+          details: errorText 
+        });
+      }
+
+      const routeData = await response.json();
+      
+      if (routeData.features && routeData.features.length > 0) {
+        const route = routeData.features[0];
+        const distance = route.properties.summary.distance; // in meters
+        const duration = route.properties.summary.duration; // in seconds
+        
+        // Calculate realistic travel time (add some variation)
+        const realisticDuration = duration * (0.8 + Math.random() * 0.4); // ±20% variation
+        
+        res.json({
+          route: route,
+          distance: distance,
+          duration: realisticDuration,
+          coordinates: route.geometry.coordinates,
+          instructions: route.properties.segments?.[0]?.steps || []
+        });
+      } else {
+        res.status(404).json({ error: 'No route found' });
+      }
+
+    } catch (error: any) {
+      console.error('[Routing] Error:', error);
+      res.status(500).json({
+        error: error?.message || 'Routing failed',
+        details: String(error)
       });
     }
   });
@@ -831,6 +1280,241 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Kazernes routes
+  app.get("/api/kazernes", async (req, res) => {
+    try {
+      // Laad de complete dataset met 63 kazernes als fallback
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        
+        const filePath = path.join(process.cwd(), 'attached_assets', '63_kazernes_complete.json');
+        
+        if (fs.existsSync(filePath)) {
+          const jsonData = fs.readFileSync(filePath, 'utf8');
+          const kazernes = JSON.parse(jsonData);
+          console.log(`✅ ${kazernes.length} kazernes geladen uit JSON bestand`);
+          return res.json(kazernes);
+        }
+      } catch (error) {
+        console.error('❌ Fout bij laden van 63 kazernes JSON:', error);
+      }
+      
+      // Fallback naar oude mock data
+      const mockKazernes = [
+        {
+          id: "kazerne-001",
+          naam: "Brandweerkazerne Maassluis",
+          adres: "Lange Boonestraat 12",
+          postcode: "3141 AA",
+          plaats: "Maassluis",
+          type: "Beroeps",
+          telefoonnummer: "010-5912345",
+          email: "maassluis@brandweer.nl",
+          capaciteit: 25,
+          actief: true,
+          latitude: "51.9208",
+          longitude: "4.2508",
+          regio: "Zuid-Holland",
+          opmerkingen: "Hoofdkazerne Maassluis"
+        },
+        {
+          id: "kazerne-002",
+          naam: "Brandweerkazerne Vlaardingen",
+          adres: "Wilhelminaplein 1",
+            postcode: "3132 AA",
+            plaats: "Vlaardingen",
+            type: "Beroeps",
+            telefoonnummer: "010-5912346",
+            email: "vlaardingen@brandweer.nl",
+            capaciteit: 30,
+            actief: true,
+            latitude: "51.9056",
+            longitude: "4.3292",
+            regio: "Zuid-Holland",
+            opmerkingen: "Hoofdkazerne Vlaardingen"
+          },
+          {
+            id: "kazerne-003",
+            naam: "Brandweerkazerne Schiedam",
+            adres: "Marktplein 15",
+            postcode: "3111 AA",
+            plaats: "Schiedam",
+            type: "Beroeps",
+            telefoonnummer: "010-5912347",
+            email: "schiedam@brandweer.nl",
+            capaciteit: 28,
+            actief: true,
+            latitude: "51.9194",
+            longitude: "4.3889",
+            regio: "Zuid-Holland",
+            opmerkingen: "Hoofdkazerne Schiedam"
+          },
+          {
+            id: "kazerne-004",
+            naam: "Brandweerkazerne Rotterdam Centrum",
+            adres: "Stationsplein 8",
+            postcode: "3013 AA",
+            plaats: "Rotterdam",
+            type: "Beroeps",
+            telefoonnummer: "010-5912348",
+            email: "rotterdam@brandweer.nl",
+            capaciteit: 50,
+            actief: true,
+            latitude: "51.9225",
+            longitude: "4.4792",
+            regio: "Zuid-Holland",
+            opmerkingen: "Hoofdkazerne Rotterdam"
+          },
+          {
+            id: "kazerne-005",
+            naam: "Brandweerkazerne Spijkenisse",
+            adres: "Parkweg 22",
+            postcode: "3201 AA",
+            plaats: "Spijkenisse",
+            type: "Vrijwilligers",
+            telefoonnummer: "010-5912349",
+            email: "spijkenisse@brandweer.nl",
+            capaciteit: 20,
+            actief: true,
+            latitude: "51.8450",
+            longitude: "4.3292",
+            regio: "Zuid-Holland",
+            opmerkingen: "Vrijwilligerskazerne"
+          }
+        ];
+
+      // Try to fetch from database using Drizzle
+      try {
+        const rows = await db.select().from(kazernes).orderBy(kazernes.naam);
+        res.json(rows);
+      } catch (dbError) {
+        console.error('Database error, using fallback:', dbError);
+        return res.json(mockKazernes);
+      }
+    } catch (error: any) {
+      console.error('Error fetching kazernes:', error);
+      console.error('Error details:', error.message);
+      res.status(500).json({ error: "Failed to fetch kazernes", details: error.message });
+    }
+  });
+
+  app.post("/api/kazernes", async (req, res) => {
+    try {
+      const kazerneData = insertKazerneSchema.parse(req.body);
+      const [newKazerne] = await db.insert(kazernes).values(kazerneData).returning();
+      res.status(201).json(newKazerne);
+    } catch (error) {
+      console.error('Error creating kazerne:', error);
+      res.status(500).json({ error: "Failed to create kazerne" });
+    }
+  });
+
+
+  app.get("/api/kazernes/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [kazerne] = await db.select().from(kazernes).where(eq(kazernes.id, id));
+      if (!kazerne) {
+        return res.status(404).json({ error: "Kazerne not found" });
+      }
+      res.json(kazerne);
+    } catch (error) {
+      console.error('Error fetching kazerne:', error);
+      res.status(500).json({ error: "Failed to fetch kazerne" });
+    }
+  });
+
+  app.put("/api/kazernes/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const kazerneData = updateKazerneSchema.parse(req.body);
+      const [updatedKazerne] = await db.update(kazernes)
+        .set({ ...kazerneData, updatedAt: new Date() })
+        .where(eq(kazernes.id, id))
+        .returning();
+
+      if (!updatedKazerne) {
+        return res.status(404).json({ error: "Kazerne not found" });
+      }
+      res.json(updatedKazerne);
+    } catch (error) {
+      console.error('Error updating kazerne:', error);
+      res.status(500).json({ error: "Failed to update kazerne" });
+    }
+  });
+
+  // Update kazerne coördinaten
+  app.patch("/api/kazernes/:id/coordinates", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { latitude, longitude } = req.body;
+
+      if (!latitude || !longitude) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Latitude en longitude zijn verplicht' 
+        });
+      }
+
+      const lat = parseFloat(latitude);
+      const lng = parseFloat(longitude);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Ongeldige coördinaten' 
+        });
+      }
+
+      // Valideer coördinaten (Nederland ligt tussen 50-54°N en 3-8°E)
+      if (lat < 50 || lat > 54 || lng < 3 || lng > 8) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Coördinaten liggen buiten Nederland' 
+        });
+      }
+
+      await db
+        .update(kazernes)
+        .set({
+          latitude: lat.toString(),
+          longitude: lng.toString(),
+          updated_at: sql`NOW()`
+        })
+        .where(eq(kazernes.id, id));
+
+      res.json({ 
+        success: true, 
+        message: 'Coördinaten bijgewerkt',
+        data: { id, latitude: lat, longitude: lng }
+      });
+    } catch (error: any) {
+      console.error('Error updating kazerne coordinates:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'Fout bij bijwerken coördinaten' 
+      });
+    }
+  });
+
+  app.delete("/api/kazernes/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [deletedKazerne] = await db.delete(kazernes)
+        .where(eq(kazernes.id, id))
+        .returning();
+
+      if (!deletedKazerne) {
+        return res.status(404).json({ error: "Kazerne not found" });
+      }
+      res.json({ message: "Kazerne deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting kazerne:', error);
+      res.status(500).json({ error: "Failed to delete kazerne" });
+    }
+  });
+
   // PDOK Bestuurlijke Gebieden WMS API
   app.get('/api/pdok/bestuurlijke-gebieden', async (req, res) => {
     try {
@@ -1064,6 +1748,274 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[PDOK WFS] Error fetching gemeente boundaries:', error);
       res.status(500).json({ error: 'Failed to fetch gemeente boundaries from PDOK WFS API' });
+    }
+  });
+
+  // PDOK Hydrografie – Netwerk WFS: GetCapabilities passthrough
+  app.get('/api/pdok/hydrografie/capabilities', async (_req, res) => {
+    try {
+      const baseUrls = [
+        'https://service.pdok.nl/kadaster/hy/wfs/v1_0',
+        'https://api.pdok.nl/kadaster/hy/wfs/v1_0'
+      ];
+
+      for (const baseUrl of baseUrls) {
+        try {
+          const url = `${baseUrl}?service=WFS&request=GetCapabilities`;
+          console.log(`[PDOK HY WFS] Trying capabilities: ${url}`);
+          const response = await fetch(url, {
+            headers: {
+              'User-Agent': 'GMS2-Application/1.0'
+            }
+          });
+
+          if (response.ok) {
+            const xml = await response.text();
+            res.set('Content-Type', 'application/xml');
+            return res.send(xml);
+          } else {
+            console.error(`[PDOK HY WFS] ${baseUrl} capabilities returned ${response.status}`);
+          }
+        } catch (err) {
+          console.error(`[PDOK HY WFS] Error with ${baseUrl}:`, err);
+        }
+      }
+
+      return res.status(500).json({ error: 'Failed to fetch PDOK Hydrografie WFS capabilities from any endpoint' });
+    } catch (error) {
+      console.error('[PDOK HY WFS] Error fetching capabilities:', error);
+      res.status(500).json({ error: 'Failed to fetch PDOK Hydrografie WFS capabilities' });
+    }
+  });
+
+  // PDOK Hydrografie – Netwerk WFS: generic GetFeature -> GeoJSON
+  // Example: /api/pdok/hydrografie/features?typeNames=hy:Network&bbox=3.2,50.7,7.3,53.7&srsName=EPSG:4326&count=1000
+  app.get('/api/pdok/hydrografie/features', async (req, res) => {
+    try {
+      const {
+        typeNames,
+        bbox,
+        srsName = 'EPSG:4326',
+        count = '1000',
+        filter,
+        cql_filter,
+      } = req.query as Record<string, string | undefined>;
+
+      if (!typeNames) {
+        return res.status(400).json({ error: "Missing required query parameter 'typeNames' (e.g. hy:Network)" });
+      }
+
+      // Try both api.pdok.nl and service.pdok.nl endpoints
+      const baseUrls = [
+        'https://service.pdok.nl/kadaster/hy/wfs/v1_0',
+        'https://api.pdok.nl/kadaster/hy/wfs/v1_0'
+      ];
+
+      const params = new URLSearchParams({
+        service: 'WFS',
+        version: '2.0.0',
+        request: 'GetFeature',
+        typeNames: String(typeNames),
+        outputFormat: 'application/json',
+        srsName: String(srsName),
+        count: String(count),
+      });
+
+      if (bbox) params.set('bbox', String(bbox));
+      if (filter) params.set('CQL_FILTER', String(filter));
+
+      let lastError: any = null;
+      let lastResponse: Response | null = null;
+
+      // Build bbox variants with CRS suffix, as some WFS 2.0 servers require it
+      const bboxValue = bbox ? String(bbox) : undefined;
+      const bboxVariants = bboxValue
+        ? [
+            bboxValue,
+            `${bboxValue},${srsName || 'EPSG:4326'}`,
+            `${bboxValue},urn:ogc:def:crs:EPSG::4326`
+          ]
+        : [undefined];
+
+      // Try each base URL with each bbox variant
+      for (const baseUrl of baseUrls) {
+        for (const bboxVariant of bboxVariants) {
+          const tryParams = new URLSearchParams(params);
+          if (bboxVariant) tryParams.set('bbox', bboxVariant);
+
+          const url = `${baseUrl}?${tryParams.toString()}`;
+          console.log(`[PDOK HY WFS] Trying GetFeature: ${url}`);
+
+          try {
+            const response = await fetch(url, {
+              headers: {
+                'User-Agent': 'GMS2-Application/1.0',
+                'Accept': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log(`[PDOK HY WFS] Success with ${baseUrl} (bbox ${bboxVariant || 'none'}), features=${data.features?.length || 0}`);
+              return res.json(data);
+            } else {
+              const errorText = await response.text();
+              console.error(`[PDOK HY WFS] ${baseUrl} returned ${response.status}: ${errorText.substring(0, 500)}`);
+              lastResponse = response;
+              lastError = { status: response.status, text: errorText };
+            }
+          } catch (err) {
+            console.error(`[PDOK HY WFS] Error with ${baseUrl}:`, err);
+            lastError = err;
+          }
+        }
+      }
+
+      // All endpoints failed
+      if (lastResponse) {
+        const errorText = lastError?.text || 'Unknown error';
+        return res.status(500).json({ 
+          error: `PDOK Hydrografie WFS returned status ${lastResponse.status}`,
+          details: errorText.substring(0, 500)
+        });
+      }
+
+      throw lastError || new Error('All PDOK endpoints failed');
+    } catch (error: any) {
+      console.error('[PDOK HY WFS] Error fetching features:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch features from PDOK Hydrografie WFS',
+        details: error.message || String(error)
+      });
+    }
+  });
+
+  // PDOK NWB Wegen WFS: GetCapabilities passthrough
+  app.get('/api/pdok/nwb-wegen/capabilities', async (_req, res) => {
+    try {
+      const baseUrls = [
+        'https://api.pdok.nl/lv/nwb-wegen/wfs/v1_0',
+        'https://service.pdok.nl/lv/nwb-wegen/wfs/v1_0'
+      ];
+
+      for (const baseUrl of baseUrls) {
+        try {
+          const url = `${baseUrl}?service=WFS&request=GetCapabilities`;
+          console.log(`[PDOK NWB WFS] Trying capabilities: ${url}`);
+          const response = await fetch(url, {
+            headers: {
+              'User-Agent': 'GMS2-Application/1.0',
+              'Accept': 'application/xml'
+            }
+          });
+
+          if (response.ok) {
+            const xml = await response.text();
+            res.set('Content-Type', 'application/xml');
+            return res.send(xml);
+          } else {
+            console.error(`[PDOK NWB WFS] ${baseUrl} capabilities returned ${response.status}`);
+          }
+        } catch (err) {
+          console.error(`[PDOK NWB WFS] Error with ${baseUrl}:`, err);
+        }
+      }
+
+      return res.status(500).json({ error: 'Failed to fetch PDOK NWB WFS capabilities from any endpoint' });
+    } catch (error) {
+      console.error('[PDOK NWB WFS] Error fetching capabilities:', error);
+      res.status(500).json({ error: 'Failed to fetch PDOK NWB WFS capabilities' });
+    }
+  });
+
+  // PDOK NWB Wegen WFS: generic GetFeature -> GeoJSON
+  // Example: /api/pdok/nwb-wegen/features?typeNames=nwb:Wegvakken&bbox=3.2,50.7,7.3,53.7&srsName=EPSG:4326&count=1000
+  app.get('/api/pdok/nwb-wegen/features', async (req, res) => {
+    try {
+      const {
+        typeNames,
+        bbox,
+        srsName = 'EPSG:4326',
+        count = '1000',
+        filter,
+      } = req.query as Record<string, string | undefined>;
+
+      if (!typeNames) {
+        return res.status(400).json({ error: 'Missing required query parameter: typeNames' });
+      }
+
+      const baseUrls = [
+        'https://api.pdok.nl/lv/nwb-wegen/wfs/v1_0',
+        'https://service.pdok.nl/lv/nwb-wegen/wfs/v1_0'
+      ];
+
+      const bboxVariants: Array<string | undefined> = [
+        bbox,
+        bbox ? `${bbox},${srsName}` : undefined,
+      ];
+
+      let lastResponse: Response | undefined;
+      let lastError: any;
+
+      for (const baseUrl of baseUrls) {
+        for (const bboxVariant of bboxVariants) {
+          try {
+            const params = new URLSearchParams({
+              service: 'WFS',
+              version: '2.0.0',
+              request: 'GetFeature',
+              typeNames: String(typeNames),
+              outputFormat: 'application/json',
+              srsName,
+              count: String(count),
+            });
+            if (bboxVariant) params.set('bbox', bboxVariant);
+            // Forward CQL filter as cql_filter for PDOK WFS servers (support both 'filter' and 'cql_filter' inputs)
+            const effectiveFilter = cql_filter || filter;
+            if (effectiveFilter) params.set('cql_filter', effectiveFilter);
+
+            const url = `${baseUrl}?${params.toString()}`;
+            console.log(`[PDOK NWB WFS] Trying GetFeature: ${url}`);
+
+            const response = await fetch(url, {
+              headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'GMS2-Application/1.0'
+              }
+            });
+            lastResponse = response as any;
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log(`[PDOK NWB WFS] Success with ${baseUrl} (bbox ${bboxVariant || 'none'}), features=${data.features?.length || 0}`);
+              return res.json(data);
+            } else {
+              const errorText = await response.text();
+              lastError = { text: errorText };
+              console.error(`[PDOK NWB WFS] ${baseUrl} returned ${response.status}: ${errorText.substring(0, 500)}`);
+            }
+          } catch (err) {
+            console.error(`[PDOK NWB WFS] Error with ${baseUrl}:`, err);
+            lastError = err;
+          }
+        }
+      }
+
+      if (lastResponse) {
+        const errorText = lastError?.text || 'Unknown error';
+        return res.status(500).json({
+          error: `PDOK NWB WFS returned status ${lastResponse.status}`,
+          details: errorText.substring(0, 500)
+        });
+      }
+
+      throw lastError || new Error('All PDOK NWB endpoints failed');
+    } catch (error: any) {
+      console.error('[PDOK NWB WFS] Error fetching features:', error);
+      res.status(500).json({
+        error: 'Failed to fetch features from PDOK NWB WFS',
+        details: error.message || String(error)
+      });
     }
   });
 
@@ -2124,6 +3076,404 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         status: 'fetch_error',
         error: error?.message || 'Unknown error'
+      });
+    }
+  });
+
+  // Voertuigen routes
+  app.get("/api/voertuigen", async (req, res) => {
+    try {
+      const rows = await db.select().from(voertuigen).orderBy(voertuigen.roepnummer);
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching voertuigen:', error);
+      res.status(500).json({ error: "Failed to fetch voertuigen" });
+    }
+  });
+
+  app.get("/api/voertuigen/kazerne/:kazerne_id", async (req, res) => {
+    try {
+      const { kazerne_id } = req.params;
+      const rows = await db.select()
+        .from(voertuigen)
+        .where(eq(voertuigen.kazerne_id, kazerne_id))
+        .orderBy(voertuigen.roepnummer);
+      res.json(rows);
+    } catch (error) {
+      console.error('Error fetching voertuigen for kazerne:', error);
+      res.status(500).json({ error: "Failed to fetch voertuigen" });
+    }
+  });
+
+  /**
+   * Normaliseer plaatsnamen voor matching
+   */
+  function normalizePlaatsnaam(naam: string): string {
+    return naam
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/^kazerne\s*/i, '')
+      .replace(/^gezamenlijke\s*brandweer\s*-\s*/i, '')
+      .replace(/\s+/g, '');
+  }
+
+  /**
+   * Parse BRW eenheden bestand (tab-gescheiden)
+   */
+  function parseBRWEenheden(text: string): any[] {
+    const lines = text.split(/\r?\n/);
+    const result: any[] = [];
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      
+      const cols = trimmed.split('\t');
+      if (cols.length < 2) continue;
+      
+      const roepnummer_interregionaal = cols[0]?.trim();
+      const roepnummer = cols[1]?.trim();
+      const post = cols[cols.length - 1]?.trim();
+      
+      if (!roepnummer && !roepnummer_interregionaal) continue;
+      if (!post) continue;
+      
+      const type = cols[2]?.trim() || '';
+      const functie = cols[3]?.trim() || '';
+      
+      result.push({
+        roepnummer: roepnummer || roepnummer_interregionaal,
+        roepnummer_interregionaal: roepnummer_interregionaal || roepnummer,
+        type: type,
+        functie: functie,
+        post: post
+      });
+    }
+    
+    return result;
+  }
+
+  /**
+   * Koppel BRW eenheden aan kazernes op basis van postnamen
+   */
+  function koppelBRWEenhedenAanKazernes(brwEenheden: any[], kazernes: any[]): Record<string, any[]> {
+    const voertuigenByKazerne: Record<string, any[]> = {};
+    
+    // Maak mapping tussen postnamen en kazerne IDs
+    const postnaamMapping = new Map<string, string>();
+    
+    for (const kazerne of kazernes) {
+      const plaatsGenormaliseerd = normalizePlaatsnaam(kazerne.plaats);
+      const naamGenormaliseerd = normalizePlaatsnaam(kazerne.naam);
+      
+      if (plaatsGenormaliseerd) {
+        postnaamMapping.set(plaatsGenormaliseerd, kazerne.id);
+      }
+      if (naamGenormaliseerd && naamGenormaliseerd !== plaatsGenormaliseerd) {
+        postnaamMapping.set(naamGenormaliseerd, kazerne.id);
+      }
+    }
+    
+    // Speciale mappings voor gevallen die niet direct matchen
+    const specialeMappings: Record<string, string> = {
+      'hoekvanholland': 'kazerne-001',
+      'maassluis': 'kazerne-002',
+      'vlaardingen': 'kazerne-003',
+      'schiedam': 'kazerne-004',
+      'frobenstraat': 'kazerne-005',
+      'baan': 'kazerne-006',
+      'berkelenrodenrijs': 'kazerne-007',
+      'bleiswijk': 'kazerne-008',
+      'bosland': 'kazerne-009',
+      'metaalhof': 'kazerne-010',
+      'capelleaandijssel': 'kazerne-011',
+      'capellea/dijssel': 'kazerne-011',
+      'capelleadijssel': 'kazerne-011',
+      'krimpenaandijssel': 'kazerne-012',
+      'krimpena/dijssel': 'kazerne-012',
+      'krimpenadijssel': 'kazerne-012',
+      'maximaweg': 'kazerne-013',
+      'gb-maximaweg': 'kazerne-013',
+      'gbmaximaweg': 'kazerne-013',
+      'coloradoweg': 'kazerne-014',
+      'gb-coloradoweg': 'kazerne-014',
+      'gbcoloradoweg': 'kazerne-014',
+      'elbeweg': 'kazerne-015',
+      'gb-elbeweg': 'kazerne-015',
+      'gbelbeweg': 'kazerne-015',
+      'hoofdkantoor': 'kazerne-016',
+      'gb-hoofdkantoor': 'kazerne-016',
+      'gbhoofdkantoor': 'kazerne-016',
+      'rozenburg': 'kazerne-017',
+      'gb-rozenburg': 'kazerne-017',
+      'gbrozenburg': 'kazerne-017',
+      'franshalsstraat': 'kazerne-018',
+      'merseyweg': 'kazerne-019',
+      'gb-merseyweg': 'kazerne-019',
+      'gbmerseyweg': 'kazerne-019',
+      'botlekweg': 'kazerne-020',
+      'gb-botlekweg': 'kazerne-020',
+      'gbbotlekweg': 'kazerne-020',
+      'butaanweg': 'kazerne-021',
+      'gb-butaanweg': 'kazerne-021',
+      'gbbutaanweg': 'kazerne-021',
+      'hoogvliet': 'kazerne-022',
+      'gb-hoogvliet': 'kazerne-022',
+      'gbhoogvliet': 'kazerne-022',
+      'rockanje': 'kazerne-023',
+      'oostvoorne': 'kazerne-024',
+      'hellevoetsluis': 'kazerne-025',
+      'brielle': 'kazerne-026',
+      'zwartewaal': 'kazerne-027',
+      'oudenhoorn': 'kazerne-028',
+      'heenvliet': 'kazerne-029',
+      'zuidland': 'kazerne-030',
+      'spijkenisse': 'kazerne-031',
+      'albrandswaard': 'kazerne-032',
+      'keijenburg': 'kazerne-033',
+      'mijnsherenlaan': 'kazerne-034',
+      'albertplesmanweg': 'kazerne-035',
+      'barendrecht': 'kazerne-036',
+      'groenetuin': 'kazerne-037',
+      'ridderkerk': 'kazerne-038',
+      'ouddorp': 'kazerne-039',
+      'goedereede': 'kazerne-040',
+      'stellendam': 'kazerne-041',
+      'melissant': 'kazerne-042',
+      'dirksland': 'kazerne-043',
+      'herkingen': 'kazerne-044',
+      'olympiaweg': 'kazerne-045',
+      'olympia': 'kazerne-045',
+      'nieuwetonge': 'kazerne-046',
+      'stadaanhetharingvliet': 'kazerne-047',
+      'stada/haringvliet': 'kazerne-047',
+      'stadaharingvliet': 'kazerne-047',
+      'oudetonge': 'kazerne-048',
+      'denbommel': 'kazerne-049',
+      'ooltgensplaat': 'kazerne-050',
+      // Cluster en andere speciale gevallen
+      'cluster': 'kazerne-054', // Cluster commandanten gaan naar Leiding
+      'rpa/dhmr/hbr': 'kazerne-055', // Regionaal
+      'rotterdamrijnmondleidingcoördinatie': 'kazerne-054',
+      'rotterdamrijnmondregio': 'kazerne-055',
+      'rotterdamrijnmondlogistiek': 'kazerne-056',
+      'rotterdamrijnmondvakbekwaamheid': 'kazerne-057',
+      'rotterdamrijnmondmulti': 'kazerne-058',
+      'moezelweghoofdkantoor': 'kazerne-016',
+      'gb-moezelweghoofdkantoor': 'kazerne-016',
+      'gbmoezelweghoofdkantoor': 'kazerne-016',
+      'schiedamboothuis': 'kazerne-004',
+      'bpraffinerijrotterdam-europoort': 'kazerne-021',
+      'bpraffinerijrotterdameuropoort': 'kazerne-021',
+      'vrr-adviesgevaarlijkestoffen': 'kazerne-055', // Regionaal
+      'vrradviesgevaarlijkestoffen': 'kazerne-055', // Regionaal
+      'rotterdamthehagueairport': 'kazerne-053',
+      'rotterdam-thehagueairport': 'kazerne-053',
+      'prorail': 'kazerne-052',
+      'rotterdamportauthority': 'kazerne-051',
+      'portauthority': 'kazerne-051',
+      'gemeenschappelijkemeldkamer': 'kazerne-059',
+      'meldkamer': 'kazerne-059',
+      'leiding': 'kazerne-054',
+      'regionaal': 'kazerne-055',
+      'logistiek': 'kazerne-056',
+      'vakbekwaamheid': 'kazerne-057',
+      'multidisciplinair': 'kazerne-058',
+      'transport': 'kazerne-060',
+      'dienstbussen': 'kazerne-060',
+      'specialistisch': 'kazerne-061',
+      'vakbekwaamheidunits': 'kazerne-061',
+    };
+    
+    for (const [key, value] of Object.entries(specialeMappings)) {
+      postnaamMapping.set(key, value);
+    }
+    
+    // Koppel voertuigen aan kazernes
+    let gekoppeld = 0;
+    let nietGekoppeld = 0;
+    
+    for (const voertuig of brwEenheden) {
+      const postGenormaliseerd = normalizePlaatsnaam(voertuig.post);
+      const kazerneId = postnaamMapping.get(postGenormaliseerd);
+      
+      if (kazerneId) {
+        if (!voertuigenByKazerne[kazerneId]) {
+          voertuigenByKazerne[kazerneId] = [];
+        }
+        
+        // Converteer naar voertuig formaat
+        voertuigenByKazerne[kazerneId].push({
+          roepnummer: voertuig.roepnummer,
+          roepnummer_interregionaal: voertuig.roepnummer_interregionaal,
+          type: voertuig.type || null,
+          functie: voertuig.functie || null,
+          bemanning: null,
+          typenummer_lrnp: null,
+          gms_omschrijving: voertuig.functie || null,
+          criteria: null,
+          opmerking: null,
+        });
+        
+        gekoppeld++;
+      } else {
+        nietGekoppeld++;
+        console.warn(`⚠️ Geen match voor voertuig ${voertuig.roepnummer} (post: ${voertuig.post})`);
+      }
+    }
+    
+    console.log(`📊 BRW eenheden koppeling: ${gekoppeld} gekoppeld, ${nietGekoppeld} niet gekoppeld`);
+    
+    return voertuigenByKazerne;
+  }
+
+  // Reset alle eenheden naar kazerne (client-side actie)
+  app.post("/api/units/reset-to-kazerne", async (req, res) => {
+    try {
+      // Dit endpoint geeft alleen een signaal - de daadwerkelijke reset gebeurt client-side
+      // omdat de posities in localStorage staan
+      res.json({ 
+        success: true, 
+        message: "Reset signaal verstuurd. Client moet resetAllUnitsToKazerne() aanroepen.",
+        action: "resetAllUnitsToKazerne"
+      });
+    } catch (error) {
+      console.error("Error in reset endpoint:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to trigger reset" 
+      });
+    }
+  });
+
+  app.get("/api/kazernes-with-voertuigen", async (req, res) => {
+    try {
+      // Laad de complete dataset met 63 kazernes
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        
+        const kazernesFilePath = path.join(process.cwd(), 'attached_assets', '63_kazernes_complete.json');
+        const brwFilePath = path.join(process.cwd(), 'client', 'public', 'data', 'BRW eenheden.json');
+        
+        if (fs.existsSync(kazernesFilePath)) {
+          const kazernesData = fs.readFileSync(kazernesFilePath, 'utf8');
+          const kazernes = JSON.parse(kazernesData);
+          
+          // Laad BRW eenheden als die bestaat
+          let voertuigenByKazerne: Record<string, any[]> = {};
+          
+          if (fs.existsSync(brwFilePath)) {
+            console.log('📖 Laden BRW eenheden...');
+            const brwText = fs.readFileSync(brwFilePath, 'utf8');
+            const brwEenheden = parseBRWEenheden(brwText);
+            console.log(`✅ ${brwEenheden.length} BRW eenheden geladen`);
+            
+            // Koppel BRW eenheden aan kazernes
+            voertuigenByKazerne = koppelBRWEenhedenAanKazernes(brwEenheden, kazernes);
+            
+            // Log voorbeelden van gekoppelde voertuigen
+            const totaalVoertuigen = Object.values(voertuigenByKazerne).reduce((sum, arr) => sum + arr.length, 0);
+            console.log(`📊 Totaal ${totaalVoertuigen} voertuigen gekoppeld aan ${Object.keys(voertuigenByKazerne).length} kazernes`);
+            
+            // Log voorbeelden
+            const voorbeelden = Object.entries(voertuigenByKazerne).slice(0, 3);
+            voorbeelden.forEach(([kazerneId, voertuigen]) => {
+              const kazerne = kazernes.find((k: any) => k.id === kazerneId);
+              console.log(`   ${kazerne?.naam || kazerneId}: ${voertuigen.length} voertuigen (bijv. ${voertuigen[0]?.roepnummer || 'geen'})`);
+            });
+          } else {
+            console.warn('⚠️ BRW eenheden bestand niet gevonden, geen voertuigen gekoppeld');
+            console.warn(`   Gezocht in: ${brwFilePath}`);
+          }
+          
+          // Voeg voertuigen toe aan elke kazerne
+          const kazernesWithVoertuigen = kazernes.map((kazerne: any) => ({
+            ...kazerne,
+            voertuigen: voertuigenByKazerne[kazerne.id] || []
+          }));
+          
+          // Log statistieken
+          const kazernesMetVoertuigen = kazernesWithVoertuigen.filter((k: any) => k.voertuigen && k.voertuigen.length > 0).length;
+          const totaalVoertuigen = kazernesWithVoertuigen.reduce((sum: number, k: any) => sum + (k.voertuigen?.length || 0), 0);
+          console.log(`✅ ${kazernesWithVoertuigen.length} kazernes geladen, ${kazernesMetVoertuigen} met voertuigen, totaal ${totaalVoertuigen} voertuigen`);
+          
+          return res.json(kazernesWithVoertuigen);
+        } else {
+          // JSON bestand bestaat niet, probeer database
+          console.log('⚠️ JSON bestand niet gevonden, probeer database...');
+          const kazernes = await db.select().from(kazernes).orderBy(kazernes.naam);
+          const voertuigen = await db.select().from(voertuigen).orderBy(voertuigen.roepnummer);
+          
+          console.log(`[API] Fetched ${kazernes.length} kazernes and ${voertuigen.length} voertuigen from database`);
+          
+          // Group voertuigen by kazerne_id
+          const voertuigenByKazerne: Record<string, any[]> = {};
+          voertuigen.forEach((v: any) => {
+            if (v.kazerne_id) {
+              if (!voertuigenByKazerne[v.kazerne_id]) {
+                voertuigenByKazerne[v.kazerne_id] = [];
+              }
+              voertuigenByKazerne[v.kazerne_id].push(v);
+            }
+          });
+          
+          console.log(`[API] Grouped into ${Object.keys(voertuigenByKazerne).length} kazernes with voertuigen`);
+          
+          // Combine kazernes with their voertuigen
+          const result = kazernes.map((k: any) => ({
+            ...k,
+            voertuigen: voertuigenByKazerne[k.id] || []
+          }));
+          
+          console.log(`[API] Returning ${result.length} kazernes with voertuigen from database`);
+          
+          return res.json(result);
+        }
+      } catch (error) {
+        console.error('❌ Fout bij laden van kazernes/BRW data:', error);
+        // Geen fallback meer - gebruik alleen echte data
+        return res.status(500).json({ 
+          error: "Kon kazernes niet laden. Zorg dat attached_assets/63_kazernes_complete.json bestaat.",
+          details: error instanceof Error ? error.message : "Onbekende fout"
+        });
+      }
+    } catch (error: any) {
+      console.error('Error fetching kazernes with voertuigen:', error);
+      console.error('Error details:', error.message);
+      res.status(500).json({ error: "Failed to fetch kazernes with voertuigen", details: error.message });
+    }
+  });
+
+  // Database Query Executor (for development/admin use)
+  app.post('/api/db/query', async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Query is required' });
+      }
+
+      console.log(`[DB Query] Executing: ${query.substring(0, 100)}...`);
+      
+      const result = await pool.query(query);
+      
+      console.log(`[DB Query] Success: ${result.rowCount} rows affected`);
+      
+      res.json({
+        success: true,
+        rows: result.rows,
+        rowCount: result.rowCount,
+        fields: result.fields?.map(f => ({ name: f.name, dataType: f.dataTypeID }))
+      });
+      
+    } catch (error: any) {
+      console.error('[DB Query] Error:', error);
+      res.status(500).json({ 
+        error: error.message,
+        detail: error.detail,
+        hint: error.hint
       });
     }
   });
